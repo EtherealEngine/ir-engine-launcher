@@ -1,6 +1,7 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
-import './App.css';
+import { Route, MemoryRouter as Router, Routes } from 'react-router-dom'
+
+import icon from '../../assets/icon.svg'
+import './App.css'
 
 const Hello = () => {
   return (
@@ -10,8 +11,8 @@ const Hello = () => {
       </div>
       <h1>xrengine-control-center</h1>
     </div>
-  );
-};
+  )
+}
 
 export default function App() {
   return (
@@ -20,5 +21,5 @@ export default function App() {
         <Route path="/" element={<Hello />} />
       </Routes>
     </Router>
-  );
+  )
 }

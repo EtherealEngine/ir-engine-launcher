@@ -1,26 +1,26 @@
 /**
  * Webpack config for production electron main process
  */
+import path from 'path'
+import TerserPlugin from 'terser-webpack-plugin'
+import webpack from 'webpack'
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
+import { merge } from 'webpack-merge'
 
-import path from 'path';
-import webpack from 'webpack';
-import { merge } from 'webpack-merge';
-import TerserPlugin from 'terser-webpack-plugin';
-import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
-import baseConfig from './webpack.config.base';
-import webpackPaths from './webpack.paths';
-import checkNodeEnv from '../scripts/check-node-env';
-import deleteSourceMaps from '../scripts/delete-source-maps';
+import checkNodeEnv from '../scripts/check-node-env'
+import deleteSourceMaps from '../scripts/delete-source-maps'
+import baseConfig from './webpack.config.base'
+import webpackPaths from './webpack.paths'
 
-checkNodeEnv('production');
-deleteSourceMaps();
+checkNodeEnv('production')
+deleteSourceMaps()
 
 const devtoolsConfig =
   process.env.DEBUG_PROD === 'true'
     ? {
-        devtool: 'source-map',
+        devtool: 'source-map'
       }
-    : {};
+    : {}
 
 const configuration: webpack.Configuration = {
   ...devtoolsConfig,
@@ -31,25 +31,25 @@ const configuration: webpack.Configuration = {
 
   entry: {
     main: path.join(webpackPaths.srcMainPath, 'main.ts'),
-    preload: path.join(webpackPaths.srcMainPath, 'preload.js'),
+    preload: path.join(webpackPaths.srcMainPath, 'preload.js')
   },
 
   output: {
     path: webpackPaths.distMainPath,
-    filename: '[name].js',
+    filename: '[name].js'
   },
 
   optimization: {
     minimizer: [
       new TerserPlugin({
-        parallel: true,
-      }),
-    ],
+        parallel: true
+      })
+    ]
   },
 
   plugins: [
     new BundleAnalyzerPlugin({
-      analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled',
+      analyzerMode: process.env.ANALYZE === 'true' ? 'server' : 'disabled'
     }),
 
     /**
@@ -64,8 +64,8 @@ const configuration: webpack.Configuration = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: false,
-      START_MINIMIZED: false,
-    }),
+      START_MINIMIZED: false
+    })
   ],
 
   /**
@@ -75,8 +75,8 @@ const configuration: webpack.Configuration = {
    */
   node: {
     __dirname: false,
-    __filename: false,
-  },
-};
+    __filename: false
+  }
+}
 
-export default merge(baseConfig, configuration);
+export default merge(baseConfig, configuration)

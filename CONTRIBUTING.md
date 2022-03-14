@@ -14,7 +14,7 @@ Develop on your own branch and submit PRs for review.
 
 If you are part of the XREngine development team, please create branches on ths repository, otherwise create a fork and branches to PR.
 
-Ensure any extraneous local project files, installs or build dependencies are removed before making a PR. You may make a seperate PR for adding to the .gitignore.
+Ensure any extraneous local project files, installs or build dependencies are removed before making a PR. You may make a separate PR for adding to the .gitignore.
 
 Before merging in any Pull Request, ensure that all checks pass, particularly the workflow/compile-codebase check. This ensures that the codebase will continue to build and deploy successfully.
 
