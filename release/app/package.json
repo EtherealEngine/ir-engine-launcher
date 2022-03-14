@@ -1,0 +1,18 @@
+{
+  "name": "xrengine-control-center",
+  "version": "0.0.1",
+  "description": "A desktop app for managing XREngine cluster. Please support XRFoundation https://opencollective.com/xrfoundation",
+  "main": "./dist/main/main.js",
+  "author": {
+    "name": "XR Engine - XR Foundation",
+    "email": "info@xrengine.io",
+    "url": "https://xrengine.io"
+  },
+  "scripts": {
+    "electron-rebuild": "node -r ts-node/register ../../.electron/scripts/electron-rebuild.js",
+    "link-modules": "node -r ts-node/register ../../.electron/scripts/link-modules.ts",
+    "postinstall": "npm run electron-rebuild && npm run link-modules"
+  },
+  "dependencies": {},
+  "license": "MIT"
+}
