@@ -1,23 +1,37 @@
+const Channels = require('../constants/Channels.js')
 const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('electron', {
-  ipcRenderer: {
-    myPing() {
-      ipcRenderer.send('ipc-example', 'ping')
-    },
-    on(channel, func) {
-      const validChannels = ['ipc-example']
-      if (validChannels.includes(channel)) {
-        // Deliberately strip event as it includes `sender`
-        ipcRenderer.on(channel, (event, ...args) => func(...args))
-      }
-    },
-    once(channel, func) {
-      const validChannels = ['ipc-example']
-      if (validChannels.includes(channel)) {
-        // Deliberately strip event as it includes `sender`
-        ipcRenderer.once(channel, (event, ...args) => func(...args))
-      }
+/**
+ * https://stackoverflow.com/a/46619982
+ * @param {*} node
+ * @returns
+ */
+const getNodes = (node) => {
+  if (node == null) return null
+  if (typeof node !== 'object') {
+    return [node]
+  }
+  var arr = []
+  var array_node = Object.keys(node).map(function (key) {
+    return node[key]
+  })
+  for (var i = 0; i < array_node.length; i++) {
+    Array.prototype.push.apply(arr, getNodes(array_node[i]))
+  }
+  return arr
+}
+
+const validChannels = getNodes(Channels)
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  invoke: (channel, ...args) => {
+    if (validChannels.includes(channel, ...args)) {
+      ipcRenderer.invoke(channel, ...args)
+    }
+  },
+  on: (channel, func) => {
+    if (validChannels.includes(channel)) {
+      ipcRenderer.on(channel, (_event, ...args) => func(...args))
     }
   }
 })
