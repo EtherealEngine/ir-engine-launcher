@@ -1,5 +1,5 @@
 const Endpoints = {
-  HOST: 'https://xrengine.io',
-};
+  HOST: 'https://xrengine.io'
+}
 
-export default Endpoints;
+export default Endpoints

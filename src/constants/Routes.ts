@@ -1,6 +1,6 @@
 const Routes = {
   HOME: '/home',
-  SETTINGS: '/settings',
-};
+  SETTINGS: '/settings'
+}
 
-export default Routes;
+export default Routes

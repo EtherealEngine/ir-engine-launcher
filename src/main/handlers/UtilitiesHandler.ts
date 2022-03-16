@@ -1,6 +1,7 @@
-import { Channels } from '../../constants/Channels'
 import { clipboard, ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
+
+import { Channels } from '../../constants/Channels'
 import { IBaseHandler } from './IBaseHandler'
 
 class UtilitiesHandler implements IBaseHandler {

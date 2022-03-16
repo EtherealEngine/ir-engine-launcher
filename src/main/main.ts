@@ -12,9 +12,9 @@ import { app, BrowserWindow, shell } from 'electron'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
+
 import { IBaseHandler } from './handlers/IBaseHandler'
 import UtilitiesHandler from './handlers/UtilitiesHandler'
-
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 
@@ -118,16 +118,14 @@ app.on('window-all-closed', () => {
   }
 })
 
-const ipcHandlers: IBaseHandler[] = [
-  new UtilitiesHandler(),
-];
+const ipcHandlers: IBaseHandler[] = [new UtilitiesHandler()]
 
 app
   .whenReady()
   .then(() => {
     ipcHandlers.forEach((handler) => {
-      handler.configure();
-    });
+      handler.configure()
+    })
 
     createWindow()
     app.on('activate', () => {

@@ -1,7 +1,7 @@
-import { Channels } from '../constants/Channels'
 import { Route, MemoryRouter as Router, Routes } from 'react-router-dom'
 
 import icon from '../../assets/icon.svg'
+import { Channels } from '../constants/Channels'
 import './App.css'
 
 const Hello = () => {
@@ -11,7 +11,9 @@ const Hello = () => {
         <img width="200px" alt="icon" src={icon} />
       </div>
       <h1>xrengine-control-center</h1>
-      <button onClick={() => window.electronAPI.invoke(Channels.Utilities.CopyClipboard, "Hello XREngine")}>Test</button>
+      <button onClick={() => window.electronAPI.invoke(Channels.Utilities.CopyClipboard, 'Hello XREngine')}>
+        Test
+      </button>
     </div>
   )
 }
