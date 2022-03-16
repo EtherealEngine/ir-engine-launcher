@@ -1,11 +1,24 @@
 ![xrengine black](https://user-images.githubusercontent.com/5104160/142821267-7e131891-0caa-496b-9cda-a82dee8a04b6.png)
 
 
-**Your own sandbox in the Metaverse. Take what you need, or launch the full stack.**
+**Your own sandbox in the Metaverse. Take what you need, or launch the full stack. 
+XREngine Control Center is a desktop app for managing XREngine cluster.**
+
+https://github.com/XRFoundation/XREngine/issues/3206
+Electron based XR Engine Server Cluster Creator app
+
+Ability to fully manage an on premises server.
+
+Electron K8S Cluster Creator and Manager App
+
+Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 1
+Wrap all K8S CLI into a GUI 2
+Benchmark tool - detect min PC specs Probably has a min of 4 CPU cores and 16-24GB of ram. 1
+Electron app with client for access to admin panel, supply link to open location in browser 2
+Multiple electron apps with same k8s control plane 1
 
 We [XR Foundation](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
 
-XREngine Control Center is a desktop app for managing XREngine cluster.
 
 ## Install
 
@@ -36,22 +49,7 @@ npm run package
 
 
 
-https://github.com/XRFoundation/XREngine/issues/3206
-
-
-an Electron based XR Engine Server Cluster Creator app
-
-Ability to fully manage an on premises server.
-
-Electron K8S Cluster Creator and Manager App
-
-Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 1
-Wrap all K8S CLI into a GUI 2
-Benchmark tool - detect min PC specs Probably has a min of 4 CPU cores and 16-24GB of ram. 1
-Electron app with client for access to admin panel, supply link to open location in browser 2
-Multiple electron apps with same k8s control plane 1
-
-ROADMAP
+# ROADMAP
 
 ## V1
 Install terminal screen - might require root prompt
