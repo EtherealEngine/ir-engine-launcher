@@ -24,9 +24,9 @@ const getNodes = (node) => {
 const validChannels = getNodes(Channels)
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  invoke: (channel, ...args) => {
-    if (validChannels.includes(channel, ...args)) {
-      ipcRenderer.invoke(channel, ...args)
+  invoke: async (channel, ...args) => {
+    if (validChannels.includes(channel)) {
+      return await ipcRenderer.invoke(channel, ...args)
     }
   },
   on: (channel, func) => {

@@ -5,7 +5,7 @@ import App from './App'
 render(<App />, document.getElementById('root'))
 
 export interface IElectronAPI {
-  invoke: (channel: string, ...args: any[]) => Promise<void>
+  invoke: (channel: string, ...args: any[]) => Promise<any>
   on: (channel: string, func: (...args: any[]) => {}) => Promise<void>
 }
 

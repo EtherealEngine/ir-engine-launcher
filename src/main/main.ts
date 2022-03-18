@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater'
 import path from 'path'
 
 import { IBaseHandler } from './handlers/IBaseHandler'
+import ShellHandler from './handlers/ShellHandler'
 import UtilitiesHandler from './handlers/UtilitiesHandler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
@@ -84,6 +85,7 @@ const createWindow = async () => {
     if (process.env.START_MINIMIZED) {
       mainWindow.minimize()
     } else {
+      mainWindow.maximize()
       mainWindow.show()
     }
   })
@@ -118,7 +120,7 @@ app.on('window-all-closed', () => {
   }
 })
 
-const ipcHandlers: IBaseHandler[] = [new UtilitiesHandler()]
+const ipcHandlers: IBaseHandler[] = [new UtilitiesHandler(), new ShellHandler()]
 
 app
   .whenReady()

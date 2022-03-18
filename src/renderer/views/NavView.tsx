@@ -1,4 +1,6 @@
+import Paths from 'constants/Paths'
 import * as React from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ColorModeContext } from 'renderer/App'
 
 import { AccountCircleOutlined } from '@mui/icons-material'
@@ -17,7 +19,21 @@ import Toolbar from '@mui/material/Toolbar'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
-const pages = ['Admin', 'Cluster', 'Config']
+const pages = [
+  {
+    title: 'Config',
+    path: Paths.ROOT
+  },
+  {
+    title: 'Admin',
+    path: Paths.ADMIN
+  },
+  {
+    title: 'Cluster',
+    path: Paths.CLUSTER
+  },
+]
+
 const settings = ['Profile', 'Logout']
 
 const NavView = () => {
@@ -26,6 +42,9 @@ const NavView = () => {
 
   const theme = useTheme()
   const colorMode = React.useContext(ColorModeContext)
+
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
 
   const handleOpenNavMenu = (event: any) => {
     setAnchorElNav(event.currentTarget)
@@ -79,8 +98,14 @@ const NavView = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+                <MenuItem
+                  key={page.title}
+                  onClick={() => {
+                    navigate(page.path)
+                    handleCloseNavMenu()
+                  }}
+                >
+                  <Typography textAlign="center">{page.title}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -90,8 +115,15 @@ const NavView = () => {
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <Button key={page} onClick={handleCloseNavMenu} sx={{ my: 2, color: 'white', display: 'block' }}>
-                {page}
+              <Button
+                key={page.title}
+                onClick={() => {
+                  navigate(page.path)
+                  handleCloseNavMenu()
+                }}
+                sx={{ my: 2, color: page.path === pathname ? 'white' : 'gray', display: 'block' }}
+              >
+                {page.title}
               </Button>
             ))}
           </Box>

@@ -1,4 +1,5 @@
 import Paths from 'constants/Paths'
+import Storage from 'constants/Storage'
 import * as React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 
@@ -14,11 +15,17 @@ export const ColorModeContext = React.createContext({ toggleColorMode: () => {} 
 
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const [mode, setMode] = React.useState((prefersDarkMode ? 'dark' : 'light') as PaletteMode)
+  const defaultMode = (prefersDarkMode ? 'dark' : 'light') as PaletteMode
+  const storedMode = localStorage.getItem(Storage.COLOR_MODE) as PaletteMode | undefined
+  const [mode, setMode] = React.useState(storedMode ? storedMode : defaultMode)
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
+        setMode((prevMode) => {
+          const newMode = prevMode === 'light' ? 'dark' : 'light'
+          localStorage.setItem(Storage.COLOR_MODE, newMode)
+          return newMode
+        })
       }
     }),
     []
@@ -49,7 +56,9 @@ const App = () => {
             }}
           >
             <Routes>
-              <Route path={Paths.ROOT} element={<ConfigView />} />
+              <Route index path={Paths.ROOT} element={<ConfigView />} />
+              <Route path={Paths.ADMIN} element={<div>Admin</div>} />
+              <Route path={Paths.CLUSTER} element={<div>Cluster</div>} />
             </Routes>
           </Box>
         </BrowserRouter>
