@@ -1,9 +1,11 @@
 const Channels = {
   Shell: {
     CheckMinikubeConfig: 'CheckMinikubeConfig',
+    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig'
   },
   Utilities: {
-    CopyClipboard: 'CopyClipboard'
+    CopyClipboard: 'CopyClipboard',
+    Logs: 'Logs'
   }
 }
 

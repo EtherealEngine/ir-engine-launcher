@@ -1,134 +1,65 @@
 import childProcess, { ExecException } from 'child_process'
-import { ipcMain, IpcMainInvokeEvent } from 'electron'
+import { BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
+import path from 'path'
 import sudo from 'sudo-prompt'
 
 import { Channels } from '../../constants/Channels'
-import { AppStatus } from '../../models/AppStatus'
+import { AppModel, AppStatus, DefaultApps } from '../../models/AppStatus'
 import { IBaseHandler } from './IBaseHandler'
 
-const apps = [
-  {
-    id: 'node',
-    name: 'Node',
-    checkCommand: 'node --version',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'npm',
-    name: 'npm',
-    checkCommand: 'npm --version',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'git',
-    name: 'Git',
-    checkCommand: 'git --version',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'docker',
-    name: 'Docker',
-    checkCommand: 'docker --version',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'dockercompose',
-    name: 'Docker Compose',
-    checkCommand: 'docker-compose --version',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'mysql',
-    name: 'MySql',
-    checkCommand: 'docker inspect xrengine_minikube_db | grep "Running"',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'virtualbox',
-    name: 'VirtualBox',
-    checkCommand: 'vboxmanage --version',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'kubectl',
-    name: 'kubectl',
-    checkCommand: 'kubectl version',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'helm',
-    name: 'Helm',
-    checkCommand: 'helm version',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'minikube',
-    name: 'Minikube',
-    checkCommand: 'minikube version; minikube status',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'redis',
-    name: 'Redis',
-    checkCommand: '',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'ingress',
-    name: 'Ingress',
-    checkCommand: '',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'xrengine',
-    name: 'XREngine',
-    checkCommand: '',
-    detail: '',
-    status: AppStatus.Checking
-  }
-]
-
 class ShellHandler implements IBaseHandler {
-  configure = () => {
+  configure = (window: BrowserWindow) => {
     ipcMain.handle(Channels.Shell.CheckMinikubeConfig, async (_event: IpcMainInvokeEvent, sudoMode: boolean) => {
-      const appStatus: any = []
+      try {
+        const appStatus: AppModel[] = []
 
-      for (const app of apps) {
-        if (app.checkCommand) {
-          const response = await exec(app.checkCommand, sudoMode)
-          const { stdout, stderr } = response
+        for (const app of DefaultApps) {
+          if (app.checkCommand) {
+            const response = await exec(app.checkCommand, sudoMode)
+            const { stdout, stderr } = response
 
-          const status = {
-            ...app,
-            detail: stderr ? stderr : stdout,
-            status: stderr ? AppStatus.NotInstalled : AppStatus.Installed
+            const status: AppModel = {
+              ...app,
+              detail: stderr ? stderr : stdout,
+              status: stderr ? AppStatus.NotConfigured : AppStatus.Configured
+            }
+
+            appStatus.push(status)
+          } else {
+            const status = {
+              ...app
+            }
+
+            appStatus.push(status)
           }
-
-          appStatus.push(status)
-        } else {
-          const status = {
-            ...app
-          }
-
-          appStatus.push(status)
         }
-      }
 
-      return appStatus
-    })
+        return appStatus
+      } catch (err) {
+        return DefaultApps
+      }
+    }),
+      ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
+        try {
+          const script = path.join(__dirname, '../../../assets', 'scripts', 'configure-minikube.sh')
+          // dialog.showMessageBox({message: stdout!.toString()})
+          const onStdout = (data: any) => {
+            log.info(data)
+            window.webContents.send(Channels.Utilities.Logs, data)
+          }
+          const onStderr = (data: any) => {
+            log.info(data)
+            window.webContents.send(Channels.Utilities.Logs, data)
+          }
+          const response = await shellExecStream(`sh ${script}`, onStdout, onStderr)
+          log.info(response)
+
+          return true
+        } catch (err) {
+          return false
+        }
+      })
   }
 }
 
@@ -147,6 +78,25 @@ const sudoShellExec = (command: string): Promise<ShellResponse> => {
 const shellExec = (command: string): Promise<ShellResponse> => {
   return new Promise((resolve) => {
     childProcess.exec(command, (error, stdout, stderr) => resolve({ error, stdout, stderr }))
+  })
+}
+
+const shellExecStream = (
+  command: string,
+  onStdout: (data: any) => void,
+  onStderr: (data: any) => void
+): Promise<number | null> => {
+  return new Promise((resolve) => {
+    const process = childProcess.exec(command)
+    process.stdout?.on('data', (data) => {
+      onStdout(data)
+    })
+    process.stderr?.on('data', (data) => {
+      onStderr(data)
+    })
+    process.on('close', (code) => {
+      resolve(code)
+    })
   })
 }
 

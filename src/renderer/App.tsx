@@ -1,7 +1,8 @@
 import Paths from 'constants/Paths'
 import Storage from 'constants/Storage'
+import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { Box, PaletteMode } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
@@ -44,24 +45,27 @@ const App = () => {
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <NavView />
-          <Box
-            sx={{
-              display: 'flex',
-              height: 'calc(100vh - 117px)',
-              bgcolor: 'background.default',
-              color: 'text.primary',
-              p: 3
-            }}
-          >
-            <Routes>
-              <Route index path={Paths.ROOT} element={<ConfigView />} />
-              <Route path={Paths.ADMIN} element={<div>Admin</div>} />
-              <Route path={Paths.CLUSTER} element={<div>Cluster</div>} />
-            </Routes>
-          </Box>
-        </BrowserRouter>
+        <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+          <BrowserRouter>
+            <NavView />
+            <Box
+              sx={{
+                display: 'flex',
+                height: 'calc(100vh - 117px)',
+                bgcolor: 'background.default',
+                color: 'text.primary',
+                p: 3
+              }}
+            >
+              <Routes>
+                <Route path={Paths.ROOT} element={<ConfigView />} />
+                <Route path={Paths.ADMIN} element={<div>Admin</div>} />
+                <Route path={Paths.CLUSTER} element={<div>Cluster</div>} />
+                <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
+              </Routes>
+            </Box>
+          </BrowserRouter>
+        </SnackbarProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>
   )

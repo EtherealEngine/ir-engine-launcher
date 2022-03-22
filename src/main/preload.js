@@ -31,7 +31,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   on: (channel, func) => {
     if (validChannels.includes(channel)) {
-      ipcRenderer.on(channel, (_event, ...args) => func(...args))
+      const subscription = (event, ...args) => func(...args)
+      ipcRenderer.on(channel, subscription)
+      return () => {
+        ipcRenderer.removeListener(channel, subscription)
+      }
     }
   }
 })

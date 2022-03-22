@@ -76,6 +76,12 @@ const createWindow = async () => {
     }
   })
 
+  const ipcHandlers: IBaseHandler[] = [new UtilitiesHandler(), new ShellHandler()]
+  
+  ipcHandlers.forEach((handler) => {
+    handler.configure(mainWindow!)
+  })
+
   mainWindow.loadURL(resolveHtmlPath('index.html'))
 
   mainWindow.on('ready-to-show', () => {
@@ -120,15 +126,9 @@ app.on('window-all-closed', () => {
   }
 })
 
-const ipcHandlers: IBaseHandler[] = [new UtilitiesHandler(), new ShellHandler()]
-
 app
   .whenReady()
   .then(() => {
-    ipcHandlers.forEach((handler) => {
-      handler.configure()
-    })
-
     createWindow()
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

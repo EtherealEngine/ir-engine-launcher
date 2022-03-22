@@ -1,3 +1,5 @@
+import { BrowserWindow } from "electron";
+
 export interface IBaseHandler {
-  configure: () => void
+  configure: (window: BrowserWindow) => void
 }
