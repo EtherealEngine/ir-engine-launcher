@@ -77,7 +77,7 @@ const sudoShellExec = (command: string): Promise<ShellResponse> => {
 
 const shellExec = (command: string): Promise<ShellResponse> => {
   return new Promise((resolve) => {
-    childProcess.exec(command, (error, stdout, stderr) => resolve({ error, stdout, stderr }))
+    childProcess.exec(command, { shell: '/bin/bash' }, (error, stdout, stderr) => resolve({ error, stdout, stderr }))
   })
 }
 

@@ -40,10 +40,10 @@ if $INSTALL_NODE; then
 
     nvm install node
     echo "node is installed"
-
-    NODE_VERSION=$(node --version)
-    echo "node version is $NODE_VERSION"
 fi
+
+NODE_VERSION=$(node --version)
+echo "node version is $NODE_VERSION"
 
 #=============
 # Verify Npm
@@ -68,8 +68,75 @@ if git --version >/dev/null; then
 else
     echo "git is not installed"
 
-    sudo apt install git-all
+    sudo apt install -y git-all
 fi
 
 GIT_VERSION=$(git --version)
 echo "git version is $GIT_VERSION"
+
+#=============
+# Get XREngine
+#=============
+
+XRENGINE_PATH=~/xrengine
+
+if [[ -d $XRENGINE_PATH ]] && [[ -f "$XRENGINE_PATH/package.json" ]]; then
+    echo "xrengine repo exists at $XRENGINE_PATH"
+else
+    echo "cloning xrengine in $XRENGINE_PATH"
+    git clone https://github.com/XRFoundation/XREngine $XRENGINE_PATH
+fi
+
+cd $XRENGINE_PATH
+npm install
+
+#==============
+# Verify Docker
+#==============
+
+if docker --version >/dev/null; then
+    echo "docker is installed"
+else
+    echo "docker is not installed"
+
+    sudo apt-get remove -y docker docker-engine docker.io containerd runc
+    sudo apt-get update -y
+    sudo apt-get install -y ca-certificates curl gnupg lsb-release
+
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+
+    sudo apt-get update -y
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+fi
+
+DOCKER_VERSION=$(docker --version)
+echo "docker version is $DOCKER_VERSION"
+
+#======================
+# Verify Docker Compose
+#======================
+
+if docker-compose --version >/dev/null; then
+    echo "docker-compose is installed"
+else
+    echo "docker-compose is not installed"
+
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+fi
+
+DOCKER_COMPOSE_VERSION=$(docker-compose --version)
+echo "docker-compose version is $DOCKER_COMPOSE_VERSION"
+
+#============================
+# Ensure DB and Redis Running
+#============================
+
+if docker ps -q -f status=running -f name=^/xrengine_minikube_db$; then
+    echo "mysql is running"
+else
+    echo "mysql is running"
+
+    npm run dev-docker
+fi
