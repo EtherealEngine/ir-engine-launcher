@@ -26,7 +26,7 @@ Clone the repo and install dependencies:
 
 ```bash
 git clone https://github.com/xrfoundation/xrengine-control-center.git xrengine-control-center
-cd your-project-name
+cd xrengine-control-center
 npm install
 ```
 
