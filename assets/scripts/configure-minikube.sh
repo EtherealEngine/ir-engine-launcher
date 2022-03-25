@@ -145,3 +145,117 @@ else
 
     npm run dev-docker
 fi
+
+#==================
+# Verify VirtualBox
+#==================
+
+if vboxmanage --version >/dev/null; then
+    echo "virtualbox is installed"
+else
+    echo "virtualbox is not installed"
+
+    sudo apt-get update -y
+    sudo apt-get install -y virtualbox-6.1
+fi
+
+VIRTUALBOX_VERSION=$(vboxmanage --version)
+echo "vboxmanage version is $VIRTUALBOX_VERSION"
+
+#===============
+# Verify Kubectl
+#===============
+
+if kubectl version --client >/dev/null; then
+    echo "kubectl is installed"
+else
+    echo "kubectl is not installed"
+
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+fi
+
+KUBECTL_VERSION=$(kubectl version --client)
+echo "kubectl version is $KUBECTL_VERSION"
+
+#============
+# Verify Helm
+#============
+
+if helm version >/dev/null; then
+    echo "helm is installed"
+else
+    echo "helm is not installed"
+
+    curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+    sudo apt-get install -y apt-transport-https
+    echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+    sudo apt-get update -y
+    sudo apt-get install -y helm
+fi
+
+HELM_VERSION=$(helm version)
+echo "helm version is $HELM_VERSION"
+
+#================
+# Verify Minikube
+#================
+
+if minikube version >/dev/null; then
+    echo "minikube is installed"
+else
+    echo "minikube is not installed"
+
+    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    sudo install minikube-linux-amd64 /usr/local/bin/minikube
+    minikube start --disk-size 40000m --cpus 4 --memory 10124m --addons ingress --driver virtualbox
+fi
+
+MINIKUBE_VERSION=$(minikube version)
+echo "minikube version is $MINIKUBE_VERSION"
+
+MINIKUBE_STATUS=$(minikube status --output json)
+if [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
+    minikube start
+fi
+
+MINIKUBE_STATUS=$(minikube status --output json)
+echo "minikube status is $MINIKUBE_STATUS"
+
+kubectl config use-context minikube
+
+#================
+# Verify hostfile
+# Reference:
+# https://stackoverflow.com/a/29082739/2077741
+# https://stackoverflow.com/a/18744367/2077741
+#================
+
+if grep -q "host.minikube.internal" /etc/hosts; then
+    echo "host.minikube.internal entry exists"
+else
+    echo "10.0.2.2 host.minikube.internal" >>/etc/hosts
+    echo "host.minikube.internal entries added"
+fi
+
+MINIKUBE_IP=$(minikube ip)
+ADD_MINIKUBE_IP=false
+if grep -q "local.theoverlay.io" /etc/hosts; then
+
+    if grep -q "$MINIKUBE_IP" /etc/hosts; then
+        echo "*.theoverlay.io entries exists"
+    else
+        grep -v 'local.theoverlay.io' /etc/hosts >/tmp/hosts.tmp
+        cp /tmp/hosts.tmp /etc/hosts
+        ADD_MINIKUBE_IP=true
+        echo "*.theoverlay.io entries outdated"
+    fi
+else
+    echo " local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io" >>/etc/hosts
+    ADD_MINIKUBE_IP=true
+fi
+
+if $ADD_MINIKUBE_IP; then
+    echo "$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io" >>/etc/hosts
+    echo "*.theoverlay.io entries added"
+fi

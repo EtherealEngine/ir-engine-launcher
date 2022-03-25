@@ -66,7 +66,7 @@ export const DefaultApps: AppModel[] = [
   {
     id: 'kubectl',
     name: 'kubectl',
-    checkCommand: 'kubectl version',
+    checkCommand: 'kubectl version --client',
     detail: '',
     status: AppStatus.Checking
   },
