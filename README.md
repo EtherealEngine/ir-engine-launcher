@@ -25,8 +25,8 @@ We [XR Foundation](https://github.com/xrfoundation) believe that the Metaverse, 
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/xrfoundation/xrengine-control-center.git your-project-name
-cd your-project-name
+git clone https://github.com/xrfoundation/xrengine-control-center.git xrengine-control-center
+cd xrengine-control-center
 npm install
 ```
 
