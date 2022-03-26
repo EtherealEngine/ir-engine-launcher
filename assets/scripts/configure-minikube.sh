@@ -222,8 +222,6 @@ fi
 MINIKUBE_STATUS=$(minikube status --output json)
 echo "minikube status is $MINIKUBE_STATUS"
 
-kubectl config use-context minikube
-
 #================
 # Verify hostfile
 # Reference:
@@ -259,3 +257,68 @@ if $ADD_MINIKUBE_IP; then
     echo "$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io" >>/etc/hosts
     echo "*.theoverlay.io entries added"
 fi
+
+#==================
+# Verify Helm Repos
+#==================
+
+helm repo add agones https://agones.dev/chart/stable
+helm repo add redis https://charts.bitnami.com/bitnami
+helm repo add xrengine https://helm.xrengine.io
+
+helm repo update
+
+echo "helm repos added and updated"
+
+#======================
+# Verify agones & redis
+#======================
+
+kubectl config use-context minikube
+
+if helm status agones >/dev/null; then
+    echo "agones is installed"
+else
+    echo "agones is not installed"
+
+    helm install -f packages/ops/configs/agones-default-values.yaml agones agones/agones
+    sleep 20
+fi
+
+AGONES_STATUS=$(helm status agones)
+echo "agones status is $AGONES_STATUS"
+
+if helm status local-redis >/dev/null; then
+    echo "redis is installed"
+else
+    echo "redis is not installed"
+
+    helm install local-redis redis/redis
+    sleep 20
+fi
+
+REDIS_STATUS=$(helm status local-redis)
+echo "redis status is $REDIS_STATUS"
+
+#================
+# Verify XREngine
+#================
+
+echo "XREngine docker images build starting"
+./scripts/build_minikube.sh
+
+if helm status local >/dev/null; then
+    echo "XREngine is installed"
+else
+    echo "XREngine is not installed"
+
+    helm install -f ../local.values.yaml --set api.extraEnv.FORCE_DB_REFRESH=true local xrengine/xrengine
+    sleep 30
+    helm upgrade --reuse-values --set api.extraEnv.FORCE_DB_REFRESH=false local xrengine/xrengine
+    sleep 30
+fi
+
+XRENGINE_STATUS=$(helm status local)
+echo "XREngine status is $XRENGINE_STATUS"
+
+exit 0
