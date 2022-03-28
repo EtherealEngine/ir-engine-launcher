@@ -29,6 +29,13 @@ export const DefaultApps: AppModel[] = [
     status: AppStatus.Checking
   },
   {
+    id: 'python',
+    name: 'Python',
+    checkCommand: 'python3 --version',
+    detail: '',
+    status: AppStatus.Checking
+  },
+  {
     id: 'make',
     name: 'Make',
     checkCommand: 'make --version',

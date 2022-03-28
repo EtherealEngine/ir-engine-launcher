@@ -63,6 +63,22 @@ else
     exit 1
 fi
 
+#================
+# Verify Python 3
+#================
+
+if python3 --version >/dev/null; then
+    echo "python is installed"
+else
+    echo "python is not installed"
+
+    sudo apt-get update -y
+    sudo apt-get install -y python3-pip
+fi
+
+PYTHON_VERSION=$(python3 --version)
+echo "python version is $PYTHON_VERSION"
+
 #=============
 # Verify Make
 #=============
