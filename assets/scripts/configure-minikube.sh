@@ -144,6 +144,8 @@ else
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
     sudo apt-get update -y
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+    sudo chmod 666 /var/run/docker.sock
 fi
 
 DOCKER_VERSION=$(docker --version)
@@ -169,10 +171,10 @@ echo "docker-compose version is $DOCKER_COMPOSE_VERSION"
 # Ensure DB and Redis Running
 #============================
 
-if docker ps -q -f status=running -f name=^/xrengine_minikube_db$; then
+if docker top xrengine_minikube_db; then
     echo "mysql is running"
 else
-    echo "mysql is running"
+    echo "mysql is not running"
 
     npm run dev-docker
 fi
@@ -185,6 +187,12 @@ if vboxmanage --version >/dev/null; then
     echo "virtualbox is installed"
 else
     echo "virtualbox is not installed"
+
+    sudo apt-get install -y software–properties–common
+    wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+    wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add –
+
+    echo "deb [arch=amd64] http://virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
 
     sudo apt-get update -y
     sudo apt-get install -y virtualbox-6.1
