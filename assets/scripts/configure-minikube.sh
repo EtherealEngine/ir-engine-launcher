@@ -64,6 +64,22 @@ else
 fi
 
 #=============
+# Verify Make
+#=============
+
+if make --version >/dev/null; then
+    echo "make is installed"
+else
+    echo "make is not installed"
+
+    sudo apt-get update -y
+    sudo apt-get install -y build-essential
+fi
+
+MAKE_VERSION=$(make --version)
+echo "make version is $MAKE_VERSION"
+
+#=============
 # Verify Git
 #=============
 

@@ -29,6 +29,13 @@ export const DefaultApps: AppModel[] = [
     status: AppStatus.Checking
   },
   {
+    id: 'make',
+    name: 'Make',
+    checkCommand: 'make --version',
+    detail: '',
+    status: AppStatus.Checking
+  },
+  {
     id: 'git',
     name: 'Git',
     checkCommand: 'git --version',
