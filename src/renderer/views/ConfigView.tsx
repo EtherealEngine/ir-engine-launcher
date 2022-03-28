@@ -1,5 +1,5 @@
 import { Channels } from 'constants/Channels'
-import { AppStatus, DefaultApps } from 'models/AppStatus'
+import { AppStatus, DefaultApps, DefaultDeployments } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { Fragment, useEffect, useState } from 'react'
 
@@ -26,12 +26,16 @@ import { Box } from '@mui/system'
 
 const ConfigView = () => {
   const [sudoMode] = useState(false)
-  const [showAppStatus, setShowAppStatus] = useState(true)
   const [showLogs, setShowLogs] = useState(true)
+  const [showAppStatus, setShowAppStatus] = useState(true)
   const [appStatus, setAppStatus] = useState(DefaultApps)
+  const [showDeploymentStatus, setShowDeploymentStatus] = useState(true)
+  const [deploymentStatus, setDeploymentStatus] = useState(DefaultDeployments)
   const { enqueueSnackbar } = useSnackbar()
-  const allConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
-  const allNotConfigured = appStatus.every((app) => app.status === AppStatus.NotConfigured)
+  const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
+  const allAppsNotConfigured = appStatus.every((app) => app.status === AppStatus.NotConfigured)
+  const allDeploymentsConfigured = deploymentStatus.every((app) => app.status === AppStatus.Configured)
+  const allDeploymentsNotConfigured = deploymentStatus.every((app) => app.status === AppStatus.NotConfigured)
 
   const checkMinikubeConfig = async () => {
     const response = await window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig, sudoMode)
@@ -72,8 +76,8 @@ const ConfigView = () => {
             variant="contained"
             startIcon={<PowerSettingsNewOutlinedIcon />}
             onClick={async () => {
-              if (allConfigured) {
-                enqueueSnackbar('XREngine already configured successfully', { variant: 'success' })
+              if (allAppsConfigured) {
+                enqueueSnackbar('XREngine Apps already configured successfully', { variant: 'success' })
                 return
               }
 
@@ -100,17 +104,17 @@ const ConfigView = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginBottom: 2 }}>
           <Typography variant="h5" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
             Apps Status:
-            {allConfigured && (
+            {allAppsConfigured && (
               <Fragment>
                 <CheckCircleOutlineIcon sx={{ marginLeft: 2, marginRight: 1, color: 'limegreen' }} /> All Configured
               </Fragment>
             )}
-            {allNotConfigured && (
+            {allAppsNotConfigured && (
               <Fragment>
                 <CancelOutlinedIcon sx={{ marginLeft: 2, marginRight: 1, color: 'red' }} /> Nothing Configured
               </Fragment>
             )}
-            {!allConfigured && !allConfigured && (
+            {!allAppsConfigured && !allAppsConfigured && (
               <Fragment>
                 <RemoveCircleOutlineRoundedIcon sx={{ marginLeft: 2, marginRight: 1, color: 'orange' }} /> Pending
                 Configuration
@@ -151,6 +155,72 @@ const ConfigView = () => {
                         sx={{ overflow: 'auto', maxHeight: '350px', whiteSpace: 'pre-line' }}
                       >
                         {app.detail}
+                      </Typography>
+                    }
+                    arrow
+                  >
+                    <InfoOutlinedIcon color="primary" sx={{ marginLeft: 2, fontSize: '18px' }} />
+                  </Tooltip>
+                )}
+              </Grid>
+            ))}
+          </Grid>
+        )}
+
+        <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginBottom: 2, marginTop: 3 }}>
+          <Typography variant="h5" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+            Deployment Status:
+            {allDeploymentsConfigured && (
+              <Fragment>
+                <CheckCircleOutlineIcon sx={{ marginLeft: 2, marginRight: 1, color: 'limegreen' }} /> All Configured
+              </Fragment>
+            )}
+            {allDeploymentsNotConfigured && (
+              <Fragment>
+                <CancelOutlinedIcon sx={{ marginLeft: 2, marginRight: 1, color: 'red' }} /> Nothing Configured
+              </Fragment>
+            )}
+            {!allDeploymentsConfigured && !allDeploymentsNotConfigured && (
+              <Fragment>
+                <RemoveCircleOutlineRoundedIcon sx={{ marginLeft: 2, marginRight: 1, color: 'orange' }} /> Pending
+                Configuration
+              </Fragment>
+            )}
+          </Typography>
+          <FormControlLabel
+            value={showDeploymentStatus}
+            control={<Switch defaultChecked color="primary" />}
+            label={showDeploymentStatus ? 'Hide Details' : 'Show Details'}
+            labelPlacement="start"
+            onChange={(_event, checked) => setShowDeploymentStatus(checked)}
+          />
+        </Box>
+        {showDeploymentStatus && (
+          <Grid container>
+            {deploymentStatus.map((deploy) => (
+              <Grid
+                item
+                key={deploy.id}
+                xs={12}
+                md={3}
+                sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginBottom: 2 }}
+              >
+                {deploy.status === AppStatus.Checking && <CircularProgress size={20} />}
+                {deploy.status === AppStatus.Configured && <CheckCircleOutlineIcon sx={{ color: 'limegreen' }} />}
+                {deploy.status === AppStatus.NotConfigured && <CancelOutlinedIcon sx={{ color: 'red' }} />}
+                {deploy.status === AppStatus.Pending && <RemoveCircleOutlineRoundedIcon />}
+
+                <Typography marginLeft={1}>{deploy.name}</Typography>
+
+                {deploy.detail && (
+                  <Tooltip
+                    title={
+                      <Typography
+                        variant="body2"
+                        color="inherit"
+                        sx={{ overflow: 'auto', maxHeight: '350px', whiteSpace: 'pre-line' }}
+                      >
+                        {deploy.detail}
                       </Typography>
                     }
                     arrow

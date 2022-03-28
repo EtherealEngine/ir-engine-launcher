@@ -115,3 +115,27 @@ export const DefaultApps: AppModel[] = [
     status: AppStatus.Checking
   }
 ]
+
+export const DefaultDeployments: AppModel[] = [
+  {
+    id: 'client',
+    name: 'Client',
+    checkCommand: 'kubectl get deployment local-xrengine-client -o "jsonpath={.status.availableReplicas}"',
+    detail: '',
+    status: AppStatus.Checking
+  },
+  {
+    id: 'api',
+    name: 'API Server',
+    checkCommand: 'kubectl get deployment local-xrengine-api -o "jsonpath={.status.availableReplicas}"',
+    detail: '',
+    status: AppStatus.Checking
+  },
+  {
+    id: 'gameserver',
+    name: 'Gameservers',
+    checkCommand: 'kubectl get fleets local-gameserver -o "jsonpath={.status.availableReplicas}"',
+    detail: '',
+    status: AppStatus.Checking
+  },
+]
