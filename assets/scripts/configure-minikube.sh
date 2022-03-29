@@ -247,8 +247,11 @@ fi
 MINIKUBE_VERSION=$(minikube version)
 echo "minikube version is $MINIKUBE_VERSION"
 
+# Since minikube status can return a non-zero result here
+set +e
 MINIKUBE_STATUS=$(minikube status --output json)
-if [[ $MINIKUBE_STATUS == *"minikube start"* ]]; then
+set -e
+if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"Nonexistent"* ]]; then
     minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress --driver virtualbox
 elif [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
     minikube start
