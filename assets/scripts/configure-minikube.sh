@@ -67,7 +67,7 @@ fi
 # Verify Python 3
 #================
 
-if python3 --version >/dev/null; then
+if pip --version >/dev/null; then
     echo "python is installed"
 else
     echo "python is not installed"
@@ -176,6 +176,7 @@ if docker top xrengine_minikube_db; then
 else
     echo "mysql is not running"
 
+    sudo chmod 666 /var/run/docker.sock
     npm run dev-docker
 fi
 
@@ -188,14 +189,8 @@ if vboxmanage --version >/dev/null; then
 else
     echo "virtualbox is not installed"
 
-    sudo apt-get install -y software–properties–common
-    wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-    wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add –
-
-    echo "deb [arch=amd64] http://virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
-
-    sudo apt-get update -y
-    sudo apt-get install -y virtualbox-6.1
+    sudo apt update -y
+    sudo apt install -y virtualbox
 fi
 
 VIRTUALBOX_VERSION=$(vboxmanage --version)
@@ -247,18 +242,19 @@ else
 
     curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
     sudo install minikube-linux-amd64 /usr/local/bin/minikube
-    minikube start --disk-size 40000m --cpus 4 --memory 10124m --addons ingress --driver virtualbox
 fi
 
 MINIKUBE_VERSION=$(minikube version)
 echo "minikube version is $MINIKUBE_VERSION"
 
 MINIKUBE_STATUS=$(minikube status --output json)
-if [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
+if [[ $MINIKUBE_STATUS == *"minikube start"* ]]; then
+    minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress --driver virtualbox
+elif [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
     minikube start
 fi
 
-MINIKUBE_STATUS=$(minikube status --output json)
+MINIKUBE_STATUS=$(minikube status)
 echo "minikube status is $MINIKUBE_STATUS"
 
 #================

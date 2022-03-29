@@ -31,7 +31,7 @@ export const DefaultApps: AppModel[] = [
   {
     id: 'python',
     name: 'Python',
-    checkCommand: 'python3 --version',
+    checkCommand: 'pip --version && python3 --version',
     detail: '',
     status: AppStatus.Checking
   },
