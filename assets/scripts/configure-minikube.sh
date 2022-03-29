@@ -350,6 +350,8 @@ else
 fi
 
 echo "XREngine docker images build starting"
+export DOCKER_BUILDKIT=0
+export COMPOSE_DOCKER_CLI_BUILD=0
 ./scripts/build_minikube.sh
 
 if helm status local >/dev/null; then
