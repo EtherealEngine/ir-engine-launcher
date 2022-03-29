@@ -270,29 +270,27 @@ echo "minikube status is $MINIKUBE_STATUS"
 if grep -q "host.minikube.internal" /etc/hosts; then
     echo "host.minikube.internal entry exists"
 else
-    echo "10.0.2.2 host.minikube.internal" >>/etc/hosts
+    sudo -- sh -c "echo '10.0.2.2 host.minikube.internal' >>/etc/hosts"
     echo "host.minikube.internal entries added"
 fi
 
 MINIKUBE_IP=$(minikube ip)
 ADD_MINIKUBE_IP=false
 if grep -q "local.theoverlay.io" /etc/hosts; then
-
     if grep -q "$MINIKUBE_IP" /etc/hosts; then
         echo "*.theoverlay.io entries exists"
     else
-        grep -v 'local.theoverlay.io' /etc/hosts >/tmp/hosts.tmp
-        cp /tmp/hosts.tmp /etc/hosts
-        ADD_MINIKUBE_IP=true
         echo "*.theoverlay.io entries outdated"
+        grep -v 'local.theoverlay.io' /etc/hosts >/tmp/hosts.tmp
+        sudo cp /tmp/hosts.tmp /etc/hosts
+        ADD_MINIKUBE_IP=true
     fi
 else
-    echo " local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io" >>/etc/hosts
     ADD_MINIKUBE_IP=true
 fi
 
 if $ADD_MINIKUBE_IP; then
-    echo "$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io" >>/etc/hosts
+    sudo -- sh -c "echo '$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io' >>/etc/hosts"
     echo "*.theoverlay.io entries added"
 fi
 
@@ -341,6 +339,15 @@ echo "redis status is $REDIS_STATUS"
 #================
 # Verify XREngine
 #================
+
+PROJECTS_PATH=~/xrengine/packages/projects/projects/
+
+if [[ -d $PROJECTS_PATH ]]; then
+    echo "xrengine projects exists at $PROJECTS_PATH"
+else
+    echo "xrengine projects does not exists at $PROJECTS_PATH"
+    npm run install-projects
+fi
 
 echo "XREngine docker images build starting"
 ./scripts/build_minikube.sh
