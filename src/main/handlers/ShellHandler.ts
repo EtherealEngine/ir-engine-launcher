@@ -12,9 +12,11 @@ class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
     ipcMain.handle(Channels.Shell.CheckMinikubeConfig, async (_event: IpcMainInvokeEvent, sudoMode: boolean) => {
       try {
-        const appStatus: AppModel[] = []
-
         for (const app of DefaultApps) {
+          let status: AppModel = {
+            ...app
+          }
+
           if (app.checkCommand) {
             const response = await exec(app.checkCommand, sudoMode)
             const { stdout, stderr } = response
@@ -32,23 +34,15 @@ class ShellHandler implements IBaseHandler {
               )
             }
 
-            const status: AppModel = {
+            status = {
               ...app,
               detail: stderr ? stderr : stdout,
               status: stderr ? AppStatus.NotConfigured : AppStatus.Configured
             }
-
-            appStatus.push(status)
-          } else {
-            const status = {
-              ...app
-            }
-
-            appStatus.push(status)
           }
-        }
 
-        return appStatus
+          window.webContents.send(Channels.Shell.CheckMinikubeConfigResult, status)
+        }
       } catch (err) {
         window.webContents.send(Channels.Utilities.Logs, err)
         return DefaultApps

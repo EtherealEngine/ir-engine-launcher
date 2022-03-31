@@ -1,5 +1,5 @@
 import { Channels } from 'constants/Channels'
-import { AppStatus, DefaultApps, DefaultDeployments } from 'models/AppStatus'
+import { AppModel, AppStatus, DefaultApps, DefaultDeployments } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { Fragment, useEffect, useRef, useState } from 'react'
 
@@ -38,15 +38,29 @@ const ConfigView = () => {
   const allDeploymentsConfigured = deploymentStatus.every((app) => app.status === AppStatus.Configured)
   const allDeploymentsNotConfigured = deploymentStatus.every((app) => app.status === AppStatus.NotConfigured)
 
-  const checkMinikubeConfig = async () => {
-    const response = await window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig, sudoMode)
-    console.log(response)
-
-    setAppStatus(response)
+  const checkMinikubeConfig = () => {
+    window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig, sudoMode)
   }
 
+  useEffect(() => {
+    const removeEventListener = window.electronAPI.on(Channels.Shell.CheckMinikubeConfigResult, (data: AppModel) => {
+      const apps = [...appStatus]
+
+      let index = apps.findIndex((app) => app.id === data.id)
+      if (index !== -1) {
+        apps[index] = data
+      }
+
+      setAppStatus(apps)
+    })
+
+    return () => {
+      removeEventListener()
+    }
+  }, [appStatus])
+
   const scrollLogsToBottom = () => {
-    (logsEndRef.current as any)?.scrollIntoView({ behavior: 'smooth' })
+    ;(logsEndRef.current as any)?.scrollIntoView({ behavior: 'smooth' })
   }
 
   useEffect(() => {
@@ -79,7 +93,14 @@ const ConfigView = () => {
       </Box> */}
 
         <Stack sx={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 2, marginBottom: 3 }}>
-          <IconButton title="Refresh" color="primary" onClick={() => checkMinikubeConfig()}>
+          <IconButton
+            title="Refresh"
+            color="primary"
+            onClick={() => {
+              setAppStatus(DefaultApps)
+              checkMinikubeConfig()
+            }}
+          >
             <CachedOutlinedIcon />
           </IconButton>
           <Button
@@ -260,7 +281,9 @@ const ConfigView = () => {
         {showLogs && (
           <Box sx={{ overflow: 'auto', height: '30vh' }}>
             {logs.map((log) => (
-              <pre>{new Date().toLocaleTimeString()}: {log}</pre>
+              <pre>
+                {new Date().toLocaleTimeString()}: {log}
+              </pre>
             ))}
             <pre ref={logsEndRef} />
           </Box>
