@@ -16,6 +16,8 @@ class ShellHandler implements IBaseHandler {
 
         for (const app of DefaultApps) {
           if (app.checkCommand) {
+            log.info(app.name)
+            log.info(app.checkCommand)
             const response = await exec(app.checkCommand, sudoMode)
             const { stdout, stderr } = response
 
@@ -37,6 +39,7 @@ class ShellHandler implements IBaseHandler {
 
         return appStatus
       } catch (err) {
+        log.info(err)
         return DefaultApps
       }
     }),

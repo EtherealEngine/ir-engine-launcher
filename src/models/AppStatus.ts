@@ -13,118 +13,128 @@ export enum AppStatus {
   Pending
 }
 
+const minikubeDependantScript = (script: string) => {
+  return `
+  MINIKUBE_STATUS=$(minikube status --output json);
+  if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"Nonexistent"* ]] || [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
+    echo "minikube not configured" >&2;
+    exit 1;
+  else
+    ${script}
+    exit 0;
+  fi`
+}
+
 export const DefaultApps: AppModel[] = [
   {
     id: 'node',
     name: 'Node',
-    checkCommand: 'node --version',
+    checkCommand: 'node --version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'npm',
     name: 'npm',
-    checkCommand: 'npm --version',
+    checkCommand: 'npm --version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'python',
     name: 'Python',
-    checkCommand: 'pip --version && python3 --version',
+    checkCommand: 'pip --version && python3 --version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'make',
     name: 'Make',
-    checkCommand: 'make --version',
+    checkCommand: 'make --version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'git',
     name: 'Git',
-    checkCommand: 'git --version',
+    checkCommand: 'git --version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'docker',
     name: 'Docker',
-    checkCommand: 'docker --version',
+    checkCommand: 'docker --version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'dockercompose',
     name: 'Docker Compose',
-    checkCommand: 'docker-compose --version',
+    checkCommand: 'docker-compose --version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'mysql',
     name: 'MySql',
-    checkCommand: 'docker inspect xrengine_minikube_db | grep "Running"',
+    checkCommand: 'docker inspect xrengine_minikube_db | grep "Running";',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'virtualbox',
     name: 'VirtualBox',
-    checkCommand: 'vboxmanage --version',
+    checkCommand: 'vboxmanage --version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'kubectl',
     name: 'kubectl',
-    checkCommand: 'kubectl version --client',
+    checkCommand: 'kubectl version --client;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'helm',
     name: 'Helm',
-    checkCommand: 'helm version',
+    checkCommand: 'helm version;',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'minikube',
     name: 'Minikube',
-    checkCommand: 'minikube version; minikube status',
+    checkCommand: minikubeDependantScript('minikube version; minikube status;'),
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'ingress',
     name: 'Ingress',
-    checkCommand: `ingress_ns="ingress-nginx";
-    podname=$(kubectl get pods -n $ingress_ns -l app.kubernetes.io/name=ingress-nginx --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}');
-    kubectl exec -i -n $ingress_ns $podname -- /nginx-ingress-controller --version`,
+    checkCommand: minikubeDependantScript(`ingress_ns="ingress-nginx"; podname=$(kubectl get pods -n $ingress_ns -l app.kubernetes.io/name=ingress-nginx --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl exec -i -n $ingress_ns $podname -- /nginx-ingress-controller --version;`),
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'redis',
     name: 'Redis',
-    checkCommand: 'helm status local-redis',
+    checkCommand: minikubeDependantScript('helm status local-redis;'),
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'agones',
     name: 'Agones',
-    checkCommand: 'helm status agones',
+    checkCommand: minikubeDependantScript('helm status agones;'),
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'xrengine',
     name: 'XREngine',
-    checkCommand: 'helm status local',
+    checkCommand: minikubeDependantScript('helm status local;'),
     detail: '',
     status: AppStatus.Checking
   }
