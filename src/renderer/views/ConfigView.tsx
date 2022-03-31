@@ -1,7 +1,7 @@
 import { Channels } from 'constants/Channels'
 import { AppStatus, DefaultApps, DefaultDeployments } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
@@ -13,7 +13,6 @@ import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutl
 import {
   Button,
   CircularProgress,
-  Container,
   FormControlLabel,
   Grid,
   IconButton,
@@ -29,8 +28,10 @@ const ConfigView = () => {
   const [showLogs, setShowLogs] = useState(true)
   const [showAppStatus, setShowAppStatus] = useState(true)
   const [appStatus, setAppStatus] = useState(DefaultApps)
+  const [logs, setLogs] = useState<string[]>([])
   const [showDeploymentStatus, setShowDeploymentStatus] = useState(true)
   const [deploymentStatus, setDeploymentStatus] = useState(DefaultDeployments)
+  const logsEndRef = useRef(null)
   const { enqueueSnackbar } = useSnackbar()
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
   const allAppsNotConfigured = appStatus.every((app) => app.status === AppStatus.NotConfigured)
@@ -44,22 +45,31 @@ const ConfigView = () => {
     setAppStatus(response)
   }
 
+  const scrollLogsToBottom = () => {
+    (logsEndRef.current as any)?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   useEffect(() => {
-    const removeEventListener = window.electronAPI.on(Channels.Utilities.Logs, (data: any) => {
-      console.log(data)
+    const removeEventListener = window.electronAPI.on(Channels.Utilities.Logs, (data: string) => {
+      setLogs([...logs, data])
     })
 
     return () => {
       removeEventListener()
     }
-  }, [])
+  }, [logs])
+
+  // Scroll to bottom of logs
+  useEffect(() => {
+    scrollLogsToBottom()
+  }, [logs, showLogs])
 
   useEffect(() => {
     checkMinikubeConfig()
   }, [sudoMode])
 
   return (
-    <Container sx={{ display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       <Box sx={{ flexGrow: 1 }}>
         {/* <Box sx={{ textAlign: 'center' }}>
         <Typography variant="h4" gutterBottom>
@@ -68,7 +78,7 @@ const ConfigView = () => {
         <Typography variant="subtitle1">Setup this OS for XREngine K8s Control Plane</Typography>
       </Box> */}
 
-        <Stack direction="row" justifyContent="flex-end" marginBottom={4} spacing={2}>
+        <Stack sx={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 2, marginBottom: 3 }}>
           <IconButton title="Refresh" color="primary" onClick={() => checkMinikubeConfig()}>
             <CachedOutlinedIcon />
           </IconButton>
@@ -247,9 +257,16 @@ const ConfigView = () => {
             onChange={(_event, checked) => setShowLogs(checked)}
           />
         </Box>
-        {showLogs && <Box>Coming soon</Box>}
+        {showLogs && (
+          <Box sx={{ overflow: 'auto', height: '30vh' }}>
+            {logs.map((log) => (
+              <pre>{new Date().toLocaleTimeString()}: {log}</pre>
+            ))}
+            <pre ref={logsEndRef} />
+          </Box>
+        )}
       </Box>
-    </Container>
+    </Box>
   )
 }
 

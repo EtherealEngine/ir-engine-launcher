@@ -1,6 +1,6 @@
 import childProcess, { ExecException } from 'child_process'
-import { BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent } from 'electron'
-import log from 'electron-log'
+import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
+// import log from 'electron-log'
 import path from 'path'
 import sudo from 'sudo-prompt'
 
@@ -16,10 +16,21 @@ class ShellHandler implements IBaseHandler {
 
         for (const app of DefaultApps) {
           if (app.checkCommand) {
-            log.info(app.name)
-            log.info(app.checkCommand)
             const response = await exec(app.checkCommand, sudoMode)
             const { stdout, stderr } = response
+
+            if (stdout) {
+              window.webContents.send(
+                Channels.Utilities.Logs,
+                `${app.name} - ` + (typeof stdout === 'string' ? stdout.trim() : stdout)
+              )
+            }
+            if (stderr) {
+              window.webContents.send(
+                Channels.Utilities.Logs,
+                `${app.name} - ` + (typeof stderr === 'string' ? stderr.trim() : stderr)
+              )
+            }
 
             const status: AppModel = {
               ...app,
@@ -39,27 +50,26 @@ class ShellHandler implements IBaseHandler {
 
         return appStatus
       } catch (err) {
-        log.info(err)
+        window.webContents.send(Channels.Utilities.Logs, err)
         return DefaultApps
       }
     }),
       ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
         try {
           const script = path.join(__dirname, '../../../assets', 'scripts', 'configure-minikube.sh')
-          // dialog.showMessageBox({message: stdout!.toString()})
+
           const onStdout = (data: any) => {
-            log.info(data)
             window.webContents.send(Channels.Utilities.Logs, data)
           }
           const onStderr = (data: any) => {
-            log.info(data)
             window.webContents.send(Channels.Utilities.Logs, data)
           }
           const response = await shellExecStream(`sh ${script}`, onStdout, onStderr)
-          log.info(response)
+          window.webContents.send(Channels.Utilities.Logs, response)
 
           return true
         } catch (err) {
+          window.webContents.send(Channels.Utilities.Logs, err)
           return false
         }
       })

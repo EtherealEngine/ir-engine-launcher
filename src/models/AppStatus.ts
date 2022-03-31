@@ -78,7 +78,7 @@ export const DefaultApps: AppModel[] = [
   {
     id: 'mysql',
     name: 'MySql',
-    checkCommand: 'docker inspect xrengine_minikube_db | grep "Running";',
+    checkCommand: 'docker top xrengine_minikube_db;',
     detail: '',
     status: AppStatus.Checking
   },
