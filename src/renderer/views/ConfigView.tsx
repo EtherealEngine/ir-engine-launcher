@@ -8,6 +8,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import PlaylistRemoveOutlinedIcon from '@mui/icons-material/PlaylistRemoveOutlined'
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded'
 import {
@@ -270,6 +271,9 @@ const ConfigView = () => {
           <Typography variant="h5" sx={{ flexGrow: 1, display: 'flex' }}>
             Logs
           </Typography>
+          <IconButton title="Clear Logs" color="primary" onClick={() => setLogs([])}>
+            <PlaylistRemoveOutlinedIcon />
+          </IconButton>
           <FormControlLabel
             value={showLogs}
             control={<Switch defaultChecked color="primary" />}
