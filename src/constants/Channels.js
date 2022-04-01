@@ -6,7 +6,7 @@ const Channels = {
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',
-    Logs: 'Logs'
+    Log: 'Log'
   }
 }
 

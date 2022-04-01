@@ -1,6 +1,9 @@
 import { render } from 'react-dom'
 
 import App from './App'
+import { LogService } from './services/LogService'
+
+LogService.listenLog()
 
 render(<App />, document.getElementById('root'))
 

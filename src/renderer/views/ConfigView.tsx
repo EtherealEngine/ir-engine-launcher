@@ -2,6 +2,7 @@ import { Channels } from 'constants/Channels'
 import { AppModel, AppStatus, DefaultApps, DefaultDeployments } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { Fragment, useEffect, useRef, useState } from 'react'
+import { LogService, useLogState } from 'renderer/services/LogService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
@@ -29,7 +30,10 @@ const ConfigView = () => {
   const [showLogs, setShowLogs] = useState(true)
   const [showAppStatus, setShowAppStatus] = useState(true)
   const [appStatus, setAppStatus] = useState(DefaultApps)
-  const [logs, setLogs] = useState<string[]>([])
+  // const [logs, setLogs] = useState<string[]>([])
+
+  const logState = useLogState()
+  const { logs } = logState.value
   const [showDeploymentStatus, setShowDeploymentStatus] = useState(true)
   const [deploymentStatus, setDeploymentStatus] = useState(DefaultDeployments)
   const logsEndRef = useRef(null)
@@ -63,16 +67,6 @@ const ConfigView = () => {
   const scrollLogsToBottom = () => {
     ;(logsEndRef.current as any)?.scrollIntoView({ behavior: 'smooth' })
   }
-
-  useEffect(() => {
-    const removeEventListener = window.electronAPI.on(Channels.Utilities.Logs, (data: string) => {
-      setLogs([...logs, data])
-    })
-
-    return () => {
-      removeEventListener()
-    }
-  }, [logs])
 
   // Scroll to bottom of logs
   useEffect(() => {
@@ -271,7 +265,7 @@ const ConfigView = () => {
           <Typography variant="h5" sx={{ flexGrow: 1, display: 'flex' }}>
             Logs
           </Typography>
-          <IconButton title="Clear Logs" color="primary" onClick={() => setLogs([])}>
+          <IconButton title="Clear Logs" color="primary" onClick={LogService.clearLogs}>
             <PlaylistRemoveOutlinedIcon />
           </IconButton>
           <FormControlLabel
@@ -284,8 +278,8 @@ const ConfigView = () => {
         </Box>
         {showLogs && (
           <Box sx={{ overflow: 'auto', height: '30vh' }}>
-            {logs.map((log) => (
-              <pre>
+            {logs.map((log, index) => (
+              <pre key={`log-${index}`}>
                 {new Date().toLocaleTimeString()}: {log}
               </pre>
             ))}

@@ -23,13 +23,13 @@ class ShellHandler implements IBaseHandler {
 
             if (stdout) {
               window.webContents.send(
-                Channels.Utilities.Logs,
+                Channels.Utilities.Log,
                 `${app.name} - ` + (typeof stdout === 'string' ? stdout.trim() : stdout)
               )
             }
             if (stderr) {
               window.webContents.send(
-                Channels.Utilities.Logs,
+                Channels.Utilities.Log,
                 `${app.name} - ` + (typeof stderr === 'string' ? stderr.trim() : stderr)
               )
             }
@@ -44,7 +44,7 @@ class ShellHandler implements IBaseHandler {
           window.webContents.send(Channels.Shell.CheckMinikubeConfigResult, status)
         }
       } catch (err) {
-        window.webContents.send(Channels.Utilities.Logs, err)
+        window.webContents.send(Channels.Utilities.Log, err)
         return DefaultApps
       }
     }),
@@ -53,17 +53,17 @@ class ShellHandler implements IBaseHandler {
           const script = path.join(__dirname, '../../../assets', 'scripts', 'configure-minikube.sh')
 
           const onStdout = (data: any) => {
-            window.webContents.send(Channels.Utilities.Logs, data)
+            window.webContents.send(Channels.Utilities.Log, data)
           }
           const onStderr = (data: any) => {
-            window.webContents.send(Channels.Utilities.Logs, data)
+            window.webContents.send(Channels.Utilities.Log, data)
           }
           const response = await shellExecStream(`sh ${script}`, onStdout, onStderr)
-          window.webContents.send(Channels.Utilities.Logs, response)
+          window.webContents.send(Channels.Utilities.Log, response)
 
           return true
         } catch (err) {
-          window.webContents.send(Channels.Utilities.Logs, err)
+          window.webContents.send(Channels.Utilities.Log, err)
           return false
         }
       })
