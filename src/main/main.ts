@@ -12,7 +12,6 @@ import { app, BrowserWindow, shell } from 'electron'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
-import fixPath from 'fix-path'
 
 import { IBaseHandler } from './handlers/IBaseHandler'
 import ShellHandler from './handlers/ShellHandler'
@@ -20,9 +19,10 @@ import UtilitiesHandler from './handlers/UtilitiesHandler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 
-// https://stackoverflow.com/a/55414549/2077741
+https://stackoverflow.com/a/55414549/2077741
 if (process.env.NODE_ENV === 'production') {
-  fixPath();
+  const prodFixes = require('./prodFixes')
+  prodFixes.loadProdConfigs();
 }
 
 export default class AppUpdater {
