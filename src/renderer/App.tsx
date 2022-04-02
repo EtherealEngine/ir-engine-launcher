@@ -9,8 +9,8 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import './App.css'
-import ConfigView from './views/ConfigView'
-import NavView from './views/NavView'
+import ConfigView from './pages/ConfigPage'
+import NavView from './components/NavView'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 

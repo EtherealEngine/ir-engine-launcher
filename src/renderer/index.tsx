@@ -1,9 +1,12 @@
 import { render } from 'react-dom'
 
 import App from './App'
+import { AppStatusService } from './services/AppStatusService'
 import { LogService } from './services/LogService'
 
 LogService.listenLog()
+AppStatusService.listenAppStatus()
+AppStatusService.fetchAppStatus(false)
 
 render(<App />, document.getElementById('root'))
 
