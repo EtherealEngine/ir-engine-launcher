@@ -5,7 +5,7 @@ import path from 'path'
 import sudo from 'sudo-prompt'
 
 import { Channels } from '../../constants/Channels'
-import { AppModel, AppStatus, DefaultApps, DefaultCluster } from '../../models/AppStatus'
+import { AppModel, AppStatus, DefaultAppsStatus, DefaultClusterStatus } from '../../models/AppStatus'
 import { IBaseHandler } from './IBaseHandler'
 
 class ShellHandler implements IBaseHandler {
@@ -17,7 +17,6 @@ class ShellHandler implements IBaseHandler {
         await checkClusterStatus(window, sudoMode)
       } catch (err) {
         window.webContents.send(Channels.Utilities.Log, err)
-        return DefaultApps
       }
     }),
       ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
@@ -43,7 +42,7 @@ class ShellHandler implements IBaseHandler {
 }
 
 const checkAppStatus = async (window: BrowserWindow, sudoMode: boolean) => {
-  for (const app of DefaultApps) {
+  for (const app of DefaultAppsStatus) {
     let status: AppModel = {
       ...app
     }
@@ -77,7 +76,7 @@ const checkAppStatus = async (window: BrowserWindow, sudoMode: boolean) => {
 }
 
 const checkClusterStatus = async (window: BrowserWindow, sudoMode: boolean) => {
-  for (const clusterItem of DefaultCluster) {
+  for (const clusterItem of DefaultClusterStatus) {
     let status: AppModel = {
       ...clusterItem
     }

@@ -25,7 +25,7 @@ const minikubeDependantScript = (script: string) => {
   fi`
 }
 
-export const DefaultApps: AppModel[] = [
+export const DefaultAppsStatus: AppModel[] = [
   {
     id: 'node',
     name: 'Node',
@@ -113,7 +113,9 @@ export const DefaultApps: AppModel[] = [
   {
     id: 'ingress',
     name: 'Ingress',
-    checkCommand: minikubeDependantScript(`ingress_ns="ingress-nginx"; podname=$(kubectl get pods -n $ingress_ns -l app.kubernetes.io/name=ingress-nginx --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl exec -i -n $ingress_ns $podname -- /nginx-ingress-controller --version;`),
+    checkCommand: minikubeDependantScript(
+      `ingress_ns="ingress-nginx"; podname=$(kubectl get pods -n $ingress_ns -l app.kubernetes.io/name=ingress-nginx --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl exec -i -n $ingress_ns $podname -- /nginx-ingress-controller --version;`
+    ),
     detail: '',
     status: AppStatus.Checking
   },
@@ -140,7 +142,7 @@ export const DefaultApps: AppModel[] = [
   }
 ]
 
-export const DefaultCluster: AppModel[] = [
+export const DefaultClusterStatus: AppModel[] = [
   {
     id: 'client',
     name: 'Client',
@@ -161,5 +163,29 @@ export const DefaultCluster: AppModel[] = [
     checkCommand: 'kubectl get fleets local-gameserver -o "jsonpath={.status.readyReplicas}"',
     detail: '',
     status: AppStatus.Checking
+  }
+]
+
+export const DefaultSystemStatus: AppModel[] = [
+  {
+    id: 'client',
+    name: 'Client',
+    checkCommand: 'kubectl get deployment local-xrengine-client -o "jsonpath={.status.availableReplicas}"',
+    detail: '',
+    status: AppStatus.Checking
   },
+  {
+    id: 'api',
+    name: 'API Server',
+    checkCommand: 'kubectl get deployment local-xrengine-api -o "jsonpath={.status.availableReplicas}"',
+    detail: '',
+    status: AppStatus.Checking
+  },
+  {
+    id: 'gameserver',
+    name: 'Gameservers',
+    checkCommand: 'kubectl get fleets local-gameserver -o "jsonpath={.status.readyReplicas}"',
+    detail: '',
+    status: AppStatus.Checking
+  }
 ]

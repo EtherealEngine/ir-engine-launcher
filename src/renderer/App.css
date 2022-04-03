@@ -2,3 +2,7 @@ body {
     margin: 0px;
     overflow: hidden;
 }
+
+.MuiSwitch-root {
+    margin-right: 2px;
+}

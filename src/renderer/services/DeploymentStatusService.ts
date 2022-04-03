@@ -1,13 +1,14 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
-import { AppModel, DefaultApps, DefaultCluster } from 'models/AppStatus'
+import { AppModel, DefaultAppsStatus, DefaultClusterStatus, DefaultSystemStatus } from 'models/AppStatus'
 
 import { store, useDispatch } from '../store'
 
 //State
 const state = createState({
   appStatus: [] as AppModel[],
-  clusterStatus: [] as AppModel[]
+  clusterStatus: [] as AppModel[],
+  systemStatus:  [] as AppModel[]
 })
 
 store.receptors.push((action: DeploymentStatusActionType): void => {
@@ -15,8 +16,9 @@ store.receptors.push((action: DeploymentStatusActionType): void => {
     switch (action.type) {
       case 'DEPLOYMENT_STATUS_FETCH':
         return s.merge({
-          appStatus: [...DefaultApps],
-          clusterStatus: [...DefaultCluster]
+          appStatus: [...DefaultAppsStatus],
+          clusterStatus: [...DefaultClusterStatus],
+          systemStatus: [...DefaultSystemStatus]
         })
       case 'APP_STATUS_RECEIVED': {
         const index = s.appStatus.value.findIndex((app) => app.id === action.appStatus.id)

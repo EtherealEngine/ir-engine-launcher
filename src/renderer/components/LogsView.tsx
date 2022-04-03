@@ -41,7 +41,7 @@ const LogsView = () => {
         />
       </Box>
       {showLogs && (
-        <Box sx={{ overflow: 'auto', height: '30vh' }}>
+        <Box sx={{ overflow: 'auto', height: '25vh' }}>
           {logs.map((log, index) => (
             <pre key={`log-${index}`}>
               {new Date().toLocaleTimeString()}: {log}
