@@ -1,17 +1,27 @@
 import childProcess, { ExecException } from 'child_process'
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
+import os from 'os'
 // import log from 'electron-log'
 import path from 'path'
 import sudo from 'sudo-prompt'
 
 import { Channels } from '../../constants/Channels'
-import { AppModel, AppStatus, DefaultAppsStatus, DefaultClusterStatus } from '../../models/AppStatus'
+import SysRequirements from '../../constants/SysRequirements'
+import {
+  AppModel,
+  AppStatus,
+  DefaultAppsStatus,
+  DefaultClusterStatus,
+  DefaultSystemStatus
+} from '../../models/AppStatus'
 import { IBaseHandler } from './IBaseHandler'
 
 class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
     ipcMain.handle(Channels.Shell.CheckMinikubeConfig, async (_event: IpcMainInvokeEvent, sudoMode: boolean) => {
       try {
+        await checkSystemStatus(window)
+
         await checkAppStatus(window, sudoMode)
 
         await checkClusterStatus(window, sudoMode)
@@ -38,6 +48,40 @@ class ShellHandler implements IBaseHandler {
           return false
         }
       })
+  }
+}
+
+const checkSystemStatus = async (window: BrowserWindow) => {
+  for (const app of DefaultSystemStatus) {
+    let status: AppModel = {
+      ...app
+    }
+
+    if (status.id === 'os') {
+      const type = os.type()
+      status = {
+        ...app,
+        detail: type,
+        status: SysRequirements.SUPPORTED_OSES.includes(type) ? AppStatus.Configured : AppStatus.NotConfigured
+      }
+    } else if (status.id === 'cpu') {
+      const cpus = os.cpus()
+      status = {
+        ...app,
+        detail: `${cpus.length.toString()} core(s)`,
+        status: cpus.length < SysRequirements.MIN_CPU ? AppStatus.NotConfigured : AppStatus.Configured
+      }
+    } else if (status.id === 'memory') {
+      let memory = os.totalmem() / (1024 * 1024)
+      status = {
+        ...app,
+        detail: `${memory.toString()} MB`,
+        status: memory < SysRequirements.MIN_MEMORY ? AppStatus.NotConfigured : AppStatus.Configured
+      }
+    }
+
+    window.webContents.send(Channels.Utilities.Log, `${status.name} - ${status.detail}`)
+    window.webContents.send(Channels.Shell.CheckSystemStatusResult, status)
   }
 }
 

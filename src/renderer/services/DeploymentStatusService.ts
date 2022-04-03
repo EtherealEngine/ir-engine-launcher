@@ -8,7 +8,7 @@ import { store, useDispatch } from '../store'
 const state = createState({
   appStatus: [] as AppModel[],
   clusterStatus: [] as AppModel[],
-  systemStatus:  [] as AppModel[]
+  systemStatus: [] as AppModel[]
 })
 
 store.receptors.push((action: DeploymentStatusActionType): void => {
@@ -16,10 +16,15 @@ store.receptors.push((action: DeploymentStatusActionType): void => {
     switch (action.type) {
       case 'DEPLOYMENT_STATUS_FETCH':
         return s.merge({
+          systemStatus: [...DefaultSystemStatus],
           appStatus: [...DefaultAppsStatus],
-          clusterStatus: [...DefaultClusterStatus],
-          systemStatus: [...DefaultSystemStatus]
+          clusterStatus: [...DefaultClusterStatus]
         })
+      case 'SYSTEM_STATUS_RECEIVED': {
+        const index = s.systemStatus.value.findIndex((app) => app.id === action.systemStatus.id)
+        s.systemStatus.merge({ [index]: action.systemStatus })
+        break
+      }
       case 'APP_STATUS_RECEIVED': {
         const index = s.appStatus.value.findIndex((app) => app.id === action.appStatus.id)
         s.appStatus.merge({ [index]: action.appStatus })
@@ -52,6 +57,9 @@ export const DeploymentStatusService = {
   listenDeploymentStatus: async () => {
     const dispatch = useDispatch()
     try {
+      window.electronAPI.on(Channels.Shell.CheckSystemStatusResult, (data: AppModel) => {
+        dispatch(DeploymentStatusAction.systemStatusReceived(data))
+      })
       window.electronAPI.on(Channels.Shell.CheckAppStatusResult, (data: AppModel) => {
         dispatch(DeploymentStatusAction.appStatusReceived(data))
       })
@@ -69,6 +77,12 @@ export const DeploymentStatusAction = {
   fetchDeploymentStatus: () => {
     return {
       type: 'DEPLOYMENT_STATUS_FETCH' as const
+    }
+  },
+  systemStatusReceived: (systemStatus: AppModel) => {
+    return {
+      type: 'SYSTEM_STATUS_RECEIVED' as const,
+      systemStatus: systemStatus
     }
   },
   appStatusReceived: (appStatus: AppModel) => {

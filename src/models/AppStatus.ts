@@ -25,6 +25,30 @@ const minikubeDependantScript = (script: string) => {
   fi`
 }
 
+export const DefaultSystemStatus: AppModel[] = [
+  {
+    id: 'os',
+    name: 'Operating System',
+    checkCommand: '',
+    detail: '',
+    status: AppStatus.Checking
+  },
+  {
+    id: 'cpu',
+    name: 'CPUs',
+    checkCommand: '',
+    detail: '',
+    status: AppStatus.Checking
+  },
+  {
+    id: 'memory',
+    name: 'Memory',
+    checkCommand: '',
+    detail: '',
+    status: AppStatus.Checking
+  }
+]
+
 export const DefaultAppsStatus: AppModel[] = [
   {
     id: 'node',
@@ -143,30 +167,6 @@ export const DefaultAppsStatus: AppModel[] = [
 ]
 
 export const DefaultClusterStatus: AppModel[] = [
-  {
-    id: 'client',
-    name: 'Client',
-    checkCommand: 'kubectl get deployment local-xrengine-client -o "jsonpath={.status.availableReplicas}"',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'api',
-    name: 'API Server',
-    checkCommand: 'kubectl get deployment local-xrengine-api -o "jsonpath={.status.availableReplicas}"',
-    detail: '',
-    status: AppStatus.Checking
-  },
-  {
-    id: 'gameserver',
-    name: 'Gameservers',
-    checkCommand: 'kubectl get fleets local-gameserver -o "jsonpath={.status.readyReplicas}"',
-    detail: '',
-    status: AppStatus.Checking
-  }
-]
-
-export const DefaultSystemStatus: AppModel[] = [
   {
     id: 'client',
     name: 'Client',
