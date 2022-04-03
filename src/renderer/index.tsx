@@ -1,12 +1,12 @@
 import { render } from 'react-dom'
 
 import App from './App'
-import { AppStatusService } from './services/AppStatusService'
+import { DeploymentStatusService } from './services/DeploymentStatusService'
 import { LogService } from './services/LogService'
 
 LogService.listenLog()
-AppStatusService.listenAppStatus()
-AppStatusService.fetchAppStatus(false)
+DeploymentStatusService.listenDeploymentStatus()
+DeploymentStatusService.fetchDeploymentStatus(false)
 
 render(<App />, document.getElementById('root'))
 

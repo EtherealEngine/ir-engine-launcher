@@ -140,7 +140,7 @@ export const DefaultApps: AppModel[] = [
   }
 ]
 
-export const DefaultDeployments: AppModel[] = [
+export const DefaultCluster: AppModel[] = [
   {
     id: 'client',
     name: 'Client',
@@ -158,7 +158,7 @@ export const DefaultDeployments: AppModel[] = [
   {
     id: 'gameserver',
     name: 'Gameservers',
-    checkCommand: 'kubectl get fleets local-gameserver -o "jsonpath={.status.availableReplicas}"',
+    checkCommand: 'kubectl get fleets local-gameserver -o "jsonpath={.status.readyReplicas}"',
     detail: '',
     status: AppStatus.Checking
   },

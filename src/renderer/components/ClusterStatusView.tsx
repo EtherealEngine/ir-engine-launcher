@@ -2,11 +2,11 @@ import { useDeploymentStatusState } from 'renderer/services/DeploymentStatusServ
 
 import StatusView from './StatusView'
 
-const AppStatusView = () => {
+const ClusterStatusView = () => {
   const deploymentStatusState = useDeploymentStatusState()
-  const { appStatus } = deploymentStatusState.value
+  const { clusterStatus } = deploymentStatusState.value
 
-  return <StatusView title="Apps" statuses={appStatus} />
+  return <StatusView title="Apps" statuses={clusterStatus} />
 }
 
-export default AppStatusView
+export default ClusterStatusView

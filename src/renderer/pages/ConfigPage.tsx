@@ -3,9 +3,9 @@ import { AppStatus } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import AppStatusView from 'renderer/components/AppStatusView'
-import DeploymentStatusView from 'renderer/components/DeploymentStatusView'
+import ClusterStatusView from 'renderer/components/ClusterStatusView'
 import LogsView from 'renderer/components/LogsView'
-import { AppStatusService, useAppStatusState } from 'renderer/services/AppStatusService'
+import { DeploymentStatusService, useDeploymentStatusState } from 'renderer/services/DeploymentStatusService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
@@ -16,8 +16,8 @@ import { Box } from '@mui/system'
 const ConfigView = () => {
   const [sudoMode] = useState(false)
 
-  const appStatusState = useAppStatusState()
-  const { appStatus } = appStatusState.value
+  const deploymentStatusState = useDeploymentStatusState()
+  const { appStatus } = deploymentStatusState.value
 
   const { enqueueSnackbar } = useSnackbar()
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
@@ -37,7 +37,7 @@ const ConfigView = () => {
             title="Refresh"
             color="primary"
             onClick={() => {
-              AppStatusService.fetchAppStatus(sudoMode)
+              DeploymentStatusService.fetchDeploymentStatus(sudoMode)
             }}
           >
             <CachedOutlinedIcon />
@@ -53,7 +53,7 @@ const ConfigView = () => {
 
               const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig)
               if (response) {
-                AppStatusService.fetchAppStatus(sudoMode)
+                DeploymentStatusService.fetchDeploymentStatus(sudoMode)
               }
             }}
           >
@@ -74,7 +74,7 @@ const ConfigView = () => {
 
         <AppStatusView />
 
-        <DeploymentStatusView />
+        <ClusterStatusView />
       </Box>
 
       <LogsView />

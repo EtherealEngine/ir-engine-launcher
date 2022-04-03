@@ -5,44 +5,16 @@ import path from 'path'
 import sudo from 'sudo-prompt'
 
 import { Channels } from '../../constants/Channels'
-import { AppModel, AppStatus, DefaultApps } from '../../models/AppStatus'
+import { AppModel, AppStatus, DefaultApps, DefaultCluster } from '../../models/AppStatus'
 import { IBaseHandler } from './IBaseHandler'
 
 class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
     ipcMain.handle(Channels.Shell.CheckMinikubeConfig, async (_event: IpcMainInvokeEvent, sudoMode: boolean) => {
       try {
-        for (const app of DefaultApps) {
-          let status: AppModel = {
-            ...app
-          }
+        await checkAppStatus(window, sudoMode)
 
-          if (app.checkCommand) {
-            const response = await exec(app.checkCommand, sudoMode)
-            const { stdout, stderr } = response
-
-            if (stdout) {
-              window.webContents.send(
-                Channels.Utilities.Log,
-                `${app.name} - ` + (typeof stdout === 'string' ? stdout.trim() : stdout)
-              )
-            }
-            if (stderr) {
-              window.webContents.send(
-                Channels.Utilities.Log,
-                `${app.name} - ` + (typeof stderr === 'string' ? stderr.trim() : stderr)
-              )
-            }
-
-            status = {
-              ...app,
-              detail: stderr ? stderr : stdout,
-              status: stderr ? AppStatus.NotConfigured : AppStatus.Configured
-            }
-          }
-
-          window.webContents.send(Channels.Shell.CheckMinikubeConfigResult, status)
-        }
+        await checkClusterStatus(window, sudoMode)
       } catch (err) {
         window.webContents.send(Channels.Utilities.Log, err)
         return DefaultApps
@@ -67,6 +39,84 @@ class ShellHandler implements IBaseHandler {
           return false
         }
       })
+  }
+}
+
+const checkAppStatus = async (window: BrowserWindow, sudoMode: boolean) => {
+  for (const app of DefaultApps) {
+    let status: AppModel = {
+      ...app
+    }
+
+    if (app.checkCommand) {
+      const response = await exec(app.checkCommand, sudoMode)
+      const { stdout, stderr } = response
+
+      if (stdout) {
+        window.webContents.send(
+          Channels.Utilities.Log,
+          `${app.name} - ` + (typeof stdout === 'string' ? stdout.trim() : stdout)
+        )
+      }
+      if (stderr) {
+        window.webContents.send(
+          Channels.Utilities.Log,
+          `${app.name} - ` + (typeof stderr === 'string' ? stderr.trim() : stderr)
+        )
+      }
+
+      status = {
+        ...app,
+        detail: stderr ? stderr : stdout,
+        status: stderr ? AppStatus.NotConfigured : AppStatus.Configured
+      }
+    }
+
+    window.webContents.send(Channels.Shell.CheckAppStatusResult, status)
+  }
+}
+
+const checkClusterStatus = async (window: BrowserWindow, sudoMode: boolean) => {
+  for (const clusterItem of DefaultCluster) {
+    let status: AppModel = {
+      ...clusterItem
+    }
+
+    if (clusterItem.checkCommand) {
+      const response = await exec(clusterItem.checkCommand, sudoMode)
+      const { stdout, stderr } = response
+
+      if (stdout) {
+        window.webContents.send(
+          Channels.Utilities.Log,
+          `${clusterItem.name} - ` + (typeof stdout === 'string' ? stdout.trim() : stdout)
+        )
+      }
+      if (stderr) {
+        window.webContents.send(
+          Channels.Utilities.Log,
+          `${clusterItem.name} - ` + (typeof stderr === 'string' ? stderr.trim() : stderr)
+        )
+      }
+
+      let detail: string | Buffer = `Ready Instances: ${stdout === '' || stdout === undefined ? 0 : stdout}`
+      let itemStatus = AppStatus.Configured
+
+      if (stderr) {
+        detail = stderr
+        itemStatus = AppStatus.NotConfigured
+      } else if (!stdout || parseInt(stdout.toString()) < 1) {
+        itemStatus = AppStatus.NotConfigured
+      }
+
+      status = {
+        ...clusterItem,
+        detail,
+        status: itemStatus
+      }
+    }
+
+    window.webContents.send(Channels.Shell.CheckClusterStatusResult, status)
   }
 }
 
