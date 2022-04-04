@@ -4,13 +4,14 @@ import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import { Box, PaletteMode } from '@mui/material'
+import { PaletteMode } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import './App.css'
-import ConfigView from './pages/ConfigPage'
 import NavView from './components/NavView'
+import ConfigPage from './pages/ConfigPage'
+import ClusterPage from './pages/ClusterPage'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
@@ -48,22 +49,12 @@ const App = () => {
         <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
           <BrowserRouter>
             <NavView />
-            <Box
-              sx={{
-                display: 'flex',
-                height: 'calc(100vh - 117px)',
-                bgcolor: 'background.default',
-                color: 'text.primary',
-                p: 3
-              }}
-            >
               <Routes>
-                <Route path={Paths.ROOT} element={<ConfigView />} />
+                <Route path={Paths.ROOT} element={<ConfigPage />} />
                 <Route path={Paths.ADMIN} element={<div>Admin</div>} />
-                <Route path={Paths.CLUSTER} element={<div>Cluster</div>} />
+                <Route path={Paths.CLUSTER} element={<ClusterPage />} />
                 <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
               </Routes>
-            </Box>
           </BrowserRouter>
         </SnackbarProvider>
       </ThemeProvider>

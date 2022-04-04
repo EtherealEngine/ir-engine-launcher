@@ -1,12 +1,17 @@
 import { render } from 'react-dom'
 
 import App from './App'
-import { DeploymentStatusService } from './services/DeploymentStatusService'
+import { DeploymentService } from './services/DeploymentService'
 import { LogService } from './services/LogService'
+import { accessSettingsState, SettingsService } from './services/SettingsService'
 
-LogService.listenLog()
-DeploymentStatusService.listenDeploymentStatus()
-DeploymentStatusService.fetchDeploymentStatus(false)
+const settingsState = accessSettingsState()
+const { sudoMode } = settingsState.value
+
+LogService.listen()
+SettingsService.listen()
+DeploymentService.listen()
+DeploymentService.fetchDeploymentStatus(sudoMode)
 
 render(<App />, document.getElementById('root'))
 

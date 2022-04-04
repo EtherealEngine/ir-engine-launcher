@@ -29,7 +29,7 @@ export const useLogState = () => useState(state) as any as typeof state
 
 //Service
 export const LogService = {
-  listenLog: async () => {
+  listen: async () => {
     const dispatch = useDispatch()
     try {
       window.electronAPI.on(Channels.Utilities.Log, (data: string) => {

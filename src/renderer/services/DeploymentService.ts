@@ -6,15 +6,15 @@ import { store, useDispatch } from '../store'
 
 //State
 const state = createState({
-  appStatus: [] as AppModel[],
-  clusterStatus: [] as AppModel[],
-  systemStatus: [] as AppModel[]
+  systemStatus: [...DefaultSystemStatus] as AppModel[],
+  appStatus: [...DefaultAppsStatus] as AppModel[],
+  clusterStatus: [...DefaultClusterStatus] as AppModel[]
 })
 
-store.receptors.push((action: DeploymentStatusActionType): void => {
+store.receptors.push((action: DeploymentActionType): void => {
   state.batch((s) => {
     switch (action.type) {
-      case 'DEPLOYMENT_STATUS_FETCH':
+      case 'FETCH_DEPLOYMENT_STATUS':
         return s.merge({
           systemStatus: [...DefaultSystemStatus],
           appStatus: [...DefaultAppsStatus],
@@ -39,32 +39,32 @@ store.receptors.push((action: DeploymentStatusActionType): void => {
   }, action.type)
 })
 
-export const accessDeploymentStatusState = () => state
+export const accessDeploymentState = () => state
 
-export const useDeploymentStatusState = () => useState(state) as any as typeof state
+export const useDeploymentState = () => useState(state) as any as typeof state
 
 //Service
-export const DeploymentStatusService = {
+export const DeploymentService = {
   fetchDeploymentStatus: async (sudoMode: boolean) => {
     const dispatch = useDispatch()
     try {
-      dispatch(DeploymentStatusAction.fetchDeploymentStatus())
+      dispatch(DeploymentAction.fetchDeploymentStatus())
       window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig, sudoMode)
     } catch (error) {
       console.error(error)
     }
   },
-  listenDeploymentStatus: async () => {
+  listen: async () => {
     const dispatch = useDispatch()
     try {
       window.electronAPI.on(Channels.Shell.CheckSystemStatusResult, (data: AppModel) => {
-        dispatch(DeploymentStatusAction.systemStatusReceived(data))
+        dispatch(DeploymentAction.systemStatusReceived(data))
       })
       window.electronAPI.on(Channels.Shell.CheckAppStatusResult, (data: AppModel) => {
-        dispatch(DeploymentStatusAction.appStatusReceived(data))
+        dispatch(DeploymentAction.appStatusReceived(data))
       })
       window.electronAPI.on(Channels.Shell.CheckClusterStatusResult, (data: AppModel) => {
-        dispatch(DeploymentStatusAction.clusterStatusReceived(data))
+        dispatch(DeploymentAction.clusterStatusReceived(data))
       })
     } catch (error) {
       console.error(error)
@@ -73,10 +73,10 @@ export const DeploymentStatusService = {
 }
 
 //Action
-export const DeploymentStatusAction = {
+export const DeploymentAction = {
   fetchDeploymentStatus: () => {
     return {
-      type: 'DEPLOYMENT_STATUS_FETCH' as const
+      type: 'FETCH_DEPLOYMENT_STATUS' as const
     }
   },
   systemStatusReceived: (systemStatus: AppModel) => {
@@ -99,4 +99,4 @@ export const DeploymentStatusAction = {
   }
 }
 
-export type DeploymentStatusActionType = ReturnType<typeof DeploymentStatusAction[keyof typeof DeploymentStatusAction]>
+export type DeploymentActionType = ReturnType<typeof DeploymentAction[keyof typeof DeploymentAction]>

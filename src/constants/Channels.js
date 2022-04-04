@@ -4,7 +4,10 @@ const Channels = {
     CheckSystemStatusResult: 'CheckSystemStatusResult',
     CheckAppStatusResult: 'CheckAppStatusResult',
     CheckClusterStatusResult: 'CheckClusterStatusResult',
-    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig'
+    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig',
+    ConfigureMinikubeDashboard: 'ConfigureMinikubeDashboard',
+    ConfigureMinikubeDashboardError: 'ConfigureMinikubeDashboardError',
+    ConfigureMinikubeDashboardResponse: 'ConfigureMinikubeDashboardResponse',
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',

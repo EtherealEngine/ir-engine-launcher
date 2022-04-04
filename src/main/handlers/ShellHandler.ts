@@ -26,26 +26,47 @@ class ShellHandler implements IBaseHandler {
 
         await checkClusterStatus(window, sudoMode)
       } catch (err) {
-        window.webContents.send(Channels.Utilities.Log, err)
+        window.webContents.send(Channels.Utilities.Log, `check minikube config - ` + err)
       }
     }),
       ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
         try {
           const script = path.join(__dirname, '../../../assets', 'scripts', 'configure-minikube.sh')
 
-          const onStdout = (data: any) => {
+          const onStd = (data: any) => {
             window.webContents.send(Channels.Utilities.Log, data)
           }
-          const onStderr = (data: any) => {
-            window.webContents.send(Channels.Utilities.Log, data)
-          }
-          const response = await shellExecStream(`sh ${script}`, onStdout, onStderr)
+          const response = await shellExecStream(`sh ${script}`, onStd, onStd)
           window.webContents.send(Channels.Utilities.Log, response)
 
           return true
         } catch (err) {
-          window.webContents.send(Channels.Utilities.Log, err)
+          window.webContents.send(Channels.Utilities.Log, `configure minikube - ` + err)
           return false
+        }
+      }),
+      ipcMain.handle(Channels.Shell.ConfigureMinikubeDashboard, async (_event: IpcMainInvokeEvent) => {
+        try {
+          const onStdout = (data: any) => {
+            window.webContents.send(
+              Channels.Utilities.Log,
+              `minikube dashboard - ` + (typeof data === 'string' ? data.trim() : data)
+            )
+            if (isValidUrl(data)) {
+              window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardResponse, data)
+            }
+          }
+          const onStderr = (data: any) => {
+            window.webContents.send(
+              Channels.Utilities.Log,
+              `minikube dashboard - ` + (typeof data === 'string' ? data.trim() : data)
+            )
+            window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardError, data)
+          }
+          await shellExecStream(`minikube dashboard --url`, onStdout, onStderr)
+        } catch (err) {
+          window.webContents.send(Channels.Utilities.Log, `minikube dashboard - ` + err)
+          return err
         }
       })
   }
@@ -206,6 +227,23 @@ const exec = async (command: string, isSudo = false): Promise<ShellResponse> => 
   }
 
   return await shellExec(command)
+}
+
+/**
+ * https://stackoverflow.com/a/43467144/2077741
+ * @param urlString
+ * @returns
+ */
+const isValidUrl = (urlString: string) => {
+  let url
+
+  try {
+    url = new URL(urlString)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
 type ShellResponse = {
