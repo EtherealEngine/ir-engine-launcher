@@ -11,6 +11,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
 import { Button, IconButton, Stack } from '@mui/material'
 import { Box } from '@mui/system'
+import PageRoot from 'renderer/components/PageRoot'
 
 const ConfigPage = () => {
   const settingsState = useSettingsState()
@@ -23,15 +24,7 @@ const ConfigPage = () => {
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        height: 'calc(100vh - 117px)',
-        bgcolor: 'background.default',
-        color: 'text.primary',
-        p: 3
-      }}
-    >
+    <PageRoot>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <Stack sx={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 2, marginBottom: 3 }}>
           <IconButton
@@ -74,7 +67,7 @@ const ConfigPage = () => {
 
         <LogsView />
       </Box>
-    </Box>
+    </PageRoot>
   )
 }
 

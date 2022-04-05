@@ -26,7 +26,7 @@ class ShellHandler implements IBaseHandler {
 
         await checkClusterStatus(window, sudoMode)
       } catch (err) {
-        window.webContents.send(Channels.Utilities.Log, `check minikube config - ` + err)
+        window.webContents.send(Channels.Utilities.Log, { category: 'check minikube config', message: err })
       }
     }),
       ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
@@ -34,38 +34,36 @@ class ShellHandler implements IBaseHandler {
           const script = path.join(__dirname, '../../../assets', 'scripts', 'configure-minikube.sh')
 
           const onStd = (data: any) => {
-            window.webContents.send(Channels.Utilities.Log, data)
+            window.webContents.send(Channels.Utilities.Log, { category: 'configure minikube', message: data })
           }
           const response = await shellExecStream(`sh ${script}`, onStd, onStd)
-          window.webContents.send(Channels.Utilities.Log, response)
+          window.webContents.send(Channels.Utilities.Log, { category: 'configure minikube', message: response })
 
           return true
         } catch (err) {
-          window.webContents.send(Channels.Utilities.Log, `configure minikube - ` + err)
+          window.webContents.send(Channels.Utilities.Log, { category: 'configure minikube', message: err })
           return false
         }
       }),
       ipcMain.handle(Channels.Shell.ConfigureMinikubeDashboard, async (_event: IpcMainInvokeEvent) => {
         try {
           const onStdout = (data: any) => {
-            window.webContents.send(
-              Channels.Utilities.Log,
-              `minikube dashboard - ` + (typeof data === 'string' ? data.trim() : data)
-            )
+            const stringData = typeof data === 'string' ? data.trim() : data
+            window.webContents.send(Channels.Utilities.Log, { category: 'minikube dashboard', message: stringData })
             if (isValidUrl(data)) {
               window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardResponse, data)
             }
           }
           const onStderr = (data: any) => {
-            window.webContents.send(
-              Channels.Utilities.Log,
-              `minikube dashboard - ` + (typeof data === 'string' ? data.trim() : data)
-            )
-            window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardError, data)
+            const stringData = typeof data === 'string' ? data.trim() : data
+            window.webContents.send(Channels.Utilities.Log, { category: 'minikube dashboard', message: stringData })
+            if (stringData.toString().startsWith('*') === false) {
+              window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardError, data)
+            }
           }
           await shellExecStream(`minikube dashboard --url`, onStdout, onStderr)
         } catch (err) {
-          window.webContents.send(Channels.Utilities.Log, `minikube dashboard - ` + err)
+          window.webContents.send(Channels.Utilities.Log, { category: 'minikube dashboard', message: err })
           return err
         }
       })
@@ -101,7 +99,7 @@ const checkSystemStatus = async (window: BrowserWindow) => {
       }
     }
 
-    window.webContents.send(Channels.Utilities.Log, `${status.name} - ${status.detail}`)
+    window.webContents.send(Channels.Utilities.Log, { category: status.name, message: status.detail })
     window.webContents.send(Channels.Shell.CheckSystemStatusResult, status)
   }
 }
@@ -117,16 +115,16 @@ const checkAppStatus = async (window: BrowserWindow, sudoMode: boolean) => {
       const { stdout, stderr } = response
 
       if (stdout) {
-        window.webContents.send(
-          Channels.Utilities.Log,
-          `${app.name} - ` + (typeof stdout === 'string' ? stdout.trim() : stdout)
-        )
+        window.webContents.send(Channels.Utilities.Log, {
+          category: status.name,
+          message: typeof stdout === 'string' ? stdout.trim() : stdout
+        })
       }
       if (stderr) {
-        window.webContents.send(
-          Channels.Utilities.Log,
-          `${app.name} - ` + (typeof stderr === 'string' ? stderr.trim() : stderr)
-        )
+        window.webContents.send(Channels.Utilities.Log, {
+          category: status.name,
+          message: typeof stderr === 'string' ? stderr.trim() : stderr
+        })
       }
 
       status = {
@@ -151,16 +149,16 @@ const checkClusterStatus = async (window: BrowserWindow, sudoMode: boolean) => {
       const { stdout, stderr } = response
 
       if (stdout) {
-        window.webContents.send(
-          Channels.Utilities.Log,
-          `${clusterItem.name} - ` + (typeof stdout === 'string' ? stdout.trim() : stdout)
-        )
+        window.webContents.send(Channels.Utilities.Log, {
+          category: clusterItem.name,
+          message: typeof stdout === 'string' ? stdout.trim() : stdout
+        })
       }
       if (stderr) {
-        window.webContents.send(
-          Channels.Utilities.Log,
-          `${clusterItem.name} - ` + (typeof stderr === 'string' ? stderr.trim() : stderr)
-        )
+        window.webContents.send(Channels.Utilities.Log, {
+          category: clusterItem.name,
+          message: typeof stderr === 'string' ? stderr.trim() : stderr
+        })
       }
 
       let detail: string | Buffer = `Ready Instances: ${stdout === '' || stdout === undefined ? 0 : stdout}`

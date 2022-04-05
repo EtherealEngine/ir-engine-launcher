@@ -1,11 +1,13 @@
 import { AppStatus } from 'models/AppStatus'
-import ErrorView from 'renderer/components/ErrorView'
-import LoadingView from 'renderer/components/LoadingView'
+import PageRoot from 'renderer/components/PageRoot'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
 import { Box } from '@mui/system'
+
+import ErrorPage from './ErrorPage'
+import LoadingPage from './LoadingPage'
 
 const ClusterPage = () => {
   const settingsState = useSettingsState()
@@ -44,24 +46,17 @@ const ClusterPage = () => {
   }
 
   if (loadingMessage) {
-    return <LoadingView title={loadingMessage} />
+    return <LoadingPage title={loadingMessage} />
   } else if (errorMessage) {
-    return <ErrorView error={errorMessage} detail={errorDetail} onRetry={errorRetry} />
+    return <ErrorPage error={errorMessage} detail={errorDetail} onRetry={errorRetry} />
   }
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        height: 'calc(100vh - 69px)',
-        bgcolor: 'background.default',
-        color: 'text.primary'
-      }}
-    >
+    <PageRoot full>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <iframe height="100%" src={cluster.url}></iframe>
       </Box>
-    </Box>
+    </PageRoot>
   )
 }
 

@@ -44,7 +44,7 @@ const LogsView = () => {
         <Box sx={{ overflow: 'auto', height: '25vh' }}>
           {logs.map((log, index) => (
             <pre key={`log-${index}`}>
-              {new Date().toLocaleTimeString()}: {log}
+              {new Date().toLocaleTimeString()}: {log.category} - {log.message}
             </pre>
           ))}
           <pre ref={logsEndRef} />
