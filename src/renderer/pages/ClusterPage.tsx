@@ -54,7 +54,7 @@ const ClusterPage = () => {
   return (
     <PageRoot full>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <iframe height="100%" src={cluster.url}></iframe>
+        <iframe height="100%" style={{ border: 0 }} src={cluster.url}></iframe>
       </Box>
     </PageRoot>
   )

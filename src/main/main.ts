@@ -13,17 +13,23 @@ import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 import path from 'path'
 
+import Endpoints from '../constants/Endpoints'
 import { IBaseHandler } from './handlers/IBaseHandler'
 import ShellHandler from './handlers/ShellHandler'
 import UtilitiesHandler from './handlers/UtilitiesHandler'
+import XREngineHandler from './handlers/XREngineHandler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 
-https://stackoverflow.com/a/55414549/2077741
+// https://stackoverflow.com/a/55414549/2077741
 if (process.env.NODE_ENV === 'production') {
   const prodFixes = require('./prodFixes')
-  prodFixes.loadProdConfigs();
+  prodFixes.loadProdConfigs()
 }
+
+// To allow XREngine certificate errors
+// https://stackoverflow.com/a/51291249/2077741
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
 export default class AppUpdater {
   constructor() {
@@ -82,8 +88,19 @@ const createWindow = async () => {
     }
   })
 
-  const ipcHandlers: IBaseHandler[] = [new UtilitiesHandler(), new ShellHandler()]
-  
+  // To allow XREngine certificate errors
+  // https://github.com/electron/electron/issues/14885#issuecomment-770953041
+  mainWindow.webContents.session.setCertificateVerifyProc((request, callback) => {
+    const { hostname } = request
+    if (Endpoints.ALLOW_CERTIFICATES.includes(hostname)) {
+      callback(0) //this means trust this domain
+    } else {
+      callback(-3) //use chromium's verification result
+    }
+  })
+
+  const ipcHandlers: IBaseHandler[] = [new UtilitiesHandler(), new ShellHandler(), new XREngineHandler()]
+
   ipcHandlers.forEach((handler) => {
     handler.configure(mainWindow!)
   })

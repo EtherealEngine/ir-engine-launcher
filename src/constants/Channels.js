@@ -12,6 +12,11 @@ const Channels = {
   Utilities: {
     CopyClipboard: 'CopyClipboard',
     Log: 'Log'
+  },
+  XREngine: {
+    EnsureAdminAccess: 'EnsureAdminAccess',
+    EnsureAdminAccessError: 'EnsureAdminAccessError',
+    EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
   }
 }
 

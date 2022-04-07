@@ -10,8 +10,9 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 import './App.css'
 import NavView from './components/NavView'
-import ConfigPage from './pages/ConfigPage'
+import AdminPage from './pages/AdminPage'
 import ClusterPage from './pages/ClusterPage'
+import ConfigPage from './pages/ConfigPage'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
@@ -49,12 +50,12 @@ const App = () => {
         <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
           <BrowserRouter>
             <NavView />
-              <Routes>
-                <Route path={Paths.ROOT} element={<ConfigPage />} />
-                <Route path={Paths.ADMIN} element={<div>Admin</div>} />
-                <Route path={Paths.CLUSTER} element={<ClusterPage />} />
-                <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
-              </Routes>
+            <Routes>
+              <Route path={Paths.ROOT} element={<ConfigPage />} />
+              <Route path={Paths.ADMIN} element={<AdminPage />} />
+              <Route path={Paths.CLUSTER} element={<ClusterPage />} />
+              <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
+            </Routes>
           </BrowserRouter>
         </SnackbarProvider>
       </ThemeProvider>

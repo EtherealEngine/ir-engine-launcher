@@ -26,7 +26,10 @@ class ShellHandler implements IBaseHandler {
 
         await checkClusterStatus(window, sudoMode)
       } catch (err) {
-        window.webContents.send(Channels.Utilities.Log, { category: 'check minikube config', message: err })
+        window.webContents.send(Channels.Utilities.Log, {
+          category: 'check minikube config',
+          message: JSON.stringify(err)
+        })
       }
     }),
       ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
@@ -41,7 +44,10 @@ class ShellHandler implements IBaseHandler {
 
           return true
         } catch (err) {
-          window.webContents.send(Channels.Utilities.Log, { category: 'configure minikube', message: err })
+          window.webContents.send(Channels.Utilities.Log, {
+            category: 'configure minikube',
+            message: JSON.stringify(err)
+          })
           return false
         }
       }),
@@ -63,7 +69,10 @@ class ShellHandler implements IBaseHandler {
           }
           await shellExecStream(`minikube dashboard --url`, onStdout, onStderr)
         } catch (err) {
-          window.webContents.send(Channels.Utilities.Log, { category: 'minikube dashboard', message: err })
+          window.webContents.send(Channels.Utilities.Log, {
+            category: 'minikube dashboard',
+            message: JSON.stringify(err)
+          })
           return err
         }
       })
@@ -219,7 +228,7 @@ const shellExecStream = (
   })
 }
 
-const exec = async (command: string, isSudo = false): Promise<ShellResponse> => {
+export const exec = async (command: string, isSudo = false): Promise<ShellResponse> => {
   if (isSudo) {
     return await sudoShellExec(command)
   }

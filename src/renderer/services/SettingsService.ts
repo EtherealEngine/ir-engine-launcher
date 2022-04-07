@@ -10,6 +10,11 @@ const state = createState({
     loading: false,
     url: '',
     error: ''
+  },
+  adminPanel: {
+    loading: false,
+    adminAccess: false,
+    error: ''
   }
 })
 
@@ -48,6 +53,38 @@ store.receptors.push((action: SettingsActionType): void => {
             error: ''
           }
         })
+      case 'FETCH_ADMIN_PANEL_ACCESS':
+        return s.merge({
+          adminPanel: {
+            loading: true,
+            adminAccess: false,
+            error: ''
+          }
+        })
+      case 'FETCH_ADMIN_PANEL_ACCESS_RESPONSE':
+        return s.merge({
+          adminPanel: {
+            loading: false,
+            adminAccess: true,
+            error: ''
+          }
+        })
+      case 'FETCH_ADMIN_PANEL_ACCESS_ERROR':
+        return s.merge({
+          adminPanel: {
+            loading: false,
+            adminAccess: false,
+            error: action.error
+          }
+        })
+      case 'CLEAR_ADMIN_PANEL_ACCESS':
+        return s.merge({
+          adminPanel: {
+            loading: false,
+            adminAccess: false,
+            error: ''
+          }
+        })
     }
   }, action.type)
 })
@@ -75,6 +112,23 @@ export const SettingsService = {
       console.error(error)
     }
   },
+  fetchAdminPanelAccess: async () => {
+    const dispatch = useDispatch()
+    try {
+      dispatch(SettingsAction.fetchAdminPanelAccess())
+      window.electronAPI.invoke(Channels.XREngine.EnsureAdminAccess)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  clearAdminPanelAccess: async () => {
+    const dispatch = useDispatch()
+    try {
+      dispatch(SettingsAction.clearAdminPanelAccess())
+    } catch (error) {
+      console.error(error)
+    }
+  },
   listen: async () => {
     const dispatch = useDispatch()
     try {
@@ -83,6 +137,12 @@ export const SettingsService = {
       })
       window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardError, (data: string) => {
         dispatch(SettingsAction.fetchClusterDashboardError(data))
+      })
+      window.electronAPI.on(Channels.XREngine.EnsureAdminAccessResponse, () => {
+        dispatch(SettingsAction.fetchAdminPanelAccessResponse())
+      })
+      window.electronAPI.on(Channels.XREngine.EnsureAdminAccessError, (data: string) => {
+        dispatch(SettingsAction.fetchAdminPanelAccessError(data))
       })
     } catch (error) {
       console.error(error)
@@ -112,6 +172,27 @@ export const SettingsAction = {
   clearClusterDashboard: () => {
     return {
       type: 'CLEAR_CLUSTER_DASHBOARD' as const
+    }
+  },
+  fetchAdminPanelAccess: () => {
+    return {
+      type: 'FETCH_ADMIN_PANEL_ACCESS' as const
+    }
+  },
+  fetchAdminPanelAccessResponse: () => {
+    return {
+      type: 'FETCH_ADMIN_PANEL_ACCESS_RESPONSE' as const
+    }
+  },
+  fetchAdminPanelAccessError: (error: any) => {
+    return {
+      type: 'FETCH_ADMIN_PANEL_ACCESS_ERROR' as const,
+      error
+    }
+  },
+  clearAdminPanelAccess: () => {
+    return {
+      type: 'CLEAR_ADMIN_PANEL_ACCESS' as const
     }
   }
 }
