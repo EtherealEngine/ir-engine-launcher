@@ -41,7 +41,7 @@ const ErrorPage = ({ error, detail, retryText, onRetry }: Props) => {
             color="primary"
             variant="contained"
             startIcon={<CachedOutlinedIcon />}
-            sx={{ marginTop: 1 }}
+            sx={{ marginTop: 1, background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
             onClick={onRetry}
           >
             {retryText ? retryText : 'Retry'}

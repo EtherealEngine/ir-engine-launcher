@@ -13,8 +13,8 @@ const PageRoot = ({ full, children }: PropsWithChildren<Props>) => {
         sx={{
           display: 'flex',
           height: 'calc(100vh - 69px)',
-          bgcolor: 'background.default',
-          color: 'text.primary'
+          bgcolor: 'var(--purpleDarkest)',
+          color: 'var(--text)'
         }}
       >
         {children}
@@ -27,8 +27,8 @@ const PageRoot = ({ full, children }: PropsWithChildren<Props>) => {
       sx={{
         display: 'flex',
         height: 'calc(100vh - 117px)',
-        bgcolor: 'background.default',
-        color: 'text.primary',
+        bgcolor: 'var(--purpleDarkest)',
+        color: 'var(--text)',
         p: 3
       }}
     >

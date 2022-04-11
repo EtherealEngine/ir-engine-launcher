@@ -31,7 +31,7 @@ const pages = [
   {
     title: 'Cluster',
     path: Paths.CLUSTER
-  },
+  }
 ]
 
 const settings = ['Profile', 'Logout']
@@ -62,7 +62,7 @@ const NavView = () => {
   }
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ background: 'var(--purpleColor)' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography variant="h6" noWrap component="div" sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}>

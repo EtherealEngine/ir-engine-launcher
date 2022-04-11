@@ -30,6 +30,7 @@ const ConfigPage = () => {
           </IconButton>
           <Button
             variant="contained"
+            sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
             startIcon={<PowerSettingsNewOutlinedIcon />}
             onClick={async () => {
               if (allConfigured) {
@@ -45,7 +46,7 @@ const ConfigPage = () => {
           >
             Configure
           </Button>
-          <Button variant="outlined" disabled startIcon={<DeleteOutlineOutlinedIcon />}>
+          <Button variant="outlined" startIcon={<DeleteOutlineOutlinedIcon />}>
             Uninstall
           </Button>
         </Stack>

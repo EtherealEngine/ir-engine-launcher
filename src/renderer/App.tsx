@@ -26,6 +26,10 @@ const App = () => {
       toggleColorMode: () => {
         setMode((prevMode) => {
           const newMode = prevMode === 'light' ? 'dark' : 'light'
+          const html = document.querySelector('html')
+          if (html) {
+            html.dataset.theme = newMode
+          }
           localStorage.setItem(Storage.COLOR_MODE, newMode)
           return newMode
         })
@@ -33,6 +37,13 @@ const App = () => {
     }),
     []
   )
+
+  React.useEffect(() => {
+    const html = document.querySelector('html')
+    if (html) {
+      html.dataset.theme = defaultMode || 'dark'
+    }
+  }, [])
 
   const theme = React.useMemo(
     () =>
