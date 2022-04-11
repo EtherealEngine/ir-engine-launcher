@@ -354,16 +354,41 @@ export DOCKER_BUILDKIT=0
 export COMPOSE_DOCKER_CLI_BUILD=0
 ./scripts/build_minikube.sh
 
+XRENGINE_INSTALLED=false
 if helm status local >/dev/null; then
+    XRENGINE_INSTALLED=true
     echo "XREngine is installed"
 else
     echo "XREngine is not installed"
-
-    helm install -f ../local.values.yaml --set api.extraEnv.FORCE_DB_REFRESH=true local xrengine/xrengine
-    sleep 30
-    helm upgrade --reuse-values --set api.extraEnv.FORCE_DB_REFRESH=false local xrengine/xrengine
-    sleep 30
 fi
+
+export MYSQL_PORT=3304
+DB_STATUS=$(npm run check-db-exists-only)
+DB_EXISTS=false
+if [[ $DB_STATUS == *"database found"* ]]; then
+    DB_EXISTS=true
+    echo "Database populated"
+elif [[ $DB_STATUS == *"database not found"* ]]; then
+    echo "Database not populated"
+fi
+
+if [[ $XRENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false ]]; then
+    echo "Updating XREngine deployment to configure database"
+    helm upgrade --reuse-values -f ~/db-refresh-true.values.yaml local xrengine/xrengine
+    sleep 35
+    helm upgrade --reuse-values -f ~/db-refresh-false.values.yaml local xrengine/xrengine
+elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false ]]; then
+    echo "Installing XREngine deployment with populating database"
+    helm install -f ~/local.values.yaml -f ~/db-refresh-true.values.yaml local xrengine/xrengine
+    sleep 35
+    helm upgrade --reuse-values -f ~/db-refresh-false.values.yaml local xrengine/xrengine
+elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
+    echo "Installing XREngine deployment without populating database"
+    helm install -f ~/local.values.yaml local xrengine/xrengine
+fi
+
+export RELEASE_NAME=local
+./scripts/check-engine.sh
 
 XRENGINE_STATUS=$(helm status local)
 echo "XREngine status is $XRENGINE_STATUS"
