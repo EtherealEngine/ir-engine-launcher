@@ -3,9 +3,7 @@ import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 // import log from 'electron-log'
 import { Channels } from '../../constants/Channels'
 import Endpoints from '../../constants/Endpoints'
-import { IBaseHandler } from './IBaseHandler'
-import { exec } from './ShellHandler'
-import { delay } from './UtilitiesHandler'
+import { delay, exec, executeJS, IBaseHandler } from './IBaseHandler'
 
 class XREngineHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -105,13 +103,4 @@ const ensureAdminAccess = async (parentWindow: BrowserWindow) => {
     )
   }
 }
-
-const executeJS = async (script: string, window: BrowserWindow | null) => {
-  try {
-    return await window?.webContents.executeJavaScript(script)
-  } catch {
-    return ''
-  }
-}
-
 export default XREngineHandler

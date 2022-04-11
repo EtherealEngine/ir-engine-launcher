@@ -11,7 +11,7 @@ import LoadingPage from './LoadingPage'
 
 const ClusterPage = () => {
   const settingsState = useSettingsState()
-  const { sudoMode, cluster } = settingsState.value
+  const { cluster } = settingsState.value
 
   const deploymentState = useDeploymentState()
   const { appStatus } = deploymentState.value
@@ -38,7 +38,7 @@ const ClusterPage = () => {
   if (minikubeStatus?.status === AppStatus.NotConfigured) {
     errorMessage = 'Minikube Not Configured'
     errorDetail = 'Please configure minikube before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus(sudoMode)
+    errorRetry = () => DeploymentService.fetchDeploymentStatus()
   } else if (cluster.error) {
     errorMessage = 'Minikube Dashboard Error'
     errorDetail = cluster.error

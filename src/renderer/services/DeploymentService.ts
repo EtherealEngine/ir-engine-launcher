@@ -45,11 +45,11 @@ export const useDeploymentState = () => useState(state) as any as typeof state
 
 //Service
 export const DeploymentService = {
-  fetchDeploymentStatus: async (sudoMode: boolean) => {
+  fetchDeploymentStatus: async () => {
     const dispatch = useDispatch()
     try {
       dispatch(DeploymentAction.fetchDeploymentStatus())
-      window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig, sudoMode)
+      window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig)
     } catch (error) {
       console.error(error)
     }

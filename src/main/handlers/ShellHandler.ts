@@ -1,9 +1,7 @@
-import childProcess, { ExecException } from 'child_process'
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
+import log from 'electron-log'
 import os from 'os'
-// import log from 'electron-log'
 import path from 'path'
-import sudo from 'sudo-prompt'
 
 import { Channels } from '../../constants/Channels'
 import SysRequirements from '../../constants/SysRequirements'
@@ -14,17 +12,17 @@ import {
   DefaultClusterStatus,
   DefaultSystemStatus
 } from '../../models/AppStatus'
-import { IBaseHandler } from './IBaseHandler'
+import { exec, execStream, IBaseHandler, isValidUrl } from './IBaseHandler'
 
 class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
-    ipcMain.handle(Channels.Shell.CheckMinikubeConfig, async (_event: IpcMainInvokeEvent, sudoMode: boolean) => {
+    ipcMain.handle(Channels.Shell.CheckMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
       try {
         await checkSystemStatus(window)
 
-        await checkAppStatus(window, sudoMode)
+        await checkAppStatus(window)
 
-        await checkClusterStatus(window, sudoMode)
+        await checkClusterStatus(window)
       } catch (err) {
         window.webContents.send(Channels.Utilities.Log, {
           category: 'check minikube config',
@@ -35,11 +33,12 @@ class ShellHandler implements IBaseHandler {
       ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
         try {
           const script = path.join(__dirname, '../../../assets', 'scripts', 'configure-minikube.sh')
+          log.info(`Executing script ${script}`)
 
           const onStd = (data: any) => {
             window.webContents.send(Channels.Utilities.Log, { category: 'configure minikube', message: data })
           }
-          const response = await shellExecStream(`sh ${script}`, onStd, onStd)
+          const response = await execStream(`sh ${script}`, onStd, onStd)
           window.webContents.send(Channels.Utilities.Log, { category: 'configure minikube', message: response })
 
           return true
@@ -67,7 +66,7 @@ class ShellHandler implements IBaseHandler {
               window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardError, data)
             }
           }
-          await shellExecStream(`minikube dashboard --url`, onStdout, onStderr)
+          await execStream(`minikube dashboard --url`, onStdout, onStderr)
         } catch (err) {
           window.webContents.send(Channels.Utilities.Log, {
             category: 'minikube dashboard',
@@ -113,14 +112,14 @@ const checkSystemStatus = async (window: BrowserWindow) => {
   }
 }
 
-const checkAppStatus = async (window: BrowserWindow, sudoMode: boolean) => {
+const checkAppStatus = async (window: BrowserWindow) => {
   for (const app of DefaultAppsStatus) {
     let status: AppModel = {
       ...app
     }
 
     if (app.checkCommand) {
-      const response = await exec(app.checkCommand, sudoMode)
+      const response = await exec(app.checkCommand)
       const { stdout, stderr } = response
 
       if (stdout) {
@@ -147,14 +146,14 @@ const checkAppStatus = async (window: BrowserWindow, sudoMode: boolean) => {
   }
 }
 
-const checkClusterStatus = async (window: BrowserWindow, sudoMode: boolean) => {
+const checkClusterStatus = async (window: BrowserWindow) => {
   for (const clusterItem of DefaultClusterStatus) {
     let status: AppModel = {
       ...clusterItem
     }
 
     if (clusterItem.checkCommand) {
-      const response = await exec(clusterItem.checkCommand, sudoMode)
+      const response = await exec(clusterItem.checkCommand)
       const { stdout, stderr } = response
 
       if (stdout) {
@@ -189,74 +188,6 @@ const checkClusterStatus = async (window: BrowserWindow, sudoMode: boolean) => {
 
     window.webContents.send(Channels.Shell.CheckClusterStatusResult, status)
   }
-}
-
-const sudoShellExec = (command: string): Promise<ShellResponse> => {
-  return new Promise((resolve) => {
-    sudo.exec(
-      command,
-      {
-        name: 'XREngine Control Center'
-      },
-      (error, stdout, stderr) => resolve({ error, stdout, stderr })
-    )
-  })
-}
-
-const shellExec = (command: string): Promise<ShellResponse> => {
-  return new Promise((resolve) => {
-    childProcess.exec(command, { shell: '/bin/bash' }, (error, stdout, stderr) => resolve({ error, stdout, stderr }))
-  })
-}
-
-const shellExecStream = (
-  command: string,
-  onStdout: (data: any) => void,
-  onStderr: (data: any) => void
-): Promise<number | null> => {
-  return new Promise((resolve) => {
-    const process = childProcess.exec(command)
-    process.stdout?.on('data', (data) => {
-      onStdout(data)
-    })
-    process.stderr?.on('data', (data) => {
-      onStderr(data)
-    })
-    process.on('close', (code) => {
-      resolve(code)
-    })
-  })
-}
-
-export const exec = async (command: string, isSudo = false): Promise<ShellResponse> => {
-  if (isSudo) {
-    return await sudoShellExec(command)
-  }
-
-  return await shellExec(command)
-}
-
-/**
- * https://stackoverflow.com/a/43467144/2077741
- * @param urlString
- * @returns
- */
-const isValidUrl = (urlString: string) => {
-  let url
-
-  try {
-    url = new URL(urlString)
-  } catch (_) {
-    return false
-  }
-
-  return url.protocol === 'http:' || url.protocol === 'https:'
-}
-
-type ShellResponse = {
-  error: ExecException | Error | null | undefined
-  stdout: string | Buffer | undefined
-  stderr: string | Buffer | undefined
 }
 
 export default ShellHandler

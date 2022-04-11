@@ -12,7 +12,7 @@ import LoadingPage from './LoadingPage'
 
 const AdminPage = () => {
   const settingsState = useSettingsState()
-  const { sudoMode, adminPanel } = settingsState.value
+  const { adminPanel } = settingsState.value
 
   const deploymentState = useDeploymentState()
   const { appStatus, clusterStatus } = deploymentState.value
@@ -43,7 +43,7 @@ const AdminPage = () => {
   if (!allConfigured) {
     errorMessage = 'XREngine Not Configured'
     errorDetail = 'Please configure XREngine before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus(sudoMode)
+    errorRetry = () => DeploymentService.fetchDeploymentStatus()
   } else if (adminPanel.error) {
     errorMessage = 'Admin Panel Error'
     errorDetail = adminPanel.error

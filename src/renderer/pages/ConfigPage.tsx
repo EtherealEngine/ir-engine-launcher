@@ -2,52 +2,44 @@ import { Channels } from 'constants/Channels'
 import { AppStatus } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import LogsView from 'renderer/components/LogsView'
+import PageRoot from 'renderer/components/PageRoot'
 import StatusView from 'renderer/components/StatusView'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
-import { useSettingsState } from 'renderer/services/SettingsService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
 import { Button, IconButton, Stack } from '@mui/material'
 import { Box } from '@mui/system'
-import PageRoot from 'renderer/components/PageRoot'
 
 const ConfigPage = () => {
-  const settingsState = useSettingsState()
-  const { sudoMode } = settingsState.value
-
   const deploymentState = useDeploymentState()
   const { appStatus, clusterStatus, systemStatus } = deploymentState.value
 
   const { enqueueSnackbar } = useSnackbar()
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
+  const allClusterConfigured = clusterStatus.every((cluster) => cluster.status === AppStatus.Configured)
+  const allConfigured = allAppsConfigured && allClusterConfigured
 
   return (
     <PageRoot>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <Stack sx={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 2, marginBottom: 3 }}>
-          <IconButton
-            title="Refresh"
-            color="primary"
-            onClick={() => {
-              DeploymentService.fetchDeploymentStatus(sudoMode)
-            }}
-          >
+          <IconButton title="Refresh" color="primary" onClick={DeploymentService.fetchDeploymentStatus}>
             <CachedOutlinedIcon />
           </IconButton>
           <Button
             variant="contained"
             startIcon={<PowerSettingsNewOutlinedIcon />}
             onClick={async () => {
-              if (allAppsConfigured) {
-                enqueueSnackbar('XREngine Apps already configured successfully', { variant: 'success' })
+              if (allConfigured) {
+                enqueueSnackbar('XREngine already configured successfully', { variant: 'success' })
                 return
               }
 
               const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig)
               if (response) {
-                DeploymentService.fetchDeploymentStatus(sudoMode)
+                DeploymentService.fetchDeploymentStatus()
               }
             }}
           >

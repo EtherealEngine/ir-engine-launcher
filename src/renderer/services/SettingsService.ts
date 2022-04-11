@@ -5,7 +5,6 @@ import { store, useDispatch } from '../store'
 
 //State
 const state = createState({
-  sudoMode: false,
   cluster: {
     loading: false,
     url: '',
