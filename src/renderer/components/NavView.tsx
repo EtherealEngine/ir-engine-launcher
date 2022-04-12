@@ -62,7 +62,7 @@ const NavView = () => {
   }
 
   return (
-    <AppBar position="static" sx={{ height: '70px', backgroundColor: 'rgb(81, 81, 255)' }}>
+    <AppBar position="static" sx={{ height: '70px', backgroundColor: theme.palette.primary.main }}>
       <Box sx={{ height: '70px', backgroundColor: 'var(--dock)' }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
