@@ -40,6 +40,10 @@ const ConfigPage = () => {
     const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig)
     if (response) {
       DeploymentService.fetchDeploymentStatus()
+    } else {
+      enqueueSnackbar('Failed to configure XREngine. Please check logs.', {
+        variant: 'error'
+      })
     }
   }
 

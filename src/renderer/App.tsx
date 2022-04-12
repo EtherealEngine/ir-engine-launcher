@@ -4,7 +4,8 @@ import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import { PaletteMode } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
+import { IconButton, PaletteMode } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
@@ -17,6 +18,7 @@ import ConfigPage from './pages/ConfigPage'
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
 const App = () => {
+  const notistackRef = React.createRef<SnackbarProvider>()
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const defaultMode = (prefersDarkMode ? 'dark' : 'light') as PaletteMode
   const storedMode = localStorage.getItem(Storage.COLOR_MODE) as PaletteMode | undefined
@@ -47,7 +49,16 @@ const App = () => {
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
-        <SnackbarProvider maxSnack={3} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <SnackbarProvider
+          ref={notistackRef}
+          maxSnack={3}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          action={(key) => (
+            <IconButton onClick={() => notistackRef.current?.closeSnackbar(key)}>
+              <CloseIcon />
+            </IconButton>
+          )}
+        >
           <BrowserRouter>
             <NavView />
             <Routes>
