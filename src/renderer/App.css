@@ -136,3 +136,23 @@ body {
   --themeSwitchTrack: #8796a5;
   --themeSwitchThumb: #02022d;
 }
+
+::-webkit-scrollbar {
+  width: auto;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 1px grey;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--purplePinkGradientTB);
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+  background: var(--purplePinkGradient);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}

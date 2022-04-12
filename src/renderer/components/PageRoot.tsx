@@ -12,7 +12,7 @@ const PageRoot = ({ full, children }: PropsWithChildren<Props>) => {
       <Box
         sx={{
           display: 'flex',
-          height: 'calc(100vh - 69px)',
+          height: 'calc(100vh - 70px)',
           bgcolor: 'var(--purpleDarkest)',
           color: 'var(--text)'
         }}
@@ -26,7 +26,7 @@ const PageRoot = ({ full, children }: PropsWithChildren<Props>) => {
     <Box
       sx={{
         display: 'flex',
-        height: 'calc(100vh - 117px)',
+        height: 'calc(100vh - 118px)',
         bgcolor: 'var(--purpleDarkest)',
         color: 'var(--text)',
         p: 3

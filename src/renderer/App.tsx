@@ -10,6 +10,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 import './App.css'
 import NavView from './components/NavView'
+import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
 import ClusterPage from './pages/ClusterPage'
 import ConfigPage from './pages/ConfigPage'
@@ -41,19 +42,11 @@ const App = () => {
   React.useEffect(() => {
     const html = document.querySelector('html')
     if (html) {
-      html.dataset.theme = defaultMode || 'dark'
+      html.dataset.theme = mode || 'dark'
     }
   }, [])
 
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: mode
-        }
-      }),
-    [mode]
-  )
+  const theme = React.useMemo(() => createTheme(MUITheme(mode) as any), [mode])
 
   return (
     <ColorModeContext.Provider value={colorMode}>
