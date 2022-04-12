@@ -1,5 +1,6 @@
-import { BrowserWindow } from 'electron'
 import childProcess, { ExecException } from 'child_process'
+import { BrowserWindow } from 'electron'
+import path from 'path'
 
 export interface IBaseHandler {
   configure: (window: BrowserWindow) => void
@@ -36,6 +37,14 @@ export const isValidUrl = (urlString: string) => {
   }
 
   return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+export const assetsPath = () => {
+  return path.join(__dirname, '../../../assets')
+}
+
+export const scriptsPath = () => {
+  return path.join(assetsPath(), 'scripts')
 }
 
 export const exec = (command: string): Promise<ShellResponse> => {

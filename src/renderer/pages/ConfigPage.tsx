@@ -1,9 +1,11 @@
 import { Channels } from 'constants/Channels'
 import { AppStatus } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
+import { useState } from 'react'
 import LogsView from 'renderer/components/LogsView'
 import PageRoot from 'renderer/components/PageRoot'
 import StatusView from 'renderer/components/StatusView'
+import SudoPasswordDialog from 'renderer/components/SudoPasswordDialog'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
@@ -13,6 +15,7 @@ import { Button, IconButton, Stack } from '@mui/material'
 import { Box } from '@mui/system'
 
 const ConfigPage = () => {
+  const [showPasswordDialog, setPasswordDialog] = useState(false)
   const deploymentState = useDeploymentState()
   const { appStatus, clusterStatus, systemStatus } = deploymentState.value
 
@@ -20,6 +23,25 @@ const ConfigPage = () => {
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
   const allClusterConfigured = clusterStatus.every((cluster) => cluster.status === AppStatus.Configured)
   const allConfigured = allAppsConfigured && allClusterConfigured
+
+  const configureMinikube = async (checkPassword: boolean) => {
+    if (allConfigured) {
+      enqueueSnackbar('XREngine already configured successfully', { variant: 'success' })
+      return
+    }
+
+    if (checkPassword) {
+      const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword)
+      if (sudoLoggedIn === false) {
+        setPasswordDialog(true)
+      }
+    }
+
+    const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig)
+    if (response) {
+      DeploymentService.fetchDeploymentStatus()
+    }
+  }
 
   return (
     <PageRoot>
@@ -32,17 +54,7 @@ const ConfigPage = () => {
             variant="contained"
             sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
             startIcon={<PowerSettingsNewOutlinedIcon />}
-            onClick={async () => {
-              if (allConfigured) {
-                enqueueSnackbar('XREngine already configured successfully', { variant: 'success' })
-                return
-              }
-
-              const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig)
-              if (response) {
-                DeploymentService.fetchDeploymentStatus()
-              }
-            }}
+            onClick={() => configureMinikube(true)}
           >
             Configure
           </Button>
@@ -60,6 +72,17 @@ const ConfigPage = () => {
 
         <LogsView />
       </Box>
+      {showPasswordDialog && (
+        <SudoPasswordDialog
+          onClose={(result) => {
+            setPasswordDialog(false)
+
+            if (result) {
+              configureMinikube(false)
+            }
+          }}
+        />
+      )}
     </PageRoot>
   )
 }

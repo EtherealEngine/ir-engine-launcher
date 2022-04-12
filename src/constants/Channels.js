@@ -8,6 +8,7 @@ const Channels = {
     ConfigureMinikubeDashboard: 'ConfigureMinikubeDashboard',
     ConfigureMinikubeDashboardError: 'ConfigureMinikubeDashboardError',
     ConfigureMinikubeDashboardResponse: 'ConfigureMinikubeDashboardResponse',
+    CheckSudoPassword: 'CheckSudoPassword',
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',
