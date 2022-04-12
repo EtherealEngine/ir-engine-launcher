@@ -24,8 +24,8 @@ const LogsView = () => {
   }, [logState.logs, showLogs])
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginTop: 2 }}>
+    <Box sx={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginTop: 1, marginBottom: 1 }}>
         <Typography variant="h5" sx={{ flexGrow: 1, display: 'flex' }}>
           Logs
         </Typography>
@@ -41,7 +41,7 @@ const LogsView = () => {
         />
       </Box>
       {showLogs && (
-        <Box sx={{ overflow: 'auto', height: '25vh' }}>
+        <Box sx={{ overflow: 'auto' }}>
           {logs.map((log, index) => (
             <pre key={`log-${index}`}>
               {new Date().toLocaleTimeString()}: {log.category} - {log.message}
