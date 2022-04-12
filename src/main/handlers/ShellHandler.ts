@@ -12,7 +12,7 @@ import {
   DefaultClusterStatus,
   DefaultSystemStatus
 } from '../../models/AppStatus'
-import { exec, execStream, IBaseHandler, isValidUrl } from './IBaseHandler'
+import { exec, execStream, IBaseHandler, isValidUrl, scriptsPath } from './IBaseHandler'
 
 class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -30,38 +30,57 @@ class ShellHandler implements IBaseHandler {
         })
       }
     }),
-      ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
+      ipcMain.handle(Channels.Shell.CheckSudoPassword, async (_event: IpcMainInvokeEvent, password: string = '') => {
         try {
-          const script = path.join(__dirname, '../../../assets', 'scripts', 'configure-minikube.sh')
-          log.info(`Executing script ${script}`)
-
-          const onStd = (data: any) => {
-            window.webContents.send(Channels.Utilities.Log, { category: 'configure minikube', message: data })
+          const validPassword = await checkSudoPassword(password)
+          if (validPassword === false) {
+            throw password ? 'Invalid password.' : 'Not logged in.'
           }
-          const response = await execStream(`sh ${script}`, onStd, onStd)
-          window.webContents.send(Channels.Utilities.Log, { category: 'configure minikube', message: response })
+
+          return true
+        } catch (err) {
+          return false
+        }
+      }),
+      ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
+        const category = 'configure minikube'
+        try {
+          const validPassword = await checkSudoPassword('')
+          if (validPassword === false) {
+            throw 'Invalid password.'
+          }
+
+          // const configureScript = path.join(scriptsPath(), 'configure-minikube.sh')
+          // log.info(`Executing script ${configureScript}`)
+
+          // const onStd = (data: any) => {
+          //   window.webContents.send(Channels.Utilities.Log, { category, message: data })
+          // }
+          // const response = await execStream(`bash ${configureScript}`, onStd, onStd)
+          // window.webContents.send(Channels.Utilities.Log, { category, message: response })
 
           return true
         } catch (err) {
           window.webContents.send(Channels.Utilities.Log, {
-            category: 'configure minikube',
+            category,
             message: JSON.stringify(err)
           })
           return false
         }
       }),
       ipcMain.handle(Channels.Shell.ConfigureMinikubeDashboard, async (_event: IpcMainInvokeEvent) => {
+        const category = 'minikube dashboard'
         try {
           const onStdout = (data: any) => {
             const stringData = typeof data === 'string' ? data.trim() : data
-            window.webContents.send(Channels.Utilities.Log, { category: 'minikube dashboard', message: stringData })
+            window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
             if (isValidUrl(data)) {
               window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardResponse, data)
             }
           }
           const onStderr = (data: any) => {
             const stringData = typeof data === 'string' ? data.trim() : data
-            window.webContents.send(Channels.Utilities.Log, { category: 'minikube dashboard', message: stringData })
+            window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
             if (stringData.toString().startsWith('*') === false) {
               window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardError, data)
             }
@@ -69,7 +88,7 @@ class ShellHandler implements IBaseHandler {
           await execStream(`minikube dashboard --url`, onStdout, onStderr)
         } catch (err) {
           window.webContents.send(Channels.Utilities.Log, {
-            category: 'minikube dashboard',
+            category,
             message: JSON.stringify(err)
           })
           return err
@@ -188,6 +207,20 @@ const checkClusterStatus = async (window: BrowserWindow) => {
 
     window.webContents.send(Channels.Shell.CheckClusterStatusResult, status)
   }
+}
+
+const checkSudoPassword = async (password: string) => {
+  const loginScript = path.join(scriptsPath(), 'sudo-login.sh')
+  log.info(`Executing script ${loginScript}`)
+
+  const response = await exec(`bash ${loginScript} ${password}`)
+  const { error } = response
+
+  if (!error) {
+    return true
+  }
+
+  return false
 }
 
 export default ShellHandler
