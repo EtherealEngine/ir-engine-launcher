@@ -1,7 +1,15 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
+import { OptionsObject, SnackbarKey, SnackbarMessage } from 'notistack'
 
 import { store, useDispatch } from '../store'
+
+type EnqueCallback = (message: SnackbarMessage, options?: OptionsObject) => void
+type CloseCallback = (key?: SnackbarKey) => void
+type NotistackPayload = {
+  enqueueSnackbar: EnqueCallback
+  closeSnackbar: CloseCallback
+}
 
 //State
 const state = createState({
@@ -14,12 +22,19 @@ const state = createState({
     loading: false,
     adminAccess: false,
     error: ''
-  }
+  },
+  enqueueSnackbar: undefined as EnqueCallback | undefined,
+  closeSnackbar: undefined as CloseCallback | undefined
 })
 
 store.receptors.push((action: SettingsActionType): void => {
   state.batch((s) => {
     switch (action.type) {
+      case 'SET_NOTISTACK':
+        return s.merge({
+          enqueueSnackbar: action.payload.enqueueSnackbar,
+          closeSnackbar: action.payload.closeSnackbar
+        })
       case 'FETCH_CLUSTER_DASHBOARD':
         return s.merge({
           cluster: {
@@ -94,6 +109,10 @@ export const useSettingsState = () => useState(state) as any as typeof state
 
 //Service
 export const SettingsService = {
+  setNotiStack: async (payload: NotistackPayload) => {
+    const dispatch = useDispatch()
+    dispatch(SettingsAction.setNotiStack(payload))
+  },
   fetchClusterDashboard: async () => {
     const dispatch = useDispatch()
     try {
@@ -151,6 +170,12 @@ export const SettingsService = {
 
 //Action
 export const SettingsAction = {
+  setNotiStack: (payload: NotistackPayload) => {
+    return {
+      type: 'SET_NOTISTACK' as const,
+      payload
+    }
+  },
   fetchClusterDashboard: () => {
     return {
       type: 'FETCH_CLUSTER_DASHBOARD' as const

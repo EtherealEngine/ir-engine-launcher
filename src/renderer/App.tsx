@@ -15,6 +15,7 @@ import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
 import ClusterPage from './pages/ClusterPage'
 import ConfigPage from './pages/ConfigPage'
+import { SettingsService } from './services/SettingsService'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
@@ -40,6 +41,15 @@ const App = () => {
     }),
     []
   )
+
+  React.useEffect(() => {
+    if (notistackRef.current) {
+      SettingsService.setNotiStack({
+        enqueueSnackbar: notistackRef.current.enqueueSnackbar,
+        closeSnackbar: notistackRef.current.closeSnackbar
+      })
+    }
+  }, [notistackRef])
 
   React.useEffect(() => {
     const html = document.querySelector('html')

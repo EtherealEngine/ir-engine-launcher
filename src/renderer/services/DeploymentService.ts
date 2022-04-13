@@ -3,17 +3,23 @@ import { Channels } from 'constants/Channels'
 import { AppModel, DefaultAppsStatus, DefaultClusterStatus, DefaultSystemStatus } from 'models/AppStatus'
 
 import { store, useDispatch } from '../store'
+import { accessSettingsState } from './SettingsService'
 
 //State
 const state = createState({
   systemStatus: [...DefaultSystemStatus] as AppModel[],
   appStatus: [...DefaultAppsStatus] as AppModel[],
-  clusterStatus: [...DefaultClusterStatus] as AppModel[]
+  clusterStatus: [...DefaultClusterStatus] as AppModel[],
+  isConfiguring: false as boolean
 })
 
 store.receptors.push((action: DeploymentActionType): void => {
   state.batch((s) => {
     switch (action.type) {
+      case 'SET_CONFIGURING':
+        return s.merge({
+          isConfiguring: action.isConfiguring
+        })
       case 'FETCH_DEPLOYMENT_STATUS':
         return s.merge({
           systemStatus: [...DefaultSystemStatus],
@@ -45,6 +51,25 @@ export const useDeploymentState = () => useState(state) as any as typeof state
 
 //Service
 export const DeploymentService = {
+  processConfigurations: async (password: string) => {
+    const settingsState = accessSettingsState()
+    const { enqueueSnackbar } = settingsState.value
+    const dispatch = useDispatch()
+    try {
+      dispatch(DeploymentAction.setConfiguring(true))
+      const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig, password)
+      if (response) {
+        DeploymentService.fetchDeploymentStatus()
+      } else if (enqueueSnackbar) {
+        enqueueSnackbar('Failed to configure XREngine. Please check logs.', {
+          variant: 'error'
+        })
+      }
+    } catch (error) {
+      console.error(error)
+    }
+    dispatch(DeploymentAction.setConfiguring(false))
+  },
   fetchDeploymentStatus: async () => {
     const dispatch = useDispatch()
     try {
@@ -74,6 +99,12 @@ export const DeploymentService = {
 
 //Action
 export const DeploymentAction = {
+  setConfiguring: (isConfiguring: boolean) => {
+    return {
+      type: 'SET_CONFIGURING' as const,
+      isConfiguring
+    }
+  },
   fetchDeploymentStatus: () => {
     return {
       type: 'FETCH_DEPLOYMENT_STATUS' as const

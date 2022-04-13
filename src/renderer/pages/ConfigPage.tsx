@@ -1,4 +1,3 @@
-import { Channels } from 'constants/Channels'
 import { AppStatus } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -13,13 +12,13 @@ import { DeploymentService, useDeploymentState } from 'renderer/services/Deploym
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
-import { Button, IconButton, Stack } from '@mui/material'
-import { Box } from '@mui/system'
+import LoadingButton from '@mui/lab/LoadingButton'
+import { Box, Button, CircularProgress, IconButton, Stack } from '@mui/material'
 
 const ConfigPage = () => {
   const [showPasswordDialog, setPasswordDialog] = useState(false)
   const deploymentState = useDeploymentState()
-  const { appStatus, clusterStatus, systemStatus } = deploymentState.value
+  const { isConfiguring, appStatus, clusterStatus, systemStatus } = deploymentState.value
 
   const { enqueueSnackbar } = useSnackbar()
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
@@ -39,14 +38,7 @@ const ConfigPage = () => {
     setPasswordDialog(false)
 
     if (password) {
-      const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig, password)
-      if (response) {
-        DeploymentService.fetchDeploymentStatus()
-      } else {
-        enqueueSnackbar('Failed to configure XREngine. Please check logs.', {
-          variant: 'error'
-        })
-      }
+      DeploymentService.processConfigurations(password)
     }
   }
 
@@ -57,14 +49,21 @@ const ConfigPage = () => {
           <IconButton title="Refresh" color="primary" onClick={DeploymentService.fetchDeploymentStatus}>
             <CachedOutlinedIcon />
           </IconButton>
-          <Button
+          <LoadingButton
             variant="contained"
             sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
             startIcon={<PowerSettingsNewOutlinedIcon />}
+            loading={isConfiguring}
+            loadingIndicator={
+              <Box sx={{ display: 'flex', color: '#ffffffab' }}>
+                <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+                Configuring
+              </Box>
+            }
             onClick={onConfigureClicked}
           >
             Configure
-          </Button>
+          </LoadingButton>
           <Button variant="outlined" startIcon={<DeleteOutlineOutlinedIcon />}>
             Uninstall
           </Button>
