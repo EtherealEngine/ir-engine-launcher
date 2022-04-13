@@ -18,7 +18,7 @@ import { Box, Button, CircularProgress, IconButton, Stack } from '@mui/material'
 const ConfigPage = () => {
   const [showPasswordDialog, setPasswordDialog] = useState(false)
   const deploymentState = useDeploymentState()
-  const { isConfiguring, appStatus, clusterStatus, systemStatus } = deploymentState.value
+  const { isConfiguring, isFetchingStatuses, appStatus, clusterStatus, systemStatus } = deploymentState.value
 
   const { enqueueSnackbar } = useSnackbar()
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
@@ -46,7 +46,12 @@ const ConfigPage = () => {
     <PageRoot>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
         <Stack sx={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 2, marginBottom: 3 }}>
-          <IconButton title="Refresh" color="primary" onClick={DeploymentService.fetchDeploymentStatus}>
+          <IconButton
+            title="Refresh"
+            color="primary"
+            disabled={isFetchingStatuses}
+            onClick={DeploymentService.fetchDeploymentStatus}
+          >
             <CachedOutlinedIcon />
           </IconButton>
           <LoadingButton

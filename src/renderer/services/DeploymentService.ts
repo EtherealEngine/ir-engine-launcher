@@ -10,6 +10,7 @@ const state = createState({
   systemStatus: [...DefaultSystemStatus] as AppModel[],
   appStatus: [...DefaultAppsStatus] as AppModel[],
   clusterStatus: [...DefaultClusterStatus] as AppModel[],
+  isFetchingStatuses: false as boolean,
   isConfiguring: false as boolean
 })
 
@@ -20,8 +21,13 @@ store.receptors.push((action: DeploymentActionType): void => {
         return s.merge({
           isConfiguring: action.isConfiguring
         })
+      case 'SET_FETCHING_STATUSES':
+        return s.merge({
+          isFetchingStatuses: action.isFetchingStatuses
+        })
       case 'FETCH_DEPLOYMENT_STATUS':
         return s.merge({
+          isFetchingStatuses: true,
           systemStatus: [...DefaultSystemStatus],
           appStatus: [...DefaultAppsStatus],
           clusterStatus: [...DefaultClusterStatus]
@@ -74,10 +80,11 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     try {
       dispatch(DeploymentAction.fetchDeploymentStatus())
-      window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig)
+      await window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig)
     } catch (error) {
       console.error(error)
     }
+    dispatch(DeploymentAction.setFetchingStatuses(false))
   },
   listen: async () => {
     const dispatch = useDispatch()
@@ -103,6 +110,12 @@ export const DeploymentAction = {
     return {
       type: 'SET_CONFIGURING' as const,
       isConfiguring
+    }
+  },
+  setFetchingStatuses: (isFetchingStatuses: boolean) => {
+    return {
+      type: 'SET_FETCHING_STATUSES' as const,
+      isFetchingStatuses
     }
   },
   fetchDeploymentStatus: () => {
