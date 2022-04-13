@@ -12,9 +12,9 @@ const PageRoot = ({ full, children }: PropsWithChildren<Props>) => {
       <Box
         sx={{
           display: 'flex',
-          height: 'calc(100vh - 69px)',
-          bgcolor: 'background.default',
-          color: 'text.primary'
+          height: 'calc(100vh - 70px)',
+          bgcolor: 'var(--purpleDarkest)',
+          color: 'var(--text)'
         }}
       >
         {children}
@@ -26,9 +26,9 @@ const PageRoot = ({ full, children }: PropsWithChildren<Props>) => {
     <Box
       sx={{
         display: 'flex',
-        height: 'calc(100vh - 117px)',
-        bgcolor: 'background.default',
-        color: 'text.primary',
+        height: 'calc(100vh - 118px)',
+        bgcolor: 'var(--purpleDarkest)',
+        color: 'var(--text)',
         p: 3
       }}
     >

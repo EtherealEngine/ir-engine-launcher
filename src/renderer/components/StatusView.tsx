@@ -21,8 +21,8 @@ const StatusView = ({ statuses, title }: Props) => {
   const allNotConfigured = statuses.every((status) => status.status === AppStatus.NotConfigured)
 
   return (
-    <Box sx={{ marginBottom: 2}}>
-      <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginBottom: 2}}>
+    <Box sx={{ marginBottom: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginBottom: 2 }}>
         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
           <Typography variant="h5">{title}:</Typography>
           {checking && (

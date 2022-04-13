@@ -11,6 +11,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 import './App.css'
 import NavView from './components/NavView'
+import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
 import ClusterPage from './pages/ClusterPage'
 import ConfigPage from './pages/ConfigPage'
@@ -28,6 +29,10 @@ const App = () => {
       toggleColorMode: () => {
         setMode((prevMode) => {
           const newMode = prevMode === 'light' ? 'dark' : 'light'
+          const html = document.querySelector('html')
+          if (html) {
+            html.dataset.theme = newMode
+          }
           localStorage.setItem(Storage.COLOR_MODE, newMode)
           return newMode
         })
@@ -36,15 +41,14 @@ const App = () => {
     []
   )
 
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        palette: {
-          mode: mode
-        }
-      }),
-    [mode]
-  )
+  React.useEffect(() => {
+    const html = document.querySelector('html')
+    if (html) {
+      html.dataset.theme = mode || 'dark'
+    }
+  }, [])
+
+  const theme = React.useMemo(() => createTheme(MUITheme(mode) as any), [mode])
 
   return (
     <ColorModeContext.Provider value={colorMode}>

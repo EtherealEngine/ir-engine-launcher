@@ -1,7 +1,7 @@
 const Paths = {
   ROOT: '/',
   ADMIN: '/admin',
-  CLUSTER: '/cluster',
+  CLUSTER: '/cluster'
 }
 
 export default Paths
