@@ -4,7 +4,7 @@ const Endpoints = {
   LOGIN_PAGE: 'https://local.theoverlay.io/',
   ALLOW_CERTIFICATES: ['local.theoverlay.io', 'api-local.theoverlay.io', 'gameserver-local.theoverlay.io'],
   MYSQL_PORT: 3304,
-  XRENGINE_PATH: "~/xrengine",
+  XRENGINE_PATH: '~/xrengine'
 }
 
 export default Endpoints
