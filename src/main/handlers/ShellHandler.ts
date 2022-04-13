@@ -20,9 +20,9 @@ class ShellHandler implements IBaseHandler {
       try {
         await checkSystemStatus(window)
 
-        await checkAppStatus(window)
+        const allConfigured = await checkAppStatus(window)
 
-        await checkClusterStatus(window)
+        await checkClusterStatus(window, allConfigured)
       } catch (err) {
         window.webContents.send(Channels.Utilities.Log, {
           category: 'check minikube config',
@@ -42,22 +42,19 @@ class ShellHandler implements IBaseHandler {
           return false
         }
       }),
-      ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
+      ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent, password: string) => {
         const category = 'configure minikube'
         try {
-          const validPassword = await checkSudoPassword('')
-          if (validPassword === false) {
-            throw 'Invalid password.'
+          const configureScript = path.join(scriptsPath(), `configure-minikube.sh ${password}`)
+          log.info(`Executing script ${configureScript}`)
+
+          const onStd = (data: any) => {
+            window.webContents.send(Channels.Utilities.Log, { category, message: data })
           }
-
-          // const configureScript = path.join(scriptsPath(), 'configure-minikube.sh')
-          // log.info(`Executing script ${configureScript}`)
-
-          // const onStd = (data: any) => {
-          //   window.webContents.send(Channels.Utilities.Log, { category, message: data })
-          // }
-          // const response = await execStream(`bash ${configureScript}`, onStd, onStd)
-          // window.webContents.send(Channels.Utilities.Log, { category, message: response })
+          const code = await execStream(`bash ${configureScript}`, onStd, onStd)
+          if (code !== 0) {
+            throw `Failed with error code ${code}.`
+          }
 
           return true
         } catch (err) {
@@ -132,6 +129,7 @@ const checkSystemStatus = async (window: BrowserWindow) => {
 }
 
 const checkAppStatus = async (window: BrowserWindow) => {
+  let allConfigured = true
   for (const app of DefaultAppsStatus) {
     let status: AppModel = {
       ...app
@@ -152,6 +150,7 @@ const checkAppStatus = async (window: BrowserWindow) => {
           category: status.name,
           message: typeof stderr === 'string' ? stderr.trim() : stderr
         })
+        allConfigured = false
       }
 
       status = {
@@ -163,15 +162,22 @@ const checkAppStatus = async (window: BrowserWindow) => {
 
     window.webContents.send(Channels.Shell.CheckAppStatusResult, status)
   }
+  return allConfigured
 }
 
-const checkClusterStatus = async (window: BrowserWindow) => {
+const checkClusterStatus = async (window: BrowserWindow, allConfigured: boolean) => {
   for (const clusterItem of DefaultClusterStatus) {
     let status: AppModel = {
       ...clusterItem
     }
 
-    if (clusterItem.checkCommand) {
+    if (allConfigured == false) {
+      status = {
+        ...clusterItem,
+        detail: 'Apps not configured',
+        status: AppStatus.NotConfigured
+      }
+    } else if (clusterItem.checkCommand) {
       const response = await exec(clusterItem.checkCommand)
       const { stdout, stderr } = response
 

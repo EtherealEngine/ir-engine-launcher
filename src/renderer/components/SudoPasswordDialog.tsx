@@ -17,7 +17,7 @@ import {
 } from '@mui/material'
 
 interface Props {
-  onClose: (result: boolean) => void
+  onClose: (password: string) => void
 }
 
 const SudoPasswordDialog = ({ onClose }: Props) => {
@@ -35,7 +35,7 @@ const SudoPasswordDialog = ({ onClose }: Props) => {
     setLoading(true)
     const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
     if (sudoLoggedIn) {
-      onClose(true)
+      onClose(password)
     } else {
       setError('Invalid password')
       setLoading(false)
@@ -43,7 +43,7 @@ const SudoPasswordDialog = ({ onClose }: Props) => {
   }
 
   return (
-    <Dialog open fullWidth maxWidth="sm" onClose={() => onClose(false)}>
+    <Dialog open fullWidth maxWidth="sm" onClose={() => onClose('')}>
       {isLoading && <LinearProgress />}
       <DialogTitle>Authentication</DialogTitle>
       <DialogContent>
@@ -59,6 +59,11 @@ const SudoPasswordDialog = ({ onClose }: Props) => {
           error={error ? true : false}
           helperText={error ? error : undefined}
           onChange={(event) => passwordChange(event)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              validatePassword()
+            }
+          }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -71,8 +76,8 @@ const SudoPasswordDialog = ({ onClose }: Props) => {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onClose(false)}>Cancel</Button>
-        <Button disabled={isLoading} onClick={validatePassword}>
+        <Button onClick={() => onClose('')}>Cancel</Button>
+        <Button type="submit" disabled={isLoading} onClick={validatePassword}>
           Validate
         </Button>
       </DialogActions>

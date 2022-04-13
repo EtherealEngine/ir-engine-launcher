@@ -1,5 +1,23 @@
 #!/bin/bash
 
+#===========
+# Parameters
+#===========
+
+PASSWORD=$1
+
+#======
+# Login
+#======
+
+LOGIN=$(echo "$PASSWORD" | sudo -S echo "User logged in")
+if [[ $LOGIN == *"User logged in"* ]]; then
+    echo "user logged in"
+else
+    echo "user not logged in"
+    exit 1
+fi
+
 set -e
 
 #=============
@@ -60,7 +78,7 @@ if npm --version >/dev/null; then
     echo "npm version is $NPM_VERSION"
 else
     echo "npm is not installed"
-    exit 1
+    exit 2
 fi
 
 #================

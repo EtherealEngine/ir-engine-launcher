@@ -26,26 +26,27 @@ const ConfigPage = () => {
   const allClusterConfigured = clusterStatus.every((cluster) => cluster.status === AppStatus.Configured)
   const allConfigured = allAppsConfigured && allClusterConfigured
 
-  const configureMinikube = async (checkPassword: boolean) => {
+  const onConfigureClicked = () => {
     if (allConfigured) {
       enqueueSnackbar('XREngine already configured successfully', { variant: 'success' })
       return
     }
 
-    if (checkPassword) {
-      const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword)
-      if (sudoLoggedIn === false) {
-        setPasswordDialog(true)
-      }
-    }
+    setPasswordDialog(true)
+  }
 
-    const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig)
-    if (response) {
-      DeploymentService.fetchDeploymentStatus()
-    } else if (checkPassword == false) {
-      enqueueSnackbar('Failed to configure XREngine. Please check logs.', {
-        variant: 'error'
-      })
+  const onPassword = async (password: string) => {
+    setPasswordDialog(false)
+
+    if (password) {
+      const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig, password)
+      if (response) {
+        DeploymentService.fetchDeploymentStatus()
+      } else {
+        enqueueSnackbar('Failed to configure XREngine. Please check logs.', {
+          variant: 'error'
+        })
+      }
     }
   }
 
@@ -60,7 +61,7 @@ const ConfigPage = () => {
             variant="contained"
             sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
             startIcon={<PowerSettingsNewOutlinedIcon />}
-            onClick={() => configureMinikube(true)}
+            onClick={onConfigureClicked}
           >
             Configure
           </Button>
@@ -84,17 +85,7 @@ const ConfigPage = () => {
           </ReflexElement>
         </ReflexContainer>
       </Box>
-      {showPasswordDialog && (
-        <SudoPasswordDialog
-          onClose={(result) => {
-            setPasswordDialog(false)
-
-            if (result) {
-              configureMinikube(false)
-            }
-          }}
-        />
-      )}
+      {showPasswordDialog && <SudoPasswordDialog onClose={(password) => onPassword(password)} />}
     </PageRoot>
   )
 }
