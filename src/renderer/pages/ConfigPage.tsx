@@ -2,6 +2,8 @@ import { Channels } from 'constants/Channels'
 import { AppStatus } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
+import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex'
+import 'react-reflex/styles.css'
 import LogsView from 'renderer/components/LogsView'
 import PageRoot from 'renderer/components/PageRoot'
 import StatusView from 'renderer/components/StatusView'
@@ -40,6 +42,10 @@ const ConfigPage = () => {
     const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig)
     if (response) {
       DeploymentService.fetchDeploymentStatus()
+    } else if (checkPassword == false) {
+      enqueueSnackbar('Failed to configure XREngine. Please check logs.', {
+        variant: 'error'
+      })
     }
   }
 
@@ -62,15 +68,21 @@ const ConfigPage = () => {
             Uninstall
           </Button>
         </Stack>
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-          <StatusView title="System" statuses={systemStatus} />
+        <ReflexContainer orientation="horizontal">
+          <ReflexElement minSize={200} flex={0.7} style={{ overflowX: 'hidden' }}>
+            <StatusView title="System" statuses={systemStatus} />
 
-          <StatusView title="Apps" statuses={appStatus} />
+            <StatusView title="Apps" statuses={appStatus} />
 
-          <StatusView title="Cluster" statuses={clusterStatus} />
-        </Box>
+            <StatusView title="Cluster" statuses={clusterStatus} />
+          </ReflexElement>
 
-        <LogsView />
+          <ReflexSplitter />
+
+          <ReflexElement minSize={200} flex={0.3} style={{ overflow: 'hidden' }}>
+            <LogsView />
+          </ReflexElement>
+        </ReflexContainer>
       </Box>
       {showPasswordDialog && (
         <SudoPasswordDialog
