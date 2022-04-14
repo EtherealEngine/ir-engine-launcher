@@ -48,7 +48,7 @@ if $INSTALL_NODE; then
     else
         echo "nvm is not installed"
 
-        sudo apt install curl
+        echo "$PASSWORD" | sudo -S apt install curl
         curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
         source ~/.profile
 
@@ -90,8 +90,8 @@ if pip --version >/dev/null; then
 else
     echo "python is not installed"
 
-    sudo apt-get update -y
-    sudo apt-get install -y python3-pip
+    echo "$PASSWORD" | sudo -S apt-get update -y
+    echo "$PASSWORD" | sudo -S apt-get install -y python3-pip
 fi
 
 PYTHON_VERSION=$(python3 --version)
@@ -106,8 +106,8 @@ if make --version >/dev/null; then
 else
     echo "make is not installed"
 
-    sudo apt-get update -y
-    sudo apt-get install -y build-essential
+    echo "$PASSWORD" | sudo -S apt-get update -y
+    echo "$PASSWORD" | sudo -S apt-get install -y build-essential
 fi
 
 MAKE_VERSION=$(make --version)
@@ -122,8 +122,8 @@ if git --version >/dev/null; then
 else
     echo "git is not installed"
 
-    sudo apt-get update -y
-    sudo apt-get install -y git
+    echo "$PASSWORD" | sudo -S apt-get update -y
+    echo "$PASSWORD" | sudo -S apt-get install -y git
 fi
 
 GIT_VERSION=$(git --version)
@@ -154,16 +154,16 @@ if docker --version >/dev/null; then
 else
     echo "docker is not installed"
 
-    # sudo apt-get remove -y docker docker-engine docker.io containerd runc
-    sudo apt-get update -y
-    sudo apt-get install -y ca-certificates curl gnupg lsb-release
+    # echo "$PASSWORD" | sudo -S apt-get remove -y docker docker-engine docker.io containerd runc
+    echo "$PASSWORD" | sudo -S apt-get update -y
+    echo "$PASSWORD" | sudo -S apt-get install -y ca-certificates curl gnupg lsb-release
 
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-    sudo apt-get update -y
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | echo "$PASSWORD" | sudo -S gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | echo "$PASSWORD" | sudo -S tee /etc/apt/sources.list.d/docker.list >/dev/null
+    echo "$PASSWORD" | sudo -S apt-get update -y
+    echo "$PASSWORD" | sudo -S apt-get install -y docker-ce docker-ce-cli containerd.io
 
-    sudo chmod 666 /var/run/docker.sock
+    echo "$PASSWORD" | sudo -S chmod 666 /var/run/docker.sock
 fi
 
 DOCKER_VERSION=$(docker --version)
@@ -178,8 +178,8 @@ if docker-compose --version >/dev/null; then
 else
     echo "docker-compose is not installed"
 
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
+    echo "$PASSWORD" | sudo -S curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    echo "$PASSWORD" | sudo -S chmod +x /usr/local/bin/docker-compose
 fi
 
 DOCKER_COMPOSE_VERSION=$(docker-compose --version)
@@ -194,7 +194,7 @@ if docker top xrengine_minikube_db; then
 else
     echo "mysql is not running"
 
-    sudo chmod 666 /var/run/docker.sock
+    echo "$PASSWORD" | sudo -S chmod 666 /var/run/docker.sock
     npm run dev-docker
 fi
 
@@ -207,8 +207,8 @@ if vboxmanage --version >/dev/null; then
 else
     echo "virtualbox is not installed"
 
-    sudo apt update -y
-    sudo apt install -y virtualbox
+    echo "$PASSWORD" | sudo -S apt update -y
+    echo "$PASSWORD" | sudo -S apt install -y virtualbox
 fi
 
 VIRTUALBOX_VERSION=$(vboxmanage --version)
@@ -224,7 +224,7 @@ else
     echo "kubectl is not installed"
 
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    echo "$PASSWORD" | sudo -S install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 fi
 
 KUBECTL_VERSION=$(kubectl version --client)
@@ -239,11 +239,11 @@ if helm version >/dev/null; then
 else
     echo "helm is not installed"
 
-    curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
-    sudo apt-get install -y apt-transport-https
-    echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-    sudo apt-get update -y
-    sudo apt-get install -y helm
+    curl https://baltocdn.com/helm/signing.asc | echo "$PASSWORD" | sudo -S apt-key add -
+    echo "$PASSWORD" | sudo -S apt-get install -y apt-transport-https
+    echo "deb https://baltocdn.com/helm/stable/debian/ all main" | echo "$PASSWORD" | sudo -S tee /etc/apt/sources.list.d/helm-stable-debian.list
+    echo "$PASSWORD" | sudo -S apt-get update -y
+    echo "$PASSWORD" | sudo -S apt-get install -y helm
 fi
 
 HELM_VERSION=$(helm version)
@@ -259,7 +259,7 @@ else
     echo "minikube is not installed"
 
     curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-    sudo install minikube-linux-amd64 /usr/local/bin/minikube
+    echo "$PASSWORD" | sudo -S install minikube-linux-amd64 /usr/local/bin/minikube
 fi
 
 MINIKUBE_VERSION=$(minikube version)
@@ -288,7 +288,7 @@ echo "minikube status is $MINIKUBE_STATUS"
 if grep -q "host.minikube.internal" /etc/hosts; then
     echo "host.minikube.internal entry exists"
 else
-    sudo -- sh -c "echo '10.0.2.2 host.minikube.internal' >>/etc/hosts"
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '10.0.2.2 host.minikube.internal' >>/etc/hosts"
     echo "host.minikube.internal entries added"
 fi
 
@@ -300,7 +300,7 @@ if grep -q "local.theoverlay.io" /etc/hosts; then
     else
         echo "*.theoverlay.io entries outdated"
         grep -v 'local.theoverlay.io' /etc/hosts >/tmp/hosts.tmp
-        sudo cp /tmp/hosts.tmp /etc/hosts
+        echo "$PASSWORD" | sudo -S cp /tmp/hosts.tmp /etc/hosts
         ADD_MINIKUBE_IP=true
     fi
 else
@@ -308,7 +308,7 @@ else
 fi
 
 if $ADD_MINIKUBE_IP; then
-    sudo -- sh -c "echo '$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io' >>/etc/hosts"
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io' >>/etc/hosts"
     echo "*.theoverlay.io entries added"
 fi
 
