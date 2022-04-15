@@ -1,3 +1,5 @@
+import { Channels } from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -10,13 +12,14 @@ import SudoPasswordDialog from 'renderer/components/SudoPasswordDialog'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
+import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { Box, Button, CircularProgress, IconButton, Stack } from '@mui/material'
+import { Box, CircularProgress, IconButton, Stack } from '@mui/material'
 
 const ConfigPage = () => {
   const [showPasswordDialog, setPasswordDialog] = useState(false)
+  const [isLaunching, setLaunching] = useState(false)
   const deploymentState = useDeploymentState()
   const { isConfiguring, isFetchingStatuses, appStatus, clusterStatus, systemStatus } = deploymentState.value
 
@@ -42,6 +45,14 @@ const ConfigPage = () => {
     }
   }
 
+  const onLaunch = async () => {
+    setLaunching(true)
+
+    await window.electronAPI.invoke(Channels.Utilities.OpenExternal, Endpoints.LAUNCH_PAGE)
+
+    setLaunching(false)
+  }
+
   return (
     <PageRoot>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
@@ -56,7 +67,7 @@ const ConfigPage = () => {
           </IconButton>
           <LoadingButton
             variant="contained"
-            sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
+            sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 }, width: 150 }}
             startIcon={<PowerSettingsNewOutlinedIcon />}
             loading={isConfiguring}
             loadingIndicator={
@@ -69,9 +80,22 @@ const ConfigPage = () => {
           >
             Configure
           </LoadingButton>
-          <Button variant="outlined" startIcon={<DeleteOutlineOutlinedIcon />}>
-            Uninstall
-          </Button>
+          <LoadingButton
+            variant="outlined"
+            disabled={!allConfigured}
+            startIcon={<RocketLaunchOutlinedIcon />}
+            sx={{ width: isLaunching ? 140 : 'auto' }}
+            loading={isLaunching}
+            loadingIndicator={
+              <Box sx={{ display: 'flex', color: '#ffffffab' }}>
+                <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+                Launching
+              </Box>
+            }
+            onClick={onLaunch}
+          >
+            Launch
+          </LoadingButton>
         </Stack>
         <ReflexContainer orientation="horizontal">
           <ReflexElement minSize={200} flex={0.7} style={{ overflowX: 'hidden' }}>

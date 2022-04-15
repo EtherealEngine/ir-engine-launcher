@@ -12,6 +12,7 @@ const Channels = {
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',
+    OpenExternal: 'OpenExternal',
     Log: 'Log'
   },
   XREngine: {
