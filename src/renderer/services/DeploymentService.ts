@@ -58,8 +58,7 @@ export const useDeploymentState = () => useState(state) as any as typeof state
 //Service
 export const DeploymentService = {
   processConfigurations: async (password: string) => {
-    const settingsState = accessSettingsState()
-    const { enqueueSnackbar } = settingsState.value
+    const { enqueueSnackbar } = accessSettingsState().value
     const dispatch = useDispatch()
     try {
       dispatch(DeploymentAction.setConfiguring(true))

@@ -4,8 +4,7 @@ import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import CloseIcon from '@mui/icons-material/Close'
-import { IconButton, PaletteMode } from '@mui/material'
+import { PaletteMode } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
@@ -16,6 +15,7 @@ import AdminPage from './pages/AdminPage'
 import ClusterPage from './pages/ClusterPage'
 import ConfigPage from './pages/ConfigPage'
 import { SettingsService } from './services/SettingsService'
+import { defaultAction } from './components/NotistackActions'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
@@ -44,10 +44,7 @@ const App = () => {
 
   React.useEffect(() => {
     if (notistackRef.current) {
-      SettingsService.setNotiStack({
-        enqueueSnackbar: notistackRef.current.enqueueSnackbar,
-        closeSnackbar: notistackRef.current.closeSnackbar
-      })
+      SettingsService.setNotiStack(notistackRef.current.enqueueSnackbar)
     }
   }, [notistackRef])
 
@@ -65,13 +62,9 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <SnackbarProvider
           ref={notistackRef}
-          maxSnack={3}
+          maxSnack={5}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          action={(key) => (
-            <IconButton onClick={() => notistackRef.current?.closeSnackbar(key)}>
-              <CloseIcon />
-            </IconButton>
-          )}
+          action={defaultAction}
         >
           <BrowserRouter>
             <NavView />

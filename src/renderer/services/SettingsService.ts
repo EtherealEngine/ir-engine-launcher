@@ -1,15 +1,11 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
-import { OptionsObject, SnackbarKey, SnackbarMessage } from 'notistack'
+import { OptionsObject, SnackbarMessage } from 'notistack'
 
 import { store, useDispatch } from '../store'
 
-type EnqueCallback = (message: SnackbarMessage, options?: OptionsObject) => void
-type CloseCallback = (key?: SnackbarKey) => void
-type NotistackPayload = {
-  enqueueSnackbar: EnqueCallback
-  closeSnackbar: CloseCallback
-}
+type EnqueueCallback = (message: SnackbarMessage, options?: OptionsObject) => void
+
 
 //State
 const state = createState({
@@ -23,8 +19,7 @@ const state = createState({
     adminAccess: false,
     error: ''
   },
-  enqueueSnackbar: undefined as EnqueCallback | undefined,
-  closeSnackbar: undefined as CloseCallback | undefined
+  enqueueSnackbar: undefined as EnqueueCallback | undefined,
 })
 
 store.receptors.push((action: SettingsActionType): void => {
@@ -32,8 +27,7 @@ store.receptors.push((action: SettingsActionType): void => {
     switch (action.type) {
       case 'SET_NOTISTACK':
         return s.merge({
-          enqueueSnackbar: action.payload.enqueueSnackbar,
-          closeSnackbar: action.payload.closeSnackbar
+          enqueueSnackbar: action.payload
         })
       case 'FETCH_CLUSTER_DASHBOARD':
         return s.merge({
@@ -109,7 +103,7 @@ export const useSettingsState = () => useState(state) as any as typeof state
 
 //Service
 export const SettingsService = {
-  setNotiStack: async (payload: NotistackPayload) => {
+  setNotiStack: async (payload: EnqueueCallback) => {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setNotiStack(payload))
   },
@@ -170,7 +164,7 @@ export const SettingsService = {
 
 //Action
 export const SettingsAction = {
-  setNotiStack: (payload: NotistackPayload) => {
+  setNotiStack: (payload: EnqueueCallback) => {
     return {
       type: 'SET_NOTISTACK' as const,
       payload

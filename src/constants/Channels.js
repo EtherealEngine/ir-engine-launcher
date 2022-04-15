@@ -13,7 +13,9 @@ const Channels = {
   Utilities: {
     CopyClipboard: 'CopyClipboard',
     OpenExternal: 'OpenExternal',
-    Log: 'Log'
+    OpenPath: 'OpenPath',
+    Log: 'Log',
+    SaveLog: 'SaveLog',
   },
   XREngine: {
     EnsureAdminAccess: 'EnsureAdminAccess',
