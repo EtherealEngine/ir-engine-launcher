@@ -1,4 +1,4 @@
-import { app, BrowserWindow, clipboard, ipcMain, IpcMainInvokeEvent, shell } from 'electron'
+import { app, BrowserWindow, clipboard, dialog, ipcMain, IpcMainInvokeEvent, shell } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
 import { EOL } from 'os'
@@ -21,13 +21,24 @@ class UtilitiesHandler implements IBaseHandler {
         shell.showItemInFolder(pathToOpen)
         log.info('Opening path: ', pathToOpen)
       }),
+      ipcMain.handle(Channels.Utilities.SelectFolder, async (_event: IpcMainInvokeEvent) => {
+        const { filePaths } = await dialog.showOpenDialog({
+          properties: ['openDirectory']
+        })
+
+        if (filePaths.length > 0) {
+          return filePaths[0]
+        }
+
+        return ''
+      }),
       ipcMain.handle(
         Channels.Utilities.SaveLog,
         async (_event: IpcMainInvokeEvent, contents: string[], fileName: string) => {
           try {
             const logPath = path.join(app.getPath('downloads'), fileName)
             const content = contents.join(EOL)
-            
+
             await fs.writeFile(logPath, content)
             log.info('Logs saved at: ', logPath)
 

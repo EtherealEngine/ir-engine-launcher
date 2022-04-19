@@ -4,6 +4,7 @@ import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 import { Channels } from '../../constants/Channels'
 import Endpoints from '../../constants/Endpoints'
 import { delay, exec, executeJS, IBaseHandler } from './IBaseHandler'
+import { getXREnginePath } from './SettingsHandler'
 
 class XREngineHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -64,8 +65,9 @@ const ensureAdminAccess = async (parentWindow: BrowserWindow) => {
             message: `Making ${userId} admin.`
           })
 
+          const xrenginePath = getXREnginePath()
           const response = await exec(
-            `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${Endpoints.XRENGINE_PATH};npm run make-user-admin -- --id=${userId}`
+            `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${xrenginePath};npm run make-user-admin -- --id=${userId}`
           )
           const { error } = response
 

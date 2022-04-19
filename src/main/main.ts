@@ -15,6 +15,7 @@ import path from 'path'
 
 import Endpoints from '../constants/Endpoints'
 import { IBaseHandler } from './handlers/IBaseHandler'
+import SettingsHandler from './handlers/SettingsHandler'
 import ShellHandler from './handlers/ShellHandler'
 import UtilitiesHandler from './handlers/UtilitiesHandler'
 import XREngineHandler from './handlers/XREngineHandler'
@@ -99,7 +100,12 @@ const createWindow = async () => {
     }
   })
 
-  const ipcHandlers: IBaseHandler[] = [new UtilitiesHandler(), new ShellHandler(), new XREngineHandler()]
+  const ipcHandlers: IBaseHandler[] = [
+    new UtilitiesHandler(),
+    new ShellHandler(),
+    new XREngineHandler(),
+    new SettingsHandler()
+  ]
 
   ipcHandlers.forEach((handler) => {
     handler.configure(mainWindow!)

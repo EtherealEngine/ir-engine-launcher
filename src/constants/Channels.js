@@ -14,6 +14,7 @@ const Channels = {
     CopyClipboard: 'CopyClipboard',
     OpenExternal: 'OpenExternal',
     OpenPath: 'OpenPath',
+    SelectFolder: 'SelectFolder',
     Log: 'Log',
     SaveLog: 'SaveLog',
   },
@@ -21,6 +22,9 @@ const Channels = {
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
+  },
+  Settings: {
+    CheckPaths: 'CheckPaths',
   }
 }
 

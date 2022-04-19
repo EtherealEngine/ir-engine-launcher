@@ -141,7 +141,7 @@ const NavView = () => {
                 <Brightness4Icon fontSize="small" />
               )}
             </IconButton>
-            <Tooltip title="Open settings">
+            <Tooltip title="Profile">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircleOutlined sx={{ color: 'white' }} fontSize="large" />
               </IconButton>

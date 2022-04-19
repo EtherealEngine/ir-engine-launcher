@@ -7,6 +7,7 @@ import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex'
 import 'react-reflex/styles.css'
 import LogsView from 'renderer/components/LogsView'
 import PageRoot from 'renderer/components/PageRoot'
+import SettingsDialog from 'renderer/components/SettingsDialog'
 import StatusView from 'renderer/components/StatusView'
 import SudoPasswordDialog from 'renderer/components/SudoPasswordDialog'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
@@ -14,11 +15,13 @@ import { DeploymentService, useDeploymentState } from 'renderer/services/Deploym
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
 import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined'
+import SettingsIcon from '@mui/icons-material/Settings'
 import LoadingButton from '@mui/lab/LoadingButton'
 import { Box, CircularProgress, IconButton, Stack } from '@mui/material'
 
 const ConfigPage = () => {
   const [showPasswordDialog, setPasswordDialog] = useState(false)
+  const [showSettingsDialog, setSettingsDialog] = useState(false)
   const [isLaunching, setLaunching] = useState(false)
   const deploymentState = useDeploymentState()
   const { isConfiguring, isFetchingStatuses, appStatus, clusterStatus, systemStatus } = deploymentState.value
@@ -64,6 +67,9 @@ const ConfigPage = () => {
             onClick={DeploymentService.fetchDeploymentStatus}
           >
             <CachedOutlinedIcon />
+          </IconButton>
+          <IconButton title="Settings" color="primary" onClick={() => setSettingsDialog(true)}>
+            <SettingsIcon />
           </IconButton>
           <LoadingButton
             variant="contained"
@@ -114,6 +120,7 @@ const ConfigPage = () => {
         </ReflexContainer>
       </Box>
       {showPasswordDialog && <SudoPasswordDialog onClose={(password) => onPassword(password)} />}
+      {showSettingsDialog && <SettingsDialog onClose={() => setSettingsDialog(false)} />}
     </PageRoot>
   )
 }

@@ -6,7 +6,6 @@ import { store, useDispatch } from '../store'
 
 type EnqueueCallback = (message: SnackbarMessage, options?: OptionsObject) => void
 
-
 //State
 const state = createState({
   cluster: {
@@ -19,7 +18,12 @@ const state = createState({
     adminAccess: false,
     error: ''
   },
-  enqueueSnackbar: undefined as EnqueueCallback | undefined,
+  paths: {
+    loading: false,
+    xrengine: '',
+    error: ''
+  },
+  enqueueSnackbar: undefined as EnqueueCallback | undefined
 })
 
 store.receptors.push((action: SettingsActionType): void => {
@@ -28,6 +32,30 @@ store.receptors.push((action: SettingsActionType): void => {
       case 'SET_NOTISTACK':
         return s.merge({
           enqueueSnackbar: action.payload
+        })
+      case 'FETCH_PATHS':
+        return s.merge({
+          paths: {
+            loading: true,
+            xrengine: '',
+            error: ''
+          }
+        })
+      case 'FETCH_PATHS_RESPONSE':
+        return s.merge({
+          paths: {
+            loading: false,
+            xrengine: action.response,
+            error: ''
+          }
+        })
+      case 'FETCH_PATHS_ERROR':
+        return s.merge({
+          paths: {
+            loading: false,
+            xrengine: '',
+            error: action.type
+          }
         })
       case 'FETCH_CLUSTER_DASHBOARD':
         return s.merge({
@@ -107,6 +135,17 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setNotiStack(payload))
   },
+  fetchPaths: async () => {
+    const dispatch = useDispatch()
+    try {
+      dispatch(SettingsAction.fetchPaths())
+      const response = await window.electronAPI.invoke(Channels.Settings.CheckPaths)
+      dispatch(SettingsAction.fetchPathsResponse(response))
+    } catch (error) {
+      console.error(error)
+      dispatch(SettingsAction.fetchPathsError(JSON.stringify(error)))
+    }
+  },
   fetchClusterDashboard: async () => {
     const dispatch = useDispatch()
     try {
@@ -170,18 +209,35 @@ export const SettingsAction = {
       payload
     }
   },
+  fetchPaths: () => {
+    return {
+      type: 'FETCH_PATHS' as const
+    }
+  },
+  fetchPathsResponse: (response: string) => {
+    return {
+      type: 'FETCH_PATHS_RESPONSE' as const,
+      response
+    }
+  },
+  fetchPathsError: (error: string) => {
+    return {
+      type: 'FETCH_PATHS_ERROR' as const,
+      error
+    }
+  },
   fetchClusterDashboard: () => {
     return {
       type: 'FETCH_CLUSTER_DASHBOARD' as const
     }
   },
-  fetchClusterDashboardResponse: (response: any) => {
+  fetchClusterDashboardResponse: (response: string) => {
     return {
       type: 'FETCH_CLUSTER_DASHBOARD_RESPONSE' as const,
       response
     }
   },
-  fetchClusterDashboardError: (error: any) => {
+  fetchClusterDashboardError: (error: string) => {
     return {
       type: 'FETCH_CLUSTER_DASHBOARD_ERROR' as const,
       error
@@ -202,7 +258,7 @@ export const SettingsAction = {
       type: 'FETCH_ADMIN_PANEL_ACCESS_RESPONSE' as const
     }
   },
-  fetchAdminPanelAccessError: (error: any) => {
+  fetchAdminPanelAccessError: (error: string) => {
     return {
       type: 'FETCH_ADMIN_PANEL_ACCESS_ERROR' as const,
       error
