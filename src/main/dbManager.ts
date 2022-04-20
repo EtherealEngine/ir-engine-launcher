@@ -1,3 +1,4 @@
+import Storage from '../constants/Storage'
 import log from 'electron-log'
 import sqlite from 'sqlite3'
 
@@ -6,8 +7,8 @@ const db = new sqlite3.Database('xrengine.db')
 
 export const initDB = async () => {
   try {
-    await createTable('paths', 'id TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL,', 'id')
-    await createTable('vars', 'id TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL,', 'id')
+    await createTable(Storage.PATHS_TABLE, 'id TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL,', 'id')
+    await createTable(Storage.VARS_TABLE, 'id TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL,', 'id')
 
     log.info('Initialized database.')
     return true
