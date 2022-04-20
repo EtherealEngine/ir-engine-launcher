@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater'
 import path from 'path'
 
 import Endpoints from '../constants/Endpoints'
+import { initDB } from './dbManager'
 import { IBaseHandler } from './handlers/IBaseHandler'
 import SettingsHandler from './handlers/SettingsHandler'
 import ShellHandler from './handlers/ShellHandler'
@@ -70,6 +71,8 @@ const createWindow = async () => {
   if (isDevelopment) {
     await installExtensions()
   }
+
+  await initDB()
 
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')

@@ -8,7 +8,7 @@ import { Channels } from '../../constants/Channels'
 import { IBaseHandler } from './IBaseHandler'
 
 class UtilitiesHandler implements IBaseHandler {
-  configure = (_window: BrowserWindow) => {
+  configure = (window: BrowserWindow) => {
     ipcMain.handle(Channels.Utilities.CopyClipboard, (_event: IpcMainInvokeEvent, copyText: string) => {
       clipboard.writeText(copyText)
       log.info('Copied to clipboard: ', copyText)
@@ -45,7 +45,7 @@ class UtilitiesHandler implements IBaseHandler {
             return logPath
           } catch (err) {
             log.error('Failed to save logs.', err)
-            _window.webContents.send(Channels.Utilities.Log, { category: 'log', message: JSON.stringify(err) })
+            window.webContents.send(Channels.Utilities.Log, { category: 'save logs', message: JSON.stringify(err) })
 
             return ''
           }
