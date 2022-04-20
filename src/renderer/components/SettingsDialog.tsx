@@ -1,4 +1,5 @@
 import { Channels } from 'constants/Channels'
+import Storage from 'constants/Storage'
 import { useState } from 'react'
 import { useSettingsState } from 'renderer/services/SettingsService'
 
@@ -22,13 +23,15 @@ interface Props {
 
 const SettingsDialog = ({ onClose }: Props) => {
   const settingsState = useSettingsState()
-  const { paths } = settingsState.value
-  const [xrenginePath, setXrenginePath] = useState('')
+  const { configPaths } = settingsState.value
+  const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
 
-  const changeFolder = async () => {
+  const changeFolder = async (key: string) => {
     const path = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
     if (path) {
-      setXrenginePath(path)
+      const newPaths = { ...tempPaths }
+      newPaths[key] = path
+      setTempPaths(newPaths)
     }
   }
 
@@ -36,10 +39,10 @@ const SettingsDialog = ({ onClose }: Props) => {
 
   return (
     <Dialog open fullWidth maxWidth="sm" scroll="paper">
-      {paths.loading && <LinearProgress />}
+      {configPaths.loading && <LinearProgress />}
       <DialogTitle>Settings</DialogTitle>
       <DialogContent dividers>
-        {paths.error && <DialogContentText color={'red'}>Error: {paths.error}</DialogContentText>}
+        {configPaths.error && <DialogContentText color={'red'}>Error: {configPaths.error}</DialogContentText>}
         <DialogContentText variant="button">Paths</DialogContentText>
         <TextField
           disabled
@@ -47,11 +50,15 @@ const SettingsDialog = ({ onClose }: Props) => {
           margin="dense"
           label="XREngine Path"
           variant="standard"
-          value={xrenginePath ? xrenginePath : paths.xrengine}
+          value={
+            tempPaths[Storage.XRENGINE_PATH]
+              ? tempPaths[Storage.XRENGINE_PATH]
+              : configPaths.paths[Storage.XRENGINE_PATH]
+          }
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton edge="end" title="Change Path" onClick={changeFolder}>
+                <IconButton edge="end" title="Change Path" onClick={() => changeFolder(Storage.XRENGINE_PATH)}>
                   <FolderOutlinedIcon />
                 </IconButton>
               </InputAdornment>
@@ -61,7 +68,7 @@ const SettingsDialog = ({ onClose }: Props) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit" disabled={paths.loading} onClick={saveSettings}>
+        <Button type="submit" disabled={configPaths.loading} onClick={saveSettings}>
           Save
         </Button>
       </DialogActions>

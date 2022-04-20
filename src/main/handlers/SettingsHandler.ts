@@ -1,9 +1,10 @@
-import Endpoints from '../../constants/Endpoints'
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 import path from 'path'
 
 // import log from 'electron-log'
 import { Channels } from '../../constants/Channels'
+import Endpoints from '../../constants/Endpoints'
+import Storage from '../../constants/Storage'
 import { IBaseHandler } from './IBaseHandler'
 
 class SettingsHandler implements IBaseHandler {
@@ -11,8 +12,13 @@ class SettingsHandler implements IBaseHandler {
     ipcMain.handle(Channels.Settings.CheckPaths, async (_event: IpcMainInvokeEvent) => {
       const category = 'setting paths'
       try {
-        const xrenginePath = await getXREnginePath()
-        return xrenginePath;
+        const paths: Record<string, string> = {}
+        
+        if (!paths[Storage.XRENGINE_PATH]) {
+          paths[Storage.XRENGINE_PATH] = await getXREnginePath()
+        }
+
+        return paths
       } catch (err) {
         window.webContents.send(Channels.Utilities.Log, {
           category,

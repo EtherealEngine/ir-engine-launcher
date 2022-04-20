@@ -18,9 +18,9 @@ const state = createState({
     adminAccess: false,
     error: ''
   },
-  paths: {
+  configPaths: {
     loading: false,
-    xrengine: '',
+    paths: {} as Record<string, string>,
     error: ''
   },
   enqueueSnackbar: undefined as EnqueueCallback | undefined
@@ -35,25 +35,25 @@ store.receptors.push((action: SettingsActionType): void => {
         })
       case 'FETCH_PATHS':
         return s.merge({
-          paths: {
+          configPaths: {
             loading: true,
-            xrengine: '',
+            paths: {},
             error: ''
           }
         })
       case 'FETCH_PATHS_RESPONSE':
         return s.merge({
-          paths: {
+          configPaths: {
             loading: false,
-            xrengine: action.response,
+            paths: action.response,
             error: ''
           }
         })
       case 'FETCH_PATHS_ERROR':
         return s.merge({
-          paths: {
+          configPaths: {
             loading: false,
-            xrengine: '',
+            paths: {},
             error: action.type
           }
         })
@@ -214,7 +214,7 @@ export const SettingsAction = {
       type: 'FETCH_PATHS' as const
     }
   },
-  fetchPathsResponse: (response: string) => {
+  fetchPathsResponse: (response: Record<string, string>) => {
     return {
       type: 'FETCH_PATHS_RESPONSE' as const,
       response
