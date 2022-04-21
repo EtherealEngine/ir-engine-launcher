@@ -6,6 +6,12 @@ import { store, useDispatch } from '../store'
 
 type EnqueueCallback = (message: SnackbarMessage, options?: OptionsObject) => void
 
+type FetchableItem = {
+  loading: boolean
+  data: any
+  error: string
+}
+
 //State
 const state = createState({
   cluster: {
@@ -33,92 +39,28 @@ store.receptors.push((action: SettingsActionType): void => {
         return s.merge({
           enqueueSnackbar: action.payload
         })
-      case 'FETCH_PATHS':
+      case 'SET_CONFIG_PATHS':
         return s.merge({
           configPaths: {
-            loading: true,
-            paths: {},
-            error: ''
+            loading: action.payload.loading,
+            paths: action.payload.data,
+            error: action.payload.error
           }
         })
-      case 'FETCH_PATHS_RESPONSE':
-        return s.merge({
-          configPaths: {
-            loading: false,
-            paths: action.response,
-            error: ''
-          }
-        })
-      case 'FETCH_PATHS_ERROR':
-        return s.merge({
-          configPaths: {
-            loading: false,
-            paths: {},
-            error: action.type
-          }
-        })
-      case 'FETCH_CLUSTER_DASHBOARD':
+      case 'SET_CLUSTER_DASHBOARD':
         return s.merge({
           cluster: {
-            loading: true,
-            url: '',
-            error: ''
+            loading: action.payload.loading,
+            url: action.payload.data,
+            error: action.payload.error
           }
         })
-      case 'FETCH_CLUSTER_DASHBOARD_RESPONSE':
-        return s.merge({
-          cluster: {
-            loading: false,
-            url: action.response,
-            error: ''
-          }
-        })
-      case 'FETCH_CLUSTER_DASHBOARD_ERROR':
-        return s.merge({
-          cluster: {
-            loading: false,
-            url: '',
-            error: action.error
-          }
-        })
-      case 'CLEAR_CLUSTER_DASHBOARD':
-        return s.merge({
-          cluster: {
-            loading: false,
-            url: '',
-            error: ''
-          }
-        })
-      case 'FETCH_ADMIN_PANEL_ACCESS':
+      case 'SET_ADMIN_PANEL':
         return s.merge({
           adminPanel: {
-            loading: true,
-            adminAccess: false,
-            error: ''
-          }
-        })
-      case 'FETCH_ADMIN_PANEL_ACCESS_RESPONSE':
-        return s.merge({
-          adminPanel: {
-            loading: false,
-            adminAccess: true,
-            error: ''
-          }
-        })
-      case 'FETCH_ADMIN_PANEL_ACCESS_ERROR':
-        return s.merge({
-          adminPanel: {
-            loading: false,
-            adminAccess: false,
-            error: action.error
-          }
-        })
-      case 'CLEAR_ADMIN_PANEL_ACCESS':
-        return s.merge({
-          adminPanel: {
-            loading: false,
-            adminAccess: false,
-            error: ''
+            loading: action.payload.loading,
+            adminAccess: action.payload.data,
+            error: action.payload.error
           }
         })
     }
@@ -138,18 +80,85 @@ export const SettingsService = {
   fetchPaths: async () => {
     const dispatch = useDispatch()
     try {
-      dispatch(SettingsAction.fetchPaths())
+      dispatch(
+        SettingsAction.setConfigPaths({
+          loading: true,
+          data: {},
+          error: ''
+        })
+      )
       const response = await window.electronAPI.invoke(Channels.Settings.CheckPaths)
-      dispatch(SettingsAction.fetchPathsResponse(response))
+      dispatch(
+        SettingsAction.setConfigPaths({
+          loading: false,
+          data: response,
+          error: ''
+        })
+      )
     } catch (error) {
       console.error(error)
-      dispatch(SettingsAction.fetchPathsError(JSON.stringify(error)))
+      dispatch(
+        SettingsAction.setConfigPaths({
+          loading: false,
+          data: {},
+          error: JSON.stringify(error)
+        })
+      )
+    }
+  },
+  saveSettings: async (paths: Record<string, string>) => {
+    const saved = await SettingsService.savePaths(paths)
+    return saved
+  },
+  savePaths: async (paths: Record<string, string>) => {
+    const { configPaths } = accessSettingsState().value
+    const dispatch = useDispatch()
+    try {
+      dispatch(
+        SettingsAction.setConfigPaths({
+          loading: true,
+          data: { ...configPaths.paths },
+          error: ''
+        })
+      )
+
+      await window.electronAPI.invoke(Channels.Settings.SavePaths, paths)
+
+      const updatedPaths = { ...configPaths.paths }
+      for (const key in paths) {
+        updatedPaths[key] = paths[key]
+      }
+
+      dispatch(
+        SettingsAction.setConfigPaths({
+          loading: false,
+          data: updatedPaths,
+          error: ''
+        })
+      )
+      return true
+    } catch (error) {
+      console.error(error)
+      dispatch(
+        SettingsAction.setConfigPaths({
+          loading: false,
+          data: { ...configPaths.paths },
+          error: JSON.stringify(error)
+        })
+      )
+      return false
     }
   },
   fetchClusterDashboard: async () => {
     const dispatch = useDispatch()
     try {
-      dispatch(SettingsAction.fetchClusterDashboard())
+      dispatch(
+        SettingsAction.setClusterDashboard({
+          loading: true,
+          data: '',
+          error: ''
+        })
+      )
       window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeDashboard)
     } catch (error) {
       console.error(error)
@@ -158,7 +167,13 @@ export const SettingsService = {
   clearClusterDashboard: async () => {
     const dispatch = useDispatch()
     try {
-      dispatch(SettingsAction.clearClusterDashboard())
+      dispatch(
+        SettingsAction.setClusterDashboard({
+          loading: false,
+          data: '',
+          error: ''
+        })
+      )
     } catch (error) {
       console.error(error)
     }
@@ -166,7 +181,13 @@ export const SettingsService = {
   fetchAdminPanelAccess: async () => {
     const dispatch = useDispatch()
     try {
-      dispatch(SettingsAction.fetchAdminPanelAccess())
+      dispatch(
+        SettingsAction.setAdminPanel({
+          loading: true,
+          data: false,
+          error: ''
+        })
+      )
       window.electronAPI.invoke(Channels.XREngine.EnsureAdminAccess)
     } catch (error) {
       console.error(error)
@@ -175,7 +196,13 @@ export const SettingsService = {
   clearAdminPanelAccess: async () => {
     const dispatch = useDispatch()
     try {
-      dispatch(SettingsAction.clearAdminPanelAccess())
+      dispatch(
+        SettingsAction.setAdminPanel({
+          loading: false,
+          data: false,
+          error: ''
+        })
+      )
     } catch (error) {
       console.error(error)
     }
@@ -184,16 +211,40 @@ export const SettingsService = {
     const dispatch = useDispatch()
     try {
       window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardResponse, (data: string) => {
-        dispatch(SettingsAction.fetchClusterDashboardResponse(data))
+        dispatch(
+          SettingsAction.setClusterDashboard({
+            loading: false,
+            data,
+            error: ''
+          })
+        )
       })
-      window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardError, (data: string) => {
-        dispatch(SettingsAction.fetchClusterDashboardError(data))
+      window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardError, (error: string) => {
+        dispatch(
+          SettingsAction.setClusterDashboard({
+            loading: false,
+            data: '',
+            error
+          })
+        )
       })
       window.electronAPI.on(Channels.XREngine.EnsureAdminAccessResponse, () => {
-        dispatch(SettingsAction.fetchAdminPanelAccessResponse())
+        dispatch(
+          SettingsAction.setAdminPanel({
+            loading: false,
+            data: true,
+            error: ''
+          })
+        )
       })
-      window.electronAPI.on(Channels.XREngine.EnsureAdminAccessError, (data: string) => {
-        dispatch(SettingsAction.fetchAdminPanelAccessError(data))
+      window.electronAPI.on(Channels.XREngine.EnsureAdminAccessError, (error: string) => {
+        dispatch(
+          SettingsAction.setAdminPanel({
+            loading: false,
+            data: false,
+            error
+          })
+        )
       })
     } catch (error) {
       console.error(error)
@@ -209,64 +260,22 @@ export const SettingsAction = {
       payload
     }
   },
-  fetchPaths: () => {
+  setConfigPaths: (payload: FetchableItem) => {
     return {
-      type: 'FETCH_PATHS' as const
+      type: 'SET_CONFIG_PATHS' as const,
+      payload
     }
   },
-  fetchPathsResponse: (response: Record<string, string>) => {
+  setClusterDashboard: (payload: FetchableItem) => {
     return {
-      type: 'FETCH_PATHS_RESPONSE' as const,
-      response
+      type: 'SET_CLUSTER_DASHBOARD' as const,
+      payload
     }
   },
-  fetchPathsError: (error: string) => {
+  setAdminPanel: (payload: FetchableItem) => {
     return {
-      type: 'FETCH_PATHS_ERROR' as const,
-      error
-    }
-  },
-  fetchClusterDashboard: () => {
-    return {
-      type: 'FETCH_CLUSTER_DASHBOARD' as const
-    }
-  },
-  fetchClusterDashboardResponse: (response: string) => {
-    return {
-      type: 'FETCH_CLUSTER_DASHBOARD_RESPONSE' as const,
-      response
-    }
-  },
-  fetchClusterDashboardError: (error: string) => {
-    return {
-      type: 'FETCH_CLUSTER_DASHBOARD_ERROR' as const,
-      error
-    }
-  },
-  clearClusterDashboard: () => {
-    return {
-      type: 'CLEAR_CLUSTER_DASHBOARD' as const
-    }
-  },
-  fetchAdminPanelAccess: () => {
-    return {
-      type: 'FETCH_ADMIN_PANEL_ACCESS' as const
-    }
-  },
-  fetchAdminPanelAccessResponse: () => {
-    return {
-      type: 'FETCH_ADMIN_PANEL_ACCESS_RESPONSE' as const
-    }
-  },
-  fetchAdminPanelAccessError: (error: string) => {
-    return {
-      type: 'FETCH_ADMIN_PANEL_ACCESS_ERROR' as const,
-      error
-    }
-  },
-  clearAdminPanelAccess: () => {
-    return {
-      type: 'CLEAR_ADMIN_PANEL_ACCESS' as const
+      type: 'SET_ADMIN_PANEL' as const,
+      payload
     }
   }
 }

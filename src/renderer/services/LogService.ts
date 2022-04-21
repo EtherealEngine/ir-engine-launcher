@@ -36,7 +36,7 @@ export const LogService = {
   saveLogs: async () => {
     const { enqueueSnackbar } = accessSettingsState().value
     const { logs } = accessLogState().value
-    
+
     const dispatch = useDispatch()
     try {
       dispatch(LogAction.setIsSaving(true))

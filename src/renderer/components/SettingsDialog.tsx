@@ -1,7 +1,7 @@
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
 import { useState } from 'react'
-import { useSettingsState } from 'renderer/services/SettingsService'
+import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import {
@@ -35,7 +35,12 @@ const SettingsDialog = ({ onClose }: Props) => {
     }
   }
 
-  const saveSettings = () => {}
+  const saveSettings = async () => {
+    const saved = await SettingsService.saveSettings(tempPaths)
+    if (saved) {
+      onClose()
+    }
+  }
 
   return (
     <Dialog open fullWidth maxWidth="sm" scroll="paper">
@@ -58,7 +63,12 @@ const SettingsDialog = ({ onClose }: Props) => {
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton edge="end" title="Change Path" onClick={() => changeFolder(Storage.XRENGINE_PATH)}>
+                <IconButton
+                  edge="end"
+                  title="Change Path"
+                  disabled={configPaths.loading}
+                  onClick={() => changeFolder(Storage.XRENGINE_PATH)}
+                >
                   <FolderOutlinedIcon />
                 </IconButton>
               </InputAdornment>
@@ -68,7 +78,7 @@ const SettingsDialog = ({ onClose }: Props) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button type="submit" disabled={configPaths.loading} onClick={saveSettings}>
+        <Button type="submit" disabled={configPaths.loading || Object.keys(tempPaths).length === 0} onClick={saveSettings}>
           Save
         </Button>
       </DialogActions>

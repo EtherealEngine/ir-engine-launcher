@@ -1,6 +1,7 @@
-import Storage from '../constants/Storage'
 import log from 'electron-log'
 import sqlite from 'sqlite3'
+
+import Storage from '../constants/Storage'
 
 const sqlite3 = sqlite.verbose()
 const db = new sqlite3.Database('xrengine.db')
@@ -37,6 +38,7 @@ export const insertOrUpdateValue = async (tableName: string, id: string, value: 
     }
   } catch (err) {
     log.error('Failed to insertOrUpdate in database.', err)
+    throw err
   }
 }
 
@@ -48,7 +50,7 @@ export const getAllValues = async (tableName: string) => {
     return resSql
   } catch (err) {
     log.error('Failed to getAllValues in database.', err)
-    return undefined
+    return []
   }
 }
 
@@ -63,12 +65,10 @@ export const getValue = async (tableName: string, id: string) => {
     if (resSql && resSql.length > 0) {
       return resSql[0]
     }
-
-    return undefined
   } catch (err) {
     log.error('Failed to getAllValues in database.', err)
-    return undefined
   }
+  return undefined
 }
 
 /**

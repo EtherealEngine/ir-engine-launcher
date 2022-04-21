@@ -10,12 +10,12 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 
 import './App.css'
 import NavView from './components/NavView'
+import { defaultAction } from './components/NotistackActions'
 import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
 import ClusterPage from './pages/ClusterPage'
 import ConfigPage from './pages/ConfigPage'
 import { SettingsService } from './services/SettingsService'
-import { defaultAction } from './components/NotistackActions'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
