@@ -29,6 +29,11 @@ const state = createState({
     paths: {} as Record<string, string>,
     error: ''
   },
+  configVars: {
+    loading: false,
+    vars: {} as Record<string, string>,
+    error: ''
+  },
   enqueueSnackbar: undefined as EnqueueCallback | undefined
 })
 
@@ -44,6 +49,14 @@ store.receptors.push((action: SettingsActionType): void => {
           configPaths: {
             loading: action.payload.loading,
             paths: action.payload.data,
+            error: action.payload.error
+          }
+        })
+      case 'SET_CONFIG_VARS':
+        return s.merge({
+          configVars: {
+            loading: action.payload.loading,
+            vars: action.payload.data,
             error: action.payload.error
           }
         })
@@ -77,6 +90,10 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setNotiStack(payload))
   },
+  fetchSettings: async () => {
+    await SettingsService.fetchPaths()
+    await SettingsService.fetchVars()
+  },
   fetchPaths: async () => {
     const dispatch = useDispatch()
     try {
@@ -99,6 +116,35 @@ export const SettingsService = {
       console.error(error)
       dispatch(
         SettingsAction.setConfigPaths({
+          loading: false,
+          data: {},
+          error: JSON.stringify(error)
+        })
+      )
+    }
+  },
+  fetchVars: async () => {
+    const dispatch = useDispatch()
+    try {
+      dispatch(
+        SettingsAction.setConfigVars({
+          loading: true,
+          data: {},
+          error: ''
+        })
+      )
+      const response = await window.electronAPI.invoke(Channels.Settings.CheckVars)
+      dispatch(
+        SettingsAction.setConfigVars({
+          loading: false,
+          data: response,
+          error: ''
+        })
+      )
+    } catch (error) {
+      console.error(error)
+      dispatch(
+        SettingsAction.setConfigVars({
           loading: false,
           data: {},
           error: JSON.stringify(error)
@@ -263,6 +309,12 @@ export const SettingsAction = {
   setConfigPaths: (payload: FetchableItem) => {
     return {
       type: 'SET_CONFIG_PATHS' as const,
+      payload
+    }
+  },
+  setConfigVars: (payload: FetchableItem) => {
+    return {
+      type: 'SET_CONFIG_VARS' as const,
       payload
     }
   },

@@ -1,5 +1,6 @@
 import childProcess, { ExecException } from 'child_process'
 import { BrowserWindow } from 'electron'
+import { promises as fs } from 'fs'
 import path from 'path'
 
 export interface IBaseHandler {
@@ -45,6 +46,20 @@ export const assetsPath = () => {
 
 export const scriptsPath = () => {
   return path.join(assetsPath(), 'scripts')
+}
+
+/**
+ * https://futurestud.io/tutorials/node-js-check-if-a-file-exists
+ * @param path
+ * @returns
+ */
+export const fileExists = async (path: string) => {
+  try {
+    await fs.access(path)
+    return true
+  } catch {
+    return false
+  }
 }
 
 export const exec = (command: string): Promise<ShellResponse> => {

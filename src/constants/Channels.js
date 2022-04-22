@@ -25,6 +25,7 @@ const Channels = {
   },
   Settings: {
     CheckPaths: 'CheckPaths',
+    CheckVars: 'CheckVars',
     SavePaths: 'SavePaths'
   }
 }

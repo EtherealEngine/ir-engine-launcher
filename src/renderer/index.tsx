@@ -8,7 +8,7 @@ import { SettingsService } from './services/SettingsService'
 LogService.listen()
 SettingsService.listen()
 DeploymentService.listen()
-SettingsService.fetchPaths()
+SettingsService.fetchSettings()
 DeploymentService.fetchDeploymentStatus()
 
 render(<App />, document.getElementById('root'))
