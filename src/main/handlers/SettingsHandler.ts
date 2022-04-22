@@ -90,6 +90,24 @@ class SettingsHandler implements IBaseHandler {
           })
           throw err
         }
+      }),
+      ipcMain.handle(Channels.Settings.SaveVars, async (_event: IpcMainInvokeEvent, vars: Record<string, string>) => {
+        const category = 'save variables'
+        try {
+          for (const key in vars) {
+            await insertOrUpdateValue(Storage.VARS_TABLE, key, vars[key])
+          }
+          window.webContents.send(Channels.Utilities.Log, {
+            category,
+            message: 'Setting variables saved.'
+          })
+        } catch (err) {
+          window.webContents.send(Channels.Utilities.Log, {
+            category,
+            message: JSON.stringify(err)
+          })
+          throw err
+        }
       })
   }
 }

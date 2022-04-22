@@ -152,9 +152,11 @@ export const SettingsService = {
       )
     }
   },
-  saveSettings: async (paths: Record<string, string>) => {
-    const saved = await SettingsService.savePaths(paths)
-    return saved
+  saveSettings: async (paths: Record<string, string>, vars: Record<string, string>) => {
+    const savedPaths = await SettingsService.savePaths(paths)
+    const savedVars = await SettingsService.saveVars(vars)
+
+    return savedPaths && savedVars
   },
   savePaths: async (paths: Record<string, string>) => {
     const { configPaths } = accessSettingsState().value
@@ -189,6 +191,45 @@ export const SettingsService = {
         SettingsAction.setConfigPaths({
           loading: false,
           data: { ...configPaths.paths },
+          error: JSON.stringify(error)
+        })
+      )
+      return false
+    }
+  },
+  saveVars: async (vars: Record<string, string>) => {
+    const { configVars } = accessSettingsState().value
+    const dispatch = useDispatch()
+    try {
+      dispatch(
+        SettingsAction.setConfigVars({
+          loading: true,
+          data: { ...configVars.vars },
+          error: ''
+        })
+      )
+
+      await window.electronAPI.invoke(Channels.Settings.SaveVars, vars)
+
+      const updatedVars = { ...configVars.vars }
+      for (const key in vars) {
+        updatedVars[key] = vars[key]
+      }
+
+      dispatch(
+        SettingsAction.setConfigVars({
+          loading: false,
+          data: updatedVars,
+          error: ''
+        })
+      )
+      return true
+    } catch (error) {
+      console.error(error)
+      dispatch(
+        SettingsAction.setConfigVars({
+          loading: false,
+          data: { ...configVars.vars },
           error: JSON.stringify(error)
         })
       )

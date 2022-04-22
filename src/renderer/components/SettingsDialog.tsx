@@ -43,7 +43,7 @@ const SettingsDialog = ({ onClose }: Props) => {
   }
 
   const saveSettings = async () => {
-    const saved = await SettingsService.saveSettings(tempPaths)
+    const saved = await SettingsService.saveSettings(tempPaths, tempVars)
     if (saved) {
       onClose()
     }
