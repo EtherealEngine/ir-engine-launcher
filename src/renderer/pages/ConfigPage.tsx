@@ -5,11 +5,11 @@ import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex'
 import 'react-reflex/styles.css'
+import ConfigurationDialog from 'renderer/components/ConfigurationDialog'
 import LogsView from 'renderer/components/LogsView'
 import PageRoot from 'renderer/components/PageRoot'
 import SettingsDialog from 'renderer/components/SettingsDialog'
 import StatusView from 'renderer/components/StatusView'
-import SudoPasswordDialog from 'renderer/components/SudoPasswordDialog'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
@@ -20,7 +20,7 @@ import LoadingButton from '@mui/lab/LoadingButton'
 import { Box, CircularProgress, IconButton, Stack } from '@mui/material'
 
 const ConfigPage = () => {
-  const [showPasswordDialog, setPasswordDialog] = useState(false)
+  const [showConfigDialog, setConfigDialog] = useState(false)
   const [showSettingsDialog, setSettingsDialog] = useState(false)
   const [isLaunching, setLaunching] = useState(false)
   const deploymentState = useDeploymentState()
@@ -37,15 +37,7 @@ const ConfigPage = () => {
       return
     }
 
-    setPasswordDialog(true)
-  }
-
-  const onPassword = async (password: string) => {
-    setPasswordDialog(false)
-
-    if (password) {
-      DeploymentService.processConfigurations(password)
-    }
+    setConfigDialog(true)
   }
 
   const onLaunch = async () => {
@@ -119,7 +111,7 @@ const ConfigPage = () => {
           </ReflexElement>
         </ReflexContainer>
       </Box>
-      {showPasswordDialog && <SudoPasswordDialog onClose={(password) => onPassword(password)} />}
+      {showConfigDialog && <ConfigurationDialog onClose={() => setConfigDialog(false)} />}
       {showSettingsDialog && <SettingsDialog onClose={() => setSettingsDialog(false)} />}
     </PageRoot>
   )

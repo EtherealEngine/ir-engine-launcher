@@ -47,13 +47,13 @@ const SettingsDialog = ({ onClose }: Props) => {
     <Dialog open fullWidth maxWidth="sm" scroll="paper">
       {(configPaths.loading || configVars.loading) && <LinearProgress />}
       <DialogTitle>Settings</DialogTitle>
-      <DialogContent dividers sx={{ overflowX: 'hidden' }}>
+      <DialogContent dividers sx={{ maxHeight: '40vh' }}>
         <DialogContentText variant="button">Paths</DialogContentText>
-        <ConfigPathsView localPaths={tempPaths} onChange={changePath} />
+        <ConfigPathsView localPaths={tempPaths} onChange={changePath} sx={{ paddingLeft: 2 }} />
         <DialogContentText variant="button" sx={{ marginTop: 4 }}>
           Variables
         </DialogContentText>
-        <ConfigVarsView localVars={tempVars} onChange={changeVar} />
+        <ConfigVarsView localVars={tempVars} onChange={changeVar} sx={{ paddingLeft: 2 }} />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

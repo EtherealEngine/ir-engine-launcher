@@ -1,23 +1,23 @@
 import { useSettingsState } from 'renderer/services/SettingsService'
 
-import { DialogContentText, TextField } from '@mui/material'
+import { Box, DialogContentText, SxProps, TextField, Theme } from '@mui/material'
 
 interface Props {
   localVars: Record<string, string>
   onChange: (key: string, value: string) => void
+  sx?: SxProps<Theme>
 }
 
-const ConfigVarsView = ({ localVars, onChange }: Props) => {
+const ConfigVarsView = ({ localVars, onChange, sx }: Props) => {
   const settingsState = useSettingsState()
   const { configVars } = settingsState.value
 
   return (
-    <>
+    <Box sx={sx}>
       {configVars.error && <DialogContentText color={'red'}>Error: {configVars.error}</DialogContentText>}
       {Object.keys(configVars.vars).map((key) => (
         <TextField
           fullWidth
-          sx={{ marginLeft: 2 }}
           key={key}
           margin="dense"
           label={key.replaceAll('_', ' ')}
@@ -26,7 +26,7 @@ const ConfigVarsView = ({ localVars, onChange }: Props) => {
           onChange={(event) => onChange(key, event.target.value)}
         />
       ))}
-    </>
+    </Box>
   )
 }
 

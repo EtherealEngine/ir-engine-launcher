@@ -3,14 +3,15 @@ import Storage from 'constants/Storage'
 import { useSettingsState } from 'renderer/services/SettingsService'
 
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
-import { DialogContentText, IconButton, InputAdornment, TextField } from '@mui/material'
+import { Box, DialogContentText, IconButton, InputAdornment, SxProps, TextField, Theme } from '@mui/material'
 
 interface Props {
   localPaths: Record<string, string>
   onChange: (key: string, value: string) => void
+  sx?: SxProps<Theme>
 }
 
-const ConfigPathsView = ({ localPaths, onChange }: Props) => {
+const ConfigPathsView = ({ localPaths, onChange, sx }: Props) => {
   const settingsState = useSettingsState()
   const { configPaths } = settingsState.value
 
@@ -22,12 +23,11 @@ const ConfigPathsView = ({ localPaths, onChange }: Props) => {
   }
 
   return (
-    <>
+    <Box sx={sx}>
       {configPaths.error && <DialogContentText color={'red'}>Error: {configPaths.error}</DialogContentText>}
       <TextField
         disabled
         fullWidth
-        sx={{ marginLeft: 2 }}
         margin="dense"
         label="XREngine Path"
         variant="standard"
@@ -51,7 +51,7 @@ const ConfigPathsView = ({ localPaths, onChange }: Props) => {
           )
         }}
       />
-    </>
+    </Box>
   )
 }
 
