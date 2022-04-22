@@ -57,7 +57,7 @@ class SettingsHandler implements IBaseHandler {
           const valuesKey = [] as string[]
           findRequiredValues(yamlDoc, valuesKey)
 
-          valuesKey.sort().forEach(item => vars[item] = '')
+          valuesKey.sort().forEach((item) => (vars[item] = ''))
 
           const varsData = await getAllValues(Storage.VARS_TABLE)
           for (const data of varsData) {
@@ -114,8 +114,8 @@ class SettingsHandler implements IBaseHandler {
 
 /**
  * https://stackoverflow.com/a/2549333/2077741
- * @param yaml 
- * @param values 
+ * @param yaml
+ * @param values
  */
 const findRequiredValues = async (yaml: any, values: string[]) => {
   for (var key in yaml) {
@@ -124,7 +124,7 @@ const findRequiredValues = async (yaml: any, values: string[]) => {
     } else {
       const value: string = yaml[key].toString().trim()
       if (value.startsWith('<') && value.endsWith('>')) {
-        const variable = value.slice(1, -1);
+        const variable = value.slice(1, -1)
         values.push(variable)
       }
     }

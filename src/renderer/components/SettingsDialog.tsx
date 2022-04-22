@@ -1,9 +1,6 @@
-import { Channels } from 'constants/Channels'
-import Storage from 'constants/Storage'
 import { useState } from 'react'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
-import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import {
   Button,
   Dialog,
@@ -11,11 +8,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  IconButton,
-  InputAdornment,
-  LinearProgress,
-  TextField
+  LinearProgress
 } from '@mui/material'
+
+import ConfigPathsView from './ConfigPathsView'
+import ConfigVarsView from './ConfigVarsView'
 
 interface Props {
   onClose: () => void
@@ -27,18 +24,15 @@ const SettingsDialog = ({ onClose }: Props) => {
   const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
 
-  const changeFolder = async (key: string) => {
-    const path = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
-    if (path) {
-      const newPaths = { ...tempPaths }
-      newPaths[key] = path
-      setTempPaths(newPaths)
-    }
+  const changePath = async (key: string, value: string) => {
+    const newPaths = { ...tempPaths }
+    newPaths[key] = value
+    setTempPaths(newPaths)
   }
 
-  const changeVar = async (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, key: string) => {
+  const changeVar = async (key: string, value: string) => {
     const newVars = { ...tempVars }
-    newVars[key] = event.target.value
+    newVars[key] = value
     setTempVars(newVars)
   }
 
@@ -53,52 +47,13 @@ const SettingsDialog = ({ onClose }: Props) => {
     <Dialog open fullWidth maxWidth="sm" scroll="paper">
       {(configPaths.loading || configVars.loading) && <LinearProgress />}
       <DialogTitle>Settings</DialogTitle>
-      <DialogContent dividers sx={{overflowX: 'hidden'}}>
-        {configPaths.error && <DialogContentText color={'red'}>Error: {configPaths.error}</DialogContentText>}
+      <DialogContent dividers sx={{ overflowX: 'hidden' }}>
         <DialogContentText variant="button">Paths</DialogContentText>
-        <TextField
-          disabled
-          fullWidth
-          sx={{ marginLeft: 2 }}
-          margin="dense"
-          label="XREngine Path"
-          variant="standard"
-          value={
-            tempPaths[Storage.XRENGINE_PATH]
-              ? tempPaths[Storage.XRENGINE_PATH]
-              : configPaths.paths[Storage.XRENGINE_PATH]
-          }
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  edge="end"
-                  title="Change Path"
-                  disabled={configPaths.loading}
-                  onClick={() => changeFolder(Storage.XRENGINE_PATH)}
-                >
-                  <FolderOutlinedIcon />
-                </IconButton>
-              </InputAdornment>
-            )
-          }}
-        />
-        {configVars.error && <DialogContentText color={'red'}>Error: {configVars.error}</DialogContentText>}
+        <ConfigPathsView localPaths={tempPaths} onChange={changePath} />
         <DialogContentText variant="button" sx={{ marginTop: 4 }}>
           Variables
         </DialogContentText>
-        {Object.keys(configVars.vars).map((key) => (
-          <TextField
-            fullWidth
-            sx={{ marginLeft: 2 }}
-            key={key}
-            margin="dense"
-            label={key.replaceAll('_', ' ')}
-            variant="standard"
-            value={tempVars[key] ? tempVars[key] : configVars.vars[key]}
-            onChange={(event) => changeVar(event, key)}
-          />
-        ))}
+        <ConfigVarsView localVars={tempVars} onChange={changeVar} />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
