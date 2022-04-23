@@ -42,29 +42,37 @@ class ShellHandler implements IBaseHandler {
           return false
         }
       }),
-      ipcMain.handle(Channels.Shell.ConfigureMinikubeConfig, async (_event: IpcMainInvokeEvent, password: string) => {
-        const category = 'configure minikube'
-        try {
-          const configureScript = path.join(scriptsPath(), `configure-minikube.sh ${password}`)
-          log.info(`Executing script ${configureScript}`)
+      ipcMain.handle(
+        Channels.Shell.ConfigureMinikubeConfig,
+        async (
+          _event: IpcMainInvokeEvent,
+          password: string,
+          paths: Record<string, string>,
+          vars: Record<string, string>
+        ) => {
+          const category = 'configure minikube'
+          try {
+            // const configureScript = path.join(scriptsPath(), `configure-minikube.sh ${password}`)
+            // log.info(`Executing script ${configureScript}`)
 
-          const onStd = (data: any) => {
-            window.webContents.send(Channels.Utilities.Log, { category, message: data })
-          }
-          const code = await execStream(`bash ${configureScript}`, onStd, onStd)
-          if (code !== 0) {
-            throw `Failed with error code ${code}.`
-          }
+            // const onStd = (data: any) => {
+            //   window.webContents.send(Channels.Utilities.Log, { category, message: data })
+            // }
+            // const code = await execStream(`bash ${configureScript}`, onStd, onStd)
+            // if (code !== 0) {
+            //   throw `Failed with error code ${code}.`
+            // }
 
-          return true
-        } catch (err) {
-          window.webContents.send(Channels.Utilities.Log, {
-            category,
-            message: JSON.stringify(err)
-          })
-          return false
+            return true
+          } catch (err) {
+            window.webContents.send(Channels.Utilities.Log, {
+              category,
+              message: JSON.stringify(err)
+            })
+            return false
+          }
         }
-      }),
+      ),
       ipcMain.handle(Channels.Shell.ConfigureMinikubeDashboard, async (_event: IpcMainInvokeEvent) => {
         const category = 'minikube dashboard'
         try {

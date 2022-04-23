@@ -18,7 +18,7 @@ const ConfigSummaryView = ({ localPaths, localVars, sx }: Props) => {
         Paths: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
       </Typography>
       {Object.keys(localPaths).map((key) => (
-        <Typography variant="body2">
+        <Typography key={key} variant="body2">
           <span style={{ opacity: 0.5 }}>{key.replaceAll('_', ' ')}:</span> {localPaths[key]}
         </Typography>
       ))}
@@ -27,7 +27,7 @@ const ConfigSummaryView = ({ localPaths, localVars, sx }: Props) => {
         Variables: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
       </Typography>
       {Object.keys(localVars).map((key) => (
-        <Typography variant="body2">
+        <Typography key={key} variant="body2">
           <span style={{ opacity: 0.5 }}>{key.replaceAll('_', ' ')}:</span> {localVars[key]}
         </Typography>
       ))}

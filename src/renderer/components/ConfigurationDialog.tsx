@@ -1,6 +1,7 @@
 import { Channels } from 'constants/Channels'
 import { useState } from 'react'
-import { useSettingsState } from 'renderer/services/SettingsService'
+import { DeploymentService } from 'renderer/services/DeploymentService'
+import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import AppsIcon from '@mui/icons-material/Apps'
@@ -26,6 +27,7 @@ import ConfigAuthView from './ConfigAuthView'
 import ConfigPathsView from './ConfigPathsView'
 import ConfigSummaryView from './ConfigSummaryView'
 import ConfigVarsView from './ConfigVarsView'
+import { useSnackbar } from 'notistack'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
@@ -48,6 +50,7 @@ interface Props {
 }
 
 const ConfigurationDialog = ({ onClose }: Props) => {
+  const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
   const { configPaths, configVars } = settingsState.value
 
@@ -57,6 +60,16 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const [password, setPassword] = useState('')
   const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
+
+  const localPaths = {} as Record<string, string>
+  for (const key in configPaths.paths) {
+    localPaths[key] = key in tempPaths ? tempPaths[key] : configPaths.paths[key]
+  }
+
+  const localVars = {} as Record<string, string>
+  for (const key in configVars.vars) {
+    localVars[key] = key in tempVars ? tempVars[key] : configVars.vars[key]
+  }
 
   const handleNext = async () => {
     if (activeStep === 0) {
@@ -74,6 +87,19 @@ const ConfigurationDialog = ({ onClose }: Props) => {
           return
         }
       }
+    } else if (activeStep === 3) {
+      if (Object.keys(tempPaths).length > 0 || Object.keys(tempVars).length > 0) {
+        const saved = await SettingsService.saveSettings(tempPaths, tempVars)
+
+        if (!saved) {
+          enqueueSnackbar('Failed to save configurations', { variant: 'error' })
+        }
+      }
+
+      DeploymentService.processConfigurations(password, localPaths, localVars)
+      onClose()
+
+      return
     }
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -104,16 +130,6 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     setError('')
   }
 
-  const localPaths = {} as Record<string, string>
-  for (const key in configPaths.paths) {
-    localPaths[key] = key in tempPaths ? tempPaths[key] : configPaths.paths[key]
-  }
-  
-  const localVars = {} as Record<string, string>
-  for (const key in configVars.vars) {
-    localVars[key] = key in tempVars ? tempVars[key] : configVars.vars[key]
-  }
-
   const steps = [
     {
       label: 'Authenticate',
@@ -130,7 +146,9 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     {
       label: 'Paths',
       title: 'Provide configuration paths',
-      content: <ConfigPathsView localPaths={localPaths} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangePath} />
+      content: (
+        <ConfigPathsView localPaths={localPaths} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangePath} />
+      )
     },
     {
       label: 'Variables',
@@ -140,7 +158,9 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     {
       label: 'Summary',
       title: 'Review configurations before finalizing',
-      content: <ConfigSummaryView localPaths={localPaths} localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} />
+      content: (
+        <ConfigSummaryView localPaths={localPaths} localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} />
+      )
     }
   ]
 
