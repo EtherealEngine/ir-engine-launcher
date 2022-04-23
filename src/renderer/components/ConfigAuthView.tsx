@@ -20,6 +20,7 @@ const ConfigAuthView = ({ password, sx, onChange, onEnter }: Props) => {
         autoFocus
         fullWidth
         margin="dense"
+        size="small"
         label="Sudo Password"
         variant="standard"
         value={password}
