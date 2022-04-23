@@ -29,13 +29,10 @@ const ConfigPathsView = ({ localPaths, onChange, sx }: Props) => {
         disabled
         fullWidth
         margin="dense"
+        size="small"
         label="XREngine Path"
         variant="standard"
-        value={
-          localPaths[Storage.XRENGINE_PATH]
-            ? localPaths[Storage.XRENGINE_PATH]
-            : configPaths.paths[Storage.XRENGINE_PATH]
-        }
+        value={localPaths[Storage.XRENGINE_PATH]}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">

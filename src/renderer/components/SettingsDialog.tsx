@@ -24,6 +24,16 @@ const SettingsDialog = ({ onClose }: Props) => {
   const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
 
+  const localPaths = {} as Record<string, string>
+  for (const key in configPaths.paths) {
+    localPaths[key] = key in tempPaths ? tempPaths[key] : configPaths.paths[key]
+  }
+  
+  const localVars = {} as Record<string, string>
+  for (const key in configVars.vars) {
+    localVars[key] = key in tempVars ? tempVars[key] : configVars.vars[key]
+  }
+
   const changePath = async (key: string, value: string) => {
     const newPaths = { ...tempPaths }
     newPaths[key] = value
@@ -49,11 +59,12 @@ const SettingsDialog = ({ onClose }: Props) => {
       <DialogTitle>Settings</DialogTitle>
       <DialogContent dividers sx={{ maxHeight: '40vh' }}>
         <DialogContentText variant="button">Paths</DialogContentText>
-        <ConfigPathsView localPaths={tempPaths} onChange={changePath} sx={{ paddingLeft: 2 }} />
+        <ConfigPathsView localPaths={localPaths} onChange={changePath} sx={{ paddingLeft: 2 }} />
+
         <DialogContentText variant="button" sx={{ marginTop: 4 }}>
           Variables
         </DialogContentText>
-        <ConfigVarsView localVars={tempVars} onChange={changeVar} sx={{ paddingLeft: 2 }} />
+        <ConfigVarsView localVars={localVars} onChange={changeVar} sx={{ paddingLeft: 2 }} />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>

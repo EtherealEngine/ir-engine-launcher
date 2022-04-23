@@ -15,14 +15,15 @@ const ConfigVarsView = ({ localVars, onChange, sx }: Props) => {
   return (
     <Box sx={sx}>
       {configVars.error && <DialogContentText color={'red'}>Error: {configVars.error}</DialogContentText>}
-      {Object.keys(configVars.vars).map((key) => (
+      {Object.keys(localVars).map((key) => (
         <TextField
           fullWidth
           key={key}
           margin="dense"
+          size="small"
           label={key.replaceAll('_', ' ')}
           variant="standard"
-          value={key in localVars ? localVars[key] : configVars.vars[key]}
+          value={localVars[key]}
           onChange={(event) => onChange(key, event.target.value)}
         />
       ))}

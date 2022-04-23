@@ -24,6 +24,7 @@ import { StepIconProps } from '@mui/material/StepIcon'
 import { ColorlibConnector, ColorlibStepIconRoot } from './Colorlib'
 import ConfigAuthView from './ConfigAuthView'
 import ConfigPathsView from './ConfigPathsView'
+import ConfigSummaryView from './ConfigSummaryView'
 import ConfigVarsView from './ConfigVarsView'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
@@ -103,6 +104,16 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     setError('')
   }
 
+  const localPaths = {} as Record<string, string>
+  for (const key in configPaths.paths) {
+    localPaths[key] = key in tempPaths ? tempPaths[key] : configPaths.paths[key]
+  }
+  
+  const localVars = {} as Record<string, string>
+  for (const key in configVars.vars) {
+    localVars[key] = key in tempVars ? tempVars[key] : configVars.vars[key]
+  }
+
   const steps = [
     {
       label: 'Authenticate',
@@ -119,17 +130,17 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     {
       label: 'Paths',
       title: 'Provide configuration paths',
-      content: <ConfigPathsView localPaths={tempPaths} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangePath} />
+      content: <ConfigPathsView localPaths={localPaths} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangePath} />
     },
     {
-      label: 'Variable',
+      label: 'Variables',
       title: 'Provide configuration variables',
-      content: <ConfigVarsView localVars={tempVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
+      content: <ConfigVarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
       label: 'Summary',
-      title: '',
-      content: <div />
+      title: 'Review configurations before finalizing',
+      content: <ConfigSummaryView localPaths={localPaths} localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} />
     }
   ]
 
@@ -164,7 +175,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
           <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
-          <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Finish' : 'Next'}</Button>
+          <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Configure' : 'Next'}</Button>
         </Box>
       </DialogActions>
     </Dialog>
