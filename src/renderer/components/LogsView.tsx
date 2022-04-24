@@ -4,8 +4,7 @@ import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
 import DownloadIcon from '@mui/icons-material/Download'
 import PlaylistRemoveOutlinedIcon from '@mui/icons-material/PlaylistRemoveOutlined'
-import { CircularProgress, FormControlLabel, IconButton, Switch, Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { Box, CircularProgress, FormControlLabel, IconButton, Switch, Typography } from '@mui/material'
 
 const LogsView = () => {
   const [showLogs, setShowLogs] = useState(true)

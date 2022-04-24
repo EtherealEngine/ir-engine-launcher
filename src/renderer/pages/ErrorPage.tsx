@@ -2,8 +2,7 @@ import PageRoot from 'renderer/components/PageRoot'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
-import { Button, Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { Box, Button, Typography } from '@mui/material'
 
 type RetryCallback = () => void
 

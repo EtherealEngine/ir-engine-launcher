@@ -5,7 +5,7 @@ import { DeploymentService, useDeploymentState } from 'renderer/services/Deploym
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
-import { Box } from '@mui/system'
+import { Box } from '@mui/material'
 
 import ErrorPage from './ErrorPage'
 import LoadingPage from './LoadingPage'

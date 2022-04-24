@@ -5,8 +5,7 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded'
-import { CircularProgress, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { Box, CircularProgress, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material'
 
 interface Props {
   statuses: AppModel[]

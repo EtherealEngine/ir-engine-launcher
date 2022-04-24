@@ -28,7 +28,7 @@ const SettingsDialog = ({ onClose }: Props) => {
   for (const key in configPaths.paths) {
     localPaths[key] = key in tempPaths ? tempPaths[key] : configPaths.paths[key]
   }
-  
+
   const localVars = {} as Record<string, string>
   for (const key in configVars.vars) {
     localVars[key] = key in tempVars ? tempVars[key] : configVars.vars[key]

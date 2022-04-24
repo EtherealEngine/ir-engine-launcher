@@ -1,4 +1,5 @@
 import { Channels } from 'constants/Channels'
+import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { DeploymentService } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
@@ -27,7 +28,6 @@ import ConfigAuthView from './ConfigAuthView'
 import ConfigPathsView from './ConfigPathsView'
 import ConfigSummaryView from './ConfigSummaryView'
 import ConfigVarsView from './ConfigVarsView'
-import { useSnackbar } from 'notistack'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props

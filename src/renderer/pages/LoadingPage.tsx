@@ -1,7 +1,6 @@
 import PageRoot from 'renderer/components/PageRoot'
 
-import { CircularProgress, Typography } from '@mui/material'
-import { Box } from '@mui/system'
+import { Box, CircularProgress, Typography } from '@mui/material'
 
 interface Props {
   title: string
