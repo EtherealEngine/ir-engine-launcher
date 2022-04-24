@@ -54,7 +54,7 @@ class ShellHandler implements IBaseHandler {
         ) => {
           const category = 'configure minikube'
           try {
-            await saveYamlDoc(vars)
+            const valuesPath = await saveYamlDoc(vars)
             log.info(`Saved values yaml`)
 
             const scriptsFolder = scriptsPath()
@@ -66,7 +66,7 @@ class ShellHandler implements IBaseHandler {
               window.webContents.send(Channels.Utilities.Log, { category, message: data })
             }
             const code = await execStream(
-              `bash ${configureScript} -a "${assetsFolder}" -f "${paths[Storage.XRENGINE_PATH]}" -p "${password}"`,
+              `bash ${configureScript} -a "${assetsFolder}" -f "${paths[Storage.XRENGINE_PATH]}" -p "${password}" -v "${valuesPath}"`,
               onStd,
               onStd
             )

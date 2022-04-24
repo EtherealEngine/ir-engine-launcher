@@ -9,7 +9,7 @@ import { Channels } from '../../constants/Channels'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { getAllValues, getValue, insertOrUpdateValue } from '../dbManager'
-import { fileExists, filesPath, IBaseHandler } from './IBaseHandler'
+import { fileExists, IBaseHandler } from './IBaseHandler'
 
 class SettingsHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -169,9 +169,10 @@ export const saveYamlDoc = async (vars: Record<string, string>) => {
   await populateRequiredValues(yamlDoc, vars)
 
   const yamlString = yaml.dump(yamlDoc)
-  const valuesPath = path.join(filesPath(), Endpoints.VALUES_FILE_NAME)
 
-  await fs.writeFile(valuesPath, yamlString)
+  await fs.writeFile(Endpoints.VALUES_FILE_NAME, yamlString)
+
+  return path.resolve(Endpoints.VALUES_FILE_NAME)
 }
 
 export const getXREngineDefaultPath = () => {

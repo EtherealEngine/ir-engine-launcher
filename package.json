@@ -105,8 +105,7 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**",
-      "!assets/files/local.values.yaml"
+      "./assets/**"
     ],
     "publish": {
       "provider": "github",

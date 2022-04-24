@@ -28,4 +28,4 @@ npm-debug.log.*
 *.scss.d.ts
 package-lock.json
 xrengine.db
-assets/files/local.values.yaml
+local.values.yaml

@@ -4,11 +4,12 @@
 # Parameters
 #===========
 
-while getopts a:f:p: flag; do
+while getopts a:f:p:v: flag; do
     case "${flag}" in
     a) ASSETS_FOLDER=${OPTARG} ;;
     f) XRENGINE_FOLDER=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
+    v) VALUES_PATH=${OPTARG} ;;
     *)
         echo "Invalid arguments passed" >&2
         exit 1
@@ -16,7 +17,7 @@ while getopts a:f:p: flag; do
     esac
 done
 
-if [[ -z $ASSETS_FOLDER || -z $XRENGINE_FOLDER || -z $PASSWORD ]]; then
+if [[ -z $ASSETS_FOLDER || -z $XRENGINE_FOLDER || -z $PASSWORD || -z $VALUES_PATH ]]; then
     echo "Missing arguments"
     exit 1
 fi
@@ -403,7 +404,6 @@ elif [[ $DB_STATUS == *"database not found"* ]]; then
     echo "Database not populated"
 fi
 
-VALUES_PATH="$ASSETS_FOLDER/files/local.values.yaml"
 REFRESH_TRUE_PATH="$ASSETS_FOLDER/files/db-refresh-true.values.yaml"
 REFRESH_FALSE_PATH="$ASSETS_FOLDER/files/db-refresh-false.values.yaml"
 
