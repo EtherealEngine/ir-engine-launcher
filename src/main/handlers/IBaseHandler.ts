@@ -48,6 +48,10 @@ export const scriptsPath = () => {
   return path.join(assetsPath(), 'scripts')
 }
 
+export const filesPath = () => {
+  return path.join(assetsPath(), 'files')
+}
+
 /**
  * https://futurestud.io/tutorials/node-js-check-if-a-file-exists
  * @param path

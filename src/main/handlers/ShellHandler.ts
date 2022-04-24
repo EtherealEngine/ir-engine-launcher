@@ -4,6 +4,7 @@ import os from 'os'
 import path from 'path'
 
 import { Channels } from '../../constants/Channels'
+import Storage from '../../constants/Storage'
 import SysRequirements from '../../constants/SysRequirements'
 import {
   AppModel,
@@ -12,7 +13,8 @@ import {
   DefaultClusterStatus,
   DefaultSystemStatus
 } from '../../models/AppStatus'
-import { exec, execStream, IBaseHandler, isValidUrl, scriptsPath } from './IBaseHandler'
+import { assetsPath, exec, execStream, IBaseHandler, isValidUrl, scriptsPath } from './IBaseHandler'
+import { saveYamlDoc } from './SettingsHandler'
 
 class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -52,16 +54,25 @@ class ShellHandler implements IBaseHandler {
         ) => {
           const category = 'configure minikube'
           try {
-            // const configureScript = path.join(scriptsPath(), `configure-minikube.sh ${password}`)
-            // log.info(`Executing script ${configureScript}`)
+            await saveYamlDoc(vars)
+            log.info(`Saved values yaml`)
 
-            // const onStd = (data: any) => {
-            //   window.webContents.send(Channels.Utilities.Log, { category, message: data })
-            // }
-            // const code = await execStream(`bash ${configureScript}`, onStd, onStd)
-            // if (code !== 0) {
-            //   throw `Failed with error code ${code}.`
-            // }
+            const scriptsFolder = scriptsPath()
+            const assetsFolder = assetsPath()
+            const configureScript = path.join(scriptsFolder, 'configure-minikube.sh')
+            log.info(`Executing script ${configureScript}`)
+
+            const onStd = (data: any) => {
+              window.webContents.send(Channels.Utilities.Log, { category, message: data })
+            }
+            const code = await execStream(
+              `bash ${configureScript} -a "${assetsFolder}" -f "${paths[Storage.XRENGINE_PATH]}" -p "${password}"`,
+              onStd,
+              onStd
+            )
+            if (code !== 0) {
+              throw `Failed with error code ${code}.`
+            }
 
             return true
           } catch (err) {

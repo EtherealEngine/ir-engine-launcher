@@ -1,15 +1,15 @@
 import axios from 'axios'
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
+// import log from 'electron-log'
 import { promises as fs } from 'fs'
 import yaml from 'js-yaml'
 import path from 'path'
 
-// import log from 'electron-log'
 import { Channels } from '../../constants/Channels'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { getAllValues, getValue, insertOrUpdateValue } from '../dbManager'
-import { fileExists, IBaseHandler } from './IBaseHandler'
+import { fileExists, filesPath, IBaseHandler } from './IBaseHandler'
 
 class SettingsHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -41,19 +41,8 @@ class SettingsHandler implements IBaseHandler {
         try {
           const vars: Record<string, string> = {}
 
-          const xrPath = await getXREnginePath()
-          const templatePath = path.join(xrPath, Endpoints.VALUES_TEMPLATE_PATH)
-          const templateFileExists = await fileExists(templatePath)
-          let yamlContent = ''
+          const yamlDoc = await getYamlDoc()
 
-          if (templateFileExists) {
-            yamlContent = await fs.readFile(templatePath, 'utf8')
-          } else {
-            const response = await axios.get(Endpoints.VALUES_TEMPLATE_URL)
-            yamlContent = response.data
-          }
-
-          const yamlDoc = yaml.load(yamlContent)
           const valuesKey = [] as string[]
           findRequiredValues(yamlDoc, valuesKey)
 
@@ -133,6 +122,56 @@ const findRequiredValues = async (yaml: any, values: string[]) => {
       }
     }
   }
+}
+
+const populateRequiredValues = async (yaml: any, vars: Record<string, string>) => {
+  for (var key in yaml) {
+    if (typeof yaml[key] == 'object' && yaml[key] !== null) {
+      populateRequiredValues(yaml[key], vars)
+    } else {
+      const value: string = yaml[key].toString().trim()
+      if (value.startsWith('<') && value.endsWith('>') && value.slice(1, -1).includes('<') === false) {
+        yaml[key] = vars[value.slice(1, -1)]
+      } else if (value.includes('<') && value.includes('>')) {
+        // https://stackoverflow.com/a/7201413/2077741
+        const matches = value.match(/\<(.*?)\>/g)
+        let substitutedValue = yaml[key].toString()
+        matches?.forEach(
+          (matchedKey) => (substitutedValue = substitutedValue.replace(matchedKey, vars[matchedKey.slice(1, -1)]))
+        )
+        yaml[key] = substitutedValue
+      }
+    }
+  }
+}
+
+const getYamlDoc = async () => {
+  const xrPath = await getXREnginePath()
+  const templatePath = path.join(xrPath, Endpoints.VALUES_TEMPLATE_PATH)
+  const templateFileExists = await fileExists(templatePath)
+  let yamlContent = ''
+
+  if (templateFileExists) {
+    yamlContent = await fs.readFile(templatePath, 'utf8')
+  } else {
+    const response = await axios.get(Endpoints.VALUES_TEMPLATE_URL)
+    yamlContent = response.data
+  }
+
+  const yamlDoc = yaml.load(yamlContent)
+
+  return yamlDoc
+}
+
+export const saveYamlDoc = async (vars: Record<string, string>) => {
+  const yamlDoc = await getYamlDoc()
+
+  await populateRequiredValues(yamlDoc, vars)
+
+  const yamlString = yaml.dump(yamlDoc)
+  const valuesPath = path.join(filesPath(), Endpoints.VALUES_FILE_NAME)
+
+  await fs.writeFile(valuesPath, yamlString)
 }
 
 export const getXREngineDefaultPath = () => {

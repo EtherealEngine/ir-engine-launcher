@@ -6,6 +6,7 @@ const Endpoints = {
   ALLOW_CERTIFICATES: ['local.theoverlay.io', 'api-local.theoverlay.io', 'gameserver-local.theoverlay.io'],
   MYSQL_PORT: 3304,
   DEFAULT_XRENGINE_FOLDER: 'xrengine',
+  VALUES_FILE_NAME: 'local.values.yaml',
   VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.template.values.yaml',
   VALUES_TEMPLATE_URL:
     'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.template.values.yaml'
