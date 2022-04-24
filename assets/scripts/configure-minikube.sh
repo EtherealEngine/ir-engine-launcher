@@ -85,7 +85,7 @@ fi
 # Verify Python 3
 #================
 
-if pip --version >/dev/null; then
+if pip3 --version >/dev/null; then
     echo "python is installed"
 else
     echo "python is not installed"
@@ -93,6 +93,7 @@ else
     echo "$PASSWORD" | sudo -S apt-get update -y
     echo "$PASSWORD" | sudo -S apt-get install -y python3-pip
 fi
+
 
 PYTHON_VERSION=$(python3 --version)
 echo "python version is $PYTHON_VERSION"
