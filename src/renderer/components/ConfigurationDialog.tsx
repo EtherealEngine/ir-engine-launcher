@@ -1,6 +1,6 @@
 import { Channels } from 'constants/Channels'
 import { useSnackbar } from 'notistack'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DeploymentService } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
@@ -50,6 +50,7 @@ interface Props {
 }
 
 const ConfigurationDialog = ({ onClose }: Props) => {
+  const contentStartRef = useRef(null)
   const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
   const { configPaths, configVars } = settingsState.value
@@ -164,6 +165,8 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     }
   ]
 
+  useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
+
   return (
     <Dialog open fullWidth maxWidth="sm">
       {(isLoading || configPaths.loading || configVars.loading) && <LinearProgress />}
@@ -185,7 +188,9 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         </DialogContentText>
       )}
 
-      <DialogContent sx={{ maxHeight: '35vh', marginBottom: 3 }}>{steps[activeStep].content}</DialogContent>
+      <DialogContent ref={contentStartRef} sx={{ maxHeight: '35vh', marginBottom: 3 }}>
+        {steps[activeStep].content}
+      </DialogContent>
       <DialogActions>
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
           <Button onClick={() => onClose()}>Cancel</Button>
