@@ -4,7 +4,22 @@
 # Parameters
 #===========
 
-PASSWORD=$1
+while getopts a:f:p: flag; do
+    case "${flag}" in
+    a) ASSETS_FOLDER=${OPTARG} ;;
+    f) XRENGINE_FOLDER=${OPTARG} ;;
+    p) PASSWORD=${OPTARG} ;;
+    *)
+        echo "Invalid arguments passed" >&2
+        exit 1
+        ;;
+    esac
+done
+
+if [[ -z $ASSETS_FOLDER || -z $XRENGINE_FOLDER || -z $PASSWORD ]]; then
+    echo "Missing arguments"
+    exit 1
+fi
 
 #======
 # Login
@@ -15,7 +30,7 @@ if [[ $LOGIN == *"User logged in"* ]]; then
     echo "user logged in"
 else
     echo "user not logged in"
-    exit 1
+    exit 2
 fi
 
 set -e
@@ -78,7 +93,7 @@ if npm --version >/dev/null; then
     echo "npm version is $NPM_VERSION"
 else
     echo "npm is not installed"
-    exit 2
+    exit 3
 fi
 
 #================
@@ -93,7 +108,6 @@ else
     echo "$PASSWORD" | sudo -S apt-get update -y
     echo "$PASSWORD" | sudo -S apt-get install -y python3-pip
 fi
-
 
 PYTHON_VERSION=$(python3 --version)
 echo "python version is $PYTHON_VERSION"
@@ -134,16 +148,14 @@ echo "git version is $GIT_VERSION"
 # Get XREngine
 #=============
 
-XRENGINE_PATH=~/xrengine
-
-if [[ -d $XRENGINE_PATH ]] && [[ -f "$XRENGINE_PATH/package.json" ]]; then
-    echo "xrengine repo exists at $XRENGINE_PATH"
+if [[ -d $XRENGINE_FOLDER ]] && [[ -f "$XRENGINE_FOLDER/package.json" ]]; then
+    echo "xrengine repo exists at $XRENGINE_FOLDER"
 else
-    echo "cloning xrengine in $XRENGINE_PATH"
-    git clone https://github.com/XRFoundation/XREngine $XRENGINE_PATH
+    echo "cloning xrengine in $XRENGINE_FOLDER"
+    git clone https://github.com/XRFoundation/XREngine "$XRENGINE_FOLDER"
 fi
 
-cd $XRENGINE_PATH
+cd "$XRENGINE_FOLDER"
 npm install
 
 #==============
@@ -359,7 +371,7 @@ echo "redis status is $REDIS_STATUS"
 # Verify XREngine
 #================
 
-PROJECTS_PATH=~/xrengine/packages/projects/projects/
+PROJECTS_PATH="$XRENGINE_FOLDER/packages/projects/projects/"
 
 if [[ -d $PROJECTS_PATH ]]; then
     echo "xrengine projects exists at $PROJECTS_PATH"
@@ -391,19 +403,23 @@ elif [[ $DB_STATUS == *"database not found"* ]]; then
     echo "Database not populated"
 fi
 
+VALUES_PATH="$ASSETS_FOLDER/files/local.values.yaml"
+REFRESH_TRUE_PATH="$ASSETS_FOLDER/files/db-refresh-true.values.yaml"
+REFRESH_FALSE_PATH="$ASSETS_FOLDER/files/db-refresh-false.values.yaml"
+
 if [[ $XRENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false ]]; then
     echo "Updating XREngine deployment to configure database"
-    helm upgrade --reuse-values -f ~/db-refresh-true.values.yaml local xrengine/xrengine
+    helm upgrade --reuse-values -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
     sleep 35
-    helm upgrade --reuse-values -f ~/db-refresh-false.values.yaml local xrengine/xrengine
+    helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
 elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false ]]; then
     echo "Installing XREngine deployment with populating database"
-    helm install -f ~/local.values.yaml -f ~/db-refresh-true.values.yaml local xrengine/xrengine
+    helm install -f "$VALUES_PATH" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
     sleep 35
-    helm upgrade --reuse-values -f ~/db-refresh-false.values.yaml local xrengine/xrengine
+    helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
 elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
     echo "Installing XREngine deployment without populating database"
-    helm install -f ~/local.values.yaml local xrengine/xrengine
+    helm install -f "$VALUES_PATH" local xrengine/xrengine
 fi
 
 export RELEASE_NAME=local
