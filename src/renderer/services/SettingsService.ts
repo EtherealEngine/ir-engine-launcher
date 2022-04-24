@@ -153,8 +153,15 @@ export const SettingsService = {
     }
   },
   saveSettings: async (paths: Record<string, string>, vars: Record<string, string>) => {
-    const savedPaths = await SettingsService.savePaths(paths)
-    const savedVars = await SettingsService.saveVars(vars)
+    let savedPaths = true
+    if (paths) {
+      savedPaths = await SettingsService.savePaths(paths)
+    }
+
+    let savedVars = true
+    if (vars) {
+      savedVars = await SettingsService.saveVars(vars)
+    }
 
     return savedPaths && savedVars
   },
