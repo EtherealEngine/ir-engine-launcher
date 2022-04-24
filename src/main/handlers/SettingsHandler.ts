@@ -123,9 +123,13 @@ const findRequiredValues = async (yaml: any, values: string[]) => {
       findRequiredValues(yaml[key], values)
     } else {
       const value: string = yaml[key].toString().trim()
-      if (value.startsWith('<') && value.endsWith('>')) {
+      if (value.startsWith('<') && value.endsWith('>') && value.slice(1, -1).includes('<') === false) {
         const variable = value.slice(1, -1)
         values.push(variable)
+      } else if (value.includes('<') && value.includes('>')) {
+        // https://stackoverflow.com/a/7201413/2077741
+        const matches = value.match(/\<(.*?)\>/g)
+        matches?.map((matchedKey) => values.push(matchedKey.slice(1, -1)))
       }
     }
   }
