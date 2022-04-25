@@ -7,7 +7,7 @@
 while getopts a:d:f:p:v: flag; do
     case "${flag}" in
     a) ASSETS_FOLDER=${OPTARG} ;;
-    d) FORCE_DB_REINIT=${OPTARG} ;;
+    d) FORCE_DB_REFRESH=${OPTARG} ;;
     f) XRENGINE_FOLDER=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
     v) VALUES_PATH=${OPTARG} ;;
@@ -18,7 +18,7 @@ while getopts a:d:f:p:v: flag; do
     esac
 done
 
-if [[ -z $ASSETS_FOLDER || -z $FORCE_DB_REINIT || -z $XRENGINE_FOLDER || -z $PASSWORD || -z $VALUES_PATH ]]; then
+if [[ -z $ASSETS_FOLDER || -z $FORCE_DB_REFRESH || -z $XRENGINE_FOLDER || -z $PASSWORD || -z $VALUES_PATH ]]; then
     echo "Missing arguments"
     exit 1
 fi
@@ -405,17 +405,17 @@ elif [[ $DB_STATUS == *"database not found"* ]]; then
     echo "Existing database not populated"
 fi
 
-echo "Force DB reinit is $FORCE_DB_REINIT"
+echo "Force DB refresh is $FORCE_DB_REFRESH"
 
 REFRESH_TRUE_PATH="$ASSETS_FOLDER/files/db-refresh-true.values.yaml"
 REFRESH_FALSE_PATH="$ASSETS_FOLDER/files/db-refresh-false.values.yaml"
 
-if [[ $XRENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REINIT == 'true' ]]; then
+if [[ $XRENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Updating XREngine deployment to configure database"
     helm upgrade --reuse-values -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
     sleep 35
     helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
-elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REINIT == 'true' ]]; then
+elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Installing XREngine deployment with populating database"
     helm install -f "$VALUES_PATH" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
     sleep 35

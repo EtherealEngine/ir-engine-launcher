@@ -63,7 +63,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const [password, setPassword] = useState('')
   const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
-  const [localConfigs, setLocalConfigs] = useState({ [Storage.FORCE_DB_REINIT]: 'false' } as Record<string, string>)
+  const [localConfigs, setLocalConfigs] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
 
   const localPaths = {} as Record<string, string>
   for (const key in configPaths.paths) {

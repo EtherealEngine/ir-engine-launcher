@@ -67,7 +67,7 @@ class ShellHandler implements IBaseHandler {
               window.webContents.send(Channels.Utilities.Log, { category, message: data })
             }
             const code = await execStream(
-              `bash ${configureScript} -a "${assetsFolder}" -d "${configs[Storage.FORCE_DB_REINIT]}" -f "${
+              `bash ${configureScript} -a "${assetsFolder}" -d "${configs[Storage.FORCE_DB_REFRESH]}" -f "${
                 paths[Storage.XRENGINE_PATH]
               }" -p "${password}" -v "${valuesPath}"`,
               onStd,
