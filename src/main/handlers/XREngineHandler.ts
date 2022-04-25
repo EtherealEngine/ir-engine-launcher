@@ -65,7 +65,7 @@ const ensureAdminAccess = async (parentWindow: BrowserWindow) => {
             message: `Making ${userId} admin.`
           })
 
-          const xrenginePath = getXREnginePath()
+          const xrenginePath = await getXREnginePath()
           const response = await exec(
             `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${xrenginePath};npm run make-user-admin -- --id=${userId}`
           )
