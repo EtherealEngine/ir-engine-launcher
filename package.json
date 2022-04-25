@@ -51,7 +51,7 @@
   },
   "build": {
     "productName": "XREngineControlCenter",
-    "appId": "org.electron.XREngineControlCenter",
+    "appId": "org.xrfoundation.XREngineControlCenter",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
