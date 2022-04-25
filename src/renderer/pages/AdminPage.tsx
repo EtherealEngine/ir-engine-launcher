@@ -59,7 +59,7 @@ const AdminPage = () => {
   return (
     <PageRoot full>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <iframe height="100%" style={{ border: 0 }} src={Endpoints.ADMIN_PORTAL}></iframe>
+        <iframe height="100%" style={{ border: 0 }} allow="xr-spatial-tracking" src={Endpoints.ADMIN_PORTAL}></iframe>
       </Box>
     </PageRoot>
   )
