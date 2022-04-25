@@ -1,4 +1,5 @@
 import { Channels } from 'constants/Channels'
+import Storage from 'constants/Storage'
 import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import { DeploymentService } from 'renderer/services/DeploymentService'
@@ -6,7 +7,7 @@ import { SettingsService, useSettingsState } from 'renderer/services/SettingsSer
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import AppsIcon from '@mui/icons-material/Apps'
-import FolderIcon from '@mui/icons-material/Folder'
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
 import {
   Box,
@@ -24,6 +25,7 @@ import {
 import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from './Colorlib'
+import ConfigAdvancedView from './ConfigAdvancedView'
 import ConfigAuthView from './ConfigAuthView'
 import ConfigPathsView from './ConfigPathsView'
 import ConfigSummaryView from './ConfigSummaryView'
@@ -34,7 +36,7 @@ const ColorlibStepIcon = (props: StepIconProps) => {
 
   const icons: { [index: string]: React.ReactElement } = {
     1: <AdminPanelSettingsIcon />,
-    2: <FolderIcon />,
+    2: <DisplaySettingsIcon />,
     3: <AppsIcon />,
     4: <PlaylistAddCheckIcon />
   }
@@ -61,6 +63,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const [password, setPassword] = useState('')
   const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
+  const [localConfigs, setLocalConfigs] = useState({ [Storage.FORCE_DB_REINIT]: 'false' } as Record<string, string>)
 
   const localPaths = {} as Record<string, string>
   for (const key in configPaths.paths) {
@@ -97,7 +100,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         }
       }
 
-      DeploymentService.processConfigurations(password, localPaths, localVars)
+      DeploymentService.processConfigurations(password, localPaths, localVars, localConfigs)
       onClose()
 
       return
@@ -109,6 +112,13 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1)
+    setError('')
+  }
+
+  const onChangeConfig = async (key: string, value: string) => {
+    const newConfigs = { ...localConfigs }
+    newConfigs[key] = value
+    setLocalConfigs(newConfigs)
     setError('')
   }
 
@@ -145,10 +155,13 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       )
     },
     {
-      label: 'Paths',
-      title: 'Provide configuration paths',
+      label: 'Configs',
+      title: 'Provide configuration details',
       content: (
-        <ConfigPathsView localPaths={localPaths} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangePath} />
+        <Box sx={{ marginLeft: 2, marginRight: 2 }}>
+          <ConfigPathsView localPaths={localPaths} onChange={onChangePath} />
+          <ConfigAdvancedView localConfigs={localConfigs} onChange={onChangeConfig} />
+        </Box>
       )
     },
     {
@@ -160,7 +173,12 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       label: 'Summary',
       title: 'Review configurations before finalizing',
       content: (
-        <ConfigSummaryView localPaths={localPaths} localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} />
+        <ConfigSummaryView
+          localPaths={localPaths}
+          localVars={localVars}
+          localConfigs={localConfigs}
+          sx={{ marginLeft: 2, marginRight: 2 }}
+        />
       )
     }
   ]

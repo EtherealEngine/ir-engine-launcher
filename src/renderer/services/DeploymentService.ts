@@ -57,12 +57,23 @@ export const useDeploymentState = () => useState(state) as any as typeof state
 
 //Service
 export const DeploymentService = {
-  processConfigurations: async (password: string, paths: Record<string, string>, vars: Record<string, string>) => {
+  processConfigurations: async (
+    password: string,
+    paths: Record<string, string>,
+    vars: Record<string, string>,
+    configs: Record<string, string>
+  ) => {
     const { enqueueSnackbar } = accessSettingsState().value
     const dispatch = useDispatch()
     try {
       dispatch(DeploymentAction.setConfiguring(true))
-      const response = await window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeConfig, password, paths, vars)
+      const response = await window.electronAPI.invoke(
+        Channels.Shell.ConfigureMinikubeConfig,
+        password,
+        paths,
+        vars,
+        configs
+      )
       if (response) {
         DeploymentService.fetchDeploymentStatus()
       } else if (enqueueSnackbar) {

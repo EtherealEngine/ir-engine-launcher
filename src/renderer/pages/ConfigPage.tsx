@@ -1,7 +1,6 @@
 import { Channels } from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
-import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex'
 import 'react-reflex/styles.css'
@@ -26,17 +25,11 @@ const ConfigPage = () => {
   const deploymentState = useDeploymentState()
   const { isConfiguring, isFetchingStatuses, appStatus, clusterStatus, systemStatus } = deploymentState.value
 
-  const { enqueueSnackbar } = useSnackbar()
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
   const allClusterConfigured = clusterStatus.every((cluster) => cluster.status === AppStatus.Configured)
   const allConfigured = allAppsConfigured && allClusterConfigured
 
   const onConfigureClicked = () => {
-    if (allConfigured) {
-      enqueueSnackbar('XREngine already configured successfully', { variant: 'success' })
-      return
-    }
-
     setConfigDialog(true)
   }
 

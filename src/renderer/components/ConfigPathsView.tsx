@@ -30,7 +30,7 @@ const ConfigPathsView = ({ localPaths, onChange, sx }: Props) => {
         fullWidth
         margin="dense"
         size="small"
-        label="XREngine Path"
+        label={Storage.XRENGINE_PATH.replaceAll('_', ' ')}
         variant="standard"
         value={localPaths[Storage.XRENGINE_PATH]}
         InputProps={{
