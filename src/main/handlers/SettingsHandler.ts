@@ -168,7 +168,10 @@ export const saveYamlDoc = async (vars: Record<string, string>) => {
 
   await populateRequiredValues(yamlDoc, vars)
 
-  const yamlString = yaml.dump(yamlDoc)
+  const yamlString = yaml.dump(yamlDoc, {
+    quotingType: '"',
+    forceQuotes: true
+  })
 
   await fs.writeFile(Endpoints.VALUES_FILE_NAME, yamlString)
 
