@@ -15,7 +15,7 @@ const ConfigAdvancedView = ({ localConfigs, onChange, sx }: Props) => {
         labelPlacement="start"
         label={Storage.FORCE_DB_REFRESH.replaceAll('_', ' ')}
         sx={{ marginTop: 2, marginLeft: 0 }}
-        control={<Switch defaultChecked={false} sx={{ marginLeft: 2 }} />}
+        control={<Switch checked={localConfigs[Storage.FORCE_DB_REFRESH] === 'true'} sx={{ marginLeft: 2 }} />}
         value={localConfigs[Storage.FORCE_DB_REFRESH] === 'true'}
         onChange={(_event, checked) => onChange(Storage.FORCE_DB_REFRESH, checked ? 'true' : 'false')}
       />
