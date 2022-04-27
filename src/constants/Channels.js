@@ -12,6 +12,7 @@ const Channels = {
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',
+    GetVersion: 'GetVersion',
     OpenExternal: 'OpenExternal',
     OpenPath: 'OpenPath',
     SelectFolder: 'SelectFolder',

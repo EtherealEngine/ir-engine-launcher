@@ -14,6 +14,7 @@ type FetchableItem = {
 
 //State
 const state = createState({
+  appVersion: '',
   cluster: {
     loading: false,
     url: '',
@@ -40,6 +41,10 @@ const state = createState({
 store.receptors.push((action: SettingsActionType): void => {
   state.batch((s) => {
     switch (action.type) {
+      case 'SET_APP_VERSION':
+        return s.merge({
+          appVersion: action.payload
+        })
       case 'SET_NOTISTACK':
         return s.merge({
           enqueueSnackbar: action.payload
@@ -91,8 +96,14 @@ export const SettingsService = {
     dispatch(SettingsAction.setNotiStack(payload))
   },
   fetchSettings: async () => {
+    await SettingsService.fetchAppVersion()
     await SettingsService.fetchPaths()
     await SettingsService.fetchVars()
+  },
+  fetchAppVersion: async () => {
+    const dispatch = useDispatch()
+    const version = await window.electronAPI.invoke(Channels.Utilities.GetVersion)
+    dispatch(SettingsAction.setAppVersion(version))
   },
   fetchPaths: async () => {
     const dispatch = useDispatch()
@@ -348,6 +359,12 @@ export const SettingsService = {
 
 //Action
 export const SettingsAction = {
+  setAppVersion: (payload: string) => {
+    return {
+      type: 'SET_APP_VERSION' as const,
+      payload
+    }
+  },
   setNotiStack: (payload: EnqueueCallback) => {
     return {
       type: 'SET_NOTISTACK' as const,

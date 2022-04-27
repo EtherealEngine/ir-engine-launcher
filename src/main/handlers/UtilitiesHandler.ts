@@ -13,6 +13,10 @@ class UtilitiesHandler implements IBaseHandler {
       clipboard.writeText(copyText)
       log.info('Copied to clipboard: ', copyText)
     }),
+      ipcMain.handle(Channels.Utilities.GetVersion, (_event: IpcMainInvokeEvent) => {
+        const version = app.getVersion()
+        return version
+      }),
       ipcMain.handle(Channels.Utilities.OpenExternal, async (_event: IpcMainInvokeEvent, url: string) => {
         await shell.openExternal(url)
         log.info('Opening external: ', url)

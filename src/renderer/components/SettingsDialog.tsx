@@ -20,7 +20,7 @@ interface Props {
 
 const SettingsDialog = ({ onClose }: Props) => {
   const settingsState = useSettingsState()
-  const { configPaths, configVars } = settingsState.value
+  const { appVersion, configPaths, configVars } = settingsState.value
   const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
 
@@ -58,7 +58,11 @@ const SettingsDialog = ({ onClose }: Props) => {
       {(configPaths.loading || configVars.loading) && <LinearProgress />}
       <DialogTitle>Settings</DialogTitle>
       <DialogContent dividers sx={{ maxHeight: '40vh' }}>
-        <DialogContentText variant="button">Paths</DialogContentText>
+        <DialogContentText variant="button">App Version: {appVersion}</DialogContentText>
+
+        <DialogContentText variant="button" sx={{ marginTop: 4 }}>
+          Paths
+        </DialogContentText>
         <ConfigPathsView localPaths={localPaths} onChange={changePath} sx={{ paddingLeft: 2 }} />
 
         <DialogContentText variant="button" sx={{ marginTop: 4 }}>
