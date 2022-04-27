@@ -130,14 +130,18 @@ const populateRequiredValues = async (yaml: any, vars: Record<string, string>) =
       populateRequiredValues(yaml[key], vars)
     } else {
       const value: string = yaml[key].toString().trim()
-      if (value.startsWith('<') && value.endsWith('>') && value.slice(1, -1).includes('<') === false) {
+      if (value.startsWith('<') && value.endsWith('>') && value.slice(1, -1).includes('<') === false && vars[value.slice(1, -1)]) {
         yaml[key] = vars[value.slice(1, -1)]
       } else if (value.includes('<') && value.includes('>')) {
         // https://stackoverflow.com/a/7201413/2077741
         const matches = value.match(/\<(.*?)\>/g)
         let substitutedValue = yaml[key].toString()
         matches?.forEach(
-          (matchedKey) => (substitutedValue = substitutedValue.replace(matchedKey, vars[matchedKey.slice(1, -1)]))
+          (matchedKey) => {
+            if (vars[matchedKey.slice(1, -1)]) {
+              substitutedValue = substitutedValue.replace(matchedKey, vars[matchedKey.slice(1, -1)])
+            }
+          }
         )
         yaml[key] = substitutedValue
       }
