@@ -1,6 +1,6 @@
 {
   "name": "xrengine-control-center",
-  "description": "A desktop app for managing XREngine cluster. Please support XRFoundation https://opencollective.com/xrfoundation",
+  "description": "A desktop app for managing XREngine cluster.",
   "homepage": "xrengine.io",
   "keywords": [
     "electron",
