@@ -1,6 +1,6 @@
 {
   "name": "xrengine-control-center",
-  "version": "0.0.2",
+  "version": "0.0.0",
   "description": "A desktop app for managing XREngine cluster. Please support XRFoundation https://opencollective.com/xrfoundation",
   "main": "./dist/main/main.js",
   "author": {
