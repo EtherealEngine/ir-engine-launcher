@@ -18,6 +18,8 @@ import Toolbar from '@mui/material/Toolbar'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 
+import logo from '../../../assets/icon.svg'
+
 const pages = [
   {
     title: 'Config',
@@ -64,9 +66,10 @@ const NavView = () => {
     <AppBar position="static" sx={{ height: '70px', backgroundColor: theme.palette.primary.main }}>
       <Box sx={{ height: '70px', backgroundColor: 'var(--dock)' }}>
         <Toolbar>
-          <Typography variant="h6" noWrap component="div" sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}>
-            XREngine
-          </Typography>
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 6, alignItems: 'center', flexDirection: 'row' }}>
+            <Box sx={{ height: 45, mr: 0.7 }} component="img" src={logo} />
+            <Typography variant="h6">Control Center</Typography>
+          </Box>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -109,9 +112,11 @@ const NavView = () => {
               ))}
             </Menu>
           </Box>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            XREngine
-          </Typography>
+
+          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, alignItems: 'center', flexDirection: 'row' }}>
+            <Box sx={{ height: 45, mr: 0.7 }} component="img" src={logo} />
+            <Typography variant="h6">Control Center</Typography>
+          </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
