@@ -2,7 +2,7 @@ import Paths from 'constants/Paths'
 import Storage from 'constants/Storage'
 import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { PaletteMode } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
@@ -66,7 +66,7 @@ const App = () => {
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           action={defaultAction}
         >
-          <BrowserRouter>
+          <HashRouter>
             <NavView />
             <Routes>
               <Route path={Paths.ROOT} element={<ConfigPage />} />
@@ -74,7 +74,7 @@ const App = () => {
               <Route path={Paths.CLUSTER} element={<ClusterPage />} />
               <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
             </Routes>
-          </BrowserRouter>
+          </HashRouter>
         </SnackbarProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>
