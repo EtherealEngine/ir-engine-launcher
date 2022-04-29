@@ -4,12 +4,15 @@ import App from './App'
 import { DeploymentService } from './services/DeploymentService'
 import { LogService } from './services/LogService'
 import { SettingsService } from './services/SettingsService'
+import { UpdatesService } from './services/UpdatesService'
 import SplashScreen from './SplashScreen'
 
 const searchParams = new URLSearchParams(window.location.search)
 const isSplash = searchParams.get('splash')
 
 if (isSplash) {
+  UpdatesService.listen()
+
   render(<SplashScreen />, document.getElementById('root'))
 } else {
   LogService.listen()
@@ -17,7 +20,7 @@ if (isSplash) {
   DeploymentService.listen()
   SettingsService.fetchSettings()
   DeploymentService.fetchDeploymentStatus()
-  
+
   render(<App />, document.getElementById('root'))
 }
 

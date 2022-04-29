@@ -3,6 +3,16 @@ body {
   overflow: hidden;
 }
 
+/* https://stackoverflow.com/a/44823888/2077741 */
+.splash-screen {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.MuiButton-root {
+  -webkit-app-region: no-drag;
+}
+
 .MuiSwitch-root {
   margin-right: 2px;
 }

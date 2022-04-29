@@ -33,7 +33,9 @@ const Channels = {
   Updates: {
     CheckUpdate: 'CheckUpdate',
     DownloadUpdate: 'DownloadUpdate',
-    QuitAndInstall: 'QuitAndInstall1',
+    DownloadProgress: 'DownloadProgress',
+    LaunchApp: 'LaunchApp',
+    QuitAndUpdate: 'QuitAndUpdate',
   }
 }
 

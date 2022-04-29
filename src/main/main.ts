@@ -81,9 +81,9 @@ const createWindow = async () => {
 
   splashWindow = new BrowserWindow({
     show: false,
-    width: 400,
-    height: 400,
-    // frame: false,
+    width: 350,
+    height: 300,
+    frame: false,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
@@ -178,6 +178,10 @@ export const createMainWindow = async () => {
     } else {
       mainWindow.maximize()
       mainWindow.show()
+    }
+
+    if (splashWindow) {
+      splashWindow.close()
     }
   })
 

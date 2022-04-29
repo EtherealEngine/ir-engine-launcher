@@ -25,6 +25,7 @@ const App = () => {
   const defaultMode = (prefersDarkMode ? 'dark' : 'light') as PaletteMode
   const storedMode = localStorage.getItem(Storage.COLOR_MODE) as PaletteMode | undefined
   const [mode, setMode] = React.useState(storedMode ? storedMode : defaultMode)
+  const theme = React.useMemo(() => createTheme(MUITheme(mode) as any), [mode])
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
@@ -54,8 +55,6 @@ const App = () => {
       html.dataset.theme = mode || 'dark'
     }
   }, [])
-
-  const theme = React.useMemo(() => createTheme(MUITheme(mode) as any), [mode])
 
   return (
     <ColorModeContext.Provider value={colorMode}>
