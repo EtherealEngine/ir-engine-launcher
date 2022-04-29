@@ -29,6 +29,8 @@ jobs:
         env:
           PACKAGEJSON_DIR: 'release/app'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          skip-tag:  'true'
 
       - name: Publish releases
         env:
