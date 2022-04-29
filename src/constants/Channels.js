@@ -29,6 +29,11 @@ const Channels = {
     CheckVars: 'CheckVars',
     SavePaths: 'SavePaths',
     SaveVars: 'SaveVars'
+  },
+  Updates: {
+    CheckUpdate: 'CheckUpdate',
+    DownloadUpdate: 'DownloadUpdate',
+    QuitAndInstall: 'QuitAndInstall1',
   }
 }
 

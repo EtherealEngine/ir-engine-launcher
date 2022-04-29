@@ -18,6 +18,7 @@ import { initDB } from './dbManager'
 import { IBaseHandler } from './handlers/IBaseHandler'
 import SettingsHandler from './handlers/SettingsHandler'
 import ShellHandler from './handlers/ShellHandler'
+import UpdatesHandler from './handlers/UpdatesHandler'
 import UtilitiesHandler from './handlers/UtilitiesHandler'
 import XREngineHandler from './handlers/XREngineHandler'
 import MenuBuilder from './menu'
@@ -33,14 +34,7 @@ if (process.env.NODE_ENV === 'production') {
 // https://stackoverflow.com/a/51291249/2077741
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
-export default class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info'
-    autoUpdater.logger = log
-    autoUpdater.checkForUpdatesAndNotify()
-  }
-}
-
+let splashWindow: BrowserWindow | null = null
 let mainWindow: BrowserWindow | null = null
 
 if (process.env.NODE_ENV === 'production') {
@@ -68,6 +62,65 @@ const installExtensions = async () => {
 }
 
 const createWindow = async () => {
+  if (splashWindow) {
+    splashWindow.close()
+    splashWindow = null
+  }
+
+  if (isDevelopment) {
+    await installExtensions()
+  }
+
+  const RESOURCES_PATH = app.isPackaged
+    ? path.join(process.resourcesPath, 'assets')
+    : path.join(__dirname, '../../assets')
+
+  const getAssetPath = (...paths: string[]): string => {
+    return path.join(RESOURCES_PATH, ...paths)
+  }
+
+  splashWindow = new BrowserWindow({
+    show: false,
+    width: 400,
+    height: 400,
+    // frame: false,
+    icon: getAssetPath('icon.png'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
+
+  // We want the user to proactively download the install
+  autoUpdater.autoDownload = false
+
+  log.transports.file.level = 'info'
+  autoUpdater.logger = log
+
+  const ipcHandlers: IBaseHandler[] = [new UpdatesHandler()]
+
+  ipcHandlers.forEach((handler) => {
+    handler.configure(splashWindow!)
+  })
+
+  splashWindow.loadURL(resolveHtmlPath('index.html', 'splash=true'))
+
+  splashWindow.on('ready-to-show', () => {
+    if (!splashWindow) {
+      throw new Error('"splashWindow" is not defined')
+    }
+    if (process.env.START_MINIMIZED) {
+      splashWindow.minimize()
+    } else {
+      splashWindow.show()
+    }
+  })
+
+  splashWindow.on('closed', () => {
+    splashWindow = null
+  })
+}
+
+export const createMainWindow = async () => {
   if (isDevelopment) {
     await installExtensions()
   }
@@ -140,10 +193,6 @@ const createWindow = async () => {
     shell.openExternal(edata.url)
     return { action: 'deny' }
   })
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater()
 }
 
 /**

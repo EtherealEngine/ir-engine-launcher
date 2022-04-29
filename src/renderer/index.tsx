@@ -4,14 +4,22 @@ import App from './App'
 import { DeploymentService } from './services/DeploymentService'
 import { LogService } from './services/LogService'
 import { SettingsService } from './services/SettingsService'
+import SplashScreen from './SplashScreen'
 
-LogService.listen()
-SettingsService.listen()
-DeploymentService.listen()
-SettingsService.fetchSettings()
-DeploymentService.fetchDeploymentStatus()
+const searchParams = new URLSearchParams(window.location.search)
+const isSplash = searchParams.get('splash')
 
-render(<App />, document.getElementById('root'))
+if (isSplash) {
+  render(<SplashScreen />, document.getElementById('root'))
+} else {
+  LogService.listen()
+  SettingsService.listen()
+  DeploymentService.listen()
+  SettingsService.fetchSettings()
+  DeploymentService.fetchDeploymentStatus()
+  
+  render(<App />, document.getElementById('root'))
+}
 
 export interface IElectronAPI {
   invoke: (channel: string, ...args: any[]) => Promise<any>
