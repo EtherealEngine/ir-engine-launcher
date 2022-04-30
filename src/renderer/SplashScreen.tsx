@@ -121,7 +121,16 @@ const SplashScreen = () => {
               Control Center
             </Typography>
           </Box>
-          {content}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              minHeight: 100
+            }}
+          >
+            {content}
+          </Box>
         </Box>
       </PageRoot>
     </ThemeProvider>
