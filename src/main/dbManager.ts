@@ -1,10 +1,14 @@
+import Endpoints from '../constants/Endpoints'
+import { app } from 'electron'
 import log from 'electron-log'
+import path from 'path'
 import sqlite from 'sqlite3'
 
 import Storage from '../constants/Storage'
 
+const dbPath = path.join(app.getPath('userData'), Endpoints.DB_FILE_NAME)
 const sqlite3 = sqlite.verbose()
-const db = new sqlite3.Database('xrengine.db')
+const db = new sqlite3.Database(dbPath)
 
 export const initDB = async () => {
   try {

@@ -180,9 +180,10 @@ export const saveYamlDoc = async (vars: Record<string, string>) => {
     forceQuotes: true
   })
 
-  await fs.writeFile(Endpoints.VALUES_FILE_NAME, yamlString)
+  const yamlPath = path.join(app.getPath('userData'), Endpoints.VALUES_FILE_NAME)
+  await fs.writeFile(yamlPath, yamlString)
 
-  return path.resolve(Endpoints.VALUES_FILE_NAME)
+  return path.resolve(yamlPath)
 }
 
 export const getXREngineDefaultPath = () => {
