@@ -13,6 +13,11 @@ class UpdatesHandler implements IBaseHandler {
       let latestVersion = currentVersion
 
       if (process.env.NODE_ENV !== 'development') {
+        autoUpdater.setFeedURL({
+          provider: 'github',
+          owner: 'xrfoundation',
+          repo: 'xrengine-control-center'
+        })
         const result = await autoUpdater.checkForUpdates()
         latestVersion = result.updateInfo.version
       }
