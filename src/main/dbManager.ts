@@ -1,9 +1,9 @@
-import Endpoints from '../constants/Endpoints'
 import { app } from 'electron'
 import log from 'electron-log'
 import path from 'path'
 import sqlite from 'sqlite3'
 
+import Endpoints from '../constants/Endpoints'
 import Storage from '../constants/Storage'
 
 const dbPath = path.join(app.getPath('userData'), Endpoints.DB_FILE_NAME)
