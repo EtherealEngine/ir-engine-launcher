@@ -101,6 +101,9 @@
       ],
       "category": "Development"
     },
+    "rpm": {
+      "packageName": "XREngineControlCenter"
+    },
     "directories": {
       "app": "release/app",
       "buildResources": "assets",
