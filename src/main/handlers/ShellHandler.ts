@@ -74,7 +74,7 @@ class ShellHandler implements IBaseHandler {
               window.webContents.send(Channels.Utilities.Log, { category, message: data })
             }
             const code = await execStream(
-              `bash ${configureScript} -a "${assetsFolder}" -d "${configs[Storage.FORCE_DB_REFRESH]}" -f "${
+              `bash "${configureScript}" -a "${assetsFolder}" -d "${configs[Storage.FORCE_DB_REFRESH]}" -f "${
                 paths[Storage.XRENGINE_PATH]
               }" -p "${password}" -v "${valuesPath}"`,
               onStd,
@@ -248,12 +248,14 @@ const checkSudoPassword = async (password: string) => {
   const loginScript = path.join(scriptsPath(), 'sudo-login.sh')
   log.info(`Executing script ${loginScript}`)
 
-  const response = await exec(`bash ${loginScript} ${password}`)
+  const response = await exec(`bash "${loginScript}" ${password}`)
   const { error } = response
 
   if (!error) {
     return true
   }
+
+  log.error("Error while executing script ${loginScript}.", error)
 
   return false
 }
