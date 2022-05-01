@@ -50,7 +50,7 @@
     ]
   },
   "build": {
-    "productName": "XREngine Control Center",
+    "productName": "XREngineControlCenter",
     "appId": "org.xrfoundation.XREngineControlCenter",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
