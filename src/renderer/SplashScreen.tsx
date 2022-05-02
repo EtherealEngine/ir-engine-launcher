@@ -70,9 +70,9 @@ const SplashScreen = () => {
     content = (
       <>
         <Typography sx={{ mb: 2 }}>Downloading the update...</Typography>
-        {!progress && <LinearProgress sx={{ width: '60%' }} />}
+        {!progress && <LinearProgress sx={{ width: '100%' }} />}
         {progress && (
-          <LinearProgress variant="determinate" value={Math.round(progress.percent)} sx={{ width: '60%' }} />
+          <LinearProgress variant="determinate" value={Math.round(progress.percent)} sx={{ width: '100%' }} />
         )}
         {progress && (
           <>

@@ -93,6 +93,11 @@ const createWindow = async () => {
 
   // We want the user to proactively download the install
   autoUpdater.autoDownload = false
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'xrfoundation',
+    repo: 'xrengine-control-center'
+  })
 
   log.transports.file.level = 'info'
   autoUpdater.logger = log

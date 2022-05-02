@@ -13,11 +13,6 @@ class UpdatesHandler implements IBaseHandler {
       let latestVersion = currentVersion
 
       if (process.env.NODE_ENV !== 'development') {
-        autoUpdater.setFeedURL({
-          provider: 'github',
-          owner: 'xrfoundation',
-          repo: 'xrengine-control-center'
-        })
         const result = await autoUpdater.checkForUpdates()
         latestVersion = result.updateInfo.version
       }
@@ -32,19 +27,9 @@ class UpdatesHandler implements IBaseHandler {
           window.webContents.send(Channels.Updates.DownloadProgress, progressObj)
         })
 
-        autoUpdater.setFeedURL({
-          provider: 'github',
-          owner: 'xrfoundation',
-          repo: 'xrengine-control-center'
-        })
         await autoUpdater.downloadUpdate()
       }),
       ipcMain.handle(Channels.Updates.QuitAndUpdate, (_event: IpcMainInvokeEvent) => {
-        autoUpdater.setFeedURL({
-          provider: 'github',
-          owner: 'xrfoundation',
-          repo: 'xrengine-control-center'
-        })
         autoUpdater.quitAndInstall(
           true, // isSilent
           true // isForceRunAfter, restart app after update is installed
