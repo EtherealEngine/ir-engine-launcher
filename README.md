@@ -46,49 +46,6 @@ To package apps for the local platform:
 npm run package
 ```
 
-
-
-
-# ROADMAP
-
-## V1
-Install terminal screen - might require root prompt
-
-Reinstall / Fail / uninstall?
-
-Might be some sort of default user or user setup process for making an admin.
-
-Electron runs the k8 setup we already have
-https://github.com/rannn505/child-shell
-formally https://rannn505.github.io/node-powershell/
-
-Electron server app UI : Add a built in dashboard to our setup and the admin panel
-Maybe a landing page linking to the client, admin dashbord, k8 dashbord, and logs.
-
-https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
-Kubernetes - Deploy the web UI (Kubernetes Dashboard) and access it.
-
-https://www.electronjs.org/docs/api/shell shell | Electron - Manage files and URLs using their default applications.
-
-https://github.com/jorangreef/sudo-prompt
-Run a command using sudo, prompting the user with an OS dialog if necessary.
-
-## V2
-Add dynamic DNS support - https://www.dynu.com/
-https://en.wikipedia.org/wiki/Dynamic_DNS
-
-## V3
-Make webxr client for steamvr
-https://bai.dev/projects/webxr-electron-apr2021.html
-
-## V4
-Add dev mode
-
-Add content packs (reality packs) to bundles.
-
-## V5
-add IPFS, BCIAB, P2P / SFU Chaining, Dynamic DNS to domain names, LifeScope
-
 ## Let's build it together
 We believe that projects like this are extremely complex and difficult, and can only be built when large groups of people work together, out in the open. If you believe that your calling is to build a free, open network that everyone, everywhere can get value from, then you are welcome in our community, and we'll do our best to get you set up.
 
