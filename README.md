@@ -11,13 +11,13 @@ Ability to fully manage an on premises server.
 
 Electron K8S Cluster Creator and Manager App
 
-Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 1
-Wrap all K8S CLI into a GUI 2
+Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 
+Wrap all K8S CLI into a GUI 
 
-##Benchmark tool - minimum specs of 4 CPU cores and 16-24GB of ram. 1##
+**Benchmark tool - minimum specs of 4 CPU cores and 16-24GB of ram.**
 
-Electron app with client for access to admin panel, supply link to open location in browser 2
-Multiple electron apps with same k8s control plane 1
+Electron app with client for access to admin panel, supply link to open location in browser 
+Multiple electron apps with same k8s control plane 
 
 We [XR Foundation](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
 
