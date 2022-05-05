@@ -170,16 +170,9 @@ if docker --version >/dev/null; then
 else
     echo "docker is not installed"
 
-    # echo "$PASSWORD" | sudo -S apt-get remove -y docker docker-engine docker.io containerd runc
-    echo "$PASSWORD" | sudo -S apt-get update -y
-    echo "$PASSWORD" | sudo -S apt-get install -y ca-certificates curl gnupg lsb-release
-
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | echo "$PASSWORD" | sudo -S gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | echo "$PASSWORD" | sudo -S tee /etc/apt/sources.list.d/docker.list >/dev/null
-    echo "$PASSWORD" | sudo -S apt-get update -y
-    echo "$PASSWORD" | sudo -S apt-get install -y docker-ce docker-ce-cli containerd.io
-
-    echo "$PASSWORD" | sudo -S chmod 666 /var/run/docker.sock
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    echo "$PASSWORD" | sudo -S sh get-docker.sh
+    rm ./get-docker.sh -f
 fi
 
 DOCKER_VERSION=$(docker --version)
@@ -241,6 +234,7 @@ else
 
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     echo "$PASSWORD" | sudo -S install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    rm kubectl -f
 fi
 
 KUBECTL_VERSION=$(kubectl version --client)
@@ -255,12 +249,10 @@ if helm version >/dev/null; then
 else
     echo "helm is not installed"
 
-    curl https://baltocdn.com/helm/signing.asc | echo "$PASSWORD" | sudo -S apt-key add -
-    echo "$PASSWORD" | sudo -S apt-get update -y
-    echo "$PASSWORD" | sudo -S apt-get install -y apt-transport-https
-    echo "deb https://baltocdn.com/helm/stable/debian/ all main" | echo "$PASSWORD" | sudo -S tee /etc/apt/sources.list.d/helm-stable-debian.list
-    echo "$PASSWORD" | sudo -S apt-get update -y
-    echo "$PASSWORD" | sudo -S apt-get install -y helm
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    echo "$PASSWORD" | sudo -S chmod 700 get_helm.sh
+    echo "$PASSWORD" | sudo -S bash get_helm.sh
+    rm get_helm.sh -f
 fi
 
 HELM_VERSION=$(helm version)
