@@ -65,6 +65,7 @@ if $INSTALL_NODE; then
     else
         echo "nvm is not installed"
 
+        echo "$PASSWORD" | sudo -S apt update -y
         echo "$PASSWORD" | sudo -S apt install curl
         curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
         source ~/.profile
@@ -255,6 +256,7 @@ else
     echo "helm is not installed"
 
     curl https://baltocdn.com/helm/signing.asc | echo "$PASSWORD" | sudo -S apt-key add -
+    echo "$PASSWORD" | sudo -S apt-get update -y
     echo "$PASSWORD" | sudo -S apt-get install -y apt-transport-https
     echo "deb https://baltocdn.com/helm/stable/debian/ all main" | echo "$PASSWORD" | sudo -S tee /etc/apt/sources.list.d/helm-stable-debian.list
     echo "$PASSWORD" | sudo -S apt-get update -y
