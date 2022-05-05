@@ -116,7 +116,7 @@ export const DefaultAppsStatus: AppModel[] = [
   {
     id: 'kubectl',
     name: 'kubectl',
-    checkCommand: 'kubectl version --client;',
+    checkCommand: 'kubectl version --client --output=yaml;',
     detail: '',
     status: AppStatus.Checking
   },
