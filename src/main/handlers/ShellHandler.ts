@@ -255,7 +255,7 @@ const checkSudoPassword = async (password: string) => {
     return true
   }
 
-  log.error("Error while executing script ${loginScript}.", error)
+  log.error('Error while executing script ${loginScript}.', error)
 
   return false
 }
