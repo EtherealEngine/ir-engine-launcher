@@ -1,5 +1,6 @@
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
+import CryptoJS from 'crypto-js'
 import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import { DeploymentService } from 'renderer/services/DeploymentService'
@@ -55,12 +56,24 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
   const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
-  const { configPaths, configVars } = settingsState.value
+  const { sudoPassword, configPaths, configVars } = settingsState.value
 
   const [activeStep, setActiveStep] = useState(0)
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [password, setPassword] = useState('')
+  const [password, setPassword] = useState(() => {
+    if (sudoPassword) {
+      console.log(sudoPassword)
+      let decrypted = CryptoJS.AES.decrypt(sudoPassword, Storage.PASSWORD_KEY).toString(CryptoJS.enc.Utf8)
+      console.log(decrypted)
+      decrypted = decrypted.startsWith('"') ? decrypted.substring(1) : decrypted
+      decrypted = decrypted.endsWith('"') ? decrypted.substring(0, decrypted.length - 1) : decrypted
+
+      return decrypted
+    }
+
+    return ''
+  })
   const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
   const [localConfigs, setLocalConfigs] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
@@ -80,7 +93,9 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       setLoading(true)
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
       setLoading(false)
-      if (!sudoLoggedIn) {
+      if (sudoLoggedIn) {
+        SettingsService.setSudoPassword(password)
+      } else {
         setError('Invalid password')
         return
       }

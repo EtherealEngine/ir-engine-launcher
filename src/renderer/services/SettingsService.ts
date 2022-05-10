@@ -1,5 +1,7 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
+import Storage from 'constants/Storage'
+import CryptoJS from 'crypto-js'
 import { OptionsObject, SnackbarMessage } from 'notistack'
 
 import { store, useDispatch } from '../store'
@@ -15,6 +17,7 @@ type FetchableItem = {
 //State
 const state = createState({
   appVersion: '',
+  sudoPassword: '',
   cluster: {
     loading: false,
     url: '',
@@ -44,6 +47,10 @@ store.receptors.push((action: SettingsActionType): void => {
       case 'SET_APP_VERSION':
         return s.merge({
           appVersion: action.payload
+        })
+      case 'SET_SUDO_PASSWORD':
+        return s.merge({
+          sudoPassword: action.payload
         })
       case 'SET_NOTISTACK':
         return s.merge({
@@ -91,9 +98,14 @@ export const useSettingsState = () => useState(state) as any as typeof state
 
 //Service
 export const SettingsService = {
-  setNotiStack: async (payload: EnqueueCallback) => {
+  setNotiStack: async (callback: EnqueueCallback) => {
     const dispatch = useDispatch()
-    dispatch(SettingsAction.setNotiStack(payload))
+    dispatch(SettingsAction.setNotiStack(callback))
+  },
+  setSudoPassword: (password: string) => {
+    const dispatch = useDispatch()
+    const encryptedPassword = CryptoJS.AES.encrypt(JSON.stringify(password), Storage.PASSWORD_KEY).toString()
+    dispatch(SettingsAction.setSudoPassword(encryptedPassword))
   },
   fetchSettings: async () => {
     await SettingsService.fetchAppVersion()
@@ -362,6 +374,12 @@ export const SettingsAction = {
   setAppVersion: (payload: string) => {
     return {
       type: 'SET_APP_VERSION' as const,
+      payload
+    }
+  },
+  setSudoPassword: (payload: string) => {
+    return {
+      type: 'SET_SUDO_PASSWORD' as const,
       payload
     }
   },

@@ -159,7 +159,10 @@ else
 fi
 
 cd "$XRENGINE_FOLDER"
+
+echo "running npm install"
 npm install
+echo "completed npm install"
 
 #==============
 # Verify Docker
@@ -328,9 +331,10 @@ fi
 helm repo add agones https://agones.dev/chart/stable
 helm repo add redis https://charts.bitnami.com/bitnami
 helm repo add xrengine https://helm.xrengine.io
+helm repo add w3f https://w3f.github.io/helm-charts/
 
 helm repo update
-
+helm install -f packages/ops/values/ipfs-cluster.values.yaml ipfs-cluster w3f/ipfs-cluster
 echo "helm repos added and updated"
 
 #======================
