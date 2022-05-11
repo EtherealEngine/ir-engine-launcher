@@ -10,11 +10,11 @@ interface Props {
 
 const ConfigVarsView = ({ localVars, onChange, sx }: Props) => {
   const settingsState = useSettingsState()
-  const { configVars } = settingsState.value
+  const { vars } = settingsState.value
 
   return (
     <Box sx={sx}>
-      {configVars.error && <DialogContentText color={'red'}>Error: {configVars.error}</DialogContentText>}
+      {vars.error && <DialogContentText color={'red'}>Error: {vars.error}</DialogContentText>}
       {Object.keys(localVars).map((key) => (
         <TextField
           fullWidth

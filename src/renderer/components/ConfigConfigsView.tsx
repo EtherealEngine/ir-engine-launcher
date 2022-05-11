@@ -6,14 +6,14 @@ import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import { Box, DialogContentText, IconButton, InputAdornment, SxProps, TextField, Theme } from '@mui/material'
 
 interface Props {
-  localPaths: Record<string, string>
+  localConfigs: Record<string, string>
   onChange: (key: string, value: string) => void
   sx?: SxProps<Theme>
 }
 
-const ConfigPathsView = ({ localPaths, onChange, sx }: Props) => {
+const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
   const settingsState = useSettingsState()
-  const { configPaths } = settingsState.value
+  const { configs } = settingsState.value
 
   const changeFolder = async (key: string) => {
     const path = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
@@ -24,7 +24,7 @@ const ConfigPathsView = ({ localPaths, onChange, sx }: Props) => {
 
   return (
     <Box sx={sx}>
-      {configPaths.error && <DialogContentText color={'red'}>Error: {configPaths.error}</DialogContentText>}
+      {configs.error && <DialogContentText color={'red'}>Error: {configs.error}</DialogContentText>}
       <TextField
         disabled
         fullWidth
@@ -32,14 +32,14 @@ const ConfigPathsView = ({ localPaths, onChange, sx }: Props) => {
         size="small"
         label={Storage.XRENGINE_PATH.replaceAll('_', ' ')}
         variant="standard"
-        value={localPaths[Storage.XRENGINE_PATH]}
+        value={localConfigs[Storage.XRENGINE_PATH]}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
                 edge="end"
                 title="Change Path"
-                disabled={configPaths.loading}
+                disabled={configs.loading}
                 onClick={() => changeFolder(Storage.XRENGINE_PATH)}
               >
                 <FolderOutlinedIcon />
@@ -52,4 +52,4 @@ const ConfigPathsView = ({ localPaths, onChange, sx }: Props) => {
   )
 }
 
-export default ConfigPathsView
+export default ConfigConfigsView

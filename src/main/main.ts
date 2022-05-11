@@ -27,9 +27,9 @@ import { resolveHtmlPath } from './util'
 
 // Log system info
 log.info(
-  `System Info:\n OS Type: ${os.type()}\n OS Platform: ${os.platform()}\n OS Version: ${os.version()}\n OS Arch: ${os.arch()}\n CPUs: ${os.cpus().length}\n Memory: ${
-    os.totalmem() / (1024 * 1024)
-  }`
+  `System Info:\n OS Type: ${os.type()}\n OS Platform: ${os.platform()}\n OS Version: ${os.version()}\n OS Arch: ${os.arch()}\n CPUs: ${
+    os.cpus().length
+  }\n Memory: ${os.totalmem() / (1024 * 1024)}`
 )
 
 // https://stackoverflow.com/a/55414549/2077741
@@ -139,8 +139,6 @@ export const createMainWindow = async () => {
     await installExtensions()
   }
 
-  await initDB()
-
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets')
@@ -227,7 +225,9 @@ app.on('window-all-closed', () => {
 
 app
   .whenReady()
-  .then(() => {
+  .then(async () => {
+    await initDB()
+
     createWindow()
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

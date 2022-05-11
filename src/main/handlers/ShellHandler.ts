@@ -50,9 +50,9 @@ class ShellHandler implements IBaseHandler {
         async (
           _event: IpcMainInvokeEvent,
           password: string,
-          paths: Record<string, string>,
+          configs: Record<string, string>,
           vars: Record<string, string>,
-          configs: Record<string, string>
+          flags: Record<string, string>
         ) => {
           const category = 'configure minikube'
           try {
@@ -74,8 +74,8 @@ class ShellHandler implements IBaseHandler {
               window.webContents.send(Channels.Utilities.Log, { category, message: data })
             }
             const code = await execStream(
-              `bash "${configureScript}" -a "${assetsFolder}" -d "${configs[Storage.FORCE_DB_REFRESH]}" -f "${
-                paths[Storage.XRENGINE_PATH]
+              `bash "${configureScript}" -a "${assetsFolder}" -d "${flags[Storage.FORCE_DB_REFRESH]}" -f "${
+                configs[Storage.XRENGINE_PATH]
               }" -p "${password}" -v "${valuesPath}"`,
               onStd,
               onStd

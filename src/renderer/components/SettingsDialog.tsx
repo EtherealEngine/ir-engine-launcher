@@ -11,7 +11,7 @@ import {
   LinearProgress
 } from '@mui/material'
 
-import ConfigPathsView from './ConfigPathsView'
+import ConfigConfigsView from './ConfigConfigsView'
 import ConfigVarsView from './ConfigVarsView'
 
 interface Props {
@@ -20,24 +20,24 @@ interface Props {
 
 const SettingsDialog = ({ onClose }: Props) => {
   const settingsState = useSettingsState()
-  const { appVersion, configPaths, configVars } = settingsState.value
-  const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
+  const { appVersion, configs, vars } = settingsState.value
+  const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
 
-  const localPaths = {} as Record<string, string>
-  for (const key in configPaths.paths) {
-    localPaths[key] = key in tempPaths ? tempPaths[key] : configPaths.paths[key]
+  const localConfigs = {} as Record<string, string>
+  for (const key in configs.data) {
+    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : configs.data[key]
   }
 
   const localVars = {} as Record<string, string>
-  for (const key in configVars.vars) {
-    localVars[key] = key in tempVars ? tempVars[key] : configVars.vars[key]
+  for (const key in vars.data) {
+    localVars[key] = key in tempVars ? tempVars[key] : vars.data[key]
   }
 
-  const changePath = async (key: string, value: string) => {
-    const newPaths = { ...tempPaths }
-    newPaths[key] = value
-    setTempPaths(newPaths)
+  const changeConfig = async (key: string, value: string) => {
+    const newConfigs = { ...tempConfigs }
+    newConfigs[key] = value
+    setTempConfigs(newConfigs)
   }
 
   const changeVar = async (key: string, value: string) => {
@@ -47,7 +47,7 @@ const SettingsDialog = ({ onClose }: Props) => {
   }
 
   const saveSettings = async () => {
-    const saved = await SettingsService.saveSettings(tempPaths, tempVars)
+    const saved = await SettingsService.saveSettings(tempConfigs, tempVars)
     if (saved) {
       onClose()
     }
@@ -55,15 +55,15 @@ const SettingsDialog = ({ onClose }: Props) => {
 
   return (
     <Dialog open fullWidth maxWidth="sm" scroll="paper">
-      {(configPaths.loading || configVars.loading) && <LinearProgress />}
+      {(configs.loading || vars.loading) && <LinearProgress />}
       <DialogTitle>Settings</DialogTitle>
       <DialogContent dividers sx={{ maxHeight: '40vh' }}>
         <DialogContentText variant="button">App Version: {appVersion}</DialogContentText>
 
         <DialogContentText variant="button" sx={{ marginTop: 4 }}>
-          Paths
+          Configs
         </DialogContentText>
-        <ConfigPathsView localPaths={localPaths} onChange={changePath} sx={{ paddingLeft: 2 }} />
+        <ConfigConfigsView localConfigs={localConfigs} onChange={changeConfig} sx={{ paddingLeft: 2 }} />
 
         <DialogContentText variant="button" sx={{ marginTop: 4 }}>
           Variables
@@ -75,9 +75,9 @@ const SettingsDialog = ({ onClose }: Props) => {
         <Button
           type="submit"
           disabled={
-            configPaths.loading ||
-            configVars.loading ||
-            (Object.keys(tempPaths).length === 0 && Object.keys(tempVars).length === 0)
+            configs.loading ||
+            vars.loading ||
+            (Object.keys(tempConfigs).length === 0 && Object.keys(tempVars).length === 0)
           }
           onClick={saveSettings}
         >

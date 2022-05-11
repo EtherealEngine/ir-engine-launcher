@@ -25,9 +25,9 @@ const Channels = {
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
   },
   Settings: {
-    CheckPaths: 'CheckPaths',
+    CheckConfigs: 'CheckConfigs',
     CheckVars: 'CheckVars',
-    SavePaths: 'SavePaths',
+    SaveConfigs: 'SaveConfigs',
     SaveVars: 'SaveVars'
   },
   Updates: {

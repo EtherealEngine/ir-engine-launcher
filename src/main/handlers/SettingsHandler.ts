@@ -13,21 +13,21 @@ import { fileExists, IBaseHandler } from './IBaseHandler'
 
 class SettingsHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
-    ipcMain.handle(Channels.Settings.CheckPaths, async (_event: IpcMainInvokeEvent) => {
-      const category = 'load setting paths'
+    ipcMain.handle(Channels.Settings.CheckConfigs, async (_event: IpcMainInvokeEvent) => {
+      const category = 'load setting configs'
       try {
-        const paths: Record<string, string> = {}
+        const configs: Record<string, string> = {}
 
-        const pathsData = await getAllValues(Storage.PATHS_TABLE)
-        for (const data of pathsData) {
-          paths[data.id] = data.value
+        const configsData = await getAllValues(Storage.CONFIGS_TABLE)
+        for (const data of configsData) {
+          configs[data.id] = data.value
         }
 
-        if (!paths[Storage.XRENGINE_PATH]) {
-          paths[Storage.XRENGINE_PATH] = await getXREngineDefaultPath()
+        if (!configs[Storage.XRENGINE_PATH]) {
+          configs[Storage.XRENGINE_PATH] = await getXREngineDefaultPath()
         }
 
-        return paths
+        return configs
       } catch (err) {
         window.webContents.send(Channels.Utilities.Log, {
           category,
@@ -62,24 +62,27 @@ class SettingsHandler implements IBaseHandler {
           throw err
         }
       }),
-      ipcMain.handle(Channels.Settings.SavePaths, async (_event: IpcMainInvokeEvent, paths: Record<string, string>) => {
-        const category = 'save paths'
-        try {
-          for (const key in paths) {
-            await insertOrUpdateValue(Storage.PATHS_TABLE, key, paths[key])
+      ipcMain.handle(
+        Channels.Settings.SaveConfigs,
+        async (_event: IpcMainInvokeEvent, configs: Record<string, string>) => {
+          const category = 'save configs'
+          try {
+            for (const key in configs) {
+              await insertOrUpdateValue(Storage.CONFIGS_TABLE, key, configs[key])
+            }
+            window.webContents.send(Channels.Utilities.Log, {
+              category,
+              message: 'Setting configs saved.'
+            })
+          } catch (err) {
+            window.webContents.send(Channels.Utilities.Log, {
+              category,
+              message: JSON.stringify(err)
+            })
+            throw err
           }
-          window.webContents.send(Channels.Utilities.Log, {
-            category,
-            message: 'Setting paths saved.'
-          })
-        } catch (err) {
-          window.webContents.send(Channels.Utilities.Log, {
-            category,
-            message: JSON.stringify(err)
-          })
-          throw err
         }
-      }),
+      ),
       ipcMain.handle(Channels.Settings.SaveVars, async (_event: IpcMainInvokeEvent, vars: Record<string, string>) => {
         const category = 'save variables'
         try {
@@ -192,7 +195,7 @@ export const getXREngineDefaultPath = () => {
 }
 
 export const getXREnginePath = async () => {
-  const xrenginePath = await getValue(Storage.PATHS_TABLE, Storage.XRENGINE_PATH)
+  const xrenginePath = await getValue(Storage.CONFIGS_TABLE, Storage.XRENGINE_PATH)
   return xrenginePath ? xrenginePath.value : getXREngineDefaultPath()
 }
 

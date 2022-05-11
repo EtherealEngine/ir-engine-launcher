@@ -26,9 +26,9 @@ import {
 import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from './Colorlib'
-import ConfigAdvancedView from './ConfigAdvancedView'
+import ConfigFlagsView from './ConfigFlagsView'
 import ConfigAuthView from './ConfigAuthView'
-import ConfigPathsView from './ConfigPathsView'
+import ConfigConfigsView from './ConfigConfigsView'
 import ConfigSummaryView from './ConfigSummaryView'
 import ConfigVarsView from './ConfigVarsView'
 
@@ -56,7 +56,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
   const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
-  const { sudoPassword, configPaths, configVars } = settingsState.value
+  const { sudoPassword, configs, vars } = settingsState.value
 
   const [activeStep, setActiveStep] = useState(0)
   const [isLoading, setLoading] = useState(false)
@@ -72,18 +72,18 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
     return ''
   })
-  const [tempPaths, setTempPaths] = useState({} as Record<string, string>)
+  const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
-  const [localConfigs, setLocalConfigs] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
+  const [localFlags, setLocalFlags] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
 
-  const localPaths = {} as Record<string, string>
-  for (const key in configPaths.paths) {
-    localPaths[key] = key in tempPaths ? tempPaths[key] : configPaths.paths[key]
+  const localConfigs = {} as Record<string, string>
+  for (const key in configs.data) {
+    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : configs.data[key]
   }
 
   const localVars = {} as Record<string, string>
-  for (const key in configVars.vars) {
-    localVars[key] = key in tempVars ? tempVars[key] : configVars.vars[key]
+  for (const key in vars.data) {
+    localVars[key] = key in tempVars ? tempVars[key] : vars.data[key]
   }
 
   const handleNext = async () => {
@@ -98,22 +98,22 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         return
       }
     } else if (activeStep === 2) {
-      for (const key in configVars.vars) {
-        if (!configVars.vars[key] && !tempVars[key]) {
+      for (const key in vars.data) {
+        if (!vars.data[key] && !tempVars[key]) {
           setError('Please provide value for all variables')
           return
         }
       }
     } else if (activeStep === 3) {
-      if (Object.keys(tempPaths).length > 0 || Object.keys(tempVars).length > 0) {
-        const saved = await SettingsService.saveSettings(tempPaths, tempVars)
+      if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
+        const saved = await SettingsService.saveSettings(tempConfigs, tempVars)
 
         if (!saved) {
           enqueueSnackbar('Failed to save configurations', { variant: 'error' })
         }
       }
 
-      DeploymentService.processConfigurations(password, localPaths, localVars, localConfigs)
+      DeploymentService.processConfigurations(password, localConfigs, localVars, localFlags)
       onClose()
 
       return
@@ -128,17 +128,17 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     setError('')
   }
 
-  const onChangeConfig = async (key: string, value: string) => {
-    const newConfigs = { ...localConfigs }
-    newConfigs[key] = value
-    setLocalConfigs(newConfigs)
+  const onChangeFlag = async (key: string, value: string) => {
+    const newFlags = { ...localFlags }
+    newFlags[key] = value
+    setLocalFlags(newFlags)
     setError('')
   }
 
-  const onChangePath = async (key: string, value: string) => {
-    const newPaths = { ...tempPaths }
-    newPaths[key] = value
-    setTempPaths(newPaths)
+  const onChangeConfig = async (key: string, value: string) => {
+    const newConfigs = { ...tempConfigs }
+    newConfigs[key] = value
+    setTempConfigs(newConfigs)
     setError('')
   }
 
@@ -172,8 +172,8 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       title: 'Provide configuration details',
       content: (
         <Box sx={{ marginLeft: 2, marginRight: 2 }}>
-          <ConfigPathsView localPaths={localPaths} onChange={onChangePath} />
-          <ConfigAdvancedView localConfigs={localConfigs} onChange={onChangeConfig} />
+          <ConfigConfigsView localConfigs={localConfigs} onChange={onChangeConfig} />
+          <ConfigFlagsView localFlags={localFlags} onChange={onChangeFlag} />
         </Box>
       )
     },
@@ -187,9 +187,9 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       title: 'Review configurations before finalizing',
       content: (
         <ConfigSummaryView
-          localPaths={localPaths}
-          localVars={localVars}
           localConfigs={localConfigs}
+          localVars={localVars}
+          localFlags={localFlags}
           sx={{ marginLeft: 2, marginRight: 2 }}
         />
       )
@@ -200,7 +200,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
   return (
     <Dialog open fullWidth maxWidth="sm">
-      {(isLoading || configPaths.loading || configVars.loading) && <LinearProgress />}
+      {(isLoading || configs.loading || vars.loading) && <LinearProgress />}
       <DialogTitle>
         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
           {steps.map((step) => (

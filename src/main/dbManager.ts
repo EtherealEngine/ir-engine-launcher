@@ -12,7 +12,7 @@ const db = new sqlite3.Database(dbPath)
 
 export const initDB = async () => {
   try {
-    await createTable(Storage.PATHS_TABLE, 'id TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL,', 'id')
+    await createTable(Storage.CONFIGS_TABLE, 'id TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL,', 'id')
     await createTable(Storage.VARS_TABLE, 'id TEXT NOT NULL PRIMARY KEY, value TEXT NOT NULL,', 'id')
 
     log.info('Initialized database.')
