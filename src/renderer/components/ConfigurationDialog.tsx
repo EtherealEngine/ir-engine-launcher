@@ -26,9 +26,9 @@ import {
 import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from './Colorlib'
-import ConfigFlagsView from './ConfigFlagsView'
 import ConfigAuthView from './ConfigAuthView'
 import ConfigConfigsView from './ConfigConfigsView'
+import ConfigFlagsView from './ConfigFlagsView'
 import ConfigSummaryView from './ConfigSummaryView'
 import ConfigVarsView from './ConfigVarsView'
 
