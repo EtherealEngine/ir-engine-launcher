@@ -63,9 +63,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const [error, setError] = useState('')
   const [password, setPassword] = useState(() => {
     if (sudoPassword) {
-      console.log(sudoPassword)
       let decrypted = CryptoJS.AES.decrypt(sudoPassword, Storage.PASSWORD_KEY).toString(CryptoJS.enc.Utf8)
-      console.log(decrypted)
       decrypted = decrypted.startsWith('"') ? decrypted.substring(1) : decrypted
       decrypted = decrypted.endsWith('"') ? decrypted.substring(0, decrypted.length - 1) : decrypted
 
