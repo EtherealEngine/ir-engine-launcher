@@ -3,9 +3,10 @@ import { Fragment, useState } from 'react'
 
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded'
-import { Box, CircularProgress, FormControlLabel, Grid, Switch, Tooltip, Typography } from '@mui/material'
+import { Box, CircularProgress, FormControlLabel, Grid, Switch, Typography } from '@mui/material'
+
+import InfoTooltip from './InfoTooltip'
 
 interface Props {
   statuses: AppModel[]
@@ -86,22 +87,7 @@ const StatusView = ({ statuses, title }: Props) => {
 
               <Typography marginLeft={1}>{status.name}</Typography>
 
-              {status.detail && (
-                <Tooltip
-                  title={
-                    <Typography
-                      variant="body2"
-                      color="inherit"
-                      sx={{ overflow: 'auto', maxHeight: '350px', whiteSpace: 'pre-line' }}
-                    >
-                      {status.detail}
-                    </Typography>
-                  }
-                  arrow
-                >
-                  <InfoOutlinedIcon color="primary" sx={{ marginLeft: 2, fontSize: '18px' }} />
-                </Tooltip>
-              )}
+              {status.detail && <InfoTooltip message={status.detail.toString()} />}
             </Grid>
           ))}
         </Grid>
