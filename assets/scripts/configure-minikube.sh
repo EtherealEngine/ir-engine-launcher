@@ -4,13 +4,14 @@
 # Parameters
 #===========
 
-while getopts a:d:f:p:v: flag; do
+while getopts a:c:d:f:p:r: flag; do
     case "${flag}" in
     a) ASSETS_FOLDER=${OPTARG} ;;
+    c) CONFIGS_FOLDER=${OPTARG} ;;
     d) FORCE_DB_REFRESH=${OPTARG} ;;
     f) XRENGINE_FOLDER=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
-    v) VALUES_PATH=${OPTARG} ;;
+    r) ENABLE_RIPPLE_STACK=${OPTARG} ;;
     *)
         echo "Invalid arguments passed" >&2
         exit 1
@@ -18,7 +19,7 @@ while getopts a:d:f:p:v: flag; do
     esac
 done
 
-if [[ -z $ASSETS_FOLDER || -z $FORCE_DB_REFRESH || -z $XRENGINE_FOLDER || -z $PASSWORD || -z $VALUES_PATH ]]; then
+if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $XRENGINE_FOLDER || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
     echo "Missing arguments"
     exit 1
 fi
@@ -344,9 +345,9 @@ echo "helm repos added and updated"
 kubectl config use-context minikube
 
 if helm status agones >/dev/null; then
-    echo "agones is installed"
+    echo "agones is already deployed"
 else
-    echo "agones is not installed"
+    echo "agones is not deployed"
 
     helm install -f packages/ops/configs/agones-default-values.yaml agones agones/agones
     sleep 20
@@ -356,9 +357,9 @@ AGONES_STATUS=$(helm status agones)
 echo "agones status is $AGONES_STATUS"
 
 if helm status local-redis >/dev/null; then
-    echo "redis is installed"
+    echo "redis is already deployed"
 else
-    echo "redis is not installed"
+    echo "redis is not deployed"
 
     helm install local-redis redis/redis
     sleep 20
@@ -366,6 +367,51 @@ fi
 
 REDIS_STATUS=$(helm status local-redis)
 echo "redis status is $REDIS_STATUS"
+
+#====================
+# Verify ripple stack
+#====================
+
+echo "Enable ripple stack is $ENABLE_RIPPLE_STACK"
+
+if [[ $ENABLE_RIPPLE_STACK == 'true' ]]; then
+    if helm status local-rippled >/dev/null; then
+        echo "rippled is already deployed"
+    else
+        echo "rippled is not deployed"
+
+        helm install local-rippled ./packages/ops/rippled/
+        sleep 20
+    fi
+
+    RIPPLED_STATUS=$(helm status local-rippled)
+    echo "rippled status is $RIPPLED_STATUS"
+
+
+    if helm status local-ipfs >/dev/null; then
+        echo "ipfs is already deployed"
+    else
+        echo "ipfs is not deployed"
+
+        helm install -f "$CONFIGS_FOLDER/ipfs.values.yaml" local-ipfs ./packages/ops/ipfs/
+        sleep 20
+    fi
+
+    IPFS_STATUS=$(helm status local-ipfs)
+    echo "ipfs status is $IPFS_STATUS"
+
+else
+    if helm status local-rippled >/dev/null; then
+        helm uninstall local-rippled
+        echo "rippled deployment removed"
+    fi
+
+    if helm status local-ipfs >/dev/null; then
+        helm uninstall local-ipfs
+        echo "ipfs deployment removed"
+    fi
+fi
+
 
 #================
 # Verify XREngine
@@ -415,12 +461,12 @@ if [[ $XRENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFR
     helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
 elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Installing XREngine deployment with populating database"
-    helm install -f "$VALUES_PATH" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
+    helm install -f "$CONFIGS_FOLDER/xrengine.values.yaml" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
     sleep 35
     helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
 elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
     echo "Installing XREngine deployment without populating database"
-    helm install -f "$VALUES_PATH" local xrengine/xrengine
+    helm install -f "$CONFIGS_FOLDER/xrengine.values.yaml" local xrengine/xrengine
 fi
 
 export RELEASE_NAME=local

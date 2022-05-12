@@ -7,10 +7,17 @@ const Endpoints = {
   MYSQL_PORT: 3304,
   DEFAULT_XRENGINE_FOLDER: 'xrengine',
   DB_FILE_NAME: 'xrengine.db',
-  VALUES_FILE_NAME: 'local.values.yaml',
-  VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.template.values.yaml',
-  VALUES_TEMPLATE_URL:
-    'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.template.values.yaml'
+  VALIDATOR_FILE_PATH: 'packages/ops/rippled/config/validators.txt',
+  VALIDATOR_TEMPLATE_PATH: 'packages/ops/rippled/config/validators.template.txt',
+  RIPPLED_FILE_PATH: 'packages/ops/rippled/config/rippled.cfg',
+  RIPPLED_TEMPLATE_PATH: 'packages/ops/rippled/config/rippled.template.cfg',
+  ENGINE_VALUES_FILE_NAME: 'xrengine.values.yaml',
+  ENGINE_VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.template.values.yaml',
+  ENGINE_VALUES_TEMPLATE_URL:
+    'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.template.values.yaml',
+  IPFS_VALUES_FILE_NAME: 'ipfs.values.yaml',
+  IPFS_VALUES_TEMPLATE_PATH: 'packages/ops/ipfs/values.yaml',
+  IPFS_VALUES_TEMPLATE_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/ipfs/values.yaml'
 }
 
 export default Endpoints

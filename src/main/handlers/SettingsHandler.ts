@@ -1,15 +1,16 @@
 import axios from 'axios'
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
-// import log from 'electron-log'
+import log from 'electron-log'
 import { promises as fs } from 'fs'
 import yaml from 'js-yaml'
 import path from 'path'
+import PeerId from 'peer-id'
 
 import { Channels } from '../../constants/Channels'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { getAllValues, getValue, insertOrUpdateValue } from '../dbManager'
-import { fileExists, IBaseHandler } from './IBaseHandler'
+import { appConfigsPath, exec, fileExists, IBaseHandler } from './IBaseHandler'
 
 class SettingsHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -43,7 +44,9 @@ class SettingsHandler implements IBaseHandler {
         try {
           const vars: Record<string, string> = {}
 
-          const yamlDoc = await getYamlDoc()
+          const enginePath = await getXREnginePath()
+          const templatePath = path.join(enginePath, Endpoints.ENGINE_VALUES_TEMPLATE_PATH)
+          const yamlDoc = await getYamlDoc(templatePath, Endpoints.ENGINE_VALUES_TEMPLATE_URL)
 
           const valuesKey = [] as string[]
           findRequiredValues(yamlDoc, valuesKey)
@@ -52,7 +55,9 @@ class SettingsHandler implements IBaseHandler {
 
           const varsData = await getAllValues(Storage.VARS_TABLE)
           for (const data of varsData) {
-            vars[data.id] = data.value
+            if (data.id in vars) {
+              vars[data.id] = data.value
+            }
           }
 
           return vars
@@ -157,26 +162,24 @@ const populateRequiredValues = async (yaml: any, vars: Record<string, string>) =
   }
 }
 
-const getYamlDoc = async () => {
-  const xrPath = await getXREnginePath()
-  const templatePath = path.join(xrPath, Endpoints.VALUES_TEMPLATE_PATH)
-  const templateFileExists = await fileExists(templatePath)
+const getYamlDoc = async (templatePath: string, templateUrl: string) => {
   let yamlContent = ''
 
+  const templateFileExists = await fileExists(templatePath)
   if (templateFileExists) {
     yamlContent = await fs.readFile(templatePath, 'utf8')
   } else {
-    const response = await axios.get(Endpoints.VALUES_TEMPLATE_URL)
+    const response = await axios.get(templateUrl)
     yamlContent = response.data
   }
 
   const yamlDoc = yaml.load(yamlContent)
-
   return yamlDoc
 }
 
-export const saveYamlDoc = async (vars: Record<string, string>) => {
-  const yamlDoc = await getYamlDoc()
+export const ensureEngineConfigs = async (enginePath: string, vars: Record<string, string>) => {
+  const templatePath = path.join(enginePath, Endpoints.ENGINE_VALUES_TEMPLATE_PATH)
+  const yamlDoc = await getYamlDoc(templatePath, Endpoints.ENGINE_VALUES_TEMPLATE_URL)
 
   await populateRequiredValues(yamlDoc, vars)
 
@@ -185,10 +188,94 @@ export const saveYamlDoc = async (vars: Record<string, string>) => {
     forceQuotes: true
   })
 
-  const yamlPath = path.join(app.getPath('userData'), Endpoints.VALUES_FILE_NAME)
+  const yamlPath = path.join(appConfigsPath(), Endpoints.ENGINE_VALUES_FILE_NAME)
   await fs.writeFile(yamlPath, yamlString)
+}
 
-  return path.resolve(yamlPath)
+const ensureRippledConfigs = async (enginePath: string) => {
+  const rippledCfgPath = path.join(enginePath, Endpoints.RIPPLED_FILE_PATH)
+  const rippledCfgExists = await fileExists(rippledCfgPath)
+  if (rippledCfgExists === false) {
+    await fs.copyFile(path.join(enginePath, Endpoints.RIPPLED_TEMPLATE_PATH), rippledCfgPath)
+  }
+
+  const validatorCfgPath = path.join(enginePath, Endpoints.VALIDATOR_FILE_PATH)
+  const validatorCfgExists = await fileExists(validatorCfgPath)
+  if (validatorCfgExists === false) {
+    await fs.copyFile(path.join(enginePath, Endpoints.VALIDATOR_TEMPLATE_PATH), validatorCfgPath)
+  }
+}
+
+const ensureIPFSConfigs = async (enginePath: string) => {
+  const templatePath = path.join(enginePath, Endpoints.IPFS_VALUES_TEMPLATE_PATH)
+  const yamlDoc = await getYamlDoc(templatePath, Endpoints.IPFS_VALUES_TEMPLATE_URL)
+
+  const vars: Record<string, string> = {}
+
+  const valuesKey = [] as string[]
+  findRequiredValues(yamlDoc, valuesKey)
+
+  const varsData = await getAllValues(Storage.VARS_TABLE)
+
+  for (const key of valuesKey) {
+    const dbData = varsData.find((item) => item.id === key)
+
+    // Data already exists
+    if (dbData) {
+      vars[key] = dbData.value
+    } else if (key === Storage.IPFS_CLUSTER_SECRET) {
+      const response = await exec("od  -vN 32 -An -tx1 /dev/urandom | tr -d ' \n'")
+      const { stdout, stderr } = response
+
+      if (stderr) {
+        log.error('Error in ensureIPFSConfigs', stderr)
+      }
+
+      if (stdout) {
+        vars[key] = stdout.toString()
+        await insertOrUpdateValue(Storage.VARS_TABLE, key, stdout.toString())
+      }
+    } else if (key === Storage.IPFS_BOOTSTRAP_PEER_ID) {
+      const peerIdObj = await PeerId.create({ bits: 2048, keyType: 'Ed25519' })
+      const peerId = peerIdObj.toJSON()
+
+      if (peerId.privKey) {
+        vars[key] = peerId.id
+        await insertOrUpdateValue(Storage.VARS_TABLE, key, peerId.id)
+
+        vars[Storage.IPFS_BOOTSTRAP_PEER_PRIVATE_KEY] = peerId.privKey
+        await insertOrUpdateValue(Storage.VARS_TABLE, Storage.IPFS_BOOTSTRAP_PEER_PRIVATE_KEY, peerId.privKey)
+      }
+    } else if (key === Storage.IPFS_CLUSTER_REST_ID) {
+      const peerIdObj = await PeerId.create({ bits: 2048, keyType: 'Ed25519' })
+      const peerId = peerIdObj.toJSON()
+
+      if (peerId.privKey) {
+        vars[key] = peerId.id
+        await insertOrUpdateValue(Storage.VARS_TABLE, key, peerId.id)
+
+        vars[Storage.IPFS_CLUSTER_REST_PRIVATE_KEY] = peerId.privKey
+        await insertOrUpdateValue(Storage.VARS_TABLE, Storage.IPFS_CLUSTER_REST_PRIVATE_KEY, peerId.privKey)
+      }
+    }
+  }
+
+  await populateRequiredValues(yamlDoc, vars)
+
+  const yamlString = yaml.dump(yamlDoc, {
+    quotingType: '"',
+    forceQuotes: true
+  })
+
+  const yamlPath = path.join(appConfigsPath(), Endpoints.IPFS_VALUES_FILE_NAME)
+  await fs.writeFile(yamlPath, yamlString)
+}
+
+export const ensureRippleConfigs = async (enginePath: string, enableRippleStack: string) => {
+  if (enableRippleStack === 'true') {
+    await ensureRippledConfigs(enginePath)
+    await ensureIPFSConfigs(enginePath)
+  }
 }
 
 export const getXREngineDefaultPath = () => {

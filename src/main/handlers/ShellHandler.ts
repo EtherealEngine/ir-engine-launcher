@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
+import { promises as fs } from 'fs'
 import os from 'os'
 import path from 'path'
 
@@ -14,8 +15,17 @@ import {
   DefaultClusterStatus,
   DefaultSystemStatus
 } from '../../models/AppStatus'
-import { assetsPath, exec, execStream, IBaseHandler, isValidUrl, scriptsPath } from './IBaseHandler'
-import { saveYamlDoc } from './SettingsHandler'
+import {
+  appConfigsPath,
+  assetsPath,
+  exec,
+  execStream,
+  fileExists,
+  IBaseHandler,
+  isValidUrl,
+  scriptsPath
+} from './IBaseHandler'
+import { ensureEngineConfigs, ensureRippleConfigs } from './SettingsHandler'
 
 class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -62,8 +72,14 @@ class ShellHandler implements IBaseHandler {
               vars[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
             }
 
-            const valuesPath = await saveYamlDoc(vars)
-            log.info(`Saved values yaml`)
+            const configsFolder = path.resolve(appConfigsPath())
+            const configsFolderExists = await fileExists(configsFolder)
+            if (configsFolderExists === false) {
+              await fs.mkdir(configsFolder, { recursive: true })
+            }
+
+            await ensureEngineConfigs(configs[Storage.XRENGINE_PATH], vars)
+            await ensureRippleConfigs(configs[Storage.XRENGINE_PATH], configs[Storage.ENABLE_RIPPLE_STACK])
 
             const scriptsFolder = scriptsPath()
             const assetsFolder = assetsPath()
@@ -74,9 +90,9 @@ class ShellHandler implements IBaseHandler {
               window.webContents.send(Channels.Utilities.Log, { category, message: data })
             }
             const code = await execStream(
-              `bash "${configureScript}" -a "${assetsFolder}" -d "${flags[Storage.FORCE_DB_REFRESH]}" -f "${
-                configs[Storage.XRENGINE_PATH]
-              }" -p "${password}" -v "${valuesPath}"`,
+              `bash "${configureScript}" -a "${assetsFolder}" -c "${configsFolder}" -d "${
+                flags[Storage.FORCE_DB_REFRESH]
+              }" -f "${configs[Storage.XRENGINE_PATH]}" -p "${password}" -r "${flags[Storage.ENABLE_RIPPLE_STACK]}"`,
               onStd,
               onStd
             )
@@ -86,6 +102,7 @@ class ShellHandler implements IBaseHandler {
 
             return true
           } catch (err) {
+            log.error('Error in ConfigureMinikubeConfig.', err)
             window.webContents.send(Channels.Utilities.Log, {
               category,
               message: JSON.stringify(err)

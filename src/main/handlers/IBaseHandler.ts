@@ -1,5 +1,5 @@
 import childProcess, { ExecException } from 'child_process'
-import { BrowserWindow } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import { promises as fs } from 'fs'
 import path from 'path'
 
@@ -38,6 +38,10 @@ export const isValidUrl = (urlString: string) => {
   }
 
   return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+export const appConfigsPath = () => {
+  return path.join(app.getPath('userData'), 'configs')
 }
 
 export const assetsPath = () => {
