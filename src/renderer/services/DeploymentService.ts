@@ -1,4 +1,4 @@
-import { createState, useState } from '@speigg/hookstate'
+import { createState, none, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import { AppModel, DefaultAppsStatus, DefaultClusterStatus, DefaultSystemStatus } from 'models/AppStatus'
 
@@ -29,9 +29,26 @@ store.receptors.push((action: DeploymentActionType): void => {
         return s.merge({
           isFetchingStatuses: true,
           systemStatus: [...DefaultSystemStatus],
-          appStatus: [...DefaultAppsStatus],
+          appStatus: action.appsStatus,
           clusterStatus: [...DefaultClusterStatus]
         })
+      case 'FETCH_APP_STATUS': {
+        s.isFetchingStatuses.set(true)
+
+        const defaultIds = DefaultAppsStatus.map((item) => item.id)
+
+        const removedKeys: any = {}
+        for (let index = 0; index < s.appStatus.length; index++) {
+          if (defaultIds.includes(s.appStatus.value[index].id) === false) {
+            removedKeys[index] = none
+          }
+        }
+
+        s.appStatus.merge(removedKeys)
+        s.appStatus.merge(action.appsStatus)
+
+        break
+      }
       case 'SYSTEM_STATUS_RECEIVED': {
         const index = s.systemStatus.value.findIndex((app) => app.id === action.systemStatus.id)
         s.systemStatus.merge({ [index]: action.systemStatus })
@@ -89,8 +106,19 @@ export const DeploymentService = {
   fetchDeploymentStatus: async () => {
     const dispatch = useDispatch()
     try {
-      dispatch(DeploymentAction.fetchDeploymentStatus())
-      await window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig)
+      const appsStatus = await window.electronAPI.invoke(Channels.Settings.GetCurrentAppConfigs)
+      dispatch(DeploymentAction.fetchDeploymentStatus(appsStatus))
+      await window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig, appsStatus)
+    } catch (error) {
+      console.error(error)
+    }
+    dispatch(DeploymentAction.setFetchingStatuses(false))
+  },
+  fetchAppStatus: async (appsStatus: AppModel[]) => {
+    const dispatch = useDispatch()
+    try {
+      dispatch(DeploymentAction.fetchAppStatus(appsStatus))
+      await window.electronAPI.invoke(Channels.Shell.CheckMinikubeAppConfig, appsStatus)
     } catch (error) {
       console.error(error)
     }
@@ -128,9 +156,16 @@ export const DeploymentAction = {
       isFetchingStatuses
     }
   },
-  fetchDeploymentStatus: () => {
+  fetchDeploymentStatus: (appsStatus: AppModel[]) => {
     return {
-      type: 'FETCH_DEPLOYMENT_STATUS' as const
+      type: 'FETCH_DEPLOYMENT_STATUS' as const,
+      appsStatus: appsStatus
+    }
+  },
+  fetchAppStatus: (appsStatus: AppModel[]) => {
+    return {
+      type: 'FETCH_APP_STATUS' as const,
+      appsStatus: appsStatus
     }
   },
   systemStatusReceived: (systemStatus: AppModel) => {

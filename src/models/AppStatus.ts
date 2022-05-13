@@ -166,6 +166,23 @@ export const DefaultAppsStatus: AppModel[] = [
   }
 ]
 
+export const DefaultRippleAppsStatus: AppModel[] = [
+  {
+    id: 'rippled',
+    name: 'Rippled',
+    checkCommand: minikubeDependantScript('helm status local-rippled;'),
+    detail: '',
+    status: AppStatus.Checking
+  },
+  {
+    id: 'ipfs',
+    name: 'IPFS',
+    checkCommand: minikubeDependantScript('helm status local-ipfs;'),
+    detail: '',
+    status: AppStatus.Checking
+  }
+]
+
 export const DefaultClusterStatus: AppModel[] = [
   {
     id: 'client',

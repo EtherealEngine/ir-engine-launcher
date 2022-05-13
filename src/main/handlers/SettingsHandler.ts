@@ -9,6 +9,7 @@ import PeerId from 'peer-id'
 import { Channels } from '../../constants/Channels'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
+import { DefaultAppsStatus, DefaultRippleAppsStatus } from '../../models/AppStatus'
 import { getAllValues, getValue, insertOrUpdateValue } from '../dbManager'
 import { appConfigsPath, exec, fileExists, IBaseHandler } from './IBaseHandler'
 
@@ -67,6 +68,19 @@ class SettingsHandler implements IBaseHandler {
             category,
             message: JSON.stringify(err)
           })
+          throw err
+        }
+      }),
+      ipcMain.handle(Channels.Settings.GetCurrentAppConfigs, async (_event: IpcMainInvokeEvent) => {
+        try {
+          const enableRipple = await getValue(Storage.CONFIGS_TABLE, Storage.ENABLE_RIPPLE_STACK)
+
+          if (enableRipple && enableRipple.value === 'true') {
+            return [...DefaultAppsStatus, ...DefaultRippleAppsStatus]
+          }
+
+          return [...DefaultAppsStatus]
+        } catch (err) {
           throw err
         }
       }),

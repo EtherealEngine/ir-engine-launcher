@@ -2,9 +2,11 @@ import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
+import { DefaultRippleAppsStatus } from 'models/AppStatus'
 import { OptionsObject, SnackbarMessage } from 'notistack'
 
 import { store, useDispatch } from '../store'
+import { DeploymentService } from './DeploymentService'
 
 type EnqueueCallback = (message: SnackbarMessage, options?: OptionsObject) => void
 
@@ -184,6 +186,12 @@ export const SettingsService = {
     let savedVars = true
     if (vars) {
       savedVars = await SettingsService.saveVars(vars)
+    }
+
+    if (configs[Storage.ENABLE_RIPPLE_STACK] && configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
+      DeploymentService.fetchAppStatus([...DefaultRippleAppsStatus])
+    } else if (configs[Storage.ENABLE_RIPPLE_STACK] && configs[Storage.ENABLE_RIPPLE_STACK] === 'false') {
+      DeploymentService.fetchAppStatus([])
     }
 
     return savedConfigs && savedVars

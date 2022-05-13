@@ -29,13 +29,13 @@ import { ensureEngineConfigs, ensureRippleConfigs } from './SettingsHandler'
 
 class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
-    ipcMain.handle(Channels.Shell.CheckMinikubeConfig, async (_event: IpcMainInvokeEvent) => {
+    ipcMain.handle(Channels.Shell.CheckMinikubeConfig, async (_event: IpcMainInvokeEvent, appsStatus: AppModel[]) => {
       try {
         await checkSystemStatus(window)
 
-        const allConfigured = await checkAppStatus(window)
+        const mandatoryConfigured = await checkAppStatus(window, appsStatus)
 
-        await checkClusterStatus(window, allConfigured)
+        await checkClusterStatus(window, mandatoryConfigured)
       } catch (err) {
         window.webContents.send(Channels.Utilities.Log, {
           category: 'check minikube config',
@@ -43,6 +43,19 @@ class ShellHandler implements IBaseHandler {
         })
       }
     }),
+      ipcMain.handle(
+        Channels.Shell.CheckMinikubeAppConfig,
+        async (_event: IpcMainInvokeEvent, appsStatus: AppModel[]) => {
+          try {
+            await checkAppStatus(window, appsStatus)
+          } catch (err) {
+            window.webContents.send(Channels.Utilities.Log, {
+              category: 'check minikube config',
+              message: JSON.stringify(err)
+            })
+          }
+        }
+      ),
       ipcMain.handle(Channels.Shell.CheckSudoPassword, async (_event: IpcMainInvokeEvent, password: string = '') => {
         try {
           const validPassword = await checkSudoPassword(password)
@@ -174,9 +187,9 @@ const checkSystemStatus = async (window: BrowserWindow) => {
   }
 }
 
-const checkAppStatus = async (window: BrowserWindow) => {
-  let allConfigured = true
-  for (const app of DefaultAppsStatus) {
+const checkAppStatus = async (window: BrowserWindow, appsStatus: AppModel[]) => {
+  let mandatoryConfigured = true
+  for (const app of appsStatus) {
     let status: AppModel = {
       ...app
     }
@@ -196,7 +209,11 @@ const checkAppStatus = async (window: BrowserWindow) => {
           category: status.name,
           message: typeof stderr === 'string' ? stderr.trim() : stderr
         })
-        allConfigured = false
+
+        const mandatoryApp = DefaultAppsStatus.find((item) => item.id === app.id)
+        if (mandatoryApp) {
+          mandatoryConfigured = false
+        }
       }
 
       status = {
@@ -208,19 +225,20 @@ const checkAppStatus = async (window: BrowserWindow) => {
 
     window.webContents.send(Channels.Shell.CheckAppStatusResult, status)
   }
-  return allConfigured
+
+  return mandatoryConfigured
 }
 
-const checkClusterStatus = async (window: BrowserWindow, allConfigured: boolean) => {
+const checkClusterStatus = async (window: BrowserWindow, mandatoryConfigured: boolean) => {
   for (const clusterItem of DefaultClusterStatus) {
     let status: AppModel = {
       ...clusterItem
     }
 
-    if (allConfigured == false) {
+    if (mandatoryConfigured == false) {
       status = {
         ...clusterItem,
-        detail: 'Apps not configured',
+        detail: 'XREngine required apps not configured',
         status: AppStatus.NotConfigured
       }
     } else if (clusterItem.checkCommand) {

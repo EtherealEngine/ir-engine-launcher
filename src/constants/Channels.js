@@ -1,6 +1,7 @@
 const Channels = {
   Shell: {
     CheckMinikubeConfig: 'CheckMinikubeConfig',
+    CheckMinikubeAppConfig: 'CheckMinikubeAppConfig',
     CheckSystemStatusResult: 'CheckSystemStatusResult',
     CheckAppStatusResult: 'CheckAppStatusResult',
     CheckClusterStatusResult: 'CheckClusterStatusResult',
@@ -27,6 +28,7 @@ const Channels = {
   Settings: {
     CheckConfigs: 'CheckConfigs',
     CheckVars: 'CheckVars',
+    GetCurrentAppConfigs: 'GetCurrentAppConfigs',
     SaveConfigs: 'SaveConfigs',
     SaveVars: 'SaveVars'
   },
