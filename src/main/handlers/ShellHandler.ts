@@ -149,6 +149,40 @@ class ShellHandler implements IBaseHandler {
           })
           return err
         }
+      }),
+      ipcMain.handle(Channels.Shell.ConfigureIPFSDashboard, async (_event: IpcMainInvokeEvent) => {
+        const category = 'ipfs dashboard'
+        try {
+          const onStdout = (data: any) => {
+            const stringData = typeof data === 'string' ? data.trim() : data
+            if (stringData.toString().startsWith("Handling connection")) {
+              window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
+            }
+
+            if (stringData.toString().startsWith('Forwarding from 127.0.0.1')) {
+              let url = stringData.toString().replace('Forwarding from ', '')
+              url = url.split(' ')[0]
+              url = `http://${url}/webui`
+              window.webContents.send(Channels.Shell.ConfigureIPFSDashboardResponse, url)
+            }
+          }
+          const onStderr = (data: any) => {
+            const stringData = typeof data === 'string' ? data.trim() : data
+            window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
+            window.webContents.send(Channels.Shell.ConfigureIPFSDashboardError, data)
+          }
+          await execStream(
+            `podname=$(kubectl get pods -l app=local-ipfs --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl port-forward $podname :5001;`,
+            onStdout,
+            onStderr
+          )
+        } catch (err) {
+          window.webContents.send(Channels.Utilities.Log, {
+            category,
+            message: JSON.stringify(err)
+          })
+          return err
+        }
       })
   }
 }

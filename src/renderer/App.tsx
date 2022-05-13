@@ -15,12 +15,18 @@ import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
 import ClusterPage from './pages/ClusterPage'
 import ConfigPage from './pages/ConfigPage'
-import { SettingsService } from './services/SettingsService'
+import IPFSPage from './pages/IPFSPage'
+import RippledPage from './pages/RippledPage'
+import { SettingsService, useSettingsState } from './services/SettingsService'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
 const App = () => {
   const notistackRef = React.createRef<SnackbarProvider>()
+  const settingsState = useSettingsState()
+  const { configs } = settingsState.value
+  const enableRippleStack = configs.data[Storage.ENABLE_RIPPLE_STACK] === 'true'
+
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const defaultMode = (prefersDarkMode ? 'dark' : 'light') as PaletteMode
   const storedMode = localStorage.getItem(Storage.COLOR_MODE) as PaletteMode | undefined
@@ -71,6 +77,8 @@ const App = () => {
               <Route path={Paths.ROOT} element={<ConfigPage />} />
               <Route path={Paths.ADMIN} element={<AdminPage />} />
               <Route path={Paths.CLUSTER} element={<ClusterPage />} />
+              {enableRippleStack && <Route path={Paths.IPFS} element={<IPFSPage />} />}
+              {enableRippleStack && <Route path={Paths.RIPPLED} element={<RippledPage />} />}
               <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
             </Routes>
           </HashRouter>

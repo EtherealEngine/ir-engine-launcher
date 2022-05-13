@@ -25,6 +25,11 @@ const state = createState({
     url: '',
     error: ''
   },
+  ipfs: {
+    loading: false,
+    url: '',
+    error: ''
+  },
   adminPanel: {
     loading: false,
     adminAccess: false,
@@ -77,6 +82,14 @@ store.receptors.push((action: SettingsActionType): void => {
       case 'SET_CLUSTER_DASHBOARD':
         return s.merge({
           cluster: {
+            loading: action.payload.loading,
+            url: action.payload.data,
+            error: action.payload.error
+          }
+        })
+      case 'SET_IPFS_DASHBOARD':
+        return s.merge({
+          ipfs: {
             loading: action.payload.loading,
             url: action.payload.data,
             error: action.payload.error
@@ -303,6 +316,35 @@ export const SettingsService = {
       console.error(error)
     }
   },
+  fetchIpfsDashboard: async () => {
+    const dispatch = useDispatch()
+    try {
+      dispatch(
+        SettingsAction.setIpfsDashboard({
+          loading: true,
+          data: '',
+          error: ''
+        })
+      )
+      window.electronAPI.invoke(Channels.Shell.ConfigureIPFSDashboard)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  clearIpfsDashboard: async () => {
+    const dispatch = useDispatch()
+    try {
+      dispatch(
+        SettingsAction.setIpfsDashboard({
+          loading: false,
+          data: '',
+          error: ''
+        })
+      )
+    } catch (error) {
+      console.error(error)
+    }
+  },
   fetchAdminPanelAccess: async () => {
     const dispatch = useDispatch()
     try {
@@ -347,6 +389,24 @@ export const SettingsService = {
       window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardError, (error: string) => {
         dispatch(
           SettingsAction.setClusterDashboard({
+            loading: false,
+            data: '',
+            error
+          })
+        )
+      })
+      window.electronAPI.on(Channels.Shell.ConfigureIPFSDashboardResponse, (data: string) => {
+        dispatch(
+          SettingsAction.setIpfsDashboard({
+            loading: false,
+            data,
+            error: ''
+          })
+        )
+      })
+      window.electronAPI.on(Channels.Shell.ConfigureIPFSDashboardError, (error: string) => {
+        dispatch(
+          SettingsAction.setIpfsDashboard({
             loading: false,
             data: '',
             error
@@ -412,6 +472,12 @@ export const SettingsAction = {
   setClusterDashboard: (payload: FetchableItem) => {
     return {
       type: 'SET_CLUSTER_DASHBOARD' as const,
+      payload
+    }
+  },
+  setIpfsDashboard: (payload: FetchableItem) => {
+    return {
+      type: 'SET_IPFS_DASHBOARD' as const,
       payload
     }
   },

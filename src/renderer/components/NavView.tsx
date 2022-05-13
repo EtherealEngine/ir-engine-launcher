@@ -1,7 +1,9 @@
 import Paths from 'constants/Paths'
+import Storage from 'constants/Storage'
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ColorModeContext } from 'renderer/App'
+import { useSettingsState } from 'renderer/services/SettingsService'
 
 import { AccountCircleOutlined } from '@mui/icons-material'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
@@ -20,32 +22,47 @@ import Typography from '@mui/material/Typography'
 
 import logo from '../../../assets/icon.svg'
 
-const pages = [
-  {
-    title: 'Config',
-    path: Paths.ROOT
-  },
-  {
-    title: 'Admin',
-    path: Paths.ADMIN
-  },
-  {
-    title: 'Cluster',
-    path: Paths.CLUSTER
-  }
-]
-
 const settings = ['Profile', 'Logout']
 
 const NavView = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null)
   const [anchorElUser, setAnchorElUser] = React.useState(null)
 
+  const settingsState = useSettingsState()
+  const { configs } = settingsState.value
+  const enableRippleStack = configs.data[Storage.ENABLE_RIPPLE_STACK] === 'true'
+
   const theme = useTheme()
   const colorMode = React.useContext(ColorModeContext)
 
   const navigate = useNavigate()
   const { pathname } = useLocation()
+
+  let pages = [
+    {
+      title: 'Config',
+      path: Paths.ROOT
+    },
+    {
+      title: 'Admin',
+      path: Paths.ADMIN
+    },
+    {
+      title: 'Cluster',
+      path: Paths.CLUSTER
+    }
+  ]
+
+  if (enableRippleStack) {
+    pages.push({
+      title: 'IPFS',
+      path: Paths.IPFS
+    })
+    pages.push({
+      title: 'Rippled CLI',
+      path: Paths.RIPPLED
+    })
+  }
 
   const handleOpenNavMenu = (event: any) => {
     setAnchorElNav(event.currentTarget)
@@ -117,7 +134,7 @@ const NavView = () => {
             <Box sx={{ height: 45, mr: 0.7 }} component="img" src={logo} />
             <Typography variant="h6">Control Center</Typography>
           </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1, gap: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
                 key={page.title}
