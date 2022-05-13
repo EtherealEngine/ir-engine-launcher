@@ -92,7 +92,7 @@ class ShellHandler implements IBaseHandler {
             const code = await execStream(
               `bash "${configureScript}" -a "${assetsFolder}" -c "${configsFolder}" -d "${
                 flags[Storage.FORCE_DB_REFRESH]
-              }" -f "${configs[Storage.XRENGINE_PATH]}" -p "${password}" -r "${flags[Storage.ENABLE_RIPPLE_STACK]}"`,
+              }" -f "${configs[Storage.XRENGINE_PATH]}" -p "${password}" -r "${configs[Storage.ENABLE_RIPPLE_STACK]}"`,
               onStd,
               onStd
             )
