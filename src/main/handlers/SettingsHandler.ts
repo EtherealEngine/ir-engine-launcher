@@ -26,7 +26,8 @@ class SettingsHandler implements IBaseHandler {
 
         if (!configs[Storage.XRENGINE_PATH]) {
           configs[Storage.XRENGINE_PATH] = await getXREngineDefaultPath()
-        } else if (!configs[Storage.ENABLE_RIPPLE_STACK]) {
+        }
+        if (!configs[Storage.ENABLE_RIPPLE_STACK]) {
           configs[Storage.ENABLE_RIPPLE_STACK] = 'false'
         }
 
