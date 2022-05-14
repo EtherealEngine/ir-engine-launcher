@@ -127,6 +127,11 @@ const RippledPage = () => {
           {outputs.map((output, index) => (
             <pre key={`output-${index}`}>{output}</pre>
           ))}
+          {outputs.length === 0 && (
+            <Typography sx={{ textAlign: 'center', mt: 5, color: 'gray' }}>
+              Please run a rippled command to see output here.
+            </Typography>
+          )}
           <pre ref={outputEndRef} />
         </Box>
         <TextField
