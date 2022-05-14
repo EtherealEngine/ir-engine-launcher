@@ -75,7 +75,7 @@ const RippledPage = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      if (commandInput) {
+      if (commandInput && commandInput.value) {
         const lengthOfInput = commandInput.value.length
         commandInput.setSelectionRange(lengthOfInput, lengthOfInput)
       }
