@@ -21,8 +21,15 @@ Multiple electron apps with same k8s control plane
 
 We [XR Foundation](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
 
+## Install Released
 
-## Install
+1. Download latest version of XREngine control center app from [here](https://github.com/XRFoundation/XREngine-Control-Center/releases).
+2. For AppImage: Once downloaded, right click and go to **Properties**. In **Permissions** tab check 'Allow executing file as program'.
+3. Double click on AppImage to launch the app.
+
+> Note: Currently the app is tested again Ubuntu 20.04 only.
+
+## Install Development
 
 Clone the repo and install dependencies:
 
