@@ -119,7 +119,7 @@ const RippledPage = () => {
               }
             />
           </Typography>
-          <IconButton title="Clear Logs" color="primary" onClick={() => setOutputs([])}>
+          <IconButton title="Clear Outputs" color="primary" onClick={() => setOutputs([])}>
             <PlaylistRemoveOutlinedIcon />
           </IconButton>
         </Box>
