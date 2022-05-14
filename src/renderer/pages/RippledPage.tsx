@@ -39,6 +39,13 @@ const RippledPage = () => {
       if (event.key === 'Enter' && event.shiftKey === false) {
         event.preventDefault()
 
+        if (command && command.startsWith('rippled') === false) {
+          enqueueSnackbar!('Only rippled commands are supported', {
+            variant: 'warning'
+          })
+          return
+        }
+
         const output = await window.electronAPI.invoke(Channels.Shell.ExecuteRippledCommand, command)
 
         const newHistory = [...history, command]
@@ -72,15 +79,6 @@ const RippledPage = () => {
   useEffect(() => {
     ;(outputEndRef.current as any)?.scrollIntoView({ behavior: 'smooth' })
   }, [outputs])
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (commandInput && commandInput.value) {
-        const lengthOfInput = commandInput.value.length
-        commandInput.setSelectionRange(lengthOfInput, lengthOfInput)
-      }
-    }, 50)
-  }, [historyIndex])
 
   let loadingMessage = ''
   if (rippledStatus?.status === AppStatus.Checking) {
