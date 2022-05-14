@@ -2,7 +2,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { Tooltip, Typography } from '@mui/material'
 
 interface Props {
-  message: string
+  message: React.ReactNode
 }
 
 const InfoTooltip = ({ message }: Props) => {

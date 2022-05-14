@@ -155,7 +155,7 @@ class ShellHandler implements IBaseHandler {
         try {
           const onStdout = (data: any) => {
             const stringData = typeof data === 'string' ? data.trim() : data
-            if (stringData.toString().startsWith("Handling connection")) {
+            if (stringData.toString().startsWith('Handling connection')) {
               window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
             }
 
@@ -182,6 +182,33 @@ class ShellHandler implements IBaseHandler {
             message: JSON.stringify(err)
           })
           return err
+        }
+      }),
+      ipcMain.handle(Channels.Shell.ExecuteRippledCommand, async (_event: IpcMainInvokeEvent, command: string) => {
+        const category = 'rippled cli'
+        try {
+          const response = await exec(
+            `podname=$(kubectl get pods -l app.kubernetes.io/instance=local-rippled --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl exec -i $podname -- bash -c "${command}";`
+          )
+          const { stdout, stderr } = response
+
+          let output = ''
+          if (stderr) {
+            log.error('Error in executeRippledCommand', stderr)
+            output = stderr.toString()
+          }
+
+          if (stdout) {
+            output += stdout.toString()
+          }
+
+          return output
+        } catch (err) {
+          window.webContents.send(Channels.Utilities.Log, {
+            category,
+            message: JSON.stringify(err)
+          })
+          throw err
         }
       })
   }

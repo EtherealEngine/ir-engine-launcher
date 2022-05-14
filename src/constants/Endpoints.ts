@@ -17,7 +17,8 @@ const Endpoints = {
     'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.template.values.yaml',
   IPFS_VALUES_FILE_NAME: 'ipfs.values.yaml',
   IPFS_VALUES_TEMPLATE_PATH: 'packages/ops/ipfs/values.yaml',
-  IPFS_VALUES_TEMPLATE_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/ipfs/values.yaml'
+  IPFS_VALUES_TEMPLATE_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/ipfs/values.yaml',
+  RIPPLED_CLI_DOCS: 'https://xrpl.org/commandline-usage.html'
 }
 
 export default Endpoints

@@ -13,6 +13,7 @@ const Channels = {
     ConfigureIPFSDashboardError: 'ConfigureIPFSDashboardError',
     ConfigureIPFSDashboardResponse: 'ConfigureIPFSDashboardResponse',
     CheckSudoPassword: 'CheckSudoPassword',
+    ExecuteRippledCommand: 'ExecuteRippledCommand',
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',
