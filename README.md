@@ -1,5 +1,4 @@
-![xrengine black](https://user-images.githubusercontent.com/5104160/142821267-7e131891-0caa-496b-9cda-a82dee8a04b6.png)
-
+https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-8153-cd2c9c2771d5.mp4
 
 **Your own sandbox in the Metaverse. Take what you need, or launch the full stack. 
 XREngine Control Center is a desktop app for managing XREngine cluster.**
