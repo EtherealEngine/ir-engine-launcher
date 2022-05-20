@@ -172,7 +172,7 @@ class ShellHandler implements IBaseHandler {
             window.webContents.send(Channels.Shell.ConfigureIPFSDashboardError, data)
           }
           await execStream(
-            `podname=$(kubectl get pods -l app=local-ipfs --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl port-forward $podname :5001;`,
+            `podname=$(kubectl get pods -l app.kubernetes.io/instance=local-ipfs --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl port-forward $podname :9095;`,
             onStdout,
             onStderr
           )
