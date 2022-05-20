@@ -261,17 +261,6 @@ const ensureIPFSConfigs = async (enginePath: string) => {
         vars[Storage.IPFS_BOOTSTRAP_PEER_PRIVATE_KEY] = peerId.privKey
         await insertOrUpdateValue(Storage.VARS_TABLE, Storage.IPFS_BOOTSTRAP_PEER_PRIVATE_KEY, peerId.privKey)
       }
-    } else if (key === Storage.IPFS_CLUSTER_REST_ID) {
-      const peerIdObj = await PeerId.create({ bits: 2048, keyType: 'Ed25519' })
-      const peerId = peerIdObj.toJSON()
-
-      if (peerId.privKey) {
-        vars[key] = peerId.id
-        await insertOrUpdateValue(Storage.VARS_TABLE, key, peerId.id)
-
-        vars[Storage.IPFS_CLUSTER_REST_PRIVATE_KEY] = peerId.privKey
-        await insertOrUpdateValue(Storage.VARS_TABLE, Storage.IPFS_CLUSTER_REST_PRIVATE_KEY, peerId.privKey)
-      }
     }
   }
 
