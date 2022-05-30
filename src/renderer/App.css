@@ -3,6 +3,11 @@ body {
   overflow: hidden;
 }
 
+.settingTabs .MuiTabs-flexContainer {
+  padding: 12px;
+  align-items: flex-start;
+}
+
 /* https://stackoverflow.com/a/44823888/2077741 */
 .splash-screen {
   -webkit-user-select: none;

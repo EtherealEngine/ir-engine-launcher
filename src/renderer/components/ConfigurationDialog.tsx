@@ -219,7 +219,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         </DialogContentText>
       )}
 
-      <DialogContent ref={contentStartRef} sx={{ maxHeight: '35vh', marginBottom: 3 }}>
+      <DialogContent ref={contentStartRef} sx={{ height: '27vh', marginBottom: 3 }}>
         {steps[activeStep].content}
       </DialogContent>
       <DialogActions>

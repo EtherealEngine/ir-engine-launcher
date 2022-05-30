@@ -1,16 +1,22 @@
 import { useState } from 'react'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
+import { TabContext, TabPanel } from '@mui/lab'
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  LinearProgress
+  LinearProgress,
+  Tab,
+  Tabs,
+  Typography
 } from '@mui/material'
 
+import logo from '../../../assets/icon.svg'
 import ConfigConfigsView from './ConfigConfigsView'
 import ConfigVarsView from './ConfigVarsView'
 
@@ -19,6 +25,7 @@ interface Props {
 }
 
 const SettingsDialog = ({ onClose }: Props) => {
+  const [currentTab, setTab] = useState('1')
   const settingsState = useSettingsState()
   const { appVersion, configs, vars } = settingsState.value
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
@@ -57,18 +64,49 @@ const SettingsDialog = ({ onClose }: Props) => {
     <Dialog open fullWidth maxWidth="sm" scroll="paper">
       {(configs.loading || vars.loading) && <LinearProgress />}
       <DialogTitle>Settings</DialogTitle>
-      <DialogContent dividers sx={{ maxHeight: '40vh' }}>
-        <DialogContentText variant="button">App Version: {appVersion}</DialogContentText>
-
-        <DialogContentText variant="button" sx={{ marginTop: 4 }}>
-          Configs
-        </DialogContentText>
-        <ConfigConfigsView localConfigs={localConfigs} onChange={changeConfig} sx={{ paddingLeft: 2 }} />
-
-        <DialogContentText variant="button" sx={{ marginTop: 4 }}>
-          Variables
-        </DialogContentText>
-        <ConfigVarsView localVars={localVars} onChange={changeVar} sx={{ paddingLeft: 2 }} />
+      <DialogContent dividers sx={{ padding: 0 }}>
+        <TabContext value={currentTab}>
+          <Box sx={{ height: '40vh', display: 'flex' }}>
+            <Tabs
+              orientation="vertical"
+              className="settingTabs"
+              value={currentTab}
+              onChange={(_event, newValue) => setTab(newValue)}
+              sx={{ borderRight: 1, borderColor: 'divider' }}
+            >
+              <Tab label="Configs" value="1" />
+              <Tab label="Variables" value="2" />
+              <Tab label="Minikube" value="3" />
+              <Tab label="About" value="4" />
+            </Tabs>
+            <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+              <TabPanel value="1">
+                <ConfigConfigsView
+                  localConfigs={localConfigs}
+                  onChange={changeConfig}
+                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
+                />
+              </TabPanel>
+              <TabPanel value="2">
+                <ConfigVarsView
+                  localVars={localVars}
+                  onChange={changeVar}
+                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
+                />
+              </TabPanel>
+              <TabPanel value="3">Minikube</TabPanel>
+              <TabPanel value="4">
+                <Box>
+                  <Box sx={{ display: 'flex', mr: 6, mb: 2, alignItems: 'center', flexDirection: 'row' }}>
+                    <Box sx={{ height: 45, mr: 0.7 }} component="img" src={logo} />
+                    <Typography variant="h6">Control Center</Typography>
+                  </Box>
+                  <DialogContentText variant="button">App Version: {appVersion}</DialogContentText>
+                </Box>
+              </TabPanel>
+            </Box>
+          </Box>
+        </TabContext>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
