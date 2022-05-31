@@ -194,13 +194,47 @@ class ShellHandler implements IBaseHandler {
 
           let output = ''
           if (stderr) {
-            log.error('Error in executeRippledCommand', stderr)
+            log.error('Error in ExecuteRippledCommand', stderr)
             output = stderr.toString()
           }
 
           if (stdout) {
             output += stdout.toString()
           }
+
+          return output
+        } catch (err) {
+          window.webContents.send(Channels.Utilities.Log, {
+            category,
+            message: JSON.stringify(err)
+          })
+          throw err
+        }
+      }),
+      ipcMain.handle(Channels.Shell.ExecuteCommand, async (_event: IpcMainInvokeEvent, command: string) => {
+        const category = 'execute command'
+        try {
+          const output = await new Promise((resolve) => {
+            execStream(
+              command,
+              (data: any) => {
+                const stringData = typeof data === 'string' ? data.trim() : data
+                window.webContents.send(Channels.Utilities.Log, {
+                  category,
+                  message: stringData
+                })
+
+                resolve(stringData)
+              },
+              (data: any) => {
+                const stringData = typeof data === 'string' ? data.trim() : data
+                window.webContents.send(Channels.Utilities.Log, {
+                  category,
+                  message: stringData
+                })
+              }
+            )
+          })
 
           return output
         } catch (err) {

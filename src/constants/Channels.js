@@ -14,6 +14,7 @@ const Channels = {
     ConfigureIPFSDashboardResponse: 'ConfigureIPFSDashboardResponse',
     CheckSudoPassword: 'CheckSudoPassword',
     ExecuteRippledCommand: 'ExecuteRippledCommand',
+    ExecuteCommand: 'ExecuteCommand',
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',

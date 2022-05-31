@@ -18,6 +18,7 @@ import {
 
 import logo from '../../../assets/icon.svg'
 import ConfigConfigsView from './ConfigConfigsView'
+import ConfigMinikubeView from './ConfigMinikubeView'
 import ConfigVarsView from './ConfigVarsView'
 
 interface Props {
@@ -94,7 +95,9 @@ const SettingsDialog = ({ onClose }: Props) => {
                   sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
                 />
               </TabPanel>
-              <TabPanel value="3">Minikube</TabPanel>
+              <TabPanel value="3">
+                <ConfigMinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
+              </TabPanel>
               <TabPanel value="4">
                 <Box>
                   <Box sx={{ display: 'flex', mr: 6, mb: 2, alignItems: 'center', flexDirection: 'row' }}>
