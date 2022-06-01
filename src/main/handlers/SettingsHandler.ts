@@ -7,6 +7,7 @@ import path from 'path'
 import PeerId from 'peer-id'
 
 import { Channels } from '../../constants/Channels'
+import Commands from '../../constants/Commands'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { DefaultAppsStatus, DefaultRippleAppsStatus } from '../../models/AppStatus'
@@ -239,7 +240,7 @@ const ensureIPFSConfigs = async (enginePath: string) => {
     if (dbData) {
       vars[key] = dbData.value
     } else if (key === Storage.IPFS_CLUSTER_SECRET) {
-      const response = await exec("od  -vN 32 -An -tx1 /dev/urandom | tr -d ' \n'")
+      const response = await exec(Commands.IPFS_SECRET)
       const { stdout, stderr } = response
 
       if (stderr) {

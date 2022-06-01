@@ -6,6 +6,7 @@ import os from 'os'
 import path from 'path'
 
 import { Channels } from '../../constants/Channels'
+import Commands from '../../constants/Commands'
 import Storage from '../../constants/Storage'
 import SysRequirements from '../../constants/SysRequirements'
 import {
@@ -141,7 +142,7 @@ class ShellHandler implements IBaseHandler {
               window.webContents.send(Channels.Shell.ConfigureMinikubeDashboardError, data)
             }
           }
-          await execStream(`minikube dashboard --url`, onStdout, onStderr)
+          await execStream(Commands.MINIKUBE_DASHBOARD, onStdout, onStderr)
         } catch (err) {
           window.webContents.send(Channels.Utilities.Log, {
             category,
