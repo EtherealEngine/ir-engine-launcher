@@ -102,7 +102,9 @@ const ConfigMinikubeView = ({ sx }: Props) => {
   }, [deploymentState.appStatus])
 
   useEffect(() => {
-    fetchDiskStats()
+    if (minikubeStatus?.status === AppStatus.Configured) {
+      fetchDiskStats()
+    }
   }, [])
 
   if (minikubeStatus?.status === AppStatus.Checking) {
