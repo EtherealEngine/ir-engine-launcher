@@ -51,7 +51,7 @@ const App = () => {
 
   React.useEffect(() => {
     if (notistackRef.current) {
-      SettingsService.setNotiStack(notistackRef.current.enqueueSnackbar)
+      SettingsService.setNotiStack(notistackRef.current)
     }
   }, [notistackRef])
 

@@ -3,12 +3,10 @@ import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { DefaultRippleAppsStatus } from 'models/AppStatus'
-import { OptionsObject, SnackbarMessage } from 'notistack'
+import { SnackbarProvider } from 'notistack'
 
 import { store, useDispatch } from '../store'
 import { DeploymentService } from './DeploymentService'
-
-type EnqueueCallback = (message: SnackbarMessage, options?: OptionsObject) => void
 
 type FetchableItem = {
   loading: boolean
@@ -45,7 +43,7 @@ const state = createState({
     data: {} as Record<string, string>,
     error: ''
   },
-  enqueueSnackbar: undefined as EnqueueCallback | undefined
+  notistack: {} as SnackbarProvider
 })
 
 store.receptors.push((action: SettingsActionType): void => {
@@ -61,7 +59,7 @@ store.receptors.push((action: SettingsActionType): void => {
         })
       case 'SET_NOTISTACK':
         return s.merge({
-          enqueueSnackbar: action.payload
+          notistack: action.payload
         })
       case 'SET_CONFIGS':
         return s.merge({
@@ -113,7 +111,7 @@ export const useSettingsState = () => useState(state) as any as typeof state
 
 //Service
 export const SettingsService = {
-  setNotiStack: async (callback: EnqueueCallback) => {
+  setNotiStack: async (callback: SnackbarProvider) => {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setNotiStack(callback))
   },
@@ -451,7 +449,7 @@ export const SettingsAction = {
       payload
     }
   },
-  setNotiStack: (payload: EnqueueCallback) => {
+  setNotiStack: (payload: SnackbarProvider) => {
     return {
       type: 'SET_NOTISTACK' as const,
       payload

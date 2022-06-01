@@ -80,7 +80,7 @@ export const DeploymentService = {
     vars: Record<string, string>,
     flags: Record<string, string>
   ) => {
-    const { enqueueSnackbar } = accessSettingsState().value
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
     const dispatch = useDispatch()
     try {
       dispatch(DeploymentAction.setConfiguring(true))
@@ -93,7 +93,7 @@ export const DeploymentService = {
       )
       if (response) {
         DeploymentService.fetchDeploymentStatus()
-      } else if (enqueueSnackbar) {
+      } else {
         enqueueSnackbar('Failed to configure XREngine. Please check logs.', {
           variant: 'error'
         })

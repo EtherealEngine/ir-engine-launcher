@@ -34,7 +34,7 @@ export const useLogState = () => useState(state) as any as typeof state
 //Service
 export const LogService = {
   saveLogs: async () => {
-    const { enqueueSnackbar } = accessSettingsState().value
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
     const { logs } = accessLogState().value
 
     const dispatch = useDispatch()
@@ -48,13 +48,13 @@ export const LogService = {
         throw 'Failed to save logs.'
       }
 
-      enqueueSnackbar!(`Logs saved ${fileName}.`, {
+      enqueueSnackbar(`Logs saved ${fileName}.`, {
         variant: 'success',
         action: (key) => openPathAction(key, path)
       })
     } catch (error) {
       console.error(error)
-      enqueueSnackbar!(`Failed to save logs. ${error}`, {
+      enqueueSnackbar(`Failed to save logs. ${error}`, {
         variant: 'error'
       })
     }

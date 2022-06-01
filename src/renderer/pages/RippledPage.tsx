@@ -40,7 +40,7 @@ const RippledPage = () => {
         event.preventDefault()
 
         if (command && command.startsWith('rippled') === false) {
-          enqueueSnackbar!('Only rippled commands are supported', {
+          enqueueSnackbar('Only rippled commands are supported', {
             variant: 'warning'
           })
           return
@@ -70,7 +70,7 @@ const RippledPage = () => {
       }
     } catch (err) {
       console.error(err)
-      enqueueSnackbar!(`Failed execute command. ${err}`, {
+      enqueueSnackbar(`Failed execute command. ${err}`, {
         variant: 'error'
       })
     }
