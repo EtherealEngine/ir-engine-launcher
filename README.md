@@ -20,6 +20,10 @@ Multiple electron apps with same k8s control plane
 
 We [XR Foundation](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
 
+## Tutorials
+
+Please visit [tutorials page](./TUTORIALS.md).
+
 ## Install Released
 
 1. Download latest version of XREngine control center app from [here](https://github.com/XRFoundation/XREngine-Control-Center/releases).
