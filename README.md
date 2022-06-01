@@ -5,12 +5,9 @@ XREngine Control Center is a desktop app for managing XREngine cluster.**
 
 https://github.com/XRFoundation/XREngine/issues/3206
 Electron based XR Engine Server Cluster Creator app
-
-Ability to fully manage an on premises server.
-
-Electron K8S Cluster Creator and Manager App
-
-Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 
+- Ability to fully manage an on premises server.
+- Electron K8S Cluster Creator and Manager App
+- Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 
 Wrap all K8S CLI into a GUI 
 
 **Benchmark tool - minimum specs of 4 CPU cores and 16-24GB of ram.**
