@@ -321,7 +321,7 @@ else
 fi
 
 if $ADD_MINIKUBE_IP; then
-    echo "$PASSWORD" | sudo -S -- sh -c "echo '$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io gameserver-local.theoverlay.io 00000.gameserver-local.theoverlay.io 00001.gameserver-local.theoverlay.io 00002.gameserver-local.theoverlay.io' >>/etc/hosts"
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io instanceserver-local.theoverlay.io 00000.instanceserver-local.theoverlay.io 00001.instanceserver-local.theoverlay.io 00002.instanceserver-local.theoverlay.io 00003.instanceserver-local.theoverlay.io' >>/etc/hosts"
     echo "*.theoverlay.io entries added"
 fi
 

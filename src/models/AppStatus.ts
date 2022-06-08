@@ -199,9 +199,9 @@ export const DefaultClusterStatus: AppModel[] = [
     status: AppStatus.Checking
   },
   {
-    id: 'gameserver',
-    name: 'Gameservers',
-    checkCommand: 'kubectl get fleets local-gameserver -o "jsonpath={.status.readyReplicas}"',
+    id: 'instanceserver',
+    name: 'Instance Server',
+    checkCommand: 'kubectl get fleets local-instanceserver -o "jsonpath={.status.readyReplicas}"',
     detail: '',
     status: AppStatus.Checking
   }
