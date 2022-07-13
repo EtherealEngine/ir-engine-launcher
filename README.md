@@ -37,6 +37,14 @@ cd xrengine-control-center
 npm install
 ```
 
+Not working: 
+
+Install Fuse https://docs.appimage.org/user-guide/troubleshooting/fuse.html
+
+```bash
+sudo apt-get install fuse libfuse2
+```
+
 ## Starting Development
 
 Start the app in the `dev` environment:
