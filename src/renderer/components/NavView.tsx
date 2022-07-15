@@ -22,7 +22,9 @@ import Typography from '@mui/material/Typography'
 
 import logo from '../../../assets/icon.svg'
 
-const settings = ['Profile', 'Logout']
+const settings: string[] = [
+  /*'Profile', 'Logout'*/
+]
 
 const NavView = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null)
