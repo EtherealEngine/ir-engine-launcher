@@ -1,4 +1,5 @@
 import axios from 'axios'
+import crypto from 'crypto'
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
@@ -8,6 +9,7 @@ import PeerId from 'peer-id'
 
 import { Channels } from '../../constants/Channels'
 import Commands from '../../constants/Commands'
+import ConfigEnvMap from '../../constants/ConfigEnvMap'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { DefaultAppsStatus, DefaultRippleAppsStatus } from '../../models/AppStatus'
@@ -191,6 +193,60 @@ const getYamlDoc = async (templatePath: string, templateUrl: string) => {
 
   const yamlDoc = yaml.load(yamlContent)
   return yamlDoc
+}
+
+const getEnvFile = async (enginePath: string) => {
+  let envContent = ''
+
+  const envPath = path.join(enginePath, Endpoints.ENGINE_ENV_DEFAULT_PATH)
+  const envFileExists = await fileExists(envPath)
+  if (envFileExists) {
+    envContent = await fs.readFile(envPath, 'utf8')
+  } else {
+    const response = await axios.get(Endpoints.ENGINE_ENV_DEFAULT_URL)
+    envContent = response.data
+  }
+
+  const envDoc = envContent.split('\n').filter((item) => item.startsWith('#') === false && item.includes('='))
+  return envDoc
+}
+
+export const ensureVariables = async (enginePath: string, vars: Record<string, string>) => {
+  // Ensure auth field has value
+  if (!vars[Storage.AUTH_SECRET_KEY]) {
+    // https://stackoverflow.com/a/40191779/2077741
+    vars[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
+  }
+
+  const envFile = await getEnvFile(enginePath)
+
+  // Ensure aws account id & sns topic name has value  
+  if (!vars[Storage.AWS_ACCOUNT_ID_KEY] || !vars[Storage.SNS_TOPIC_NAME_KEY]) {
+    const topicEnv = envFile.find((item) => item.trim().startsWith(`${Storage.AWS_SMS_TOPIC_KEY}=`)) || ''
+    const topicEnvValue = topicEnv.trim().replace(`${Storage.AWS_SMS_TOPIC_KEY}=`, '')
+    const topicEnvSplit = topicEnvValue.split(':')
+
+    if (topicEnvSplit.length > 2) {
+      vars[Storage.AWS_ACCOUNT_ID_KEY] = vars[Storage.AWS_ACCOUNT_ID_KEY]
+        ? vars[Storage.AWS_ACCOUNT_ID_KEY]
+        : topicEnvSplit.at(-2) || ''
+      vars[Storage.SNS_TOPIC_NAME_KEY] = vars[Storage.SNS_TOPIC_NAME_KEY]
+        ? vars[Storage.SNS_TOPIC_NAME_KEY]
+        : topicEnvSplit.at(-1) || ''
+    }
+  }
+
+  const configKeys = Object.keys(ConfigEnvMap)
+
+  // Ensure rest of the values
+  for (const key in vars) {
+    if (!vars[key] && configKeys.includes(key)) {
+      const envKey = (ConfigEnvMap as any)[key]
+      const varEnv = envFile.find((item) => item.trim().startsWith(`${envKey}=`)) || ''
+
+      vars[key] = varEnv.trim().replace(`${envKey}=`, '')
+    }
+  }
 }
 
 export const ensureEngineConfigs = async (enginePath: string, vars: Record<string, string>) => {

@@ -97,13 +97,6 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         setError('Invalid password')
         return
       }
-    } else if (activeStep === 2) {
-      for (const key in vars.data) {
-        if (!vars.data[key] && !tempVars[key]) {
-          setError('Please provide value for all variables')
-          return
-        }
-      }
     } else if (activeStep === 3) {
       if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
         const saved = await SettingsService.saveSettings(tempConfigs, tempVars)
@@ -179,7 +172,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     },
     {
       label: 'Variables',
-      title: 'Provide configuration variables',
+      title: 'Provide configuration variables (Optional)',
       content: <ConfigVarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {

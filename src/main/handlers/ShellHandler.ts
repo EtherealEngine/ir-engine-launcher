@@ -1,4 +1,3 @@
-import crypto from 'crypto'
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
@@ -26,7 +25,7 @@ import {
   isValidUrl,
   scriptsPath
 } from './IBaseHandler'
-import { ensureEngineConfigs, ensureRippleConfigs } from './SettingsHandler'
+import { ensureEngineConfigs, ensureRippleConfigs, ensureVariables } from './SettingsHandler'
 
 class ShellHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -80,11 +79,7 @@ class ShellHandler implements IBaseHandler {
         ) => {
           const category = 'configure minikube'
           try {
-            // Ensure auth field has value
-            if (!vars[Storage.AUTH_SECRET_KEY]) {
-              // https://stackoverflow.com/a/40191779/2077741
-              vars[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
-            }
+            await ensureVariables(configs[Storage.XRENGINE_PATH], vars)
 
             const configsFolder = path.resolve(appConfigsPath())
             const configsFolderExists = await fileExists(configsFolder)
