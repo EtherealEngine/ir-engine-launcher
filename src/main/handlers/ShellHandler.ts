@@ -95,19 +95,30 @@ class ShellHandler implements IBaseHandler {
             const configureScript = path.join(scriptsFolder, 'configure-minikube.sh')
             log.info(`Executing script ${configureScript}`)
 
-            const onStd = (data: any) => {
+            const onConfigureStd = (data: any) => {
               window.webContents.send(Channels.Utilities.Log, { category, message: data })
             }
             const code = await execStream(
               `bash "${configureScript}" -a "${assetsFolder}" -c "${configsFolder}" -d "${
                 flags[Storage.FORCE_DB_REFRESH]
               }" -f "${configs[Storage.XRENGINE_PATH]}" -p "${password}" -r "${configs[Storage.ENABLE_RIPPLE_STACK]}"`,
-              onStd,
-              onStd
+              onConfigureStd,
+              onConfigureStd
             )
             if (code !== 0) {
               throw `Failed with error code ${code}.`
             }
+            
+            const fileServerScript = path.join(scriptsFolder, 'configure-file-server.sh')
+
+            const onFileServerStd = (data: any) => {
+              window.webContents.send(Channels.Utilities.Log, { category: 'file server', message: data })
+            }
+            execStream(
+              `bash "${fileServerScript}" -f "${configs[Storage.XRENGINE_PATH]}"`,
+              onFileServerStd,
+              onFileServerStd
+            )
 
             return true
           } catch (err) {
