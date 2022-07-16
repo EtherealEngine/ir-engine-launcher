@@ -108,7 +108,7 @@ class ShellHandler implements IBaseHandler {
             if (code !== 0) {
               throw `Failed with error code ${code}.`
             }
-            
+
             const fileServerScript = path.join(scriptsFolder, 'configure-file-server.sh')
 
             const onFileServerStd = (data: any) => {

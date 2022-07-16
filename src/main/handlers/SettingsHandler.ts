@@ -220,7 +220,7 @@ export const ensureVariables = async (enginePath: string, vars: Record<string, s
 
   const envFile = await getEnvFile(enginePath)
 
-  // Ensure aws account id & sns topic name has value  
+  // Ensure aws account id & sns topic name has value
   if (!vars[Storage.AWS_ACCOUNT_ID_KEY] || !vars[Storage.SNS_TOPIC_NAME_KEY]) {
     const topicEnv = envFile.find((item) => item.trim().startsWith(`${Storage.AWS_SMS_TOPIC_KEY}=`)) || ''
     const topicEnvValue = topicEnv.trim().replace(`${Storage.AWS_SMS_TOPIC_KEY}=`, '')
