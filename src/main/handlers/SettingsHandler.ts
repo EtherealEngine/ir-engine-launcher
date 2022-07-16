@@ -162,7 +162,7 @@ const populateRequiredValues = async (yaml: any, vars: Record<string, string>) =
         value.startsWith('<') &&
         value.endsWith('>') &&
         value.slice(1, -1).includes('<') === false &&
-        vars[value.slice(1, -1)]
+        Object.keys(vars).includes(value.slice(1, -1))
       ) {
         yaml[key] = vars[value.slice(1, -1)]
       } else if (value.includes('<') && value.includes('>')) {
