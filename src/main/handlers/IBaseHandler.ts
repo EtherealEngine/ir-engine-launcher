@@ -78,14 +78,14 @@ export const execStream = (
   onStderr: (data: any) => void
 ): Promise<number | null> => {
   return new Promise((resolve) => {
-    const process = childProcess.exec(command)
-    process.stdout?.on('data', (data) => {
+    const child = childProcess.exec(command)
+    child.stdout?.on('data', (data) => {
       onStdout(data)
     })
-    process.stderr?.on('data', (data) => {
+    child.stderr?.on('data', (data) => {
       onStderr(data)
     })
-    process.on('close', (code) => {
+    child.on('close', (code) => {
       resolve(code)
     })
   })

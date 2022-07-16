@@ -1,8 +1,9 @@
-import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
 import os from 'os'
 import path from 'path'
+import { kill, lookup, Program } from 'ps-node'
 
 import { Channels } from '../../constants/Channels'
 import Commands from '../../constants/Commands'
@@ -109,11 +110,32 @@ class ShellHandler implements IBaseHandler {
               throw `Failed with error code ${code}.`
             }
 
+            // Below block of code is to ensure file server is stopped when app is closed.
+            const existingServer = await getProcessList('http-server')
+            if (existingServer && existingServer.length === 0) {
+              app.on('before-quit', async (e) => {
+                try {
+                  e.preventDefault()
+
+                  const existingServers = await getProcessList('http-server')
+                  existingServers.forEach((httpProcess) => {
+                    kill(httpProcess.pid)
+                  })
+                } catch {}
+
+                app.quit()
+                process.exit()
+              })
+            }
+
             const fileServerScript = path.join(scriptsFolder, 'configure-file-server.sh')
 
             const onFileServerStd = (data: any) => {
-              window.webContents.send(Channels.Utilities.Log, { category: 'file server', message: data })
+              try {
+                window.webContents.send(Channels.Utilities.Log, { category: 'file server', message: data })
+              } catch {}
             }
+
             execStream(
               `bash "${fileServerScript}" -f "${configs[Storage.XRENGINE_PATH]}"`,
               onFileServerStd,
@@ -253,6 +275,23 @@ class ShellHandler implements IBaseHandler {
         }
       })
   }
+}
+
+const getProcessList = (command: string) => {
+  return new Promise<Program[]>((resolve, reject) => {
+    lookup(
+      {
+        command
+      },
+      (err, resultList) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(resultList)
+        }
+      }
+    )
+  })
 }
 
 const checkSystemStatus = async (window: BrowserWindow) => {
