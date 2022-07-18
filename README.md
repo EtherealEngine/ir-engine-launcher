@@ -1,7 +1,7 @@
 https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-8153-cd2c9c2771d5.mp4
 
 **Your own sandbox in the Metaverse. Take what you need, or launch the full stack. 
-XREngine Control Center is a desktop app for managing Ethereal Engine cluster.**
+Ethereal Engine Control Center is a desktop app for managing Ethereal Engine cluster.**
 
 https://github.com/XRFoundation/XREngine/issues/3206
 Electron based Ethereal Engine Server Cluster Creator app
