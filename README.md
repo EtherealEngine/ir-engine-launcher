@@ -1,10 +1,10 @@
 https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-8153-cd2c9c2771d5.mp4
 
 **Your own sandbox in the Metaverse. Take what you need, or launch the full stack. 
-XREngine Control Center is a desktop app for managing XREngine cluster.**
+XREngine Control Center is a desktop app for managing Ethereal Engine cluster.**
 
 https://github.com/XRFoundation/XREngine/issues/3206
-Electron based XR Engine Server Cluster Creator app
+Electron based Ethereal Engine Server Cluster Creator app
 - Ability to fully manage an on premises server.
 - Electron K8S Cluster Creator and Manager App
 - Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 
@@ -13,7 +13,7 @@ Electron based XR Engine Server Cluster Creator app
 - Multiple electron apps with same k8s control plane 
 - Benchmark tool - minimum specs of 4 CPU cores and 16-24GB of ram.
 
-We [XR Foundation](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
+We [Ethereal Engine](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
 
 ## Tutorials
 
@@ -21,11 +21,11 @@ Please visit [tutorials page](./TUTORIALS.md).
 
 ## Install Released
 
-1. Download latest version of XREngine control center app from [here](https://github.com/XRFoundation/XREngine-Control-Center/releases).
+1. Download latest version of Ethereal Engine control center app from [here](https://github.com/XRFoundation/XREngine-Control-Center/releases).
 2. For AppImage: Once downloaded, right click and go to **Properties**. In **Permissions** tab check 'Allow executing file as program'.
 3. Double click on AppImage to launch the app.
 
-> Note: Currently the app is tested again Ubuntu 20.04 only.
+> Note: Currently the app is tested on Ubuntu 20.04 & 22.04 only.
 
 ## Install Development
 
@@ -68,4 +68,4 @@ We are always hiring talented people who want to be leaders in what is to come. 
 
 ### [Join our Discord](https://discord.gg/xrf)  [![Discord Chat](https://img.shields.io/discord/692672143053422678.svg)](https://discord.gg/xrf)
 
-### [Sponsorship](https://opencollective.com/xrfoundation) [![Open Collective](https://opencollective.com/xrfoundation/tiers/badge.svg)](https://opencollective.com/xrfoundation)
+### [Sponsorship](https://opencollective.com/etherealengine) [![Open Collective](https://opencollective.com/etherealengine/tiers/badge.svg)](https://opencollective.com/etherealengine)
