@@ -1,4 +1,4 @@
-# XREngine Control Center - Tutorials
+# Ethereal Engine Control Center - Tutorials
 
 ## 1. Getting Started
 
