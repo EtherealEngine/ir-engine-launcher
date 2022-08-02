@@ -1,33 +1,20 @@
+### [DOWNLOAD HERE](https://github.com/XRFoundation/XREngine-Control-Center/releases)
+
 https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-8153-cd2c9c2771d5.mp4
 
-**Your own sandbox in the Metaverse. Take what you need, or launch the full stack. 
-Ethereal Engine Control Center is a desktop app for managing Ethereal Engine cluster.**
+### [DOWNLOAD HERE](https://github.com/XRFoundation/XREngine-Control-Center/releases)
 
-https://github.com/XRFoundation/XREngine/issues/3206
-Electron based Ethereal Engine Server Cluster Creator app
-- Ability to fully manage an on premises server.
-- Electron K8S Cluster Creator and Manager App
-- Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 
-- Wrap all K8S CLI into a GUI
-- Electron app with client for access to admin panel, supply link to open location in browser
-- Multiple electron apps with same k8s control plane 
-- Benchmark tool - minimum specs of 4 CPU cores and 16-24GB of ram.
-
-We [Ethereal Engine](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
-
-## Tutorials
-
-Please visit [tutorials page](./TUTORIALS.md).
+### [All Control Center Video Tutorials](./TUTORIALS.md)
 
 ## Install Released
 
-1. Download latest version of Ethereal Engine control center app from [here](https://github.com/XRFoundation/XREngine-Control-Center/releases).
+1. [Download latest version of Ethereal Engine control center app from here](https://github.com/XRFoundation/XREngine-Control-Center/releases).
 2. For AppImage: Once downloaded, right click and go to **Properties**. In **Permissions** tab check 'Allow executing file as program'.
 3. Double click on AppImage to launch the app.
 
 > Note: Currently the app is tested on Ubuntu 20.04 & 22.04 only.
 
-## Install Development
+## Install Development Release
 
 Clone the repo and install dependencies:
 
@@ -62,10 +49,27 @@ npm run package
 ```
 
 ## Let's build it together
+
 We believe that projects like this are extremely complex and difficult, and can only be built when large groups of people work together, out in the open. If you believe that your calling is to build a free, open network that everyone, everywhere can get value from, then you are welcome in our community, and we'll do our best to get you set up.
 
 We are always hiring talented people who want to be leaders in what is to come. Inquire with anyone who seems like they know what's going on and they'll help you find who you need to talk to.
 
 ### [Join our Discord](https://discord.gg/xrf)  [![Discord Chat](https://img.shields.io/discord/692672143053422678.svg)](https://discord.gg/xrf)
+
+
+**Your own sandbox in the Metaverse. Take what you need, or launch the full stack. 
+Ethereal Engine Control Center is a desktop app for managing Ethereal Engine cluster.**
+
+Electron based Ethereal Engine Server Cluster Creator app
+- Ability to fully manage an on premises server.
+- Electron K8S Cluster Creator and Manager App
+- Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 
+- Wrap all K8S CLI into a GUI
+- Electron app with client for access to admin panel, supply link to open location in browser
+- Multiple electron apps with same k8s control plane 
+- Benchmark tool - minimum specs of 4 CPU cores and 16-24GB of ram.
+
+
+We [Ethereal Engine](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
 
 ### [Sponsorship](https://opencollective.com/etherealengine) [![Open Collective](https://opencollective.com/etherealengine/tiers/badge.svg)](https://opencollective.com/etherealengine)
