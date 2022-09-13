@@ -1,3 +1,14 @@
+# Ethereal Engine Control Center
+
+Want to build the spatial web on your website? Looking for a place to start?  Run a web metaverse cluster yourself on your own computer. 
+
+The Ethereal Engine Control Center is a self-contained Metaverse world in a box.  Take what you need or launch the full stack.  Ethereal Engine Control Center is a desktop app to manage a metaverse cluster.
+
+We know it's been complicated to build with #EtherealEngine and we've made this tool to give the community easy access to the engine for development and creation. The full Kubernetes cluster can run on mac and any Debian Linux distro with at least 16 GB of ram.
+
+
+We would love to see your creations and invite you all to come build with us.  We've got a long backlog and need your help to build the Open Metaverse.  Come build with us!
+
 ### [DOWNLOAD HERE](https://github.com/XRFoundation/XREngine-Control-Center/releases)
 
 https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-8153-cd2c9c2771d5.mp4
