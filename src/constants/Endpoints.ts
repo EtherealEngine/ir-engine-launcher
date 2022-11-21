@@ -1,9 +1,9 @@
 const Endpoints = {
   HOST: 'https://xrengine.io',
-  ADMIN_PORTAL: 'https://local.theoverlay.io/admin',
-  LOGIN_PAGE: 'https://local.theoverlay.io/',
-  LAUNCH_PAGE: 'https://local.theoverlay.io/location/apartment',
-  ALLOW_CERTIFICATES: ['local.theoverlay.io', 'api-local.theoverlay.io', 'instanceserver-local.theoverlay.io'],
+  ADMIN_PORTAL: 'https://local.etherealengine.com/admin',
+  LOGIN_PAGE: 'https://local.etherealengine.com/',
+  LAUNCH_PAGE: 'https://local.etherealengine.com/location/apartment',
+  ALLOW_CERTIFICATES: ['local.etherealengine.com', 'api-local.etherealengine.com', 'instanceserver-local.etherealengine.com'],
   MYSQL_PORT: 3304,
   DEFAULT_XRENGINE_FOLDER: 'xrengine',
   DB_FILE_NAME: 'xrengine.db',

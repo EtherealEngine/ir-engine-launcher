@@ -47,12 +47,14 @@ const ensureAdminAccess = async (parentWindow: BrowserWindow) => {
 
         parentWindow.webContents.send(Channels.Utilities.Log, {
           category: 'admin panel',
-          message: `User role is ${userRole}.`
+          message: `User role is ${userRole.trim()}.`
         })
 
         if (userRole !== 'admin') {
           const userId = await executeJS(
-            'function getUserId() { document.getElementById("show-user-id").click(); return document.getElementById("user-id").value; } getUserId()',
+            `const delay = async (delayInms) => { return new Promise(resolve => setTimeout(resolve, delayInms)); }
+            const getUserId = async () => { document.getElementById("show-user-id").click(); await delay(1000); return document.getElementById("user-id").value; } 
+            getUserId()`,
             adminWindow
           )
 

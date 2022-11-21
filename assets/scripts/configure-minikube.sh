@@ -314,12 +314,12 @@ fi
 
 MINIKUBE_IP=$(minikube ip)
 ADD_MINIKUBE_IP=false
-if grep -q "local.theoverlay.io" /etc/hosts; then
+if grep -q "local.etherealengine.com" /etc/hosts; then
     if grep -q "$MINIKUBE_IP" /etc/hosts; then
-        echo "*.theoverlay.io entries exists"
+        echo "*.etherealengine.com entries exists"
     else
-        echo "*.theoverlay.io entries outdated"
-        grep -v 'local.theoverlay.io' /etc/hosts >/tmp/hosts.tmp
+        echo "*.etherealengine.com entries outdated"
+        grep -v 'local.etherealengine.com' /etc/hosts >/tmp/hosts.tmp
         echo "$PASSWORD" | sudo -S cp /tmp/hosts.tmp /etc/hosts
         ADD_MINIKUBE_IP=true
     fi
@@ -328,8 +328,8 @@ else
 fi
 
 if $ADD_MINIKUBE_IP; then
-    echo "$PASSWORD" | sudo -S -- sh -c "echo '$MINIKUBE_IP local.theoverlay.io api-local.theoverlay.io instanceserver-local.theoverlay.io 00000.instanceserver-local.theoverlay.io 00001.instanceserver-local.theoverlay.io 00002.instanceserver-local.theoverlay.io 00003.instanceserver-local.theoverlay.io' >>/etc/hosts"
-    echo "*.theoverlay.io entries added"
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '$MINIKUBE_IP local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com' >>/etc/hosts"
+    echo "*.etherealengine.com entries added"
 fi
 
 #==================
