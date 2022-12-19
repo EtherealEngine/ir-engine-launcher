@@ -17,6 +17,7 @@ import {
 } from '@mui/material'
 
 import logo from '../../../assets/icon.svg'
+import ConfigBackupView from './ConfigBackupView'
 import ConfigConfigsView from './ConfigConfigsView'
 import ConfigMinikubeView from './ConfigMinikubeView'
 import ConfigVarsView from './ConfigVarsView'
@@ -26,7 +27,7 @@ interface Props {
 }
 
 const SettingsDialog = ({ onClose }: Props) => {
-  const [currentTab, setTab] = useState('1')
+  const [currentTab, setTab] = useState('configs')
   const settingsState = useSettingsState()
   const { appVersion, configs, vars } = settingsState.value
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
@@ -75,30 +76,37 @@ const SettingsDialog = ({ onClose }: Props) => {
               onChange={(_event, newValue) => setTab(newValue)}
               sx={{ borderRight: 1, borderColor: 'divider' }}
             >
-              <Tab label="Configs" value="1" />
-              <Tab label="Variables" value="2" />
-              <Tab label="Minikube" value="3" />
-              <Tab label="About" value="4" />
+              <Tab label="Configs" value="configs" />
+              <Tab label="Variables" value="variables" />
+              <Tab label="Minikube" value="minikube" />
+              <Tab label="Backup" value="backup" />
+              <Tab label="About" value="about" />
             </Tabs>
             <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-              <TabPanel value="1">
+              <TabPanel value="configs">
                 <ConfigConfigsView
                   localConfigs={localConfigs}
                   onChange={changeConfig}
                   sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
                 />
               </TabPanel>
-              <TabPanel value="2">
+              <TabPanel value="variables">
                 <ConfigVarsView
                   localVars={localVars}
                   onChange={changeVar}
                   sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
                 />
               </TabPanel>
-              <TabPanel value="3">
+              <TabPanel value="minikube">
                 <ConfigMinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
               </TabPanel>
-              <TabPanel value="4">
+              <TabPanel value="backup">
+                <ConfigBackupView
+                  hasPendingChanges={Object.keys(tempConfigs).length !== 0 || Object.keys(tempVars).length !== 0}
+                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
+                />
+              </TabPanel>
+              <TabPanel value="about">
                 <Box>
                   <Box sx={{ display: 'flex', mr: 6, mb: 2, alignItems: 'center', flexDirection: 'row' }}>
                     <Box sx={{ height: 45, mr: 0.7 }} component="img" src={logo} />

@@ -44,12 +44,10 @@ export const LogService = {
       const contents = logs.map((log) => `${new Date(log.date).toLocaleTimeString()}: ${log.category} - ${log.message}`)
       const fileName = `XRE-logs-${new Date().toJSON()}.txt`
       const path = await window.electronAPI.invoke(Channels.Utilities.SaveLog, contents, fileName)
-      if (!path) {
-        throw 'Failed to save logs.'
-      }
 
       enqueueSnackbar(`Logs saved ${fileName}.`, {
         variant: 'success',
+        autoHideDuration: 10000,
         action: (key) => openPathAction(key, path)
       })
     } catch (error) {

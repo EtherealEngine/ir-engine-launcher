@@ -35,7 +35,9 @@ const Channels = {
     CheckVars: 'CheckVars',
     GetCurrentAppConfigs: 'GetCurrentAppConfigs',
     SaveConfigs: 'SaveConfigs',
-    SaveVars: 'SaveVars'
+    SaveVars: 'SaveVars',
+    ExportSettings: "ExportSettings",
+    ImportSettings: "ImportSettings"
   },
   Updates: {
     CheckUpdate: 'CheckUpdate',

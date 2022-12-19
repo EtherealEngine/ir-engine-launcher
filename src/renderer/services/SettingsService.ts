@@ -4,6 +4,7 @@ import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { DefaultRippleAppsStatus } from 'models/AppStatus'
 import { SnackbarProvider } from 'notistack'
+import { openPathAction } from 'renderer/components/NotistackActions'
 
 import { store, useDispatch } from '../store'
 import { DeploymentService } from './DeploymentService'
@@ -370,6 +371,25 @@ export const SettingsService = {
       )
     } catch (error) {
       console.error(error)
+    }
+  },
+  exportSettings: async () => {
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+
+    try {
+      const fileName = `config-${new Date().toJSON()}.json`
+      const path = await window.electronAPI.invoke(Channels.Settings.ExportSettings, fileName)
+
+      enqueueSnackbar(`Settings exported ${fileName}.`, {
+        variant: 'success',
+        autoHideDuration: 10000,
+        action: (key) => openPathAction(key, path)
+      })
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to export settings. ${error}`, {
+        variant: 'error'
+      })
     }
   },
   listen: async () => {

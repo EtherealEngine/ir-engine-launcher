@@ -2,7 +2,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 
 interface Props {
   title: string
-  message: string
+  message: React.ReactNode
   okButtonText?: string
   cancelButtonText?: string
   onClose: () => void

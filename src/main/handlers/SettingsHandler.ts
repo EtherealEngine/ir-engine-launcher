@@ -15,6 +15,7 @@ import Storage from '../../constants/Storage'
 import { DefaultAppsStatus, DefaultRippleAppsStatus } from '../../models/AppStatus'
 import { getAllValues, getValue, insertOrUpdateValue } from '../storeManager'
 import { appConfigsPath, exec, fileExists, IBaseHandler } from './IBaseHandler'
+import { existsSync } from 'fs'
 
 class SettingsHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
@@ -125,7 +126,32 @@ class SettingsHandler implements IBaseHandler {
           })
           throw err
         }
-      })
+      }),
+      ipcMain.handle(
+        Channels.Settings.ExportSettings,
+        async (_event: IpcMainInvokeEvent, fileName: string) => {
+          try {
+            const srcPath = path.join(app.getPath('userData'), 'config.json')
+            const srcConfigExists = existsSync(srcPath)
+
+            if (!srcConfigExists) {
+              throw 'Currently you do not have any settings to export.'
+            }
+
+            const destPath = path.join(app.getPath('downloads'), fileName)
+
+            await fs.copyFile(srcPath, destPath)
+            log.info('Settings exported at: ', destPath)
+
+            return destPath
+          } catch (err) {
+            log.error('Failed to export settings.', err)
+            window.webContents.send(Channels.Utilities.Log, { category: 'export settings', message: JSON.stringify(err) })
+
+            throw err
+          }
+        }
+      )
   }
 }
 

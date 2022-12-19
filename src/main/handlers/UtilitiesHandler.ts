@@ -51,7 +51,7 @@ class UtilitiesHandler implements IBaseHandler {
             log.error('Failed to save logs.', err)
             window.webContents.send(Channels.Utilities.Log, { category: 'save logs', message: JSON.stringify(err) })
 
-            return ''
+            throw err
           }
         }
       )
