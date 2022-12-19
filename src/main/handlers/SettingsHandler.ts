@@ -13,7 +13,7 @@ import ConfigEnvMap from '../../constants/ConfigEnvMap'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { DefaultAppsStatus, DefaultRippleAppsStatus } from '../../models/AppStatus'
-import { getAllValues, getValue, insertOrUpdateValue } from '../dbManager'
+import { getAllValues, getValue, insertOrUpdateValue } from '../storeManager'
 import { appConfigsPath, exec, fileExists, IBaseHandler } from './IBaseHandler'
 
 class SettingsHandler implements IBaseHandler {
@@ -24,8 +24,8 @@ class SettingsHandler implements IBaseHandler {
         const configs: Record<string, string> = {}
 
         const configsData = await getAllValues(Storage.CONFIGS_TABLE)
-        for (const data of configsData) {
-          configs[data.id] = data.value
+        for (const key of Object.keys(configsData)) {
+          configs[key] = configsData[key]
         }
 
         if (!configs[Storage.XRENGINE_PATH]) {
@@ -59,9 +59,9 @@ class SettingsHandler implements IBaseHandler {
           valuesKey.sort().forEach((item) => (vars[item] = ''))
 
           const varsData = await getAllValues(Storage.VARS_TABLE)
-          for (const data of varsData) {
-            if (data.id in vars) {
-              vars[data.id] = data.value
+          for (const key of Object.keys(varsData)) {
+            if (key in vars) {
+              vars[key] = varsData[key]
             }
           }
 
@@ -78,7 +78,7 @@ class SettingsHandler implements IBaseHandler {
         try {
           const enableRipple = await getValue(Storage.CONFIGS_TABLE, Storage.ENABLE_RIPPLE_STACK)
 
-          if (enableRipple && enableRipple.value === 'true') {
+          if (enableRipple && enableRipple === 'true') {
             return [...DefaultAppsStatus, ...DefaultRippleAppsStatus]
           }
 
@@ -289,8 +289,8 @@ const ensureIPFSConfigs = async (enginePath: string) => {
 
   const varsData = await getAllValues(Storage.VARS_TABLE)
 
-  for (const key of valuesKey) {
-    const dbData = varsData.find((item) => item.id === key)
+  for (const key of Object.keys(valuesKey)) {
+    const dbData = varsData[key]
 
     // Data already exists
     if (dbData) {
@@ -346,7 +346,7 @@ export const getXREngineDefaultPath = () => {
 
 export const getXREnginePath = async () => {
   const xrenginePath = await getValue(Storage.CONFIGS_TABLE, Storage.XRENGINE_PATH)
-  return xrenginePath ? xrenginePath.value : getXREngineDefaultPath()
+  return xrenginePath ? xrenginePath : getXREngineDefaultPath()
 }
 
 export default SettingsHandler

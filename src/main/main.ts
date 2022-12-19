@@ -15,7 +15,6 @@ import os from 'os'
 import path from 'path'
 
 import Endpoints from '../constants/Endpoints'
-import { initDB } from './dbManager'
 import { IBaseHandler } from './handlers/IBaseHandler'
 import SettingsHandler from './handlers/SettingsHandler'
 import ShellHandler from './handlers/ShellHandler'
@@ -226,8 +225,6 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(async () => {
-    await initDB()
-
     createWindow()
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
