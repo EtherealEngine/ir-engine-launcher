@@ -27,6 +27,11 @@ const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
     }
   }
 
+  const handleImport = async () => {
+    setImportAlert(false)
+    await SettingsService.importSettings()
+  }
+
   return (
     <Box sx={sx}>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
@@ -91,7 +96,7 @@ const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
           }
           okButtonText="Proceed"
           onClose={() => setImportAlert(false)}
-          onOk={() => {alert("Coming soon")}}
+          onOk={handleImport}
         />
       )}
 

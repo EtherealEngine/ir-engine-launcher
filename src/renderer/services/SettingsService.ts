@@ -392,6 +392,27 @@ export const SettingsService = {
       })
     }
   },
+  importSettings: async () => {
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+
+    try {
+      const success = await window.electronAPI.invoke(Channels.Settings.ImportSettings)
+      await SettingsService.fetchConfigs()
+      await SettingsService.fetchVars()
+
+      if (success) {
+        enqueueSnackbar(`Settings imported.`, {
+          variant: 'success',
+          autoHideDuration: 10000,
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to import settings. ${error}`, {
+        variant: 'error'
+      })
+    }
+  },
   listen: async () => {
     const dispatch = useDispatch()
     try {

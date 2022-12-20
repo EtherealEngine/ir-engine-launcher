@@ -1,6 +1,6 @@
 import axios from 'axios'
 import crypto from 'crypto'
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, IpcMainInvokeEvent } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
 import yaml from 'js-yaml'
@@ -147,6 +147,36 @@ class SettingsHandler implements IBaseHandler {
           } catch (err) {
             log.error('Failed to export settings.', err)
             window.webContents.send(Channels.Utilities.Log, { category: 'export settings', message: JSON.stringify(err) })
+
+            throw err
+          }
+        }
+      ),
+      ipcMain.handle(
+        Channels.Settings.ImportSettings,
+        async (_event: IpcMainInvokeEvent) => {
+          try {
+            const { filePaths } = await dialog.showOpenDialog({
+              properties: ['openFile'],
+              filters: [
+                { name: 'Control Center Config File', extensions: ['json'] },
+              ]
+            })
+
+            if (filePaths.length === 0) {
+              return false
+            }
+            
+            const srcPath = filePaths[0]
+            const destPath = path.join(app.getPath('userData'), 'config.json')
+            await fs.copyFile(srcPath, destPath)
+
+            log.info('Settings imported from: ', srcPath)
+
+            return true
+          } catch (err) {
+            log.error('Failed to import settings.', err)
+            window.webContents.send(Channels.Utilities.Log, { category: 'import settings', message: JSON.stringify(err) })
 
             throw err
           }

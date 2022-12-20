@@ -28,7 +28,7 @@ export const getValue = (tableName: string, id: string) => {
     try {
         return store.get(`${tableName}.${id}`) as any
     } catch (err) {
-        log.error('Failed to getAllValues in store.', err)
+        log.error('Failed to getValue in store.', err)
         return undefined
     }
 }
