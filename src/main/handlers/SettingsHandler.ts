@@ -29,8 +29,8 @@ class SettingsHandler implements IBaseHandler {
           configs[key] = configsData[key]
         }
 
-        if (!configs[Storage.XRENGINE_PATH]) {
-          configs[Storage.XRENGINE_PATH] = await getXREngineDefaultPath()
+        if (!configs[Storage.ENGINE_PATH]) {
+          configs[Storage.ENGINE_PATH] = await getEngineDefaultPath()
         }
         if (!configs[Storage.ENABLE_RIPPLE_STACK]) {
           configs[Storage.ENABLE_RIPPLE_STACK] = 'false'
@@ -50,7 +50,7 @@ class SettingsHandler implements IBaseHandler {
         try {
           const vars: Record<string, string> = {}
 
-          const enginePath = await getXREnginePath()
+          const enginePath = await getEnginePath()
           const templatePath = path.join(enginePath, Endpoints.ENGINE_VALUES_TEMPLATE_PATH)
           const yamlDoc = await getYamlDoc(templatePath, Endpoints.ENGINE_VALUES_TEMPLATE_URL)
 
@@ -395,14 +395,14 @@ export const ensureRippleConfigs = async (enginePath: string, enableRippleStack:
   }
 }
 
-export const getXREngineDefaultPath = () => {
-  const defaultPath = path.join(app.getPath('home'), Endpoints.DEFAULT_XRENGINE_FOLDER)
+export const getEngineDefaultPath = () => {
+  const defaultPath = path.join(app.getPath('home'), Endpoints.DEFAULT_ENGINE_FOLDER)
   return defaultPath
 }
 
-export const getXREnginePath = async () => {
-  const xrenginePath = await getValue(Storage.CONFIGS_TABLE, Storage.XRENGINE_PATH)
-  return xrenginePath ? xrenginePath : getXREngineDefaultPath()
+export const getEnginePath = async () => {
+  const enginePath = await getValue(Storage.CONFIGS_TABLE, Storage.ENGINE_PATH)
+  return enginePath ? enginePath : getEngineDefaultPath()
 }
 
 export default SettingsHandler

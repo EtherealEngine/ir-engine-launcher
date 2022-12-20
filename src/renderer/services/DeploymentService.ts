@@ -94,7 +94,7 @@ export const DeploymentService = {
       if (response) {
         DeploymentService.fetchDeploymentStatus()
       } else {
-        enqueueSnackbar('Failed to configure XREngine. Please check logs.', {
+        enqueueSnackbar('Failed to configure Ethereal Engine. Please check logs.', {
           variant: 'error'
         })
       }

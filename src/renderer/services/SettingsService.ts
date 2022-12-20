@@ -354,7 +354,7 @@ export const SettingsService = {
           error: ''
         })
       )
-      window.electronAPI.invoke(Channels.XREngine.EnsureAdminAccess)
+      window.electronAPI.invoke(Channels.Engine.EnsureAdminAccess)
     } catch (error) {
       console.error(error)
     }
@@ -452,7 +452,7 @@ export const SettingsService = {
           })
         )
       })
-      window.electronAPI.on(Channels.XREngine.EnsureAdminAccessResponse, () => {
+      window.electronAPI.on(Channels.Engine.EnsureAdminAccessResponse, () => {
         dispatch(
           SettingsAction.setAdminPanel({
             loading: false,
@@ -461,7 +461,7 @@ export const SettingsService = {
           })
         )
       })
-      window.electronAPI.on(Channels.XREngine.EnsureAdminAccessError, (error: string) => {
+      window.electronAPI.on(Channels.Engine.EnsureAdminAccessError, (error: string) => {
         dispatch(
           SettingsAction.setAdminPanel({
             loading: false,

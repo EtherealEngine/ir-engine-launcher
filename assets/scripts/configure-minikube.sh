@@ -9,7 +9,7 @@ while getopts a:c:d:f:p:r: flag; do
     a) ASSETS_FOLDER=${OPTARG} ;;
     c) CONFIGS_FOLDER=${OPTARG} ;;
     d) FORCE_DB_REFRESH=${OPTARG} ;;
-    f) XRENGINE_FOLDER=${OPTARG} ;;
+    f) ENGINE_FOLDER=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
     r) ENABLE_RIPPLE_STACK=${OPTARG} ;;
     *)
@@ -19,7 +19,7 @@ while getopts a:c:d:f:p:r: flag; do
     esac
 done
 
-if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $XRENGINE_FOLDER || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
+if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENGINE_FOLDER || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
     echo "Missing arguments"
     exit 1
 fi
@@ -149,23 +149,23 @@ GIT_VERSION=$(git --version)
 echo "git version is $GIT_VERSION"
 
 #=============
-# Get XREngine
+# Get Engine
 #=============
 
-if [[ -d $XRENGINE_FOLDER ]] && [[ -f "$XRENGINE_FOLDER/package.json" ]]; then
-    echo "xrengine repo exists at $XRENGINE_FOLDER"
+if [[ -d $ENGINE_FOLDER ]] && [[ -f "$ENGINE_FOLDER/package.json" ]]; then
+    echo "ethereal engine repo exists at $ENGINE_FOLDER"
 else
-    echo "cloning xrengine in $XRENGINE_FOLDER"
-    git clone https://github.com/XRFoundation/XREngine "$XRENGINE_FOLDER"
+    echo "cloning ethereal engine in $ENGINE_FOLDER"
+    git clone https://github.com/XRFoundation/XREngine "$ENGINE_FOLDER"
 fi
 
-cd "$XRENGINE_FOLDER"
+cd "$ENGINE_FOLDER"
 
 if [[ -f ".env.local" ]]; then
-    echo "env file exists at $XRENGINE_FOLDER/.env.local"
+    echo "env file exists at $ENGINE_FOLDER/.env.local"
 else
     cp ".env.local.default" ".env.local"
-    echo "env file created at $XRENGINE_FOLDER/.env.local"
+    echo "env file created at $ENGINE_FOLDER/.env.local"
 fi
 
 echo "running npm install"
@@ -418,30 +418,30 @@ else
 fi
 
 
-#================
-# Verify XREngine
-#================
+#=======================
+# Verify Ethereal Engine
+#=======================
 
-PROJECTS_PATH="$XRENGINE_FOLDER/packages/projects/projects/"
+PROJECTS_PATH="$ENGINE_FOLDER/packages/projects/projects/"
 
 if [[ -d $PROJECTS_PATH ]]; then
-    echo "xrengine projects exists at $PROJECTS_PATH"
+    echo "ethereal engine projects exists at $PROJECTS_PATH"
 else
-    echo "xrengine projects does not exists at $PROJECTS_PATH"
+    echo "ethereal engine projects does not exists at $PROJECTS_PATH"
     npm run install-projects
 fi
 
-echo "XREngine docker images build starting"
+echo "Ethereal Engine docker images build starting"
 export DOCKER_BUILDKIT=0
 export COMPOSE_DOCKER_CLI_BUILD=0
 ./scripts/build_minikube.sh
 
-XRENGINE_INSTALLED=false
+ENGINE_INSTALLED=false
 if helm status local >/dev/null; then
-    XRENGINE_INSTALLED=true
-    echo "XREngine is installed"
+    ENGINE_INSTALLED=true
+    echo "Ethereal Engine is installed"
 else
-    echo "XREngine is not installed"
+    echo "Ethereal Engine is not installed"
 fi
 
 export MYSQL_PORT=3304
@@ -459,25 +459,25 @@ echo "Force DB refresh is $FORCE_DB_REFRESH"
 REFRESH_TRUE_PATH="$ASSETS_FOLDER/files/db-refresh-true.values.yaml"
 REFRESH_FALSE_PATH="$ASSETS_FOLDER/files/db-refresh-false.values.yaml"
 
-if [[ $XRENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
-    echo "Updating XREngine deployment to configure database"
+if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
+    echo "Updating Ethereal Engine deployment to configure database"
     helm upgrade --reuse-values -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
     sleep 35
     helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
-elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
-    echo "Installing XREngine deployment with populating database"
-    helm install -f "$CONFIGS_FOLDER/xrengine.values.yaml" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
+elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
+    echo "Installing Ethereal Engine deployment with populating database"
+    helm install -f "$CONFIGS_FOLDER/engine.values.yaml" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
     sleep 35
     helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
-elif [[ $XRENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
-    echo "Installing XREngine deployment without populating database"
-    helm install -f "$CONFIGS_FOLDER/xrengine.values.yaml" local xrengine/xrengine
+elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
+    echo "Installing Ethereal Engine deployment without populating database"
+    helm install -f "$CONFIGS_FOLDER/engine.values.yaml" local xrengine/xrengine
 fi
 
 export RELEASE_NAME=local
 ./scripts/check-engine.sh
 
-XRENGINE_STATUS=$(helm status local)
-echo "XREngine status is $XRENGINE_STATUS"
+ENGINE_STATUS=$(helm status local)
+echo "Ethereal Engine status is $ENGINE_STATUS"
 
 exit 0

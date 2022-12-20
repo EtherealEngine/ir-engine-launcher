@@ -174,8 +174,8 @@ export const DefaultAppsStatus: AppModel[] = [
     status: AppStatus.Checking
   },
   {
-    id: 'xrengine',
-    name: 'XREngine',
+    id: 'engine',
+    name: 'Ethereal Engine',
     checkCommand: minikubeDependantScript('helm status local;'),
     detail: '',
     status: AppStatus.Checking

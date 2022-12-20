@@ -30,8 +30,8 @@ https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/xrfoundation/xrengine-control-center.git xrengine-control-center
-cd xrengine-control-center
+git clone https://github.com/xrfoundation/xrengine-control-center.git ethereal-engine-control-center
+cd ethereal-engine-control-center
 npm install
 ```
 

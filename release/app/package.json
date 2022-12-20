@@ -1,12 +1,12 @@
 {
   "name": "xrengine-control-center",
   "version": "0.0.9",
-  "description": "A desktop app for managing XREngine cluster.",
+  "description": "A desktop app for managing Ethereal Engine cluster.",
   "main": "./dist/main/main.js",
   "author": {
-    "name": "XREngine - XRFoundation",
-    "email": "info@xrengine.io",
-    "url": "https://xrengine.io"
+    "name": "Ethereal Engine",
+    "email": "info@etherealengine.com",
+    "url": "https://etherealengine.com"
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.electron/scripts/electron-rebuild.js",

@@ -25,7 +25,7 @@ const Channels = {
     Log: 'Log',
     SaveLog: 'SaveLog',
   },
-  XREngine: {
+  Engine: {
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'

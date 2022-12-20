@@ -1,7 +1,7 @@
 {
   "name": "xrengine-control-center",
-  "description": "A desktop app for managing XREngine cluster.",
-  "homepage": "xrengine.io",
+  "description": "A desktop app for managing Ethereal Engine cluster.",
+  "homepage": "etherealengine.com",
   "keywords": [
     "electron",
     "kubernetes",
@@ -17,9 +17,9 @@
     "vr"
   ],
   "author": {
-    "name": "XR Engine - XR Foundation",
-    "email": "info@xrengine.io",
-    "url": "https://xrengine.io"
+    "name": "Ethereal Engine",
+    "email": "info@etherealengine.com",
+    "url": "https://etherealengine.com"
   },
   "repository": {
     "type": "git",
@@ -50,8 +50,8 @@
     ]
   },
   "build": {
-    "productName": "XREngine Control Center",
-    "appId": "org.xrfoundation.XREngineControlCenter",
+    "productName": "Ethereal Engine Control Center",
+    "appId": "org.etherealengine.controlcenter",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -227,7 +227,7 @@
     "npm": ">=7.x"
   },
   "collective": {
-    "url": "https://opencollective.com/xrfoundation"
+    "url": "https://opencollective.com/etherealengine"
   },
   "browserslist": []
 }
