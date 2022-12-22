@@ -1,5 +1,5 @@
 import { AppStatus } from 'models/AppStatus'
-import PageRoot from 'renderer/components/PageRoot'
+import PageRoot from 'renderer/common/PageRoot'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 import { useHookedEffect } from 'renderer/services/useHookedEffect'

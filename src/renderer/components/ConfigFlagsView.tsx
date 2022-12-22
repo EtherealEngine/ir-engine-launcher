@@ -2,7 +2,7 @@ import Storage from 'constants/Storage'
 
 import { Box, FormControlLabel, Switch, SxProps, Theme, Typography } from '@mui/material'
 
-import InfoTooltip from './InfoTooltip'
+import InfoTooltip from '../common/InfoTooltip'
 
 interface Props {
   localFlags: Record<string, string>

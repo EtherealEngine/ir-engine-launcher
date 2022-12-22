@@ -4,7 +4,7 @@ import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { DefaultRippleAppsStatus } from 'models/AppStatus'
 import { SnackbarProvider } from 'notistack'
-import { openPathAction } from 'renderer/components/NotistackActions'
+import { openPathAction } from 'renderer/common/NotistackActions'
 
 import { store, useDispatch } from '../store'
 import { DeploymentService } from './DeploymentService'

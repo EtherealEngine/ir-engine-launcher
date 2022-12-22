@@ -16,7 +16,7 @@ import {
   Typography
 } from '@mui/material'
 
-import InfoTooltip from './InfoTooltip'
+import InfoTooltip from '../common/InfoTooltip'
 
 interface Props {
   localConfigs: Record<string, string>

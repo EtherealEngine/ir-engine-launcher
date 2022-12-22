@@ -1,7 +1,7 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import { LogModel } from 'models/Log'
-import { openPathAction } from 'renderer/components/NotistackActions'
+import { openPathAction } from 'renderer/common/NotistackActions'
 
 import { store, useDispatch } from '../store'
 import { accessSettingsState } from './SettingsService'

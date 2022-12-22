@@ -4,13 +4,13 @@ import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import { PaletteMode } from '@mui/material'
+import { Box, PaletteMode, Tab, Tabs } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import './App.css'
-import NavView from './components/NavView'
-import { defaultAction } from './components/NotistackActions'
+import NavView from './common/NavView'
+import { defaultAction } from './common/NotistackActions'
 import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
 import ClusterPage from './pages/ClusterPage'
@@ -73,14 +73,33 @@ const App = () => {
         >
           <HashRouter>
             <NavView />
-            <Routes>
-              <Route path={Paths.ROOT} element={<ConfigPage />} />
-              <Route path={Paths.ADMIN} element={<AdminPage />} />
-              <Route path={Paths.CLUSTER} element={<ClusterPage />} />
-              {enableRippleStack && <Route path={Paths.IPFS} element={<IPFSPage />} />}
-              {enableRippleStack && <Route path={Paths.RIPPLED} element={<RippledPage />} />}
-              <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
-            </Routes>
+            <Box display="flex">
+              <Box sx={{ backgroundColor: theme.palette.primary.main }}>
+                <Tabs
+                  orientation="vertical"
+                  variant="scrollable"
+                  sx={{ width: '100px', height: 'calc(100vh - 70px)', backgroundColor: 'var(--dock)' }}
+                >
+                  <Tab label="Item One" />
+                  <Tab label="Item Two" />
+                  <Tab label="Item Three" />
+                  <Tab label="Item Four" />
+                  <Tab label="Item Five" />
+                  <Tab label="Item Six" />
+                  <Tab label="Item Seven" />
+                </Tabs>
+              </Box>
+              <Box width={'calc(100vw - 100px) !important'}>
+                <Routes>
+                  <Route path={Paths.ROOT} element={<ConfigPage />} />
+                  <Route path={Paths.ADMIN} element={<AdminPage />} />
+                  <Route path={Paths.CLUSTER} element={<ClusterPage />} />
+                  {enableRippleStack && <Route path={Paths.IPFS} element={<IPFSPage />} />}
+                  {enableRippleStack && <Route path={Paths.RIPPLED} element={<RippledPage />} />}
+                  <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
+                </Routes>
+              </Box>
+            </Box>
           </HashRouter>
         </SnackbarProvider>
       </ThemeProvider>
