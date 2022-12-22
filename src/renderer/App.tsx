@@ -4,11 +4,12 @@ import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 
-import { Box, PaletteMode, Tab, Tabs } from '@mui/material'
+import { Box, PaletteMode } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import './App.css'
+import HotBar from './common/HotBar'
 import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import MUITheme from './MUITheme'
@@ -17,6 +18,7 @@ import ClusterPage from './pages/ClusterPage'
 import ConfigPage from './pages/ConfigPage'
 import IPFSPage from './pages/IPFSPage'
 import RippledPage from './pages/RippledPage'
+import WelcomePage from './pages/WelcomePage'
 import { SettingsService, useSettingsState } from './services/SettingsService'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
@@ -74,24 +76,11 @@ const App = () => {
           <HashRouter>
             <NavView />
             <Box display="flex">
-              <Box sx={{ backgroundColor: theme.palette.primary.main }}>
-                <Tabs
-                  orientation="vertical"
-                  variant="scrollable"
-                  sx={{ width: '100px', height: 'calc(100vh - 70px)', backgroundColor: 'var(--dock)' }}
-                >
-                  <Tab label="Item One" />
-                  <Tab label="Item Two" />
-                  <Tab label="Item Three" />
-                  <Tab label="Item Four" />
-                  <Tab label="Item Five" />
-                  <Tab label="Item Six" />
-                  <Tab label="Item Seven" />
-                </Tabs>
-              </Box>
+              <HotBar />
               <Box width={'calc(100vw - 100px) !important'}>
                 <Routes>
-                  <Route path={Paths.ROOT} element={<ConfigPage />} />
+                  <Route path={Paths.ROOT} element={<WelcomePage />} />
+                  <Route path={Paths.CONFIG} element={<ConfigPage />} />
                   <Route path={Paths.ADMIN} element={<AdminPage />} />
                   <Route path={Paths.CLUSTER} element={<ClusterPage />} />
                   {enableRippleStack && <Route path={Paths.IPFS} element={<IPFSPage />} />}

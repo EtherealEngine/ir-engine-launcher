@@ -8,6 +8,7 @@ import { useSettingsState } from 'renderer/services/SettingsService'
 import { AccountCircleOutlined } from '@mui/icons-material'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
+import HomeIcon from '@mui/icons-material/Home'
 import MenuIcon from '@mui/icons-material/Menu'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
@@ -43,7 +44,7 @@ const NavView = () => {
   let pages = [
     {
       title: 'Config',
-      path: Paths.ROOT
+      path: Paths.CONFIG
     },
     {
       title: 'Admin',
@@ -100,6 +101,7 @@ const NavView = () => {
             >
               <MenuIcon />
             </IconButton>
+
             <Menu
               id="menu-appbar"
               anchorEl={anchorElNav}
@@ -136,6 +138,15 @@ const NavView = () => {
             <Box sx={{ height: 45, mr: 0.7 }} component="img" src={logo} />
             <Typography variant="h6">Control Center</Typography>
           </Box>
+
+          <IconButton
+            sx={{ mr: 2 }}
+            onClick={() => navigate(Paths.ROOT)}
+            color="inherit"
+          >
+            <HomeIcon />
+          </IconButton>
+
           <Box sx={{ flexGrow: 1, gap: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
