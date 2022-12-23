@@ -84,7 +84,7 @@ const HotBar = () => {
           ))}
         </Tabs>
 
-        <IconButton sx={{ mb: 2, mt: 2, border: '4px solid white' }}>
+        <IconButton sx={{ mb: 2, mt: 2, border: '3px solid white' }}>
           <AddIcon sx={{fontSize:'30px'}} />
         </IconButton>
       </Box>
