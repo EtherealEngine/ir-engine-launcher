@@ -14,7 +14,7 @@ import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
-import ClusterPage from './pages/ClusterPage'
+import K8DashboardPage from './pages/K8DashboardPage'
 import ConfigPage from './pages/ConfigPage'
 import IPFSPage from './pages/IPFSPage'
 import RippledPage from './pages/RippledPage'
@@ -82,7 +82,7 @@ const App = () => {
                   <Route path={Paths.ROOT} element={<WelcomePage />} />
                   <Route path={Paths.CONFIG} element={<ConfigPage />} />
                   <Route path={Paths.ADMIN} element={<AdminPage />} />
-                  <Route path={Paths.CLUSTER} element={<ClusterPage />} />
+                  <Route path={Paths.K8DASHBOARD} element={<K8DashboardPage />} />
                   {enableRippleStack && <Route path={Paths.IPFS} element={<IPFSPage />} />}
                   {enableRippleStack && <Route path={Paths.RIPPLED} element={<RippledPage />} />}
                   <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />

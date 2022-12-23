@@ -4,7 +4,7 @@ const Channels = {
     CheckMinikubeAppConfig: 'CheckMinikubeAppConfig',
     CheckSystemStatusResult: 'CheckSystemStatusResult',
     CheckAppStatusResult: 'CheckAppStatusResult',
-    CheckClusterStatusResult: 'CheckClusterStatusResult',
+    CheckEngineStatusResult: 'CheckK8DashboardStatusResult',
     ConfigureMinikubeConfig: 'ConfigureMinikubeConfig',
     ConfigureMinikubeDashboard: 'ConfigureMinikubeDashboard',
     ConfigureMinikubeDashboardError: 'ConfigureMinikubeDashboardError',

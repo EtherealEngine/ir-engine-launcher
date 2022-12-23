@@ -7,21 +7,12 @@ import { useTheme } from '@mui/material/styles'
 import logoEngine from '../../../assets/icon.svg'
 import logoMicrok8s from '../../../assets/icons/microk8s.png'
 import logoMinikube from '../../../assets/icons/minikube.png'
+import { ClusterModel, ClusterType } from 'models/Cluster'
 
-enum ClusterType {
-  Minikube,
-  MicroK8s
-}
-
-type Cluster = {
-  id: string
-  name: string
-  type: ClusterType
-}
 
 const HotBar = () => {
   const theme = useTheme()
-  const [selectedCluster, setSelectedCluster] = useState<Cluster | undefined>(undefined)
+  const [selectedCluster, setSelectedCluster] = useState<ClusterModel | undefined>(undefined)
 
   const clusters = [
     { id: 'local-minikube', name: 'Local Test Minikube', type: ClusterType.Minikube },

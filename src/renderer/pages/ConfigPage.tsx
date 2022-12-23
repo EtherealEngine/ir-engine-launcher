@@ -23,11 +23,11 @@ const ConfigPage = () => {
   const [showSettingsDialog, setSettingsDialog] = useState(false)
   const [isLaunching, setLaunching] = useState(false)
   const deploymentState = useDeploymentState()
-  const { isConfiguring, isFetchingStatuses, appStatus, clusterStatus, systemStatus } = deploymentState.value
+  const { isConfiguring, isFetchingStatuses, appStatus, engineStatus, systemStatus } = deploymentState.value
 
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
-  const allClusterConfigured = clusterStatus.every((cluster) => cluster.status === AppStatus.Configured)
-  const allConfigured = allAppsConfigured && allClusterConfigured
+  const allEngineConfigured = engineStatus.every((engine) => engine.status === AppStatus.Configured)
+  const allConfigured = allAppsConfigured && allEngineConfigured
 
   const onConfigureClicked = () => {
     setConfigDialog(true)
@@ -94,7 +94,7 @@ const ConfigPage = () => {
 
             <StatusView title="Apps" statuses={appStatus} />
 
-            <StatusView title="Cluster" statuses={clusterStatus} />
+            <StatusView title="Engine" statuses={engineStatus} />
           </ReflexElement>
 
           <ReflexSplitter />

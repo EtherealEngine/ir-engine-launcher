@@ -19,7 +19,7 @@ type FetchableItem = {
 const state = createState({
   appVersion: '',
   sudoPassword: '',
-  cluster: {
+  k8dashboard: {
     loading: false,
     url: '',
     error: ''
@@ -78,9 +78,9 @@ store.receptors.push((action: SettingsActionType): void => {
             error: action.payload.error
           }
         })
-      case 'SET_CLUSTER_DASHBOARD':
+      case 'SET_K8_DASHBOARD':
         return s.merge({
-          cluster: {
+          k8dashboard: {
             loading: action.payload.loading,
             url: action.payload.data,
             error: action.payload.error
@@ -286,11 +286,11 @@ export const SettingsService = {
       return false
     }
   },
-  fetchClusterDashboard: async () => {
+  fetchK8Dashboard: async () => {
     const dispatch = useDispatch()
     try {
       dispatch(
-        SettingsAction.setClusterDashboard({
+        SettingsAction.setK8Dashboard({
           loading: true,
           data: '',
           error: ''
@@ -301,11 +301,11 @@ export const SettingsService = {
       console.error(error)
     }
   },
-  clearClusterDashboard: async () => {
+  clearK8Dashboard: async () => {
     const dispatch = useDispatch()
     try {
       dispatch(
-        SettingsAction.setClusterDashboard({
+        SettingsAction.setK8Dashboard({
           loading: false,
           data: '',
           error: ''
@@ -418,7 +418,7 @@ export const SettingsService = {
     try {
       window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardResponse, (data: string) => {
         dispatch(
-          SettingsAction.setClusterDashboard({
+          SettingsAction.setK8Dashboard({
             loading: false,
             data,
             error: ''
@@ -427,7 +427,7 @@ export const SettingsService = {
       })
       window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardError, (error: string) => {
         dispatch(
-          SettingsAction.setClusterDashboard({
+          SettingsAction.setK8Dashboard({
             loading: false,
             data: '',
             error
@@ -508,9 +508,9 @@ export const SettingsAction = {
       payload
     }
   },
-  setClusterDashboard: (payload: FetchableItem) => {
+  setK8Dashboard: (payload: FetchableItem) => {
     return {
-      type: 'SET_CLUSTER_DASHBOARD' as const,
+      type: 'SET_K8_DASHBOARD' as const,
       payload
     }
   },

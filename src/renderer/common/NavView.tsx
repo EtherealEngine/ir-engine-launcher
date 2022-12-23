@@ -51,8 +51,8 @@ const NavView = () => {
       path: Paths.ADMIN
     },
     {
-      title: 'Cluster',
-      path: Paths.CLUSTER
+      title: 'K8 Dashboard',
+      path: Paths.K8DASHBOARD
     }
   ]
 

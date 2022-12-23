@@ -2,7 +2,7 @@ const Paths = {
   ROOT: '/',
   CONFIG: '/config',
   ADMIN: '/admin',
-  CLUSTER: '/cluster',
+  K8DASHBOARD: '/k8dashboard',
   IPFS: '/ipfs',
   RIPPLED: '/rippled'
 }

@@ -199,7 +199,7 @@ export const DefaultRippleAppsStatus: AppModel[] = [
   }
 ]
 
-export const DefaultClusterStatus: AppModel[] = [
+export const DefaultEngineStatus: AppModel[] = [
   {
     id: 'client',
     name: 'Client',

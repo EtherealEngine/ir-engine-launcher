@@ -15,14 +15,14 @@ const AdminPage = () => {
   const { adminPanel } = settingsState.value
 
   const deploymentState = useDeploymentState()
-  const { appStatus, clusterStatus } = deploymentState.value
+  const { appStatus, engineStatus } = deploymentState.value
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
-  const allClusterConfigured = clusterStatus.every((cluster) => cluster.status === AppStatus.Configured)
-  const allConfigured = allAppsConfigured && allClusterConfigured
+  const allEngineConfigured = engineStatus.every((engine) => engine.status === AppStatus.Configured)
+  const allConfigured = allAppsConfigured && allEngineConfigured
 
   const appChecking = appStatus.find((app) => app.status === AppStatus.Checking)
-  const clusterChecking = clusterStatus.find((cluster) => cluster.status === AppStatus.Checking)
-  const checking = appChecking || clusterChecking
+  const engineChecking = engineStatus.find((engine) => engine.status === AppStatus.Checking)
+  const checking = appChecking || engineChecking
 
   useHookedEffect(() => {
     if (!adminPanel.adminAccess && !adminPanel.loading && !adminPanel.error && allConfigured) {

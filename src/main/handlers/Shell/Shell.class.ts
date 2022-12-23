@@ -20,7 +20,7 @@ import {
   scriptsPath
 } from '../IBaseHandler'
 import { ensureEngineConfigs, ensureRippleConfigs, ensureVariables } from '../Settings/Settings-helper'
-import { checkAppStatus, checkClusterStatus, checkSudoPassword, checkSystemStatus, getProcessList } from './Shell-helper'
+import { checkAppStatus, checkEngineStatus, checkSudoPassword, checkSystemStatus, getProcessList } from './Shell-helper'
 
 class Shell {
   static checkMinikubeConfig = async (appsStatus: AppModel[], window: BrowserWindow) => {
@@ -29,7 +29,7 @@ class Shell {
 
       const mandatoryConfigured = await checkAppStatus(window, appsStatus)
 
-      await checkClusterStatus(window, mandatoryConfigured)
+      await checkEngineStatus(window, mandatoryConfigured)
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, {
         category: 'check minikube config',

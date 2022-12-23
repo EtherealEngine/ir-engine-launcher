@@ -1,6 +1,6 @@
 import { createState, none, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
-import { AppModel, DefaultAppsStatus, DefaultClusterStatus, DefaultSystemStatus } from 'models/AppStatus'
+import { AppModel, DefaultAppsStatus, DefaultEngineStatus, DefaultSystemStatus } from 'models/AppStatus'
 
 import { store, useDispatch } from '../store'
 import { accessSettingsState } from './SettingsService'
@@ -9,7 +9,7 @@ import { accessSettingsState } from './SettingsService'
 const state = createState({
   systemStatus: [...DefaultSystemStatus] as AppModel[],
   appStatus: [...DefaultAppsStatus] as AppModel[],
-  clusterStatus: [...DefaultClusterStatus] as AppModel[],
+  engineStatus: [...DefaultEngineStatus] as AppModel[],
   isFetchingStatuses: false as boolean,
   isConfiguring: false as boolean
 })
@@ -30,7 +30,7 @@ store.receptors.push((action: DeploymentActionType): void => {
           isFetchingStatuses: true,
           systemStatus: [...DefaultSystemStatus],
           appStatus: action.appsStatus,
-          clusterStatus: [...DefaultClusterStatus]
+          engineStatus: [...DefaultEngineStatus]
         })
       case 'FETCH_APP_STATUS': {
         s.isFetchingStatuses.set(true)
@@ -59,9 +59,9 @@ store.receptors.push((action: DeploymentActionType): void => {
         s.appStatus.merge({ [index]: action.appStatus })
         break
       }
-      case 'CLUSTER_STATUS_RECEIVED': {
-        const index = s.clusterStatus.value.findIndex((app) => app.id === action.clusterStatus.id)
-        s.clusterStatus.merge({ [index]: action.clusterStatus })
+      case 'ENGINE_STATUS_RECEIVED': {
+        const index = s.engineStatus.value.findIndex((app) => app.id === action.engineStatus.id)
+        s.engineStatus.merge({ [index]: action.engineStatus })
         break
       }
     }
@@ -133,8 +133,8 @@ export const DeploymentService = {
       window.electronAPI.on(Channels.Shell.CheckAppStatusResult, (data: AppModel) => {
         dispatch(DeploymentAction.appStatusReceived(data))
       })
-      window.electronAPI.on(Channels.Shell.CheckClusterStatusResult, (data: AppModel) => {
-        dispatch(DeploymentAction.clusterStatusReceived(data))
+      window.electronAPI.on(Channels.Shell.CheckEngineStatusResult, (data: AppModel) => {
+        dispatch(DeploymentAction.engineStatusReceived(data))
       })
     } catch (error) {
       console.error(error)
@@ -180,10 +180,10 @@ export const DeploymentAction = {
       appStatus: appStatus
     }
   },
-  clusterStatusReceived: (clusterStatus: AppModel) => {
+  engineStatusReceived: (engineStatus: AppModel) => {
     return {
-      type: 'CLUSTER_STATUS_RECEIVED' as const,
-      clusterStatus: clusterStatus
+      type: 'ENGINE_STATUS_RECEIVED' as const,
+      engineStatus: engineStatus
     }
   }
 }

@@ -9,26 +9,26 @@ import { Box } from '@mui/material'
 import ErrorPage from './ErrorPage'
 import LoadingPage from './LoadingPage'
 
-const ClusterPage = () => {
+const K8DashboardPage = () => {
   const settingsState = useSettingsState()
-  const { cluster } = settingsState.value
+  const { k8dashboard } = settingsState.value
 
   const deploymentState = useDeploymentState()
   const { appStatus } = deploymentState.value
   const minikubeStatus = appStatus.find((app) => app.id === 'minikube')
 
   useHookedEffect(() => {
-    if (!cluster.url && !cluster.loading && minikubeStatus?.status === AppStatus.Configured) {
-      SettingsService.fetchClusterDashboard()
-    } else if (!cluster.url && !cluster.loading && minikubeStatus?.status === AppStatus.NotConfigured) {
-      SettingsService.clearClusterDashboard()
+    if (!k8dashboard.url && !k8dashboard.loading && minikubeStatus?.status === AppStatus.Configured) {
+      SettingsService.fetchK8Dashboard()
+    } else if (!k8dashboard.url && !k8dashboard.loading && minikubeStatus?.status === AppStatus.NotConfigured) {
+      SettingsService.clearK8Dashboard()
     }
   }, [deploymentState.appStatus])
 
   let loadingMessage = ''
   if (minikubeStatus?.status === AppStatus.Checking) {
     loadingMessage = 'Checking Minikube'
-  } else if (cluster.loading) {
+  } else if (k8dashboard.loading) {
     loadingMessage = 'Loading Dashboard'
   }
 
@@ -39,10 +39,10 @@ const ClusterPage = () => {
     errorMessage = 'Minikube Not Configured'
     errorDetail = 'Please configure minikube before trying again.'
     errorRetry = () => DeploymentService.fetchDeploymentStatus()
-  } else if (cluster.error) {
+  } else if (k8dashboard.error) {
     errorMessage = 'Minikube Dashboard Error'
-    errorDetail = cluster.error
-    errorRetry = () => SettingsService.fetchClusterDashboard()
+    errorDetail = k8dashboard.error
+    errorRetry = () => SettingsService.fetchK8Dashboard()
   }
 
   if (loadingMessage) {
@@ -54,10 +54,10 @@ const ClusterPage = () => {
   return (
     <PageRoot full>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <iframe height="100%" style={{ border: 0 }} src={cluster.url}></iframe>
+        <iframe height="100%" style={{ border: 0 }} src={k8dashboard.url}></iframe>
       </Box>
     </PageRoot>
   )
 }
 
-export default ClusterPage
+export default K8DashboardPage

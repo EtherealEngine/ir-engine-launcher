@@ -10,7 +10,7 @@ import {
   AppModel,
   AppStatus,
   DefaultAppsStatus,
-  DefaultClusterStatus,
+  DefaultEngineStatus,
   DefaultSystemStatus
 } from '../../../models/AppStatus'
 import {
@@ -111,31 +111,31 @@ export const checkAppStatus = async (window: BrowserWindow, appsStatus: AppModel
   return mandatoryConfigured
 }
 
-export const checkClusterStatus = async (window: BrowserWindow, mandatoryConfigured: boolean) => {
-  for (const clusterItem of DefaultClusterStatus) {
+export const checkEngineStatus = async (window: BrowserWindow, mandatoryConfigured: boolean) => {
+  for (const engineItem of DefaultEngineStatus) {
     let status: AppModel = {
-      ...clusterItem
+      ...engineItem
     }
 
     if (mandatoryConfigured == false) {
       status = {
-        ...clusterItem,
+        ...engineItem,
         detail: 'Ethereal Engine required apps not configured',
         status: AppStatus.NotConfigured
       }
-    } else if (clusterItem.checkCommand) {
-      const response = await exec(clusterItem.checkCommand)
+    } else if (engineItem.checkCommand) {
+      const response = await exec(engineItem.checkCommand)
       const { stdout, stderr } = response
 
       if (stdout) {
         window.webContents.send(Channels.Utilities.Log, {
-          category: clusterItem.name,
+          category: engineItem.name,
           message: typeof stdout === 'string' ? stdout.trim() : stdout
         })
       }
       if (stderr) {
         window.webContents.send(Channels.Utilities.Log, {
-          category: clusterItem.name,
+          category: engineItem.name,
           message: typeof stderr === 'string' ? stderr.trim() : stderr
         })
       }
@@ -151,13 +151,13 @@ export const checkClusterStatus = async (window: BrowserWindow, mandatoryConfigu
       }
 
       status = {
-        ...clusterItem,
+        ...engineItem,
         detail,
         status: itemStatus
       }
     }
 
-    window.webContents.send(Channels.Shell.CheckClusterStatusResult, status)
+    window.webContents.send(Channels.Shell.CheckEngineStatusResult, status)
   }
 }
 
