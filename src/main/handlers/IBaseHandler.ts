@@ -40,32 +40,6 @@ export const isValidUrl = (urlString: string) => {
   return url.protocol === 'http:' || url.protocol === 'https:'
 }
 
-export const appConfigsPath = () => {
-  return path.join(app.getPath('userData'), 'configs')
-}
-
-export const assetsPath = () => {
-  return path.join(__dirname, '../../../assets')
-}
-
-export const scriptsPath = () => {
-  return path.join(assetsPath(), 'scripts')
-}
-
-/**
- * https://futurestud.io/tutorials/node-js-check-if-a-file-exists
- * @param path
- * @returns
- */
-export const fileExists = async (path: string) => {
-  try {
-    await fs.access(path)
-    return true
-  } catch {
-    return false
-  }
-}
-
 export const exec = (command: string): Promise<ShellResponse> => {
   return new Promise((resolve) => {
     childProcess.exec(command, { shell: '/bin/bash' }, (error, stdout, stderr) => resolve({ error, stdout, stderr }))

@@ -23,6 +23,7 @@ import UtilitiesHandler from './handlers/Utilities/Utilities.handler'
 import EngineHandler from './handlers/Engine/Engine.handler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
+import ConfigFileHandler from './handlers/ConfigFile/ConfigFile.handler'
 
 // Log system info
 log.info(
@@ -168,10 +169,11 @@ export const createMainWindow = async () => {
   })
 
   const ipcHandlers: IBaseHandler[] = [
-    new UtilitiesHandler(),
-    new ShellHandler(),
-    new EngineHandler(),
-    new SettingsHandler()
+    new ConfigFileHandler()
+    // new UtilitiesHandler(),
+    // new ShellHandler(),
+    // new EngineHandler(),
+    // new SettingsHandler()
   ]
 
   ipcHandlers.forEach((handler) => {

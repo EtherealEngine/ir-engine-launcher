@@ -1,6 +1,7 @@
 import { render } from 'react-dom'
 
 import App from './App'
+import { ConfigFileService } from './services/ConfigFileService'
 import { DeploymentService } from './services/DeploymentService'
 import { LogService } from './services/LogService'
 import { SettingsService } from './services/SettingsService'
@@ -18,7 +19,8 @@ if (isSplash) {
   LogService.listen()
   SettingsService.listen()
   DeploymentService.listen()
-  SettingsService.fetchSettings()
+  ConfigFileService.init()
+  SettingsService.init()
   DeploymentService.fetchDeploymentStatus()
 
   render(<App />, document.getElementById('root'))

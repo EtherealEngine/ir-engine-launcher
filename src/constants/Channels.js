@@ -31,13 +31,7 @@ const Channels = {
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
   },
   Settings: {
-    CheckConfigs: 'CheckConfigs',
-    CheckVars: 'CheckVars',
     GetCurrentAppConfigs: 'GetCurrentAppConfigs',
-    SaveConfigs: 'SaveConfigs',
-    SaveVars: 'SaveVars',
-    ExportSettings: "ExportSettings",
-    ImportSettings: "ImportSettings"
   },
   Updates: {
     CheckUpdate: 'CheckUpdate',
@@ -45,6 +39,12 @@ const Channels = {
     DownloadProgress: 'DownloadProgress',
     LaunchApp: 'LaunchApp',
     QuitAndUpdate: 'QuitAndUpdate',
+  },
+  ConfigFile: {
+    LoadConfig: 'LoadConfig',
+    SaveConfig: 'SaveConfig',
+    ExportConfig: "ExportConfig",
+    ImportConfig: "ImportConfig"
   }
 }
 

@@ -11,7 +11,7 @@ import Commands from '../../../constants/Commands'
 import ConfigEnvMap from '../../../constants/ConfigEnvMap'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
-import { getAllValues, getValue, insertOrUpdateValue } from '../../storeManager'
+import { getAllValues, getValue, insertOrUpdateValue } from '../../managers/StoreManager'
 import { appConfigsPath, exec, fileExists } from '../IBaseHandler'
 
 /**
@@ -230,6 +230,7 @@ export const getEngineDefaultPath = () => {
 }
 
 export const getEnginePath = async () => {
-  const enginePath = await getValue(Storage.CONFIGS_TABLE, Storage.ENGINE_PATH)
+  // const enginePath = await getValue(Storage.CONFIGS_TABLE, Storage.ENGINE_PATH)
+  const enginePath = ""
   return enginePath ? enginePath : getEngineDefaultPath()
 }
