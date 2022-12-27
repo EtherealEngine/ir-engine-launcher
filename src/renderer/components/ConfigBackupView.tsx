@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
+import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
@@ -16,20 +16,20 @@ interface Props {
 const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
   const [showImportAlert, setImportAlert] = useState(false)
   const [showExportAlert, setExportAlert] = useState(false)
-  const settingsState = useSettingsState()
-  const { configs, vars } = settingsState.value
+  const configFileState = useConfigFileState()
+  const { loading } = configFileState.value
 
   const handleExport = async () => {
     if (hasPendingChanges) {
       setExportAlert(true)
     } else {
-      await SettingsService.exportSettings()
+      await ConfigFileService.exportSettings()
     }
   }
 
   const handleImport = async () => {
     setImportAlert(false)
-    await SettingsService.importSettings()
+    await ConfigFileService.importSettings()
   }
 
   return (
@@ -47,7 +47,7 @@ const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
           sx={{ marginTop: 2, marginLeft: 0 }}
         />
         <Button
-          disabled={configs.loading || vars.loading}
+          disabled={loading}
           variant="contained"
           startIcon={<FileDownloadIcon />}
           sx={{ marginLeft: 4, width: 'auto', background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
@@ -70,7 +70,7 @@ const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
           sx={{ marginTop: 2, marginLeft: 0 }}
         />
         <Button
-          disabled={configs.loading || vars.loading}
+          disabled={loading}
           variant="contained"
           startIcon={<FileUploadIcon />}
           sx={{ marginLeft: 4, width: 'auto', background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}

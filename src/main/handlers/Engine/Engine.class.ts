@@ -73,7 +73,10 @@ class Engine {
 
           parentWindow.webContents.send(Channels.Engine.EnsureAdminAccessResponse)
         } catch (err) {
-          parentWindow.webContents.send(Channels.Utilities.Log, { category: 'admin panel', message: JSON.stringify(err) })
+          parentWindow.webContents.send(Channels.Utilities.Log, {
+            category: 'admin panel',
+            message: JSON.stringify(err)
+          })
           parentWindow.webContents.send(
             Channels.Engine.EnsureAdminAccessError,
             `Failed to load admin panel. Please check logs.`

@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
-import { ConfigFileModel } from '../../../models/ConfigFile'
 
 import { Channels } from '../../../constants/Channels'
+import { ConfigFileModel } from '../../../models/ConfigFile'
 import { IBaseHandler } from '../IBaseHandler'
 import ConfigFile from './ConfigFile.class'
 

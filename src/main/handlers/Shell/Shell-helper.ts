@@ -13,10 +13,7 @@ import {
   DefaultEngineStatus,
   DefaultSystemStatus
 } from '../../../models/AppStatus'
-import {
-  exec,
-  scriptsPath
-} from '../IBaseHandler'
+import { exec, scriptsPath } from '../IBaseHandler'
 
 export const getProcessList = (command: string) => {
   return new Promise<Program[]>((resolve, reject) => {

@@ -17,7 +17,6 @@ const WelcomePage = () => {
         alignItems: 'center'
       }}
     >
-
       <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
         <Box sx={{ height: 85, mr: 0.7 }} component="img" src={logo} />
         <Typography sx={{ fontSize: 30 }} variant="h6">

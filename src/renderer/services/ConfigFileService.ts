@@ -1,7 +1,7 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import { ClusterModel } from 'models/Cluster'
-import { ConfigFileModel } from 'models/ConfigFile'
+import { ConfigFileModel, CONFIG_VERSION } from 'models/ConfigFile'
 import { openPathAction } from 'renderer/common/NotistackActions'
 
 import { store, useDispatch } from '../store'
@@ -9,8 +9,9 @@ import { accessSettingsState } from './SettingsService'
 
 //State
 const state = createState({
+  selectedClusterId: '',
   clusters: [] as ClusterModel[],
-  version: "" as string,
+  version: '' as string,
   loading: true as boolean,
   error: ''
 })
@@ -18,6 +19,11 @@ const state = createState({
 store.receptors.push((action: ConfigFileActionType): void => {
   state.batch((s) => {
     switch (action.type) {
+      case 'SET_SELECTED_CLUSTER_ID':
+        return s.merge({
+          selectedClusterId: action.payload
+        })
+
       case 'SET_CONFIG':
         return s.merge({
           version: action.payload.version,
@@ -26,16 +32,6 @@ store.receptors.push((action: ConfigFileActionType): void => {
           error: ''
         })
 
-      case 'SET_CLUSTER': {
-        const index = s.clusters.findIndex(item => item.id.value === action.payload.id)
-        if (index) {
-          s.clusters[index].set(action.payload)
-        } else {
-          s.clusters.merge(action.payload)
-        }
-
-        break
-      }
       case 'SET_ERROR':
         return s.merge({
           loading: false,
@@ -59,18 +55,38 @@ export const ConfigFileService = {
       dispatch(ConfigFileAction.setConfig(config))
     } catch (error) {
       console.error(error)
-      dispatch(
-        ConfigFileAction.setError(JSON.stringify(error))
-      )
+      dispatch(ConfigFileAction.setError(JSON.stringify(error)))
     }
+  },
+
+  setSelectedClusterId: (clusterId: string) => {
+    const dispatch = useDispatch()
+    dispatch(ConfigFileAction.setSelectedClusterId(clusterId))
+  },
+
+  getSelectedCluster: () => {
+    const { clusters, selectedClusterId } = accessConfigFileState().value
+    const selectedCluster = clusters.find((item) => item.id === selectedClusterId)
+    return selectedCluster
   },
 
   insertOrUpdateConfig: async (cluster: ClusterModel) => {
     const dispatch = useDispatch()
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    const { clusters } = accessConfigFileState().value
 
     try {
+      const configFile = { clusters: [...clusters], version: CONFIG_VERSION } as ConfigFileModel
+
+      const index = configFile.clusters.findIndex((item) => item.id === cluster.id)
+      if (index) {
+        configFile.clusters[index] = cluster
+      } else {
+        configFile.clusters.push(cluster)
+      }
+
       await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, cluster)
-      dispatch(ConfigFileAction.setCluster(cluster))
+      dispatch(ConfigFileAction.setConfig(configFile))
 
       // if (configs[Storage.ENABLE_RIPPLE_STACK] && configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
       //   DeploymentService.fetchAppStatus([...DefaultRippleAppsStatus])
@@ -81,9 +97,9 @@ export const ConfigFileService = {
       return true
     } catch (error) {
       console.error(error)
-      dispatch(
-        ConfigFileAction.setError(JSON.stringify(error))
-      )
+      enqueueSnackbar(`Failed to update configuration. ${error}`, {
+        variant: 'error'
+      })
       return false
     }
   },
@@ -116,7 +132,7 @@ export const ConfigFileService = {
       if (success) {
         enqueueSnackbar(`Settings imported.`, {
           variant: 'success',
-          autoHideDuration: 10000,
+          autoHideDuration: 10000
         })
       }
     } catch (error) {
@@ -125,20 +141,20 @@ export const ConfigFileService = {
         variant: 'error'
       })
     }
-  },
+  }
 }
 
 //Action
 export const ConfigFileAction = {
-  setConfig: (payload: ConfigFileModel) => {
+  setSelectedClusterId: (payload: string) => {
     return {
-      type: 'SET_CONFIG' as const,
+      type: 'SET_SELECTED_CLUSTER_ID' as const,
       payload
     }
   },
-  setCluster: (payload: ClusterModel) => {
+  setConfig: (payload: ConfigFileModel) => {
     return {
-      type: 'SET_CLUSTER' as const,
+      type: 'SET_CONFIG' as const,
       payload
     }
   },

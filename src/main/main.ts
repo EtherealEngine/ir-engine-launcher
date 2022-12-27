@@ -15,15 +15,15 @@ import os from 'os'
 import path from 'path'
 
 import Endpoints from '../constants/Endpoints'
+import ConfigFileHandler from './handlers/ConfigFile/ConfigFile.handler'
+import EngineHandler from './handlers/Engine/Engine.handler'
 import { IBaseHandler } from './handlers/IBaseHandler'
 import SettingsHandler from './handlers/Settings/Settings.handler'
 import ShellHandler from './handlers/Shell/Shell.handler'
 import UpdatesHandler from './handlers/Updates/Updates.handler'
 import UtilitiesHandler from './handlers/Utilities/Utilities.handler'
-import EngineHandler from './handlers/Engine/Engine.handler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
-import ConfigFileHandler from './handlers/ConfigFile/ConfigFile.handler'
 
 // Log system info
 log.info(
@@ -169,8 +169,8 @@ export const createMainWindow = async () => {
   })
 
   const ipcHandlers: IBaseHandler[] = [
-    new ConfigFileHandler()
-    // new UtilitiesHandler(),
+    new ConfigFileHandler(),
+    new UtilitiesHandler(),
     // new ShellHandler(),
     // new EngineHandler(),
     // new SettingsHandler()

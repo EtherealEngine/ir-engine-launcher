@@ -24,18 +24,12 @@ class SettingsHandler implements IBaseHandler {
       ipcMain.handle(Channels.Settings.SaveVars, async (_event: IpcMainInvokeEvent, vars: Record<string, string>) => {
         await Settings.saveVars(vars, window)
       }),
-      ipcMain.handle(
-        Channels.Settings.ExportSettings,
-        async (_event: IpcMainInvokeEvent, fileName: string) => {
-          return await Settings.exportSettings(fileName, window)
-        }
-      ),
-      ipcMain.handle(
-        Channels.Settings.ImportSettings,
-        async (_event: IpcMainInvokeEvent) => {
-          return await Settings.importSettings(window)
-        }
-      )
+      ipcMain.handle(Channels.Settings.ExportSettings, async (_event: IpcMainInvokeEvent, fileName: string) => {
+        return await Settings.exportSettings(fileName, window)
+      }),
+      ipcMain.handle(Channels.Settings.ImportSettings, async (_event: IpcMainInvokeEvent) => {
+        return await Settings.importSettings(window)
+      })
   }
 }
 

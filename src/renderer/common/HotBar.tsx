@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { ClusterType } from 'models/Cluster'
+import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 
 import AddIcon from '@mui/icons-material/Add'
 import { Box, IconButton, Tab, Tabs, Typography } from '@mui/material'
@@ -7,17 +8,11 @@ import { useTheme } from '@mui/material/styles'
 import logoEngine from '../../../assets/icon.svg'
 import logoMicrok8s from '../../../assets/icons/microk8s.png'
 import logoMinikube from '../../../assets/icons/minikube.png'
-import { ClusterModel, ClusterType } from 'models/Cluster'
-
 
 const HotBar = () => {
   const theme = useTheme()
-  const [selectedCluster, setSelectedCluster] = useState<ClusterModel | undefined>(undefined)
-
-  const clusters = [
-    { id: 'local-minikube', name: 'Local Test Minikube', type: ClusterType.Minikube },
-    { id: 'local-microk8s', name: 'Local', type: ClusterType.MicroK8s }
-  ]
+  const configFileState = useConfigFileState()
+  const { clusters, selectedClusterId } = configFileState.value
 
   return (
     <Box sx={{ backgroundColor: theme.palette.primary.main }}>
@@ -31,9 +26,16 @@ const HotBar = () => {
           alignItems: 'center'
         }}
       >
-        <Tabs className="blankTabs" orientation="vertical" variant="scrollable" sx={{ flex: 1, width: '100%' }}>
+        <Tabs
+          className="blankTabs"
+          orientation="vertical"
+          variant="scrollable"
+          value={0}
+          sx={{ flex: 1, width: '100%' }}
+        >
           {clusters.map((cluster) => (
             <Tab
+              key={cluster.id}
               title={`${cluster.name} (${
                 cluster.type === ClusterType.Minikube
                   ? 'Minikube'
@@ -46,7 +48,7 @@ const HotBar = () => {
                   sx={{
                     width: '100%',
                     height: '100%',
-                    background: selectedCluster?.id === cluster.id ? 'var(--purpleDarkest)' : undefined,
+                    background: selectedClusterId === cluster.id ? 'var(--purpleDarkest)' : undefined,
                     color: 'var(--text)',
                     flexDirection: 'column',
                     display: 'flex',
@@ -70,13 +72,13 @@ const HotBar = () => {
                   <Typography variant="body2">{cluster.name}</Typography>
                 </Box>
               }
-              onClick={() => setSelectedCluster(cluster)}
+              onClick={() => ConfigFileService.setSelectedClusterId(cluster.id)}
             />
           ))}
         </Tabs>
 
         <IconButton sx={{ mb: 2, mt: 2, border: '3px solid white' }}>
-          <AddIcon sx={{fontSize:'30px'}} />
+          <AddIcon sx={{ fontSize: '30px' }} />
         </IconButton>
       </Box>
     </Box>

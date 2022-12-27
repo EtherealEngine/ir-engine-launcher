@@ -1,14 +1,14 @@
+import { getEngineDefaultPath } from '../../managers/PathManager'
+import { findRequiredValues, getYamlDoc } from '../../managers/YamlManager'
+import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import path from 'path'
 
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
 import { getValue } from '../../managers/StoreManager'
-import { ClusterModel, ClusterType } from 'models/Cluster'
-import { getEngineDefaultPath } from 'main/managers/PathManager'
-import { findRequiredValues, getYamlDoc } from 'main/managers/YamlManager'
 
 export const getClusters = async () => {
-  const clusters = await getValue('clusters') as ClusterModel[]
+  const clusters = (await getValue('clusters') || []) as ClusterModel[]
 
   for (const cluster of clusters) {
     await processConfigs(cluster)

@@ -1,12 +1,8 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 
 import { Channels } from '../../../constants/Channels'
-import {
-  AppModel
-} from '../../../models/AppStatus'
-import {
-  IBaseHandler
-} from '../IBaseHandler'
+import { AppModel } from '../../../models/AppStatus'
+import { IBaseHandler } from '../IBaseHandler'
 import Shell from './Shell.class'
 
 class ShellHandler implements IBaseHandler {

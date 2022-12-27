@@ -3,7 +3,7 @@ import Storage from 'constants/Storage'
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ColorModeContext } from 'renderer/App'
-import { useSettingsState } from 'renderer/services/SettingsService'
+import { ConfigFileService } from 'renderer/services/ConfigFileService'
 
 import { AccountCircleOutlined } from '@mui/icons-material'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
@@ -27,13 +27,18 @@ const settings: string[] = [
   /*'Profile', 'Logout'*/
 ]
 
+type MenuModel = {
+  title: string
+  path: string
+}
+
 const NavView = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null)
   const [anchorElUser, setAnchorElUser] = React.useState(null)
 
-  const settingsState = useSettingsState()
-  const { configs } = settingsState.value
-  const enableRippleStack = configs.data[Storage.ENABLE_RIPPLE_STACK] === 'true'
+  const selectedCluster = ConfigFileService.getSelectedCluster()
+
+  const enableRippleStack = selectedCluster && selectedCluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true'
 
   const theme = useTheme()
   const colorMode = React.useContext(ColorModeContext)
@@ -41,20 +46,22 @@ const NavView = () => {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
-  let pages = [
-    {
+  let pages: MenuModel[] = []
+
+  if (selectedCluster) {
+    pages.push({
       title: 'Config',
       path: Paths.CONFIG
-    },
-    {
+    })
+    pages.push({
       title: 'Admin',
       path: Paths.ADMIN
-    },
-    {
+    })
+    pages.push({
       title: 'K8 Dashboard',
       path: Paths.K8DASHBOARD
-    }
-  ]
+    })
+  }
 
   if (enableRippleStack) {
     pages.push({
@@ -139,11 +146,7 @@ const NavView = () => {
             <Typography variant="h6">Control Center</Typography>
           </Box>
 
-          <IconButton
-            sx={{ mr: 2 }}
-            onClick={() => navigate(Paths.ROOT)}
-            color="inherit"
-          >
+          <IconButton sx={{ mr: 2 }} onClick={() => navigate(Paths.ROOT)} color="inherit">
             <HomeIcon />
           </IconButton>
 

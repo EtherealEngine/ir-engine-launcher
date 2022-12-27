@@ -1,5 +1,8 @@
+import { ClusterModel } from 'models/Cluster'
+import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
+import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
+import { useSettingsState } from 'renderer/services/SettingsService'
 
 import { TabContext, TabPanel } from '@mui/lab'
 import {
@@ -27,20 +30,31 @@ interface Props {
 }
 
 const SettingsDialog = ({ onClose }: Props) => {
+  const { enqueueSnackbar } = useSnackbar()
   const [currentTab, setTab] = useState('configs')
+  const configFileState = useConfigFileState()
+  const { loading } = configFileState.value
   const settingsState = useSettingsState()
-  const { appVersion, configs, vars } = settingsState.value
+  const { appVersion } = settingsState.value
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
 
+  const selectedCluster = ConfigFileService.getSelectedCluster()
+
+  if (!selectedCluster) {
+    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
+    onClose()
+    return <></>
+  }
+
   const localConfigs = {} as Record<string, string>
-  for (const key in configs.data) {
-    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : configs.data[key]
+  for (const key in selectedCluster.configs) {
+    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : selectedCluster.configs[key]
   }
 
   const localVars = {} as Record<string, string>
-  for (const key in vars.data) {
-    localVars[key] = key in tempVars ? tempVars[key] : vars.data[key]
+  for (const key in selectedCluster.variables) {
+    localVars[key] = key in tempVars ? tempVars[key] : selectedCluster.variables[key]
   }
 
   const changeConfig = async (key: string, value: string) => {
@@ -56,7 +70,21 @@ const SettingsDialog = ({ onClose }: Props) => {
   }
 
   const saveSettings = async () => {
-    const saved = await SettingsService.saveSettings(tempConfigs, tempVars)
+    const updatedCluster: ClusterModel = {
+      ...selectedCluster,
+      configs: { ...selectedCluster.configs },
+      variables: { ...selectedCluster.variables }
+    }
+
+    for (const key in tempConfigs) {
+      updatedCluster.configs[key] = tempConfigs[key]
+    }
+
+    for (const key in tempVars) {
+      updatedCluster.variables[key] = tempVars[key]
+    }
+
+    const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
     if (saved) {
       onClose()
     }
@@ -64,7 +92,8 @@ const SettingsDialog = ({ onClose }: Props) => {
 
   return (
     <Dialog open fullWidth maxWidth="sm" scroll="paper">
-      {(configs.loading || vars.loading) && <LinearProgress />}
+      {loading && <LinearProgress />}
+
       <DialogTitle>Settings</DialogTitle>
       <DialogContent dividers sx={{ padding: 0 }}>
         <TabContext value={currentTab}>
@@ -123,11 +152,7 @@ const SettingsDialog = ({ onClose }: Props) => {
         <Button onClick={onClose}>Cancel</Button>
         <Button
           type="submit"
-          disabled={
-            configs.loading ||
-            vars.loading ||
-            (Object.keys(tempConfigs).length === 0 && Object.keys(tempVars).length === 0)
-          }
+          disabled={loading || (Object.keys(tempConfigs).length === 0 && Object.keys(tempVars).length === 0)}
           onClick={saveSettings}
         >
           Save

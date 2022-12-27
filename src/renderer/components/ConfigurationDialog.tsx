@@ -1,8 +1,10 @@
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
+import { ClusterModel } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
+import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
@@ -56,7 +58,18 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
   const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
-  const { sudoPassword, configs, vars } = settingsState.value
+  const { sudoPassword } = settingsState.value
+
+  const configFileState = useConfigFileState()
+  const { loading } = configFileState.value
+
+  const selectedCluster = ConfigFileService.getSelectedCluster()
+
+  if (!selectedCluster) {
+    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
+    onClose()
+    return <></>
+  }
 
   const [activeStep, setActiveStep] = useState(0)
   const [isLoading, setLoading] = useState(false)
@@ -77,13 +90,14 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const [localFlags, setLocalFlags] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
 
   const localConfigs = {} as Record<string, string>
-  for (const key in configs.data) {
-    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : configs.data[key]
+
+  for (const key in selectedCluster.configs) {
+    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : selectedCluster.configs[key]
   }
 
   const localVars = {} as Record<string, string>
-  for (const key in vars.data) {
-    localVars[key] = key in tempVars ? tempVars[key] : vars.data[key]
+  for (const key in selectedCluster.configs) {
+    localVars[key] = key in tempVars ? tempVars[key] : selectedCluster.configs[key]
   }
 
   const handleNext = async () => {
@@ -99,8 +113,21 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       }
     } else if (activeStep === 3) {
       if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
-        const saved = await SettingsService.saveSettings(tempConfigs, tempVars)
+        const updatedCluster: ClusterModel = {
+          ...selectedCluster,
+          configs: { ...selectedCluster.configs },
+          variables: { ...selectedCluster.variables }
+        }
 
+        for (const key in tempConfigs) {
+          updatedCluster.configs[key] = tempConfigs[key]
+        }
+
+        for (const key in tempVars) {
+          updatedCluster.variables[key] = tempVars[key]
+        }
+
+        const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
         if (!saved) {
           enqueueSnackbar('Failed to save configurations', { variant: 'error' })
         }
@@ -193,7 +220,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
   return (
     <Dialog open fullWidth maxWidth="sm">
-      {(isLoading || configs.loading || vars.loading) && <LinearProgress />}
+      {(isLoading || loading) && <LinearProgress />}
       <DialogTitle>
         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
           {steps.map((step) => (

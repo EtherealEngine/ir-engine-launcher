@@ -1,6 +1,5 @@
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
-import { useSettingsState } from 'renderer/services/SettingsService'
 
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import {
@@ -17,6 +16,8 @@ import {
 } from '@mui/material'
 
 import InfoTooltip from '../common/InfoTooltip'
+import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
+import { useSnackbar } from 'notistack'
 
 interface Props {
   localConfigs: Record<string, string>
@@ -25,8 +26,17 @@ interface Props {
 }
 
 const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
-  const settingsState = useSettingsState()
-  const { configs } = settingsState.value
+  const { enqueueSnackbar } = useSnackbar()
+  
+  const configFileState = useConfigFileState()
+  const { error, loading } = configFileState.value
+
+  const selectedCluster = ConfigFileService.getSelectedCluster()
+
+  if (!selectedCluster) {
+    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
+    return <></>
+  }
 
   const changeFolder = async (key: string) => {
     const path = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
@@ -37,7 +47,7 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
 
   return (
     <Box sx={sx}>
-      {configs.error && <DialogContentText color={'red'}>Error: {configs.error}</DialogContentText>}
+      {error && <DialogContentText color={'red'}>Error: {error}</DialogContentText>}
       <TextField
         disabled
         fullWidth
@@ -52,7 +62,7 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
               <IconButton
                 edge="end"
                 title="Change Path"
-                disabled={configs.loading}
+                disabled={loading}
                 onClick={() => changeFolder(Storage.ENGINE_PATH)}
               >
                 <FolderOutlinedIcon />

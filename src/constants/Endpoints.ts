@@ -3,7 +3,11 @@ const Endpoints = {
   ADMIN_PORTAL: 'https://local.etherealengine.com/admin',
   LOGIN_PAGE: 'https://local.etherealengine.com/',
   LAUNCH_PAGE: 'https://local.etherealengine.com/location/apartment',
-  ALLOW_CERTIFICATES: ['local.etherealengine.com', 'api-local.etherealengine.com', 'instanceserver-local.etherealengine.com'],
+  ALLOW_CERTIFICATES: [
+    'local.etherealengine.com',
+    'api-local.etherealengine.com',
+    'instanceserver-local.etherealengine.com'
+  ],
   MYSQL_PORT: 3304,
   DEFAULT_ENGINE_FOLDER: 'xrengine',
   VALIDATOR_FILE_PATH: 'packages/ops/rippled/config/validators.txt',

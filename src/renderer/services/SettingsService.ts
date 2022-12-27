@@ -16,11 +16,7 @@ type FetchableItem<T> = {
 const state = createState({
   appVersion: '',
   sudoPassword: '',
-  k8dashboard: {
-    loading: false,
-    url: '',
-    error: ''
-  },
+  notistack: {} as SnackbarProvider,
   ipfs: {
     loading: false,
     url: '',
@@ -31,7 +27,11 @@ const state = createState({
     adminAccess: false,
     error: ''
   },
-  notistack: {} as SnackbarProvider
+  k8dashboard: {
+    loading: false,
+    url: '',
+    error: ''
+  }
 })
 
 store.receptors.push((action: SettingsActionType): void => {

@@ -231,6 +231,6 @@ export const getEngineDefaultPath = () => {
 
 export const getEnginePath = async () => {
   // const enginePath = await getValue(Storage.CONFIGS_TABLE, Storage.ENGINE_PATH)
-  const enginePath = ""
+  const enginePath = ''
   return enginePath ? enginePath : getEngineDefaultPath()
 }

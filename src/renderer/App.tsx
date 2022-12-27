@@ -14,20 +14,22 @@ import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
-import K8DashboardPage from './pages/K8DashboardPage'
 import ConfigPage from './pages/ConfigPage'
 import IPFSPage from './pages/IPFSPage'
+import K8DashboardPage from './pages/K8DashboardPage'
 import RippledPage from './pages/RippledPage'
 import WelcomePage from './pages/WelcomePage'
-import { SettingsService, useSettingsState } from './services/SettingsService'
+import { ConfigFileService } from './services/ConfigFileService'
+import { SettingsService } from './services/SettingsService'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
 const App = () => {
   const notistackRef = React.createRef<SnackbarProvider>()
-  const settingsState = useSettingsState()
-  const { configs } = settingsState.value
-  const enableRippleStack = configs.data[Storage.ENABLE_RIPPLE_STACK] === 'true'
+
+  const selectedCluster = ConfigFileService.getSelectedCluster()
+
+  const enableRippleStack = selectedCluster && selectedCluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true'
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const defaultMode = (prefersDarkMode ? 'dark' : 'light') as PaletteMode

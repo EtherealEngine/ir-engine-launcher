@@ -1,4 +1,5 @@
-import { useSettingsState } from 'renderer/services/SettingsService'
+import { useSnackbar } from 'notistack'
+import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 
 import { Box, DialogContentText, SxProps, TextField, Theme } from '@mui/material'
 
@@ -9,12 +10,21 @@ interface Props {
 }
 
 const ConfigVarsView = ({ localVars, onChange, sx }: Props) => {
-  const settingsState = useSettingsState()
-  const { vars } = settingsState.value
+  const { enqueueSnackbar } = useSnackbar()
+
+  const configFileState = useConfigFileState()
+  const { error } = configFileState.value
+
+  const selectedCluster = ConfigFileService.getSelectedCluster()
+
+  if (!selectedCluster) {
+    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
+    return <></>
+  }
 
   return (
     <Box sx={sx}>
-      {vars.error && <DialogContentText color={'red'}>Error: {vars.error}</DialogContentText>}
+      {error && <DialogContentText color={'red'}>Error: {error}</DialogContentText>}
       {Object.keys(localVars).map((key) => (
         <TextField
           fullWidth

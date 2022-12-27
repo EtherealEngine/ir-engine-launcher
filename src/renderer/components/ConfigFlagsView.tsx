@@ -18,7 +18,7 @@ const ConfigFlagsView = ({ localFlags, onChange, sx }: Props) => {
         label={
           <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
             <Typography variant="body2">{Storage.FORCE_DB_REFRESH.replaceAll('_', ' ')}</Typography>
-            <InfoTooltip message="This will reinitialize the mysql database associated with the deployment." />
+            <InfoTooltip message="This will reinitialize the database associated with the deployment." />
           </Box>
         }
         sx={{ marginTop: 1, marginLeft: 0 }}
