@@ -1,4 +1,5 @@
 import PageRoot from 'renderer/common/PageRoot'
+import { SettingsService } from 'renderer/services/SettingsService'
 
 import AddIcon from '@mui/icons-material/Add'
 import { Box, Button, Typography } from '@mui/material'
@@ -31,6 +32,7 @@ const WelcomePage = () => {
         variant="contained"
         startIcon={<AddIcon />}
         sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
+        onClick={() => SettingsService.setCreateClusterDialog(true)}
       >
         Create
       </Button>

@@ -1,5 +1,7 @@
 import { ClusterType } from 'models/Cluster'
+import CreateClusterDialog from 'renderer/components/CreateClusterDialog'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
+import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
 import AddIcon from '@mui/icons-material/Add'
 import { Box, IconButton, Tab, Tabs, Typography } from '@mui/material'
@@ -11,6 +13,8 @@ import logoMinikube from '../../../assets/icons/minikube.png'
 
 const HotBar = () => {
   const theme = useTheme()
+  const settingsState = useSettingsState()
+  const { showCreateClusterDialog } = settingsState.value
   const configFileState = useConfigFileState()
   const { clusters, selectedClusterId } = configFileState.value
 
@@ -77,10 +81,15 @@ const HotBar = () => {
           ))}
         </Tabs>
 
-        <IconButton sx={{ mb: 2, mt: 2, border: '3px solid white' }}>
+        <IconButton
+          sx={{ mb: 2, mt: 2, border: '3px solid white' }}
+          onClick={() => SettingsService.setCreateClusterDialog(true)}
+        >
           <AddIcon sx={{ fontSize: '30px' }} />
         </IconButton>
       </Box>
+
+      {showCreateClusterDialog && <CreateClusterDialog onClose={() => SettingsService.setCreateClusterDialog(false)} />}
     </Box>
   )
 }

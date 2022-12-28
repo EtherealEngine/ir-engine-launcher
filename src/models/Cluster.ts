@@ -7,6 +7,6 @@ export type ClusterModel = {
 }
 
 export enum ClusterType {
-  Minikube,
-  MicroK8s
+  Minikube = "Minikube",
+  MicroK8s = "MicroK8s"
 }

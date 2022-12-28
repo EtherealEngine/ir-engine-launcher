@@ -1,6 +1,6 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
-import { ClusterModel } from 'models/Cluster'
+import { ClusterModel, ClusterType } from 'models/Cluster'
 import { ConfigFileModel, CONFIG_VERSION } from 'models/ConfigFile'
 import { openPathAction } from 'renderer/common/NotistackActions'
 
@@ -140,6 +140,34 @@ export const ConfigFileService = {
       enqueueSnackbar(`Failed to import settings. ${error}`, {
         variant: 'error'
       })
+    }
+  },
+  getDefaultConfigs: async () => {
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+
+    try {
+      const configs: Record<string, string> = await window.electronAPI.invoke(Channels.ConfigFile.GetDefaultConfigs)
+      return configs
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to get default configs. ${error}`, {
+        variant: 'error'
+      })
+      return {}
+    }
+  },
+  getDefaultVariables: async (clusterType: ClusterType, enginePath: string) => {
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+
+    try {
+      const variables: Record<string, string> = await window.electronAPI.invoke(Channels.ConfigFile.GetDefaultVariables, clusterType, enginePath)
+      return variables
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to get default variables. ${error}`, {
+        variant: 'error'
+      })
+      return {}
     }
   }
 }

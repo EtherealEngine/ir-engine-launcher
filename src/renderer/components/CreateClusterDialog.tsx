@@ -1,7 +1,7 @@
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
-import { ClusterModel } from 'models/Cluster'
+import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
@@ -12,6 +12,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import AppsIcon from '@mui/icons-material/Apps'
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
+import ViewListIcon from '@mui/icons-material/ViewList'
 import {
   Box,
   Button,
@@ -29,6 +30,7 @@ import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from './Colorlib'
 import ConfigAuthView from './ConfigAuthView'
+import ConfigClusterView from './ConfigClusterView'
 import ConfigConfigsView from './ConfigConfigsView'
 import ConfigFlagsView from './ConfigFlagsView'
 import ConfigSummaryView from './ConfigSummaryView'
@@ -39,9 +41,10 @@ const ColorlibStepIcon = (props: StepIconProps) => {
 
   const icons: { [index: string]: React.ReactElement } = {
     1: <AdminPanelSettingsIcon />,
-    2: <DisplaySettingsIcon />,
-    3: <AppsIcon />,
-    4: <PlaylistAddCheckIcon />
+    2: <ViewListIcon />,
+    3: <DisplaySettingsIcon />,
+    4: <AppsIcon />,
+    5: <PlaylistAddCheckIcon />
   }
 
   return (
@@ -50,11 +53,12 @@ const ColorlibStepIcon = (props: StepIconProps) => {
     </ColorlibStepIconRoot>
   )
 }
+
 interface Props {
   onClose: () => void
 }
 
-const ConfigurationDialog = ({ onClose }: Props) => {
+const CreateClusterDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
   const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
@@ -63,13 +67,13 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const configFileState = useConfigFileState()
   const { loading } = configFileState.value
 
-  const selectedCluster = ConfigFileService.getSelectedCluster()
+  // const selectedCluster = ConfigFileService.getSelectedCluster()
 
-  if (!selectedCluster) {
-    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
-    onClose()
-    return <></>
-  }
+  // if (!selectedCluster) {
+  //   enqueueSnackbar('Please select a cluster.', { variant: 'error' })
+  //   onClose()
+  //   return <></>
+  // }
 
   const [activeStep, setActiveStep] = useState(0)
   const [isLoading, setLoading] = useState(false)
@@ -85,51 +89,85 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
     return ''
   })
+  const [name, setName] = useState('')
+  const [type, setType] = useState<ClusterType | undefined>(undefined)
+  const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
+  const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
   const [localFlags, setLocalFlags] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
 
   const localConfigs = {} as Record<string, string>
-  for (const key in selectedCluster.configs) {
-    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : selectedCluster.configs[key]
+  for (const key in defaultConfigs) {
+    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : defaultConfigs[key]
   }
 
   const localVars = {} as Record<string, string>
-  for (const key in selectedCluster.variables) {
-    localVars[key] = key in tempVars ? tempVars[key] : selectedCluster.variables[key]
+  for (const key in defaultVars) {
+    localVars[key] = key in tempVars ? tempVars[key] : defaultVars[key]
+  }
+
+  useEffect(() => {
+    loadDefaultConfigs()
+  }, [])
+
+  const loadDefaultConfigs = async () => {
+    const configs = await ConfigFileService.getDefaultConfigs()
+    setDefaultConfigs(configs)
+  }
+
+  const loadDefaultVariables = async (clusterType: ClusterType) => {
+    setLoading(true)
+    const vars = await ConfigFileService.getDefaultVariables(clusterType, localConfigs[Storage.ENGINE_PATH])
+    setDefaultVars(vars)
+    setLoading(false)
   }
 
   const handleNext = async () => {
     if (activeStep === 0) {
-      setLoading(true)
-      const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
-      setLoading(false)
-      if (sudoLoggedIn) {
-        SettingsService.setSudoPassword(password)
-      } else {
-        setError('Invalid password')
+      // setLoading(true)
+      // const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
+      // setLoading(false)
+      // if (sudoLoggedIn) {
+      //   SettingsService.setSudoPassword(password)
+      // } else {
+      //   setError('Invalid password')
+      //   return
+      // }
+    } else if (activeStep === 1) {
+      if (!name || name.length < 3) {
+        setError('Please select a cluster name of minimum 3 words')
         return
       }
-    } else if (activeStep === 3) {
+
+      if (!type) {
+        setError('Please select a valid cluster type')
+        return
+      }
+    } else if (activeStep === 2) {
+      if (!type) {
+        setError('Please select a valid cluster type')
+        return
+      }
+
+      loadDefaultVariables(type)
+    } else if (activeStep === 4) {
       if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
-        const updatedCluster: ClusterModel = {
-          ...selectedCluster,
-          configs: { ...selectedCluster.configs },
-          variables: { ...selectedCluster.variables }
-        }
-
-        for (const key in tempConfigs) {
-          updatedCluster.configs[key] = tempConfigs[key]
-        }
-
-        for (const key in tempVars) {
-          updatedCluster.variables[key] = tempVars[key]
-        }
-
-        const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
-        if (!saved) {
-          enqueueSnackbar('Failed to save configurations', { variant: 'error' })
-        }
+        // const updatedCluster: ClusterModel = {
+        //   ...selectedCluster,
+        //   configs: { ...defaultConfigs.data },
+        //   variables: { ...defaultVars.data }
+        // }
+        // for (const key in tempConfigs) {
+        //   updatedCluster.configs[key] = tempConfigs[key]
+        // }
+        // for (const key in tempVars) {
+        //   updatedCluster.variables[key] = tempVars[key]
+        // }
+        // const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
+        // if (!saved) {
+        //   enqueueSnackbar('Failed to save configurations', { variant: 'error' })
+        // }
       }
 
       DeploymentService.processConfigurations(password, localConfigs, localVars, localFlags)
@@ -183,6 +221,25 @@ const ConfigurationDialog = ({ onClose }: Props) => {
           sx={{ marginLeft: 2, marginRight: 2 }}
           onChange={onChangePassword}
           onEnter={handleNext}
+        />
+      )
+    },
+    {
+      label: 'Cluster',
+      title: 'Provide cluster information',
+      content: (
+        <ConfigClusterView
+          name={name}
+          type={type}
+          sx={{ marginLeft: 2, marginRight: 2 }}
+          onNameChange={(name) => {
+            setName(name)
+            setError('')
+          }}
+          onTypeChange={(type) => {
+            setType(type)
+            setError('')
+          }}
         />
       )
     },
@@ -257,4 +314,4 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   )
 }
 
-export default ConfigurationDialog
+export default CreateClusterDialog

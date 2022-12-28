@@ -2,12 +2,13 @@ import { app, BrowserWindow, dialog } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
 import { existsSync } from 'fs'
+import { ClusterType } from 'models/Cluster'
 import { ConfigFileModel } from 'models/ConfigFile'
 import path from 'path'
 
 import { Channels } from '../../../constants/Channels'
 import { getValue, insertOrUpdateValue } from '../../managers/StoreManager'
-import { getClusters } from './ConfigFile-helper'
+import { getClusters, processConfigs, processVariables } from './ConfigFile-helper'
 
 class ConfigFile {
   static loadConfig = async (window: BrowserWindow) => {
@@ -100,6 +101,35 @@ class ConfigFile {
       throw err
     }
   }
+
+  static getDefaultConfigs = async (window: BrowserWindow) => {
+    try {
+      return await processConfigs()
+    } catch (err) {
+      log.error('Failed to get default configs.', err)
+      window.webContents.send(Channels.Utilities.Log, {
+        category: 'get default configs',
+        message: JSON.stringify(err)
+      })
+
+      throw err
+    }
+  }
+
+  static getDefaultVariables = async (window: BrowserWindow, clusterType: ClusterType, enginePath: string) => {
+    try {
+      return await processVariables(clusterType, enginePath)
+    } catch (err) {
+      log.error('Failed to get default variables.', err)
+      window.webContents.send(Channels.Utilities.Log, {
+        category: 'get default variables',
+        message: JSON.stringify(err)
+      })
+
+      throw err
+    }
+  }
+
 }
 
 export default ConfigFile

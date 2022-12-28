@@ -1,10 +1,10 @@
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import {
   Box,
-  DialogContentText,
   FormControlLabel,
   IconButton,
   InputAdornment,
@@ -16,8 +16,6 @@ import {
 } from '@mui/material'
 
 import InfoTooltip from '../common/InfoTooltip'
-import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
-import { useSnackbar } from 'notistack'
 
 interface Props {
   localConfigs: Record<string, string>
@@ -26,17 +24,8 @@ interface Props {
 }
 
 const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
-  const { enqueueSnackbar } = useSnackbar()
-  
   const configFileState = useConfigFileState()
-  const { error, loading } = configFileState.value
-
-  const selectedCluster = ConfigFileService.getSelectedCluster()
-
-  if (!selectedCluster) {
-    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
-    return <></>
-  }
+  const { loading } = configFileState.value
 
   const changeFolder = async (key: string) => {
     const path = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
@@ -47,14 +36,12 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
 
   return (
     <Box sx={sx}>
-      {error && <DialogContentText color={'red'}>Error: {error}</DialogContentText>}
       <TextField
         disabled
         fullWidth
         margin="dense"
         size="small"
         label={Storage.ENGINE_PATH.replaceAll('_', ' ')}
-        variant="standard"
         value={localConfigs[Storage.ENGINE_PATH]}
         InputProps={{
           endAdornment: (

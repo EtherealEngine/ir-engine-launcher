@@ -2,20 +2,16 @@ import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
+import { FetchableItem } from 'models/FetchableItem'
 import { SnackbarProvider } from 'notistack'
 
 import { store, useDispatch } from '../store'
-
-type FetchableItem<T> = {
-  loading: boolean
-  data: T
-  error: string
-}
 
 //State
 const state = createState({
   appVersion: '',
   sudoPassword: '',
+  showCreateClusterDialog: false,
   notistack: {} as SnackbarProvider,
   ipfs: {
     loading: false,
@@ -44,6 +40,10 @@ store.receptors.push((action: SettingsActionType): void => {
       case 'SET_SUDO_PASSWORD':
         return s.merge({
           sudoPassword: action.payload
+        })
+      case 'SET_CREATE_CLUSTER_DIALOG':
+        return s.merge({
+          showCreateClusterDialog: action.payload
         })
       case 'SET_NOTISTACK':
         return s.merge({
@@ -96,6 +96,10 @@ export const SettingsService = {
     const dispatch = useDispatch()
     const encryptedPassword = CryptoJS.AES.encrypt(JSON.stringify(password), Storage.PASSWORD_KEY).toString()
     dispatch(SettingsAction.setSudoPassword(encryptedPassword))
+  },
+  setCreateClusterDialog: (isVisible: boolean) => {
+    const dispatch = useDispatch()
+    dispatch(SettingsAction.setCreateClusterDialog(isVisible))
   },
   fetchK8Dashboard: async () => {
     const dispatch = useDispatch()
@@ -258,6 +262,12 @@ export const SettingsAction = {
   setSudoPassword: (payload: string) => {
     return {
       type: 'SET_SUDO_PASSWORD' as const,
+      payload
+    }
+  },
+  setCreateClusterDialog: (payload: boolean) => {
+    return {
+      type: 'SET_CREATE_CLUSTER_DIALOG' as const,
       payload
     }
   },

@@ -44,7 +44,9 @@ const Channels = {
     LoadConfig: 'LoadConfig',
     SaveConfig: 'SaveConfig',
     ExportConfig: "ExportConfig",
-    ImportConfig: "ImportConfig"
+    ImportConfig: "ImportConfig",
+    GetDefaultConfigs: 'GetDefaultConfigs',
+    GetDefaultVariables: 'GetDefaultVariables'
   }
 }
 

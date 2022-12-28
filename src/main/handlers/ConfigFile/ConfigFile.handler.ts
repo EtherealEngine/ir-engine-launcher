@@ -1,4 +1,5 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
+import { ClusterType } from '../../../models/Cluster'
 
 import { Channels } from '../../../constants/Channels'
 import { ConfigFileModel } from '../../../models/ConfigFile'
@@ -18,6 +19,12 @@ class ConfigFileHandler implements IBaseHandler {
     })
     ipcMain.handle(Channels.ConfigFile.ImportConfig, async (_event: IpcMainInvokeEvent) => {
       return await ConfigFile.importConfig(window)
+    })
+    ipcMain.handle(Channels.ConfigFile.GetDefaultConfigs, async (_event: IpcMainInvokeEvent) => {
+      return await ConfigFile.getDefaultConfigs(window)
+    })
+    ipcMain.handle(Channels.ConfigFile.GetDefaultVariables, async (_event: IpcMainInvokeEvent, clusterType: ClusterType, enginePath: string) => {
+      return await ConfigFile.getDefaultVariables(window, clusterType, enginePath)
     })
   }
 }
