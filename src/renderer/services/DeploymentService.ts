@@ -85,7 +85,7 @@ export const DeploymentService = {
     try {
       dispatch(DeploymentAction.setConfiguring(true))
       const response = await window.electronAPI.invoke(
-        Channels.Shell.ConfigureMinikubeConfig,
+        Channels.Cluster.ConfigureMinikubeConfig,
         password,
         configs,
         vars,
@@ -106,9 +106,9 @@ export const DeploymentService = {
   fetchDeploymentStatus: async () => {
     const dispatch = useDispatch()
     try {
-      const appsStatus = await window.electronAPI.invoke(Channels.Settings.GetCurrentAppConfigs)
+      const appsStatus = await window.electronAPI.invoke(Channels.Cluster.GetCurrentAppConfigs)
       dispatch(DeploymentAction.fetchDeploymentStatus(appsStatus))
-      await window.electronAPI.invoke(Channels.Shell.CheckMinikubeConfig, appsStatus)
+      await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeConfig, appsStatus)
     } catch (error) {
       console.error(error)
     }
@@ -118,7 +118,7 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     try {
       dispatch(DeploymentAction.fetchAppStatus(appsStatus))
-      await window.electronAPI.invoke(Channels.Shell.CheckMinikubeAppConfig, appsStatus)
+      await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeAppConfig, appsStatus)
     } catch (error) {
       console.error(error)
     }
@@ -127,13 +127,13 @@ export const DeploymentService = {
   listen: async () => {
     const dispatch = useDispatch()
     try {
-      window.electronAPI.on(Channels.Shell.CheckSystemStatusResult, (data: AppModel) => {
+      window.electronAPI.on(Channels.Cluster.CheckSystemStatusResult, (data: AppModel) => {
         dispatch(DeploymentAction.systemStatusReceived(data))
       })
-      window.electronAPI.on(Channels.Shell.CheckAppStatusResult, (data: AppModel) => {
+      window.electronAPI.on(Channels.Cluster.CheckAppStatusResult, (data: AppModel) => {
         dispatch(DeploymentAction.appStatusReceived(data))
       })
-      window.electronAPI.on(Channels.Shell.CheckEngineStatusResult, (data: AppModel) => {
+      window.electronAPI.on(Channels.Cluster.CheckEngineStatusResult, (data: AppModel) => {
         dispatch(DeploymentAction.engineStatusReceived(data))
       })
     } catch (error) {

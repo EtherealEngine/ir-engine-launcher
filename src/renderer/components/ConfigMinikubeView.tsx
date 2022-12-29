@@ -1,5 +1,5 @@
 import { Channels } from 'constants/Channels'
-import Commands from 'constants/Commands'
+import Commands from 'main/Clusters/Minikube/Minikube.commands'
 import { AppStatus } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'

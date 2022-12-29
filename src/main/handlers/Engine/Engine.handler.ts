@@ -7,8 +7,8 @@ import Engine from './Engine.class'
 
 class EngineHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
-    ipcMain.handle(Channels.Engine.EnsureAdminAccess, async (_event: IpcMainInvokeEvent) => {
-      await Engine.ensureAdminAccess(window)
+    ipcMain.handle(Channels.Engine.EnsureAdminAccess, async (_event: IpcMainInvokeEvent, enginePath: string) => {
+      await Engine.ensureAdminAccess(window, enginePath)
     })
   }
 }

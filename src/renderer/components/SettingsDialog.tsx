@@ -1,4 +1,4 @@
-import { ClusterModel } from 'models/Cluster'
+import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
@@ -105,7 +105,7 @@ const SettingsDialog = ({ onClose }: Props) => {
             >
               <Tab label="Configs" value="configs" />
               <Tab label="Variables" value="variables" />
-              <Tab label="Minikube" value="minikube" />
+              {selectedCluster.type === ClusterType.Minikube && <Tab label="Minikube" value="minikube" />}
               <Tab label="Backup" value="backup" />
               <Tab label="About" value="about" />
             </Tabs>
@@ -124,9 +124,11 @@ const SettingsDialog = ({ onClose }: Props) => {
                   sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
                 />
               </TabPanel>
-              <TabPanel value="minikube">
-                <ConfigMinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
-              </TabPanel>
+              {selectedCluster.type === ClusterType.Minikube && (
+                <TabPanel value="minikube">
+                  <ConfigMinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
+                </TabPanel>
+              )}
               <TabPanel value="backup">
                 <ConfigBackupView
                   hasPendingChanges={Object.keys(tempConfigs).length !== 0 || Object.keys(tempVars).length !== 0}

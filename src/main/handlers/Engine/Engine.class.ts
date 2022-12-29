@@ -1,13 +1,14 @@
 import { BrowserWindow } from 'electron'
+import { executeJS } from '../../managers/BrowserManager'
+import { exec } from '../../managers/ShellManager'
+import { delay } from '../../managers/UtilitiesManager'
 
 // import log from 'electron-log'
 import { Channels } from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
-import { delay, exec, executeJS } from '../IBaseHandler'
-import { getEnginePath } from '../Settings/Settings-helper'
 
 class Engine {
-  static ensureAdminAccess = async (parentWindow: BrowserWindow) => {
+  static ensureAdminAccess = async (parentWindow: BrowserWindow, enginePath: string) => {
     try {
       let adminWindow: BrowserWindow | null = null
       adminWindow = new BrowserWindow({
@@ -60,7 +61,6 @@ class Engine {
               message: `Making ${userId} admin.`
             })
 
-            const enginePath = await getEnginePath()
             const response = await exec(
               `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
             )

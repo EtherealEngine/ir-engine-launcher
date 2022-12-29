@@ -1,14 +1,5 @@
 const Channels = {
   Shell: {
-    CheckMinikubeConfig: 'CheckMinikubeConfig',
-    CheckMinikubeAppConfig: 'CheckMinikubeAppConfig',
-    CheckSystemStatusResult: 'CheckSystemStatusResult',
-    CheckAppStatusResult: 'CheckAppStatusResult',
-    CheckEngineStatusResult: 'CheckK8DashboardStatusResult',
-    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig',
-    ConfigureMinikubeDashboard: 'ConfigureMinikubeDashboard',
-    ConfigureMinikubeDashboardError: 'ConfigureMinikubeDashboardError',
-    ConfigureMinikubeDashboardResponse: 'ConfigureMinikubeDashboardResponse',
     ConfigureIPFSDashboard: 'ConfigureIPFSDashboard',
     ConfigureIPFSDashboardError: 'ConfigureIPFSDashboardError',
     ConfigureIPFSDashboardResponse: 'ConfigureIPFSDashboardResponse',
@@ -30,8 +21,17 @@ const Channels = {
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
   },
-  Settings: {
+  Cluster: {
     GetCurrentAppConfigs: 'GetCurrentAppConfigs',
+    CheckMinikubeConfig: 'CheckMinikubeConfig',
+    CheckMinikubeAppConfig: 'CheckMinikubeAppConfig',
+    CheckSystemStatusResult: 'CheckSystemStatusResult',
+    CheckAppStatusResult: 'CheckAppStatusResult',
+    CheckEngineStatusResult: 'CheckEngineStatusResult',
+    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig',
+    ConfigureK8Dashboard: 'ConfigureK8Dashboard',
+    ConfigureK8DashboardError: 'ConfigureK8DashboardError',
+    ConfigureK8DashboardResponse: 'ConfigureK8DashboardResponse',
   },
   Updates: {
     CheckUpdate: 'CheckUpdate',

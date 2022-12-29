@@ -34,3 +34,20 @@ export const fileExists = async (path: string) => {
     return false
   }
 }
+
+/**
+ * https://stackoverflow.com/a/43467144/2077741
+ * @param urlString
+ * @returns
+ */
+export const isValidUrl = (urlString: string) => {
+  let url
+
+  try {
+    url = new URL(urlString)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}

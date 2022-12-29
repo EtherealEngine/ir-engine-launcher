@@ -6,6 +6,7 @@ import { FetchableItem } from 'models/FetchableItem'
 import { SnackbarProvider } from 'notistack'
 
 import { store, useDispatch } from '../store'
+import { useConfigFileState } from './ConfigFileService'
 
 //State
 const state = createState({
@@ -111,7 +112,7 @@ export const SettingsService = {
           error: ''
         })
       )
-      window.electronAPI.invoke(Channels.Shell.ConfigureMinikubeDashboard)
+      window.electronAPI.invoke(Channels.Cluster.ConfigureK8Dashboard)
     } catch (error) {
       console.error(error)
     }
@@ -161,7 +162,13 @@ export const SettingsService = {
   },
   fetchAdminPanelAccess: async () => {
     const dispatch = useDispatch()
+    const { selectedCluster } = useConfigFileState().value
+
     try {
+      if (!selectedCluster) {
+        throw 'Please select a cluster'
+      }
+
       dispatch(
         SettingsAction.setAdminPanel({
           loading: true,
@@ -169,7 +176,7 @@ export const SettingsService = {
           error: ''
         })
       )
-      window.electronAPI.invoke(Channels.Engine.EnsureAdminAccess)
+      window.electronAPI.invoke(Channels.Engine.EnsureAdminAccess, selectedCluster.configs[Storage.ENGINE_PATH])
     } catch (error) {
       console.error(error)
     }
@@ -191,7 +198,7 @@ export const SettingsService = {
   listen: async () => {
     const dispatch = useDispatch()
     try {
-      window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardResponse, (data: string) => {
+      window.electronAPI.on(Channels.Cluster.ConfigureK8DashboardResponse, (data: string) => {
         dispatch(
           SettingsAction.setK8Dashboard({
             loading: false,
@@ -200,7 +207,7 @@ export const SettingsService = {
           })
         )
       })
-      window.electronAPI.on(Channels.Shell.ConfigureMinikubeDashboardError, (error: string) => {
+      window.electronAPI.on(Channels.Cluster.ConfigureK8DashboardError, (error: string) => {
         dispatch(
           SettingsAction.setK8Dashboard({
             loading: false,

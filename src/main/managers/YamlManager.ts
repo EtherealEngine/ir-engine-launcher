@@ -7,7 +7,7 @@ import yaml from 'js-yaml'
 import path from 'path'
 import PeerId from 'peer-id'
 
-import Commands from '../../constants/Commands'
+import Commands from '../Clusters/Minikube/Minikube.commands'
 import ConfigEnvMap from '../../constants/ConfigEnvMap'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'

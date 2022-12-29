@@ -117,15 +117,15 @@ const CreateClusterDialog = ({ onClose }: Props) => {
 
   const handleNext = async () => {
     if (activeStep === 0) {
-      // setLoading(true)
-      // const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
-      // setLoading(false)
-      // if (sudoLoggedIn) {
-      //   SettingsService.setSudoPassword(password)
-      // } else {
-      //   setError('Invalid password')
-      //   return
-      // }
+      setLoading(true)
+      const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
+      setLoading(false)
+      if (sudoLoggedIn) {
+        SettingsService.setSudoPassword(password)
+      } else {
+        setError('Invalid password')
+        return
+      }
     } else {
       if (!name || name.length < 3) {
         setError('Please select a cluster name of minimum 3 words')
