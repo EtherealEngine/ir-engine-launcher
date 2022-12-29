@@ -10,6 +10,7 @@ import { accessSettingsState } from './SettingsService'
 //State
 const state = createState({
   selectedClusterId: '',
+  selectedCluster: undefined as ClusterModel | undefined,
   clusters: [] as ClusterModel[],
   version: '' as string,
   loading: true as boolean,
@@ -19,10 +20,14 @@ const state = createState({
 store.receptors.push((action: ConfigFileActionType): void => {
   state.batch((s) => {
     switch (action.type) {
-      case 'SET_SELECTED_CLUSTER_ID':
+      case 'SET_SELECTED_CLUSTER_ID': {
+        const selectedCluster = s.clusters.value.find((item) => item.id === action.payload)
+
         return s.merge({
-          selectedClusterId: action.payload
+          selectedClusterId: action.payload,
+          selectedCluster
         })
+      }
 
       case 'SET_CONFIG':
         return s.merge({
@@ -64,28 +69,32 @@ export const ConfigFileService = {
     dispatch(ConfigFileAction.setSelectedClusterId(clusterId))
   },
 
-  getSelectedCluster: () => {
-    const { clusters, selectedClusterId } = accessConfigFileState().value
-    const selectedCluster = clusters.find((item) => item.id === selectedClusterId)
-    return selectedCluster
-  },
-
   insertOrUpdateConfig: async (cluster: ClusterModel) => {
     const dispatch = useDispatch()
     const { enqueueSnackbar } = accessSettingsState().value.notistack
-    const { clusters } = accessConfigFileState().value
+    const { clusters } = accessConfigFileState()
 
     try {
-      const configFile = { clusters: [...clusters], version: CONFIG_VERSION } as ConfigFileModel
+      const myClonedClusters: ClusterModel[] = []
+      for (const item of clusters.value) {
+        const clonedCluster: ClusterModel = {
+          ...item,
+          configs: Object.assign({}, item.configs),
+          variables: Object.assign({}, item.variables)
+        }
+        myClonedClusters.push(clonedCluster)
+      }
+
+      const configFile = { clusters: myClonedClusters, version: CONFIG_VERSION } as ConfigFileModel
 
       const index = configFile.clusters.findIndex((item) => item.id === cluster.id)
-      if (index) {
+      if (index !== -1) {
         configFile.clusters[index] = cluster
       } else {
         configFile.clusters.push(cluster)
       }
 
-      await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, cluster)
+      await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
       dispatch(ConfigFileAction.setConfig(configFile))
 
       // if (configs[Storage.ENABLE_RIPPLE_STACK] && configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {

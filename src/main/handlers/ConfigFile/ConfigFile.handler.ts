@@ -12,10 +12,10 @@ class ConfigFileHandler implements IBaseHandler {
       return await ConfigFile.loadConfig(window)
     })
     ipcMain.handle(Channels.ConfigFile.SaveConfig, async (_event: IpcMainInvokeEvent, config: ConfigFileModel) => {
-      return await ConfigFile.saveConfig(config, window)
+      return await ConfigFile.saveConfig(window, config)
     })
     ipcMain.handle(Channels.ConfigFile.ExportConfig, async (_event: IpcMainInvokeEvent, fileName: string) => {
-      return await ConfigFile.exportConfig(fileName, window)
+      return await ConfigFile.exportConfig(window, fileName)
     })
     ipcMain.handle(Channels.ConfigFile.ImportConfig, async (_event: IpcMainInvokeEvent) => {
       return await ConfigFile.importConfig(window)

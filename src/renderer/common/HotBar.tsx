@@ -1,4 +1,7 @@
-import { ClusterType } from 'models/Cluster'
+import Paths from 'constants/Paths'
+import { ClusterModel, ClusterType } from 'models/Cluster'
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CreateClusterDialog from 'renderer/components/CreateClusterDialog'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
@@ -13,10 +16,22 @@ import logoMinikube from '../../../assets/icons/minikube.png'
 
 const HotBar = () => {
   const theme = useTheme()
+  const navigate = useNavigate()
+
   const settingsState = useSettingsState()
   const { showCreateClusterDialog } = settingsState.value
   const configFileState = useConfigFileState()
   const { clusters, selectedClusterId } = configFileState.value
+
+  useEffect(() => {
+    if (selectedClusterId) {
+      navigate(Paths.CONFIG)
+    }
+  }, [selectedClusterId])
+
+  const handleClusterSelected = (cluster: ClusterModel) => {
+    ConfigFileService.setSelectedClusterId(cluster.id)
+  }
 
   return (
     <Box sx={{ backgroundColor: theme.palette.primary.main }}>
@@ -76,7 +91,7 @@ const HotBar = () => {
                   <Typography variant="body2">{cluster.name}</Typography>
                 </Box>
               }
-              onClick={() => ConfigFileService.setSelectedClusterId(cluster.id)}
+              onClick={() => handleClusterSelected(cluster)}
             />
           ))}
         </Tabs>

@@ -61,9 +61,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const { sudoPassword } = settingsState.value
 
   const configFileState = useConfigFileState()
-  const { loading } = configFileState.value
-
-  const selectedCluster = ConfigFileService.getSelectedCluster()
+  const { loading, selectedCluster } = configFileState.value
 
   if (!selectedCluster) {
     enqueueSnackbar('Please select a cluster.', { variant: 'error' })
@@ -114,16 +112,8 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
         const updatedCluster: ClusterModel = {
           ...selectedCluster,
-          configs: { ...selectedCluster.configs },
-          variables: { ...selectedCluster.variables }
-        }
-
-        for (const key in tempConfigs) {
-          updatedCluster.configs[key] = tempConfigs[key]
-        }
-
-        for (const key in tempVars) {
-          updatedCluster.variables[key] = tempVars[key]
+          configs: { ...localConfigs },
+          variables: { ...localVars }
         }
 
         const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)

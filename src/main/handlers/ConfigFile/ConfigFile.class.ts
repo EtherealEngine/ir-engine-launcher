@@ -28,7 +28,7 @@ class ConfigFile {
     }
   }
 
-  static saveConfig = async (config: ConfigFileModel, window: BrowserWindow) => {
+  static saveConfig = async (window: BrowserWindow, config: ConfigFileModel) => {
     const category = 'save config file'
     try {
       await insertOrUpdateValue('version', config.version)
@@ -47,7 +47,7 @@ class ConfigFile {
     }
   }
 
-  static exportConfig = async (fileName: string, window: BrowserWindow) => {
+  static exportConfig = async (window: BrowserWindow, fileName: string) => {
     try {
       const srcPath = path.join(app.getPath('userData'), 'config.json')
       const srcConfigExists = existsSync(srcPath)

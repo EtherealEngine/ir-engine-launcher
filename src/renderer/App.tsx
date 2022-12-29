@@ -19,15 +19,14 @@ import IPFSPage from './pages/IPFSPage'
 import K8DashboardPage from './pages/K8DashboardPage'
 import RippledPage from './pages/RippledPage'
 import WelcomePage from './pages/WelcomePage'
-import { ConfigFileService } from './services/ConfigFileService'
+import { useConfigFileState } from './services/ConfigFileService'
 import { SettingsService } from './services/SettingsService'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
 const App = () => {
   const notistackRef = React.createRef<SnackbarProvider>()
-
-  const selectedCluster = ConfigFileService.getSelectedCluster()
+  const { selectedCluster } = useConfigFileState().value
 
   const enableRippleStack = selectedCluster && selectedCluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true'
 

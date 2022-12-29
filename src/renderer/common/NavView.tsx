@@ -3,7 +3,7 @@ import Storage from 'constants/Storage'
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ColorModeContext } from 'renderer/App'
-import { ConfigFileService } from 'renderer/services/ConfigFileService'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 
 import { AccountCircleOutlined } from '@mui/icons-material'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
@@ -36,7 +36,7 @@ const NavView = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null)
   const [anchorElUser, setAnchorElUser] = React.useState(null)
 
-  const selectedCluster = ConfigFileService.getSelectedCluster()
+  const { selectedCluster } = useConfigFileState().value
 
   const enableRippleStack = selectedCluster && selectedCluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true'
 

@@ -1,5 +1,5 @@
 import { Channels } from 'constants/Channels'
-import Storage from 'constants/Storage'
+import Storage, { generateUUID } from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
@@ -67,14 +67,6 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   const configFileState = useConfigFileState()
   const { loading } = configFileState.value
 
-  // const selectedCluster = ConfigFileService.getSelectedCluster()
-
-  // if (!selectedCluster) {
-  //   enqueueSnackbar('Please select a cluster.', { variant: 'error' })
-  //   onClose()
-  //   return <></>
-  // }
-
   const [activeStep, setActiveStep] = useState(0)
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -134,7 +126,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       //   setError('Invalid password')
       //   return
       // }
-    } else if (activeStep === 1) {
+    } else {
       if (!name || name.length < 3) {
         setError('Please select a cluster name of minimum 3 words')
         return
@@ -144,36 +136,30 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         setError('Please select a valid cluster type')
         return
       }
-    } else if (activeStep === 2) {
-      if (!type) {
-        setError('Please select a valid cluster type')
+
+      if (activeStep === 2) {
+        loadDefaultVariables(type)
+      } else if (activeStep === 4) {
+        const createCluster: ClusterModel = {
+          id: generateUUID(),
+          name,
+          type,
+          configs: { ...localConfigs },
+          variables: { ...localVars }
+        }
+
+        const inserted = await ConfigFileService.insertOrUpdateConfig(createCluster)
+        if (!inserted) {
+          enqueueSnackbar('Failed to insert configurations', { variant: 'error' })
+          return
+        }
+
+        ConfigFileService.setSelectedClusterId(createCluster.id)
+        // DeploymentService.processConfigurations(password, localConfigs, localVars, localFlags)
+        onClose()
+
         return
       }
-
-      loadDefaultVariables(type)
-    } else if (activeStep === 4) {
-      if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
-        // const updatedCluster: ClusterModel = {
-        //   ...selectedCluster,
-        //   configs: { ...defaultConfigs.data },
-        //   variables: { ...defaultVars.data }
-        // }
-        // for (const key in tempConfigs) {
-        //   updatedCluster.configs[key] = tempConfigs[key]
-        // }
-        // for (const key in tempVars) {
-        //   updatedCluster.variables[key] = tempVars[key]
-        // }
-        // const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
-        // if (!saved) {
-        //   enqueueSnackbar('Failed to save configurations', { variant: 'error' })
-        // }
-      }
-
-      DeploymentService.processConfigurations(password, localConfigs, localVars, localFlags)
-      onClose()
-
-      return
     }
 
     setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -263,6 +249,8 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       title: 'Review configurations before finalizing',
       content: (
         <ConfigSummaryView
+          name={name}
+          type={type}
           localConfigs={localConfigs}
           localVars={localVars}
           localFlags={localFlags}
@@ -307,7 +295,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
-          <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Configure' : 'Next'}</Button>
+          <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Create' : 'Next'}</Button>
         </Box>
       </DialogActions>
     </Dialog>

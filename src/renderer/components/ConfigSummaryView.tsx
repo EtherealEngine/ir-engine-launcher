@@ -1,20 +1,36 @@
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { Box, SxProps, Theme, Typography } from '@mui/material'
+import { ClusterType } from 'models/Cluster'
 
 interface Props {
+  name?: string
+  type?: ClusterType
   localConfigs: Record<string, string>
   localVars: Record<string, string>
   localFlags: Record<string, string>
   sx?: SxProps<Theme>
 }
 
-const ConfigSummaryView = ({ localConfigs, localVars, localFlags, sx }: Props) => {
+const ConfigSummaryView = ({ name, type, localConfigs, localVars, localFlags, sx }: Props) => {
   return (
     <Box sx={sx}>
       <Typography sx={{ display: 'flex', fontWeight: 'bold' }}>
         Authentication: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
       </Typography>
 
+      {name && type && (
+        <>
+          <Typography sx={{ display: 'flex', fontWeight: 'bold', marginTop: 2, marginBottom: 0.5 }}>
+            Cluster: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
+          </Typography>
+          <Typography variant="body2">
+            <span style={{ opacity: 0.5 }}>Cluster Name:</span> {name}
+          </Typography>
+          <Typography variant="body2">
+            <span style={{ opacity: 0.5 }}>Cluster Type:</span> {type}
+          </Typography>
+        </>
+      )}
       <Typography sx={{ display: 'flex', fontWeight: 'bold', marginTop: 2, marginBottom: 0.5 }}>
         Configs: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
       </Typography>

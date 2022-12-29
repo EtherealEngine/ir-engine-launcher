@@ -33,13 +33,11 @@ const SettingsDialog = ({ onClose }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const [currentTab, setTab] = useState('configs')
   const configFileState = useConfigFileState()
-  const { loading } = configFileState.value
+  const { loading, selectedCluster } = configFileState.value
   const settingsState = useSettingsState()
   const { appVersion } = settingsState.value
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
-
-  const selectedCluster = ConfigFileService.getSelectedCluster()
 
   if (!selectedCluster) {
     enqueueSnackbar('Please select a cluster.', { variant: 'error' })

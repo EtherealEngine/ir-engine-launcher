@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import PageRoot from 'renderer/common/PageRoot'
+import { ConfigFileService } from 'renderer/services/ConfigFileService'
 import { SettingsService } from 'renderer/services/SettingsService'
 
 import AddIcon from '@mui/icons-material/Add'
@@ -7,6 +9,10 @@ import { Box, Button, Typography } from '@mui/material'
 import logo from '../../../assets/icon.svg'
 
 const WelcomePage = () => {
+  useEffect(() => {
+    ConfigFileService.setSelectedClusterId('')
+  }, [])
+
   const content = (
     <Box
       sx={{
