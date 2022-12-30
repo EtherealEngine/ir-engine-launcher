@@ -106,7 +106,7 @@ export const DeploymentService = {
   fetchDeploymentStatus: async () => {
     const dispatch = useDispatch()
     try {
-      const appsStatus = await window.electronAPI.invoke(Channels.Cluster.GetCurrentAppConfigs)
+      const appsStatus = await window.electronAPI.invoke(Channels.Cluster.GetAppConfigs)
       dispatch(DeploymentAction.fetchDeploymentStatus(appsStatus))
       await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeConfig, appsStatus)
     } catch (error) {

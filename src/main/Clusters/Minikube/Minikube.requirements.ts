@@ -1,7 +1,11 @@
-const SysRequirements = {
-  MIN_CPU: 4,
-  MIN_MEMORY: 3900,
-  SUPPORTED_OSES: ['Linux']
-}
+import { SysRequirement } from '../../../models/SysRequirement'
 
-export default SysRequirements
+const MinikubeRequirements: SysRequirement[] = [
+  {
+    os: 'Linux',
+    minCPU: 4,
+    minMemory: 3900
+  }
+]
+
+export default MinikubeRequirements

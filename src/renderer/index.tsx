@@ -21,7 +21,6 @@ if (isSplash) {
   DeploymentService.listen()
   ConfigFileService.init()
   SettingsService.init()
-  DeploymentService.fetchDeploymentStatus()
 
   render(<App />, document.getElementById('root'))
 }

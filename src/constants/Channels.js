@@ -22,8 +22,8 @@ const Channels = {
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
   },
   Cluster: {
-    GetCurrentAppConfigs: 'GetCurrentAppConfigs',
-    CheckMinikubeConfig: 'CheckMinikubeConfig',
+    GetClusterStatus: 'GetClusterStatus',
+    CheckClusterStatus: 'CheckClusterStatus',
     CheckMinikubeAppConfig: 'CheckMinikubeAppConfig',
     CheckSystemStatusResult: 'CheckSystemStatusResult',
     CheckAppStatusResult: 'CheckAppStatusResult',

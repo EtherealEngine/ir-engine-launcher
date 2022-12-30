@@ -15,6 +15,7 @@ import os from 'os'
 import path from 'path'
 
 import Endpoints from '../constants/Endpoints'
+import ClusterHandler from './handlers/Cluster/Cluster.handler'
 import ConfigFileHandler from './handlers/ConfigFile/ConfigFile.handler'
 import EngineHandler from './handlers/Engine/Engine.handler'
 import { IBaseHandler } from './handlers/IBaseHandler'
@@ -171,8 +172,8 @@ export const createMainWindow = async () => {
     new ConfigFileHandler(),
     new UtilitiesHandler(),
     new ShellHandler(),
-    new EngineHandler()
-    // new SettingsHandler()
+    new EngineHandler(),
+    new ClusterHandler()
   ]
 
   ipcHandlers.forEach((handler) => {
