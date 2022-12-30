@@ -129,7 +129,6 @@ class ConfigFile {
       throw err
     }
   }
-
 }
 
 export default ConfigFile

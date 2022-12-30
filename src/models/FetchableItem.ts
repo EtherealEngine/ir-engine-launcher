@@ -1,5 +1,5 @@
 export type FetchableItem<T> = {
-    loading: boolean
-    data: T
-    error: string
+  loading: boolean
+  data: T
+  error: string
 }

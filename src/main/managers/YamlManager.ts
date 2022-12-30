@@ -7,10 +7,10 @@ import yaml from 'js-yaml'
 import path from 'path'
 import PeerId from 'peer-id'
 
-import Commands from '../Clusters/Minikube/Minikube.commands'
 import ConfigEnvMap from '../../constants/ConfigEnvMap'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
+import Commands from '../Clusters/Minikube/Minikube.commands'
 import { fileExists } from './PathManager'
 
 export const getYamlDoc = async (templatePath: string, templateUrl: string) => {

@@ -1,14 +1,14 @@
-import { getEngineDefaultPath } from '../../managers/PathManager'
-import { findRequiredValues, getYamlDoc } from '../../managers/YamlManager'
-import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import path from 'path'
 
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
+import { ClusterModel, ClusterType } from '../../../models/Cluster'
+import { getEngineDefaultPath } from '../../managers/PathManager'
 import { getValue } from '../../managers/StoreManager'
+import { findRequiredValues, getYamlDoc } from '../../managers/YamlManager'
 
 export const getClusters = async () => {
-  const clusters = (await getValue('clusters') || []) as ClusterModel[]
+  const clusters = ((await getValue('clusters')) || []) as ClusterModel[]
 
   for (const cluster of clusters) {
     cluster.configs = await processConfigs(cluster.configs)
@@ -29,7 +29,11 @@ export const processConfigs = async (clusterConfigs: Record<string, string> = {}
   return clusterConfigs
 }
 
-export const processVariables = async (clusterType: ClusterType, enginePath: string, clusterVars: Record<string, string> = {}) => {
+export const processVariables = async (
+  clusterType: ClusterType,
+  enginePath: string,
+  clusterVars: Record<string, string> = {}
+) => {
   if (clusterType === ClusterType.Minikube || clusterType === ClusterType.MicroK8s) {
     return await processLocalVariables(enginePath, clusterVars)
   }

@@ -1,6 +1,7 @@
+import { ClusterType } from 'models/Cluster'
+
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import { Box, SxProps, Theme, Typography } from '@mui/material'
-import { ClusterType } from 'models/Cluster'
 
 interface Props {
   name?: string

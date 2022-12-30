@@ -7,8 +7,8 @@ export type ClusterModel = {
 }
 
 export enum ClusterType {
-  Minikube = "Minikube",
-  MicroK8s = "MicroK8s"
+  Minikube = 'Minikube',
+  MicroK8s = 'MicroK8s'
 }
 
 export const cloneCluster = (cluster: ClusterModel) => {
@@ -23,7 +23,7 @@ export const cloneCluster = (cluster: ClusterModel) => {
 
 export const cloneClusterArray = (clusters: ClusterModel[]) => {
   const myClonedClusters: ClusterModel[] = []
-  
+
   for (const cluster of clusters) {
     const clonedCluster = cloneCluster(cluster)
     myClonedClusters.push(clonedCluster)
@@ -31,4 +31,3 @@ export const cloneClusterArray = (clusters: ClusterModel[]) => {
 
   return myClonedClusters
 }
-

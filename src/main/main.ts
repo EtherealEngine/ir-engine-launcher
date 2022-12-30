@@ -26,7 +26,8 @@ import { resolveHtmlPath } from './util'
 
 // Log system info
 log.info(
-  `System Info:\n OS Type: ${os.type()}\n OS Platform: ${os.platform()}\n OS Version: ${os.version()}\n OS Arch: ${os.arch()}\n CPUs: ${os.cpus().length
+  `System Info:\n OS Type: ${os.type()}\n OS Platform: ${os.platform()}\n OS Version: ${os.version()}\n OS Arch: ${os.arch()}\n CPUs: ${
+    os.cpus().length
   }\n Memory: ${os.totalmem() / (1024 * 1024)}`
 )
 
@@ -170,7 +171,7 @@ export const createMainWindow = async () => {
     new ConfigFileHandler(),
     new UtilitiesHandler(),
     new ShellHandler(),
-    new EngineHandler(),
+    new EngineHandler()
     // new SettingsHandler()
   ]
 

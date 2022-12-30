@@ -5,26 +5,26 @@ import path from 'path'
 import { kill } from 'ps-node'
 
 import { Channels } from '../../../constants/Channels'
-import Commands from '../../Clusters/Minikube/Minikube.commands'
 import Storage from '../../../constants/Storage'
 import { AppModel } from '../../../models/AppStatus'
-import { checkAppStatus, checkEngineStatus, checkSystemStatus, getProcessList } from './Cluster-helper'
+import Commands from '../../Clusters/Minikube/Minikube.commands'
 import { appConfigsPath, assetsPath, fileExists, isValidUrl, scriptsPath } from '../../managers/PathManager'
 import { execStream } from '../../managers/ShellManager'
+import { checkAppStatus, checkEngineStatus, checkSystemStatus, getProcessList } from './Cluster-helper'
 
 class Cluster {
   static getCurrentAppConfigs = async () => {
-      try {
-          const enableRipple = await getValue(Storage.CONFIGS_TABLE, Storage.ENABLE_RIPPLE_STACK)
+    try {
+      const enableRipple = await getValue(Storage.CONFIGS_TABLE, Storage.ENABLE_RIPPLE_STACK)
 
-          if (enableRipple && enableRipple === 'true') {
-              return [...DefaultAppsStatus, ...DefaultRippleAppsStatus]
-          }
-
-          return [...DefaultAppsStatus]
-      } catch (err) {
-          throw err
+      if (enableRipple && enableRipple === 'true') {
+        return [...DefaultAppsStatus, ...DefaultRippleAppsStatus]
       }
+
+      return [...DefaultAppsStatus]
+    } catch (err) {
+      throw err
+    }
   }
 
   static checkMinikubeConfig = async (appsStatus: AppModel[], window: BrowserWindow) => {
@@ -82,7 +82,8 @@ class Cluster {
         window.webContents.send(Channels.Utilities.Log, { category, message: data })
       }
       const code = await execStream(
-        `bash "${configureScript}" -a "${assetsFolder}" -c "${configsFolder}" -d "${flags[Storage.FORCE_DB_REFRESH]
+        `bash "${configureScript}" -a "${assetsFolder}" -c "${configsFolder}" -d "${
+          flags[Storage.FORCE_DB_REFRESH]
         }" -f "${configs[Storage.ENGINE_PATH]}" -p "${password}" -r "${configs[Storage.ENABLE_RIPPLE_STACK]}"`,
         onConfigureStd,
         onConfigureStd
@@ -102,7 +103,7 @@ class Cluster {
             existingServers.forEach((httpProcess) => {
               kill(httpProcess.pid)
             })
-          } catch { }
+          } catch {}
 
           app.quit()
           process.exit()
@@ -114,7 +115,7 @@ class Cluster {
       const onFileServerStd = (data: any) => {
         try {
           window.webContents.send(Channels.Utilities.Log, { category: 'file server', message: data })
-        } catch { }
+        } catch {}
       }
 
       execStream(`bash "${fileServerScript}" -f "${configs[Storage.ENGINE_PATH]}"`, onFileServerStd, onFileServerStd)
@@ -156,7 +157,6 @@ class Cluster {
       return err
     }
   }
-
 }
 
 export default Cluster

@@ -1,7 +1,7 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import { cloneClusterArray, ClusterModel, ClusterType } from 'models/Cluster'
-import { ConfigFileModel, CONFIG_VERSION } from 'models/ConfigFile'
+import { CONFIG_VERSION, ConfigFileModel } from 'models/ConfigFile'
 import { openPathAction } from 'renderer/common/NotistackActions'
 
 import { store, useDispatch } from '../store'
@@ -192,7 +192,11 @@ export const ConfigFileService = {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
 
     try {
-      const variables: Record<string, string> = await window.electronAPI.invoke(Channels.ConfigFile.GetDefaultVariables, clusterType, enginePath)
+      const variables: Record<string, string> = await window.electronAPI.invoke(
+        Channels.ConfigFile.GetDefaultVariables,
+        clusterType,
+        enginePath
+      )
       return variables
     } catch (error) {
       console.error(error)
