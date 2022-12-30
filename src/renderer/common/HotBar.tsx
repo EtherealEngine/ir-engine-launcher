@@ -26,6 +26,8 @@ const HotBar = () => {
   useEffect(() => {
     if (selectedClusterId) {
       navigate(Paths.CONFIG)
+    } else {
+      navigate(Paths.ROOT)
     }
   }, [selectedClusterId])
 

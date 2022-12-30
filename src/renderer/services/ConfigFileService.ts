@@ -1,6 +1,6 @@
 import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
-import { ClusterModel, ClusterType } from 'models/Cluster'
+import { cloneClusterArray, ClusterModel, ClusterType } from 'models/Cluster'
 import { ConfigFileModel, CONFIG_VERSION } from 'models/ConfigFile'
 import { openPathAction } from 'renderer/common/NotistackActions'
 
@@ -75,15 +75,7 @@ export const ConfigFileService = {
     const { clusters } = accessConfigFileState()
 
     try {
-      const myClonedClusters: ClusterModel[] = []
-      for (const item of clusters.value) {
-        const clonedCluster: ClusterModel = {
-          ...item,
-          configs: Object.assign({}, item.configs),
-          variables: Object.assign({}, item.variables)
-        }
-        myClonedClusters.push(clonedCluster)
-      }
+      const myClonedClusters = cloneClusterArray(clusters.value)
 
       const configFile = { clusters: myClonedClusters, version: CONFIG_VERSION } as ConfigFileModel
 
@@ -106,12 +98,43 @@ export const ConfigFileService = {
       return true
     } catch (error) {
       console.error(error)
-      enqueueSnackbar(`Failed to update configuration. ${error}`, {
+      enqueueSnackbar(`Failed to insert/update configuration. ${error}`, {
         variant: 'error'
       })
       return false
     }
   },
+
+  deleteConfig: async (selectedClusterId: string) => {
+    const dispatch = useDispatch()
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    const { clusters } = accessConfigFileState()
+
+    try {
+      const myClonedClusters = cloneClusterArray(clusters.value)
+
+      const configFile = { clusters: myClonedClusters, version: CONFIG_VERSION } as ConfigFileModel
+
+      const index = configFile.clusters.findIndex((item) => item.id === selectedClusterId)
+      if (index === -1) {
+        throw 'Unable to find cluster.'
+      } else {
+        myClonedClusters.splice(index, 1)
+
+        await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
+        dispatch(ConfigFileAction.setConfig(configFile))
+      }
+
+      return true
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to delete configuration. ${error}`, {
+        variant: 'error'
+      })
+      return false
+    }
+  },
+
   exportSettings: async () => {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
 

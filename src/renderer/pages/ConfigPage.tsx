@@ -1,27 +1,40 @@
 import { Channels } from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
+import { ClusterType } from 'models/Cluster'
 import { useState } from 'react'
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex'
 import 'react-reflex/styles.css'
+import AlertDialog from 'renderer/common/AlertDialog'
 import PageRoot from 'renderer/common/PageRoot'
 import ConfigurationDialog from 'renderer/components/ConfigurationDialog'
 import LogsView from 'renderer/components/LogsView'
 import SettingsDialog from 'renderer/components/SettingsDialog'
 import StatusView from 'renderer/components/StatusView'
+import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
+import DeleteIcon from '@mui/icons-material/Delete'
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
 import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined'
 import SettingsIcon from '@mui/icons-material/Settings'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { Box, CircularProgress, IconButton, Stack } from '@mui/material'
+import { Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material'
+
+import logoEngine from '../../../assets/icon.svg'
+import logoMicrok8s from '../../../assets/icons/microk8s.png'
+import logoMinikube from '../../../assets/icons/minikube.png'
 
 const ConfigPage = () => {
   const [showConfigDialog, setConfigDialog] = useState(false)
   const [showSettingsDialog, setSettingsDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [isLaunching, setLaunching] = useState(false)
+
+  const configFileState = useConfigFileState()
+  const { selectedCluster, selectedClusterId } = configFileState.value
+
   const deploymentState = useDeploymentState()
   const { isConfiguring, isFetchingStatuses, appStatus, engineStatus, systemStatus } = deploymentState.value
 
@@ -41,10 +54,43 @@ const ConfigPage = () => {
     setLaunching(false)
   }
 
+  const handleDelete = async () => {
+    const deleted = await ConfigFileService.deleteConfig(selectedClusterId)
+    if (deleted) {
+      ConfigFileService.setSelectedClusterId('')
+    }
+  }
+
+  if (!selectedCluster) {
+    return <></>
+  }
+
   return (
     <PageRoot>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <Stack sx={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 2, marginBottom: 3 }}>
+        <Stack sx={{ flexDirection: 'row', gap: 2, marginBottom: 3 }}>
+          <Box sx={{ display: 'flex', flex: 1, alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{ width: 35 }}
+              component="img"
+              title={`${selectedCluster.name} (${
+                selectedCluster.type === ClusterType.Minikube
+                  ? 'Minikube'
+                  : selectedCluster.type === ClusterType.MicroK8s
+                  ? 'MicroK8s'
+                  : 'Undefined'
+              })`}
+              src={
+                selectedCluster.type === ClusterType.Minikube
+                  ? logoMinikube
+                  : selectedCluster.type === ClusterType.MicroK8s
+                  ? logoMicrok8s
+                  : logoEngine
+              }
+            />
+            <Typography variant="h5">{selectedCluster.name}</Typography>
+          </Box>
+
           <IconButton
             title="Refresh"
             color="primary"
@@ -53,9 +99,15 @@ const ConfigPage = () => {
           >
             <CachedOutlinedIcon />
           </IconButton>
+
+          <IconButton title="Delete Cluster" color="primary" onClick={() => setShowDeleteDialog(true)}>
+            <DeleteIcon />
+          </IconButton>
+
           <IconButton title="Settings" color="primary" onClick={() => setSettingsDialog(true)}>
             <SettingsIcon />
           </IconButton>
+
           <LoadingButton
             variant="contained"
             sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 }, width: 150 }}
@@ -71,6 +123,7 @@ const ConfigPage = () => {
           >
             Configure
           </LoadingButton>
+
           <LoadingButton
             variant="outlined"
             disabled={!allConfigured}
@@ -88,6 +141,7 @@ const ConfigPage = () => {
             Launch
           </LoadingButton>
         </Stack>
+
         <ReflexContainer orientation="horizontal">
           <ReflexElement minSize={200} flex={0.7} style={{ overflowX: 'hidden' }}>
             <StatusView title="System" statuses={systemStatus} />
@@ -104,8 +158,30 @@ const ConfigPage = () => {
           </ReflexElement>
         </ReflexContainer>
       </Box>
+
       {showConfigDialog && <ConfigurationDialog onClose={() => setConfigDialog(false)} />}
+
       {showSettingsDialog && <SettingsDialog onClose={() => setSettingsDialog(false)} />}
+
+      {showDeleteDialog && (
+        <AlertDialog
+          title="Confirmation"
+          message={
+            <>
+              <Typography>
+                Are you sure you want to delete '{selectedCluster.name}' cluster and all configurations associated with
+                it?
+              </Typography>
+              <Typography sx={{ mt: 2, fontWeight: 300 }}>
+                <span style={{ color: 'red' }}>Note: This is an irreversible action.</span>
+              </Typography>
+            </>
+          }
+          okButtonText="Delete"
+          onClose={() => setShowDeleteDialog(false)}
+          onOk={handleDelete}
+        />
+      )}
     </PageRoot>
   )
 }

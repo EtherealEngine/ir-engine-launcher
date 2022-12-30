@@ -2,7 +2,6 @@ import { Channels } from 'constants/Channels'
 import Storage, { generateUUID } from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { ClusterModel, ClusterType } from 'models/Cluster'
-import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
@@ -60,7 +59,6 @@ interface Props {
 
 const CreateClusterDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
-  const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
   const { sudoPassword } = settingsState.value
 
@@ -150,7 +148,6 @@ const CreateClusterDialog = ({ onClose }: Props) => {
 
         const inserted = await ConfigFileService.insertOrUpdateConfig(createCluster)
         if (!inserted) {
-          enqueueSnackbar('Failed to insert configurations', { variant: 'error' })
           return
         }
 

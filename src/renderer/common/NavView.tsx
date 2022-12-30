@@ -3,7 +3,7 @@ import Storage from 'constants/Storage'
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ColorModeContext } from 'renderer/App'
-import { useConfigFileState } from 'renderer/services/ConfigFileService'
+import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 
 import { AccountCircleOutlined } from '@mui/icons-material'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
@@ -146,7 +146,7 @@ const NavView = () => {
             <Typography variant="h6">Control Center</Typography>
           </Box>
 
-          <IconButton sx={{ mr: 2 }} onClick={() => navigate(Paths.ROOT)} color="inherit">
+          <IconButton sx={{ mr: 2 }} color="inherit" onClick={() => ConfigFileService.setSelectedClusterId('')}>
             <HomeIcon />
           </IconButton>
 

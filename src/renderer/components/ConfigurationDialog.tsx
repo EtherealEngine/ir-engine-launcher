@@ -118,7 +118,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
         const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
         if (!saved) {
-          enqueueSnackbar('Failed to save configurations', { variant: 'error' })
+          return
         }
       }
 
