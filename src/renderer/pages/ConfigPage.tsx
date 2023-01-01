@@ -35,8 +35,14 @@ const ConfigPage = () => {
   const configFileState = useConfigFileState()
   const { selectedCluster, selectedClusterId } = configFileState.value
 
+  if (!selectedCluster) {
+    return <></>
+  }
+
   const deploymentState = useDeploymentState()
-  const { isConfiguring, isFetchingStatuses, appStatus, engineStatus, systemStatus } = deploymentState.value
+  const { isConfiguring, isFetchingStatuses, appStatus, engineStatus, systemStatus } = deploymentState.deployments.find(
+    (item) => item.clusterId.value === selectedCluster.id
+  )!.value
 
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
   const allEngineConfigured = engineStatus.every((engine) => engine.status === AppStatus.Configured)
@@ -59,10 +65,6 @@ const ConfigPage = () => {
     if (deleted) {
       ConfigFileService.setSelectedClusterId('')
     }
-  }
-
-  if (!selectedCluster) {
-    return <></>
   }
 
   return (
@@ -95,7 +97,7 @@ const ConfigPage = () => {
             title="Refresh"
             color="primary"
             disabled={isFetchingStatuses}
-            onClick={DeploymentService.fetchDeploymentStatus}
+            onClick={() => DeploymentService.fetchDeploymentStatus(selectedCluster)}
           >
             <CachedOutlinedIcon />
           </IconButton>

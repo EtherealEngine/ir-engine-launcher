@@ -1,67 +1,123 @@
 import { createState, none, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
-import { AppModel, DefaultAppsStatus, DefaultEngineStatus, DefaultSystemStatus } from 'models/AppStatus'
+import { AppModel, DeploymentAppModel } from 'models/AppStatus'
+import { cloneCluster, ClusterModel } from 'models/Cluster'
 
 import { store, useDispatch } from '../store'
-import { accessSettingsState } from './SettingsService'
+
+type DeploymentItem = {
+  clusterId: string
+  isConfiguring: boolean
+  isFirstFetched: boolean
+  isFetchingStatuses: boolean
+  systemStatus: AppModel[]
+  appStatus: AppModel[]
+  engineStatus: AppModel[]
+}
 
 //State
 const state = createState({
-  systemStatus: [...DefaultSystemStatus] as AppModel[],
-  appStatus: [...DefaultAppsStatus] as AppModel[],
-  engineStatus: [...DefaultEngineStatus] as AppModel[],
-  isFetchingStatuses: false as boolean,
-  isConfiguring: false as boolean
+  deployments: [] as DeploymentItem[]
 })
 
 store.receptors.push((action: DeploymentActionType): void => {
   state.batch((s) => {
     switch (action.type) {
-      case 'SET_CONFIGURING':
-        return s.merge({
-          isConfiguring: action.isConfiguring
-        })
-      case 'SET_FETCHING_STATUSES':
-        return s.merge({
-          isFetchingStatuses: action.isFetchingStatuses
-        })
-      case 'FETCH_DEPLOYMENT_STATUS':
-        return s.merge({
-          isFetchingStatuses: true,
-          systemStatus: [...DefaultSystemStatus],
-          appStatus: action.appsStatus,
-          engineStatus: [...DefaultEngineStatus]
-        })
-      case 'FETCH_APP_STATUS': {
-        s.isFetchingStatuses.set(true)
-
-        const defaultIds = DefaultAppsStatus.map((item) => item.id)
-
-        const removedKeys: any = {}
-        for (let index = 0; index < s.appStatus.length; index++) {
-          if (defaultIds.includes(s.appStatus.value[index].id) === false) {
-            removedKeys[index] = none
-          }
+      case 'SET_CONFIGURING': {
+        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        if (index !== -1) {
+          s.deployments[index].isConfiguring.set(action.isConfiguring)
         }
-
-        s.appStatus.merge(removedKeys)
-        s.appStatus.merge(action.appsStatus)
-
         break
       }
+      case 'SET_FETCHING_STATUSES': {
+        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        if (index !== -1) {
+          s.deployments[index].isFetchingStatuses.set(action.isFetchingStatuses)
+
+          if (action.isFetchingStatuses === false) {
+            s.deployments[index].isFirstFetched.set(true)
+          }
+        }
+        break
+      }
+      case 'SET_DEPLOYMENT_APPS': {
+        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        if (index !== -1) {
+          s.deployments.merge({
+            [index]: {
+              ...s.deployments[index].value,
+              isFetchingStatuses: true,
+              systemStatus: [...action.deploymentApps.systemStatus],
+              appStatus: [...action.deploymentApps.appStatus],
+              engineStatus: [...action.deploymentApps.engineStatus]
+            } as DeploymentItem
+          })
+        } else {
+          s.deployments.merge([
+            {
+              clusterId: action.cluster.id,
+              isConfiguring: false,
+              isFirstFetched: false,
+              isFetchingStatuses: true,
+              systemStatus: [...action.deploymentApps.systemStatus],
+              appStatus: [...action.deploymentApps.appStatus],
+              engineStatus: [...action.deploymentApps.engineStatus]
+            } as DeploymentItem
+          ])
+        }
+        break
+      }
+      case 'REMOVE_DEPLOYMENT': {
+        const index = s.deployments.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s.deployments[index].set(none)
+        }
+        break
+      }
+      // case 'FETCH_APP_STATUS': {
+      //   s.isFetchingStatuses.set(true)
+
+      //   const defaultIds = DefaultAppsStatus.map((item) => item.id)
+
+      //   const removedKeys: any = {}
+      //   for (let index = 0; index < s.appStatus.length; index++) {
+      //     if (defaultIds.includes(s.appStatus.value[index].id) === false) {
+      //       removedKeys[index] = none
+      //     }
+      //   }
+
+      //   s.appStatus.merge(removedKeys)
+      //   s.appStatus.merge(action.appsStatus)
+
+      //   break
+      // }
       case 'SYSTEM_STATUS_RECEIVED': {
-        const index = s.systemStatus.value.findIndex((app) => app.id === action.systemStatus.id)
-        s.systemStatus.merge({ [index]: action.systemStatus })
+        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        if (index !== -1) {
+          const statusIndex = s.deployments[index].systemStatus.findIndex(
+            (app) => app.id.value === action.systemStatus.id
+          )
+          s.deployments[index].systemStatus.merge({ [statusIndex]: action.systemStatus })
+        }
         break
       }
       case 'APP_STATUS_RECEIVED': {
-        const index = s.appStatus.value.findIndex((app) => app.id === action.appStatus.id)
-        s.appStatus.merge({ [index]: action.appStatus })
+        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        if (index !== -1) {
+          const statusIndex = s.deployments[index].appStatus.findIndex((app) => app.id.value === action.appStatus.id)
+          s.deployments[index].appStatus.merge({ [statusIndex]: action.appStatus })
+        }
         break
       }
       case 'ENGINE_STATUS_RECEIVED': {
-        const index = s.engineStatus.value.findIndex((app) => app.id === action.engineStatus.id)
-        s.engineStatus.merge({ [index]: action.engineStatus })
+        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        if (index !== -1) {
+          const statusIndex = s.deployments[index].engineStatus.findIndex(
+            (app) => app.id.value === action.engineStatus.id
+          )
+          s.deployments[index].engineStatus.merge({ [statusIndex]: action.engineStatus })
+        }
         break
       }
     }
@@ -74,67 +130,91 @@ export const useDeploymentState = () => useState(state) as any as typeof state
 
 //Service
 export const DeploymentService = {
+  getDeploymentStatus: async (cluster: ClusterModel) => {
+    const dispatch = useDispatch()
+    try {
+      const deploymentApps: DeploymentAppModel = await window.electronAPI.invoke(
+        Channels.Cluster.GetClusterStatus,
+        cluster
+      )
+      dispatch(DeploymentAction.setDeploymentApps(cluster, deploymentApps))
+      return deploymentApps
+    } catch (error) {
+      console.error(error)
+      return undefined
+    }
+  },
+  fetchDeploymentStatus: async (cluster: ClusterModel) => {
+    const dispatch = useDispatch()
+    try {
+      const clonedCluster = cloneCluster(cluster)
+      const deploymentApps = await DeploymentService.getDeploymentStatus(clonedCluster)
+      if (deploymentApps) {
+        await window.electronAPI.invoke(Channels.Cluster.CheckClusterStatus, clonedCluster, deploymentApps)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+    dispatch(DeploymentAction.setFetchingStatuses(cluster, false))
+  },
+  removeDeploymentStatus: async (clusterId: string) => {
+    const dispatch = useDispatch()
+    try {
+      dispatch(DeploymentAction.removeDeployment(clusterId))
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  fetchAppStatus: async (appsStatus: AppModel[]) => {
+    // const dispatch = useDispatch()
+    // try {
+    //   dispatch(DeploymentAction.fetchAppStatus(cluster, appsStatus))
+    //   await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeAppConfig, appsStatus)
+    // } catch (error) {
+    //   console.error(error)
+    // }
+    // dispatch(DeploymentAction.setFetchingStatuses(cluster, false))
+  },
   processConfigurations: async (
     password: string,
     configs: Record<string, string>,
     vars: Record<string, string>,
     flags: Record<string, string>
   ) => {
-    const { enqueueSnackbar } = accessSettingsState().value.notistack
-    const dispatch = useDispatch()
-    try {
-      dispatch(DeploymentAction.setConfiguring(true))
-      const response = await window.electronAPI.invoke(
-        Channels.Cluster.ConfigureMinikubeConfig,
-        password,
-        configs,
-        vars,
-        flags
-      )
-      if (response) {
-        DeploymentService.fetchDeploymentStatus()
-      } else {
-        enqueueSnackbar('Failed to configure Ethereal Engine. Please check logs.', {
-          variant: 'error'
-        })
-      }
-    } catch (error) {
-      console.error(error)
-    }
-    dispatch(DeploymentAction.setConfiguring(false))
-  },
-  fetchDeploymentStatus: async () => {
-    const dispatch = useDispatch()
-    try {
-      const appsStatus = await window.electronAPI.invoke(Channels.Cluster.GetAppConfigs)
-      dispatch(DeploymentAction.fetchDeploymentStatus(appsStatus))
-      await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeConfig, appsStatus)
-    } catch (error) {
-      console.error(error)
-    }
-    dispatch(DeploymentAction.setFetchingStatuses(false))
-  },
-  fetchAppStatus: async (appsStatus: AppModel[]) => {
-    const dispatch = useDispatch()
-    try {
-      dispatch(DeploymentAction.fetchAppStatus(appsStatus))
-      await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeAppConfig, appsStatus)
-    } catch (error) {
-      console.error(error)
-    }
-    dispatch(DeploymentAction.setFetchingStatuses(false))
+    // const { enqueueSnackbar } = accessSettingsState().value.notistack
+    // const dispatch = useDispatch()
+    // try {
+    //   dispatch(DeploymentAction.setConfiguring(cluster, true))
+    //   const response = await window.electronAPI.invoke(
+    //     Channels.Cluster.ConfigureMinikubeConfig,
+    //     password,
+    //     configs,
+    //     vars,
+    //     flags
+    //   )
+    //   if (response) {
+    //     DeploymentService.fetchDeploymentStatus(cluster)
+    //   } else {
+    //     enqueueSnackbar('Failed to configure Ethereal Engine. Please check logs.', {
+    //       variant: 'error'
+    //     })
+    //   }
+    // } catch (error) {
+    //   console.error(error)
+    // }
+    // dispatch(DeploymentAction.setConfiguring(cluster, false))
   },
   listen: async () => {
     const dispatch = useDispatch()
     try {
-      window.electronAPI.on(Channels.Cluster.CheckSystemStatusResult, (data: AppModel) => {
-        dispatch(DeploymentAction.systemStatusReceived(data))
+      window.electronAPI.on(Channels.Cluster.CheckSystemStatusResult, (cluster: ClusterModel, data: AppModel) => {
+        dispatch(DeploymentAction.systemStatusReceived(cluster, data))
       })
-      window.electronAPI.on(Channels.Cluster.CheckAppStatusResult, (data: AppModel) => {
-        dispatch(DeploymentAction.appStatusReceived(data))
+      window.electronAPI.on(Channels.Cluster.CheckAppStatusResult, (cluster: ClusterModel, data: AppModel) => {
+        dispatch(DeploymentAction.appStatusReceived(cluster, data))
       })
-      window.electronAPI.on(Channels.Cluster.CheckEngineStatusResult, (data: AppModel) => {
-        dispatch(DeploymentAction.engineStatusReceived(data))
+      window.electronAPI.on(Channels.Cluster.CheckEngineStatusResult, (cluster: ClusterModel, data: AppModel) => {
+        dispatch(DeploymentAction.engineStatusReceived(cluster, data))
       })
     } catch (error) {
       console.error(error)
@@ -144,45 +224,58 @@ export const DeploymentService = {
 
 //Action
 export const DeploymentAction = {
-  setConfiguring: (isConfiguring: boolean) => {
+  setConfiguring: (cluster: ClusterModel, isConfiguring: boolean) => {
     return {
       type: 'SET_CONFIGURING' as const,
+      cluster,
       isConfiguring
     }
   },
-  setFetchingStatuses: (isFetchingStatuses: boolean) => {
+  setFetchingStatuses: (cluster: ClusterModel, isFetchingStatuses: boolean) => {
     return {
       type: 'SET_FETCHING_STATUSES' as const,
+      cluster,
       isFetchingStatuses
     }
   },
-  fetchDeploymentStatus: (appsStatus: AppModel[]) => {
+  removeDeployment: (clusterId: string) => {
     return {
-      type: 'FETCH_DEPLOYMENT_STATUS' as const,
-      appsStatus: appsStatus
+      type: 'REMOVE_DEPLOYMENT' as const,
+      clusterId
     }
   },
-  fetchAppStatus: (appsStatus: AppModel[]) => {
+  setDeploymentApps: (cluster: ClusterModel, deploymentApps: DeploymentAppModel) => {
     return {
-      type: 'FETCH_APP_STATUS' as const,
-      appsStatus: appsStatus
+      type: 'SET_DEPLOYMENT_APPS' as const,
+      cluster,
+      deploymentApps
     }
   },
-  systemStatusReceived: (systemStatus: AppModel) => {
+  // fetchAppStatus: (cluster: ClusterModel, appsStatus: AppModel[]) => {
+  //   return {
+  //     type: 'FETCH_APP_STATUS' as const,
+  //     cluster,
+  //     appsStatus: appsStatus
+  //   }
+  // },
+  systemStatusReceived: (cluster: ClusterModel, systemStatus: AppModel) => {
     return {
       type: 'SYSTEM_STATUS_RECEIVED' as const,
+      cluster,
       systemStatus: systemStatus
     }
   },
-  appStatusReceived: (appStatus: AppModel) => {
+  appStatusReceived: (cluster: ClusterModel, appStatus: AppModel) => {
     return {
       type: 'APP_STATUS_RECEIVED' as const,
+      cluster,
       appStatus: appStatus
     }
   },
-  engineStatusReceived: (engineStatus: AppModel) => {
+  engineStatusReceived: (cluster: ClusterModel, engineStatus: AppModel) => {
     return {
       type: 'ENGINE_STATUS_RECEIVED' as const,
+      cluster,
       engineStatus: engineStatus
     }
   }

@@ -66,7 +66,7 @@ class BaseCluster {
       }
 
       window.webContents.send(Channels.Utilities.Log, { category: status.name, message: status.detail })
-      window.webContents.send(Channels.Cluster.CheckSystemStatusResult, cluster.id, status)
+      window.webContents.send(Channels.Cluster.CheckSystemStatusResult, cluster, status)
     }
   }
 
@@ -105,7 +105,7 @@ class BaseCluster {
         }
       }
 
-      window.webContents.send(Channels.Cluster.CheckAppStatusResult, cluster.id, status)
+      window.webContents.send(Channels.Cluster.CheckAppStatusResult, cluster, status)
     }
 
     return mandatoryConfigured
@@ -162,7 +162,7 @@ class BaseCluster {
         }
       }
 
-      window.webContents.send(Channels.Cluster.CheckEngineStatusResult, cluster.id, status)
+      window.webContents.send(Channels.Cluster.CheckEngineStatusResult, cluster, status)
     }
   }
 }

@@ -1,5 +1,6 @@
 import { AppStatus } from 'models/AppStatus'
 import PageRoot from 'renderer/common/PageRoot'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 import { useHookedEffect } from 'renderer/services/useHookedEffect'
@@ -13,8 +14,15 @@ const K8DashboardPage = () => {
   const settingsState = useSettingsState()
   const { k8dashboard } = settingsState.value
 
+  const configFileState = useConfigFileState()
+  const { selectedCluster } = configFileState.value
+
+  if (!selectedCluster) {
+    return <></>
+  }
+
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.value
+  const { appStatus } = deploymentState.deployments.find((item) => item.clusterId.value === selectedCluster.id)!.value
   const minikubeStatus = appStatus.find((app) => app.id === 'minikube')
 
   useHookedEffect(() => {
@@ -23,7 +31,7 @@ const K8DashboardPage = () => {
     } else if (!k8dashboard.url && !k8dashboard.loading && minikubeStatus?.status === AppStatus.NotConfigured) {
       SettingsService.clearK8Dashboard()
     }
-  }, [deploymentState.appStatus])
+  }, [deploymentState.deployments])
 
   let loadingMessage = ''
   if (minikubeStatus?.status === AppStatus.Checking) {
@@ -38,7 +46,7 @@ const K8DashboardPage = () => {
   if (minikubeStatus?.status === AppStatus.NotConfigured) {
     errorMessage = 'Minikube Not Configured'
     errorDetail = 'Please configure minikube before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus()
+    errorRetry = () => DeploymentService.fetchDeploymentStatus(selectedCluster)
   } else if (k8dashboard.error) {
     errorMessage = 'Minikube Dashboard Error'
     errorDetail = k8dashboard.error

@@ -1,5 +1,6 @@
 import { AppStatus } from 'models/AppStatus'
 import PageRoot from 'renderer/common/PageRoot'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 import { useHookedEffect } from 'renderer/services/useHookedEffect'
@@ -13,8 +14,15 @@ const IPFSPage = () => {
   const settingsState = useSettingsState()
   const { ipfs } = settingsState.value
 
+  const configFileState = useConfigFileState()
+  const { selectedCluster } = configFileState.value
+
+  if (!selectedCluster) {
+    return <></>
+  }
+
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.value
+  const { appStatus } = deploymentState.deployments.find((item) => item.clusterId.value === selectedCluster.id)!.value
   const ipfsStatus = appStatus.find((app) => app.id === 'ipfs')
 
   useHookedEffect(() => {
@@ -23,7 +31,7 @@ const IPFSPage = () => {
     } else if (!ipfs.url && !ipfs.loading && ipfsStatus?.status === AppStatus.NotConfigured) {
       SettingsService.clearIpfsDashboard()
     }
-  }, [deploymentState.appStatus])
+  }, [deploymentState.deployments])
 
   let loadingMessage = ''
   if (ipfsStatus?.status === AppStatus.Checking) {
@@ -38,7 +46,7 @@ const IPFSPage = () => {
   if (ipfsStatus?.status === AppStatus.NotConfigured) {
     errorMessage = 'IPFS Not Configured'
     errorDetail = 'Please configure IPFS before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus()
+    errorRetry = () => DeploymentService.fetchDeploymentStatus(selectedCluster)
   } else if (ipfs.error) {
     errorMessage = 'IPFS Dashboard Error'
     errorDetail = ipfs.error

@@ -5,6 +5,7 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import InfoTooltip from 'renderer/common/InfoTooltip'
 import PageRoot from 'renderer/common/PageRoot'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 
 import PlaylistRemoveOutlinedIcon from '@mui/icons-material/PlaylistRemoveOutlined'
@@ -22,8 +23,15 @@ const RippledPage = () => {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [outputs, setOutputs] = useState<string[]>([])
 
+  const configFileState = useConfigFileState()
+  const { selectedCluster } = configFileState.value
+
+  if (!selectedCluster) {
+    return <></>
+  }
+
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.value
+  const { appStatus } = deploymentState.deployments.find((item) => item.clusterId.value === selectedCluster.id)!.value
   const rippledStatus = appStatus.find((app) => app.id === 'rippled')
 
   const onCommandChange = (value: string) => {
@@ -91,7 +99,7 @@ const RippledPage = () => {
   if (rippledStatus?.status === AppStatus.NotConfigured) {
     errorMessage = 'Rippled Not Configured'
     errorDetail = 'Please configure Rippled before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus()
+    errorRetry = () => DeploymentService.fetchDeploymentStatus(selectedCluster)
   }
 
   if (loadingMessage) {

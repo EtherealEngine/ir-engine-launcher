@@ -1,6 +1,7 @@
 import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
 import PageRoot from 'renderer/common/PageRoot'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 import { useHookedEffect } from 'renderer/services/useHookedEffect'
@@ -13,9 +14,17 @@ import LoadingPage from './LoadingPage'
 const AdminPage = () => {
   const settingsState = useSettingsState()
   const { adminPanel } = settingsState.value
+  const configFileState = useConfigFileState()
+  const { selectedCluster } = configFileState.value
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   const deploymentState = useDeploymentState()
-  const { appStatus, engineStatus } = deploymentState.value
+  const { appStatus, engineStatus } = deploymentState.deployments.find(
+    (item) => item.clusterId.value === selectedCluster.id
+  )!.value
   const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
   const allEngineConfigured = engineStatus.every((engine) => engine.status === AppStatus.Configured)
   const allConfigured = allAppsConfigured && allEngineConfigured
@@ -43,7 +52,7 @@ const AdminPage = () => {
   if (!allConfigured) {
     errorMessage = 'Ethereal Engine Not Configured'
     errorDetail = 'Please configure Ethereal Engine before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus()
+    errorRetry = () => DeploymentService.fetchDeploymentStatus(selectedCluster)
   } else if (adminPanel.error) {
     errorMessage = 'Admin Panel Error'
     errorDetail = adminPanel.error

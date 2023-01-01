@@ -5,6 +5,7 @@ import { CONFIG_VERSION, ConfigFileModel } from 'models/ConfigFile'
 import { openPathAction } from 'renderer/common/NotistackActions'
 
 import { store, useDispatch } from '../store'
+import { accessDeploymentState, DeploymentService } from './DeploymentService'
 import { accessSettingsState } from './SettingsService'
 
 //State
@@ -57,6 +58,11 @@ export const ConfigFileService = {
 
     try {
       const config: ConfigFileModel = await window.electronAPI.invoke(Channels.ConfigFile.LoadConfig)
+
+      for (const cluster of config.clusters) {
+        await DeploymentService.getDeploymentStatus(cluster)
+      }
+
       dispatch(ConfigFileAction.setConfig(config))
     } catch (error) {
       console.error(error)
@@ -67,6 +73,16 @@ export const ConfigFileService = {
   setSelectedClusterId: (clusterId: string) => {
     const dispatch = useDispatch()
     dispatch(ConfigFileAction.setSelectedClusterId(clusterId))
+
+    if (clusterId) {
+      const { isFirstFetched } = accessDeploymentState().deployments.find(
+        (item) => item.clusterId.value === clusterId
+      )!.value
+      const { selectedCluster } = accessConfigFileState().value
+      if (!isFirstFetched && selectedCluster) {
+        DeploymentService.fetchDeploymentStatus(selectedCluster)
+      }
+    }
   },
 
   insertOrUpdateConfig: async (cluster: ClusterModel) => {
@@ -87,6 +103,9 @@ export const ConfigFileService = {
       }
 
       await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
+
+      await DeploymentService.getDeploymentStatus(cluster)
+
       dispatch(ConfigFileAction.setConfig(configFile))
 
       // if (configs[Storage.ENABLE_RIPPLE_STACK] && configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
@@ -105,7 +124,7 @@ export const ConfigFileService = {
     }
   },
 
-  deleteConfig: async (selectedClusterId: string) => {
+  deleteConfig: async (clusterId: string) => {
     const dispatch = useDispatch()
     const { enqueueSnackbar } = accessSettingsState().value.notistack
     const { clusters } = accessConfigFileState()
@@ -115,13 +134,16 @@ export const ConfigFileService = {
 
       const configFile = { clusters: myClonedClusters, version: CONFIG_VERSION } as ConfigFileModel
 
-      const index = configFile.clusters.findIndex((item) => item.id === selectedClusterId)
+      const index = configFile.clusters.findIndex((item) => item.id === clusterId)
       if (index === -1) {
         throw 'Unable to find cluster.'
       } else {
         myClonedClusters.splice(index, 1)
 
         await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
+
+        await DeploymentService.removeDeploymentStatus(clusterId)
+
         dispatch(ConfigFileAction.setConfig(configFile))
       }
 

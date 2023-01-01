@@ -5,6 +5,7 @@ import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import ErrorPage from 'renderer/pages/ErrorPage'
 import LoadingPage from 'renderer/pages/LoadingPage'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
@@ -40,15 +41,22 @@ type StatInfo = {
 }
 
 const ConfigMinikubeView = ({ sx }: Props) => {
+  const { enqueueSnackbar } = useSnackbar()
   const [showAlert, setAlert] = useState(false)
   const [processingDiskPrune, setProcessingDiskPrune] = useState(false)
   const [loadingDiskStats, setLoadingDiskStats] = useState(false)
   const [errorDiskStats, setErrorDiskStats] = useState('')
   const [diskStats, setDiskStats] = useState<StatInfo[]>([])
-  const { enqueueSnackbar } = useSnackbar()
+
+  const configFileState = useConfigFileState()
+  const { selectedCluster } = configFileState.value
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.value
+  const { appStatus } = deploymentState.deployments.find((item) => item.clusterId.value === selectedCluster.id)!.value
   const minikubeStatus = appStatus.find((app) => app.id === 'minikube')
 
   const clearDiskStats = async () => {
@@ -99,7 +107,7 @@ const ConfigMinikubeView = ({ sx }: Props) => {
     } else if (minikubeStatus?.status === AppStatus.NotConfigured) {
       clearDiskStats()
     }
-  }, [deploymentState.appStatus])
+  }, [deploymentState.deployments])
 
   useEffect(() => {
     if (minikubeStatus?.status === AppStatus.Configured) {
@@ -114,7 +122,7 @@ const ConfigMinikubeView = ({ sx }: Props) => {
       <ErrorPage
         error="Minikube Not Configured"
         detail="Please configure minikube before trying again."
-        onRetry={DeploymentService.fetchDeploymentStatus}
+        onRetry={() => DeploymentService.fetchDeploymentStatus(selectedCluster)}
         variant="body1"
         isInPage
       />
