@@ -27,7 +27,7 @@ const RippledPage = () => {
   const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const currentDeployment = deploymentState.deployments.value.find((item) => item.clusterId === selectedClusterId)
+  const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
   const rippledStatus = currentDeployment?.appStatus.find((app) => app.id === 'rippled')
 
   const onCommandChange = (value: string) => {

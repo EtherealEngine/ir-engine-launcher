@@ -5,7 +5,7 @@ import { cloneCluster, ClusterModel } from 'models/Cluster'
 
 import { store, useDispatch } from '../store'
 
-type DeploymentItem = {
+type DeploymentState = {
   clusterId: string
   isConfiguring: boolean
   isFirstFetched: boolean
@@ -16,49 +16,47 @@ type DeploymentItem = {
 }
 
 //State
-const state = createState({
-  deployments: [] as DeploymentItem[]
-})
+const state = createState<DeploymentState[]>([])
 
 store.receptors.push((action: DeploymentActionType): void => {
   state.batch((s) => {
     switch (action.type) {
       case 'SET_CONFIGURING': {
-        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        const index = s.findIndex((item) => item.clusterId.value === action.cluster.id)
         if (index !== -1) {
-          s.deployments[index].isConfiguring.set(action.isConfiguring)
+          s[index].isConfiguring.set(action.isConfiguring)
         }
         break
       }
       case 'SET_FETCHING_STATUSES': {
         try {
-          const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+          const index = s.findIndex((item) => item.clusterId.value === action.cluster.id)
           if (index !== -1) {
-            s.deployments[index].isFetchingStatuses.set(action.isFetchingStatuses)
-  
+            s[index].isFetchingStatuses.set(action.isFetchingStatuses)
+
             if (action.isFetchingStatuses === false) {
-              s.deployments[index].isFirstFetched.set(true)
+              s[index].isFirstFetched.set(true)
             }
           }
-        }catch (err) {
+        } catch (err) {
           console.log(err)
         }
         break
       }
       case 'SET_DEPLOYMENT_APPS': {
-        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        const index = s.findIndex((item) => item.clusterId.value === action.cluster.id)
         if (index !== -1) {
-          s.deployments.merge({
+          s.merge({
             [index]: {
-              ...s.deployments[index].value,
+              ...s[index].value,
               isFetchingStatuses: true,
               systemStatus: [...action.deploymentApps.systemStatus],
               appStatus: [...action.deploymentApps.appStatus],
               engineStatus: [...action.deploymentApps.engineStatus]
-            } as DeploymentItem
+            } as DeploymentState
           })
         } else {
-          s.deployments.merge([
+          s.merge([
             {
               clusterId: action.cluster.id,
               isConfiguring: false,
@@ -67,15 +65,15 @@ store.receptors.push((action: DeploymentActionType): void => {
               systemStatus: [...action.deploymentApps.systemStatus],
               appStatus: [...action.deploymentApps.appStatus],
               engineStatus: [...action.deploymentApps.engineStatus]
-            } as DeploymentItem
+            } as DeploymentState
           ])
         }
         break
       }
       case 'REMOVE_DEPLOYMENT': {
-        const index = s.deployments.findIndex((item) => item.clusterId.value === action.clusterId)
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
         if (index !== -1) {
-          s.deployments[index].set(none)
+          s[index].set(none)
         }
         break
       }
@@ -97,30 +95,26 @@ store.receptors.push((action: DeploymentActionType): void => {
       //   break
       // }
       case 'SYSTEM_STATUS_RECEIVED': {
-        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        const index = s.findIndex((item) => item.clusterId.value === action.cluster.id)
         if (index !== -1) {
-          const statusIndex = s.deployments[index].systemStatus.findIndex(
-            (app) => app.id.value === action.systemStatus.id
-          )
-          s.deployments[index].systemStatus.merge({ [statusIndex]: action.systemStatus })
+          const statusIndex = s[index].systemStatus.findIndex((app) => app.id.value === action.systemStatus.id)
+          s[index].systemStatus.merge({ [statusIndex]: action.systemStatus })
         }
         break
       }
       case 'APP_STATUS_RECEIVED': {
-        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        const index = s.findIndex((item) => item.clusterId.value === action.cluster.id)
         if (index !== -1) {
-          const statusIndex = s.deployments[index].appStatus.findIndex((app) => app.id.value === action.appStatus.id)
-          s.deployments[index].appStatus.merge({ [statusIndex]: action.appStatus })
+          const statusIndex = s[index].appStatus.findIndex((app) => app.id.value === action.appStatus.id)
+          s[index].appStatus.merge({ [statusIndex]: action.appStatus })
         }
         break
       }
       case 'ENGINE_STATUS_RECEIVED': {
-        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+        const index = s.findIndex((item) => item.clusterId.value === action.cluster.id)
         if (index !== -1) {
-          const statusIndex = s.deployments[index].engineStatus.findIndex(
-            (app) => app.id.value === action.engineStatus.id
-          )
-          s.deployments[index].engineStatus.merge({ [statusIndex]: action.engineStatus })
+          const statusIndex = s[index].engineStatus.findIndex((app) => app.id.value === action.engineStatus.id)
+          s[index].engineStatus.merge({ [statusIndex]: action.engineStatus })
         }
         break
       }
@@ -135,7 +129,7 @@ export const useDeploymentState = () => useState(state) as any as typeof state
 //Service
 export const DeploymentService = {
   getDeploymentStatus: async (cluster: ClusterModel) => {
-    // Here we are cloning cluster object so that when selected Cluster is changed, 
+    // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
     const dispatch = useDispatch()
@@ -153,7 +147,7 @@ export const DeploymentService = {
     }
   },
   fetchDeploymentStatus: async (cluster: ClusterModel) => {
-    // Here we are cloning cluster object so that when selected Cluster is changed, 
+    // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
     const dispatch = useDispatch()
@@ -170,7 +164,7 @@ export const DeploymentService = {
   },
   removeDeploymentStatus: async (clusterId: string) => {
     const dispatch = useDispatch()
-    
+
     try {
       dispatch(DeploymentAction.removeDeployment(clusterId))
     } catch (error) {

@@ -75,9 +75,7 @@ export const ConfigFileService = {
     dispatch(ConfigFileAction.setSelectedClusterId(clusterId))
 
     if (clusterId) {
-      const { isFirstFetched } = accessDeploymentState().deployments.find(
-        (item) => item.clusterId.value === clusterId
-      )!.value
+      const { isFirstFetched } = accessDeploymentState().find((item) => item.clusterId.value === clusterId)!.value
       const { selectedCluster } = accessConfigFileState().value
       if (!isFirstFetched && selectedCluster) {
         DeploymentService.fetchDeploymentStatus(selectedCluster)

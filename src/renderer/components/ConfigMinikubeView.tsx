@@ -52,7 +52,7 @@ const ConfigMinikubeView = ({ sx }: Props) => {
   const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const currentDeployment = deploymentState.deployments.value.find((item) => item.clusterId === selectedClusterId)
+  const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
   const minikubeStatus = currentDeployment?.appStatus.find((app) => app.id === 'minikube')
 
   const clearDiskStats = async () => {
@@ -103,7 +103,7 @@ const ConfigMinikubeView = ({ sx }: Props) => {
     } else if (minikubeStatus?.status === AppStatus.NotConfigured) {
       clearDiskStats()
     }
-  }, [deploymentState.deployments])
+  }, [deploymentState])
 
   useEffect(() => {
     if (minikubeStatus?.status === AppStatus.Configured) {
