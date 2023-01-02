@@ -49,15 +49,11 @@ const ConfigMinikubeView = ({ sx }: Props) => {
   const [diskStats, setDiskStats] = useState<StatInfo[]>([])
 
   const configFileState = useConfigFileState()
-  const { selectedCluster } = configFileState.value
-
-  if (!selectedCluster) {
-    return <></>
-  }
+  const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.deployments.find((item) => item.clusterId.value === selectedCluster.id)!.value
-  const minikubeStatus = appStatus.find((app) => app.id === 'minikube')
+  const currentDeployment = deploymentState.deployments.value.find((item) => item.clusterId === selectedClusterId)
+  const minikubeStatus = currentDeployment?.appStatus.find((app) => app.id === 'minikube')
 
   const clearDiskStats = async () => {
     setLoadingDiskStats(false)
@@ -114,6 +110,10 @@ const ConfigMinikubeView = ({ sx }: Props) => {
       fetchDiskStats()
     }
   }, [])
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   if (minikubeStatus?.status === AppStatus.Checking) {
     return <LoadingPage title="Checking Minikube" variant="body1" isInPage />

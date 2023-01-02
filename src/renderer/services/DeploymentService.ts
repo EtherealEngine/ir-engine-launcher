@@ -31,13 +31,17 @@ store.receptors.push((action: DeploymentActionType): void => {
         break
       }
       case 'SET_FETCHING_STATUSES': {
-        const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
-        if (index !== -1) {
-          s.deployments[index].isFetchingStatuses.set(action.isFetchingStatuses)
-
-          if (action.isFetchingStatuses === false) {
-            s.deployments[index].isFirstFetched.set(true)
+        try {
+          const index = s.deployments.findIndex((item) => item.clusterId.value === action.cluster.id)
+          if (index !== -1) {
+            s.deployments[index].isFetchingStatuses.set(action.isFetchingStatuses)
+  
+            if (action.isFetchingStatuses === false) {
+              s.deployments[index].isFirstFetched.set(true)
+            }
           }
+        }catch (err) {
+          console.log(err)
         }
         break
       }
@@ -131,13 +135,17 @@ export const useDeploymentState = () => useState(state) as any as typeof state
 //Service
 export const DeploymentService = {
   getDeploymentStatus: async (cluster: ClusterModel) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed, 
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
     const dispatch = useDispatch()
+
     try {
       const deploymentApps: DeploymentAppModel = await window.electronAPI.invoke(
         Channels.Cluster.GetClusterStatus,
-        cluster
+        clonedCluster
       )
-      dispatch(DeploymentAction.setDeploymentApps(cluster, deploymentApps))
+      dispatch(DeploymentAction.setDeploymentApps(clonedCluster, deploymentApps))
       return deploymentApps
     } catch (error) {
       console.error(error)
@@ -145,9 +153,12 @@ export const DeploymentService = {
     }
   },
   fetchDeploymentStatus: async (cluster: ClusterModel) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed, 
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
     const dispatch = useDispatch()
+
     try {
-      const clonedCluster = cloneCluster(cluster)
       const deploymentApps = await DeploymentService.getDeploymentStatus(clonedCluster)
       if (deploymentApps) {
         await window.electronAPI.invoke(Channels.Cluster.CheckClusterStatus, clonedCluster, deploymentApps)
@@ -155,10 +166,11 @@ export const DeploymentService = {
     } catch (error) {
       console.error(error)
     }
-    dispatch(DeploymentAction.setFetchingStatuses(cluster, false))
+    dispatch(DeploymentAction.setFetchingStatuses(clonedCluster, false))
   },
   removeDeploymentStatus: async (clusterId: string) => {
     const dispatch = useDispatch()
+    
     try {
       dispatch(DeploymentAction.removeDeployment(clusterId))
     } catch (error) {

@@ -15,15 +15,11 @@ const IPFSPage = () => {
   const { ipfs } = settingsState.value
 
   const configFileState = useConfigFileState()
-  const { selectedCluster } = configFileState.value
-
-  if (!selectedCluster) {
-    return <></>
-  }
+  const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.deployments.find((item) => item.clusterId.value === selectedCluster.id)!.value
-  const ipfsStatus = appStatus.find((app) => app.id === 'ipfs')
+  const currentDeployment = deploymentState.deployments.value.find((item) => item.clusterId === selectedClusterId)
+  const ipfsStatus = currentDeployment?.appStatus.find((app) => app.id === 'ipfs')
 
   useHookedEffect(() => {
     if (!ipfs.url && !ipfs.loading && ipfsStatus?.status === AppStatus.Configured) {
@@ -32,6 +28,10 @@ const IPFSPage = () => {
       SettingsService.clearIpfsDashboard()
     }
   }, [deploymentState.deployments])
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   let loadingMessage = ''
   if (ipfsStatus?.status === AppStatus.Checking) {

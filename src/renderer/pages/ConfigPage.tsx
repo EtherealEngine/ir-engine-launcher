@@ -35,17 +35,11 @@ const ConfigPage = () => {
   const configFileState = useConfigFileState()
   const { selectedCluster, selectedClusterId } = configFileState.value
 
-  if (!selectedCluster) {
-    return <></>
-  }
-
   const deploymentState = useDeploymentState()
-  const { isConfiguring, isFetchingStatuses, appStatus, engineStatus, systemStatus } = deploymentState.deployments.find(
-    (item) => item.clusterId.value === selectedCluster.id
-  )!.value
+  const currentDeployment = deploymentState.deployments.value.find((item) => item.clusterId === selectedClusterId)
 
-  const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
-  const allEngineConfigured = engineStatus.every((engine) => engine.status === AppStatus.Configured)
+  const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
+  const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
   const allConfigured = allAppsConfigured && allEngineConfigured
 
   const onConfigureClicked = () => {
@@ -65,6 +59,10 @@ const ConfigPage = () => {
     if (deleted) {
       ConfigFileService.setSelectedClusterId('')
     }
+  }
+
+  if (!selectedCluster) {
+    return <></>
   }
 
   return (
@@ -96,7 +94,7 @@ const ConfigPage = () => {
           <IconButton
             title="Refresh"
             color="primary"
-            disabled={isFetchingStatuses}
+            disabled={currentDeployment?.isFetchingStatuses}
             onClick={() => DeploymentService.fetchDeploymentStatus(selectedCluster)}
           >
             <CachedOutlinedIcon />
@@ -114,7 +112,7 @@ const ConfigPage = () => {
             variant="contained"
             sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 }, width: 150 }}
             startIcon={<PowerSettingsNewOutlinedIcon />}
-            loading={isConfiguring}
+            loading={currentDeployment?.isConfiguring}
             loadingIndicator={
               <Box sx={{ display: 'flex', color: '#ffffffab' }}>
                 <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
@@ -146,11 +144,11 @@ const ConfigPage = () => {
 
         <ReflexContainer orientation="horizontal">
           <ReflexElement minSize={200} flex={0.7} style={{ overflowX: 'hidden' }}>
-            <StatusView title="System" statuses={systemStatus} />
+            <StatusView title="System" statuses={currentDeployment?.systemStatus!} />
 
-            <StatusView title="Apps" statuses={appStatus} />
+            <StatusView title="Apps" statuses={currentDeployment?.appStatus!} />
 
-            <StatusView title="Engine" statuses={engineStatus} />
+            <StatusView title="Engine" statuses={currentDeployment?.engineStatus!} />
           </ReflexElement>
 
           <ReflexSplitter />

@@ -24,15 +24,11 @@ const RippledPage = () => {
   const [outputs, setOutputs] = useState<string[]>([])
 
   const configFileState = useConfigFileState()
-  const { selectedCluster } = configFileState.value
-
-  if (!selectedCluster) {
-    return <></>
-  }
+  const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.deployments.find((item) => item.clusterId.value === selectedCluster.id)!.value
-  const rippledStatus = appStatus.find((app) => app.id === 'rippled')
+  const currentDeployment = deploymentState.deployments.value.find((item) => item.clusterId === selectedClusterId)
+  const rippledStatus = currentDeployment?.appStatus.find((app) => app.id === 'rippled')
 
   const onCommandChange = (value: string) => {
     setCommand(value)
@@ -87,6 +83,10 @@ const RippledPage = () => {
   useEffect(() => {
     ;(outputEndRef.current as any)?.scrollIntoView({ behavior: 'smooth' })
   }, [outputs])
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   let loadingMessage = ''
   if (rippledStatus?.status === AppStatus.Checking) {

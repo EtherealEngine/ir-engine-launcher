@@ -15,22 +15,17 @@ const AdminPage = () => {
   const settingsState = useSettingsState()
   const { adminPanel } = settingsState.value
   const configFileState = useConfigFileState()
-  const { selectedCluster } = configFileState.value
-
-  if (!selectedCluster) {
-    return <></>
-  }
+  const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const { appStatus, engineStatus } = deploymentState.deployments.find(
-    (item) => item.clusterId.value === selectedCluster.id
-  )!.value
-  const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
-  const allEngineConfigured = engineStatus.every((engine) => engine.status === AppStatus.Configured)
+  const currentDeployment = deploymentState.deployments.value.find((item) => item.clusterId === selectedClusterId)
+
+  const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
+  const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
   const allConfigured = allAppsConfigured && allEngineConfigured
 
-  const appChecking = appStatus.find((app) => app.status === AppStatus.Checking)
-  const engineChecking = engineStatus.find((engine) => engine.status === AppStatus.Checking)
+  const appChecking = currentDeployment?.appStatus.find((app) => app.status === AppStatus.Checking)
+  const engineChecking = currentDeployment?.engineStatus.find((engine) => engine.status === AppStatus.Checking)
   const checking = appChecking || engineChecking
 
   useHookedEffect(() => {
@@ -38,6 +33,10 @@ const AdminPage = () => {
       SettingsService.fetchAdminPanelAccess()
     }
   }, [deploymentState, settingsState])
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   let loadingMessage = ''
   if (checking) {

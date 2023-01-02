@@ -15,15 +15,11 @@ const K8DashboardPage = () => {
   const { k8dashboard } = settingsState.value
 
   const configFileState = useConfigFileState()
-  const { selectedCluster } = configFileState.value
-
-  if (!selectedCluster) {
-    return <></>
-  }
+  const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.deployments.find((item) => item.clusterId.value === selectedCluster.id)!.value
-  const minikubeStatus = appStatus.find((app) => app.id === 'minikube')
+  const currentDeployment = deploymentState.deployments.value.find((item) => item.clusterId === selectedClusterId)
+  const minikubeStatus = currentDeployment?.appStatus.find((app) => app.id === 'minikube')
 
   useHookedEffect(() => {
     if (!k8dashboard.url && !k8dashboard.loading && minikubeStatus?.status === AppStatus.Configured) {
@@ -32,6 +28,10 @@ const K8DashboardPage = () => {
       SettingsService.clearK8Dashboard()
     }
   }, [deploymentState.deployments])
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   let loadingMessage = ''
   if (minikubeStatus?.status === AppStatus.Checking) {

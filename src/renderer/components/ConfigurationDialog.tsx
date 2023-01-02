@@ -63,12 +63,6 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const configFileState = useConfigFileState()
   const { loading, selectedCluster } = configFileState.value
 
-  if (!selectedCluster) {
-    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
-    onClose()
-    return <></>
-  }
-
   const [activeStep, setActiveStep] = useState(0)
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -86,6 +80,14 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
   const [localFlags, setLocalFlags] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
+
+  useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
+
+  if (!selectedCluster) {
+    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
+    onClose()
+    return <></>
+  }
 
   const localConfigs = {} as Record<string, string>
   for (const key in selectedCluster.configs) {
@@ -204,8 +206,6 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       )
     }
   ]
-
-  useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
 
   return (
     <Dialog open fullWidth maxWidth="sm">
