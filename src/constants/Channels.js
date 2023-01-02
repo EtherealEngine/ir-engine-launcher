@@ -27,10 +27,10 @@ const Channels = {
     CheckSystemStatusResult: 'CheckSystemStatusResult',
     CheckAppStatusResult: 'CheckAppStatusResult',
     CheckEngineStatusResult: 'CheckEngineStatusResult',
-    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig',
     ConfigureK8Dashboard: 'ConfigureK8Dashboard',
     ConfigureK8DashboardError: 'ConfigureK8DashboardError',
     ConfigureK8DashboardResponse: 'ConfigureK8DashboardResponse',
+    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig'
   },
   Updates: {
     CheckUpdate: 'CheckUpdate',

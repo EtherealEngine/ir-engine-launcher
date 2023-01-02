@@ -49,6 +49,21 @@ class Cluster {
     }
   }
 
+  static configureK8Dashboard = async (window: BrowserWindow, cluster: ClusterModel) => {
+    const category = 'K8s dashboard'
+    try {
+      if (cluster.type === ClusterType.Minikube) {
+        await Minikube.configureK8Dashboard(window, cluster)
+      }
+    } catch (err) {
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category,
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
+    }
+  }
+
   // static configureMinikubeConfig = async (
   //   password: string,
   //   configs: Record<string, string>,
@@ -123,33 +138,6 @@ class Cluster {
   //       message: JSON.stringify(err)
   //     } as LogModel)
   //     return false
-  //   }
-  // }
-
-  // static configureK8Dashboard = async (window: BrowserWindow) => {
-  //   const category = 'K8s dashboard'
-  //   try {
-  //     const onStdout = (data: any) => {
-  //       const stringData = typeof data === 'string' ? data.trim() : data
-  //       window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
-  //       if (isValidUrl(data)) {
-  //         window.webContents.send(Channels.Cluster.ConfigureK8DashboardResponse, data)
-  //       }
-  //     }
-  //     const onStderr = (data: any) => {
-  //       const stringData = typeof data === 'string' ? data.trim() : data
-  //       window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
-  //       if (stringData.toString().startsWith('*') === false) {
-  //         window.webContents.send(Channels.Cluster.ConfigureK8DashboardError, data)
-  //       }
-  //     }
-  //     await execStream(Commands.MINIKUBE_DASHBOARD, onStdout, onStderr)
-  //   } catch (err) {
-  //     window.webContents.send(Channels.Utilities.Log, cluster.id, {
-  //       category,
-  //       message: JSON.stringify(err)
-  //     } as LogModel)
-  //     return err
   //   }
   // }
 }

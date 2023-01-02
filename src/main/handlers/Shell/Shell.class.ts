@@ -69,13 +69,13 @@ class Shell {
           let url = stringData.toString().replace('Forwarding from ', '')
           url = url.split(' ')[0]
           url = `http://${url}/webui`
-          window.webContents.send(Channels.Shell.ConfigureIPFSDashboardResponse, url)
+          window.webContents.send(Channels.Shell.ConfigureIPFSDashboardResponse, cluster.id, url)
         }
       }
       const onStderr = (data: any) => {
         const stringData = typeof data === 'string' ? data.trim() : data
         window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
-        window.webContents.send(Channels.Shell.ConfigureIPFSDashboardError, data)
+        window.webContents.send(Channels.Shell.ConfigureIPFSDashboardError, cluster.id, data)
       }
       await execStream(
         `podname=$(kubectl get pods -l app.kubernetes.io/instance=local-ipfs --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl port-forward $podname :9095;`,
@@ -87,7 +87,7 @@ class Shell {
         category,
         message: JSON.stringify(err)
       } as LogModel)
-      return err
+      throw err
     }
   }
 

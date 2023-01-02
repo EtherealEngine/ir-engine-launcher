@@ -16,7 +16,13 @@ class ClusterHandler implements IBaseHandler {
       async (_event: IpcMainInvokeEvent, cluster: ClusterModel, deploymentApps: DeploymentAppModel) => {
         await Cluster.checkClusterStatus(window, cluster, deploymentApps)
       }
-    )
+    ),
+      ipcMain.handle(
+        Channels.Cluster.ConfigureK8Dashboard,
+        async (_event: IpcMainInvokeEvent, cluster: ClusterModel) => {
+          await Cluster.configureK8Dashboard(window, cluster)
+        }
+      )
     //   ipcMain.handle(
     //     Channels.Cluster.ConfigureMinikubeConfig,
     //     async (
@@ -28,10 +34,7 @@ class ClusterHandler implements IBaseHandler {
     //     ) => {
     //       return await Cluster.configureMinikubeConfig(password, configs, vars, flags, window)
     //     }
-    //   ),
-    //   ipcMain.handle(Channels.Cluster.ConfigureK8Dashboard, async (_event: IpcMainInvokeEvent) => {
-    //     return await Cluster.configureK8Dashboard(window)
-    //   })
+    //   )
   }
 }
 

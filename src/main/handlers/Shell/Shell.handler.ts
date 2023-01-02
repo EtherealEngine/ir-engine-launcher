@@ -19,7 +19,7 @@ class ShellHandler implements IBaseHandler {
       ipcMain.handle(
         Channels.Shell.ConfigureIPFSDashboard,
         async (_event: IpcMainInvokeEvent, cluster: ClusterModel) => {
-          return await Shell.configureIPFSDashboard(window, cluster)
+          await Shell.configureIPFSDashboard(window, cluster)
         }
       ),
       ipcMain.handle(

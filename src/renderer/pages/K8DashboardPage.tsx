@@ -18,6 +18,10 @@ const K8DashboardPage = () => {
   const minikubeStatus = currentDeployment?.appStatus.find((app) => app.id === 'minikube')
 
   useEffect(() => {
+    init()
+  }, [])
+
+  const init = () => {
     if (
       selectedCluster &&
       !currentDeployment?.k8dashboard.data &&
@@ -33,7 +37,7 @@ const K8DashboardPage = () => {
     ) {
       DeploymentService.clearK8Dashboard(selectedCluster.id)
     }
-  }, [])
+  }
 
   if (!selectedCluster) {
     return <></>
@@ -52,7 +56,10 @@ const K8DashboardPage = () => {
   if (minikubeStatus?.status === AppStatus.NotConfigured) {
     errorMessage = 'Minikube Not Configured'
     errorDetail = 'Please configure minikube before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus(selectedCluster)
+    errorRetry = async () => {
+      await DeploymentService.fetchDeploymentStatus(selectedCluster)
+      init()
+    }
   } else if (currentDeployment?.k8dashboard.error) {
     errorMessage = 'Minikube Dashboard Error'
     errorDetail = currentDeployment?.k8dashboard.error
