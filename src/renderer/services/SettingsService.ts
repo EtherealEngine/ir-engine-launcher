@@ -2,6 +2,7 @@ import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
+import { cloneCluster, ClusterModel } from 'models/Cluster'
 import { FetchableItem } from 'models/FetchableItem'
 import { SnackbarProvider } from 'notistack'
 
@@ -160,7 +161,10 @@ export const SettingsService = {
       console.error(error)
     }
   },
-  fetchAdminPanelAccess: async () => {
+  fetchAdminPanelAccess: async (cluster: ClusterModel) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed,
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
     const dispatch = useDispatch()
     const { selectedCluster } = useConfigFileState().value
 
@@ -176,7 +180,11 @@ export const SettingsService = {
           error: ''
         })
       )
-      window.electronAPI.invoke(Channels.Engine.EnsureAdminAccess, selectedCluster.configs[Storage.ENGINE_PATH])
+      window.electronAPI.invoke(
+        Channels.Engine.EnsureAdminAccess,
+        clonedCluster,
+        selectedCluster.configs[Storage.ENGINE_PATH]
+      )
     } catch (error) {
       console.error(error)
     }
@@ -198,7 +206,7 @@ export const SettingsService = {
   listen: async () => {
     const dispatch = useDispatch()
     try {
-      window.electronAPI.on(Channels.Cluster.ConfigureK8DashboardResponse, (data: string) => {
+      window.electronAPI.on(Channels.Cluster.ConfigureK8DashboardResponse, (clusterId: string, data: string) => {
         dispatch(
           SettingsAction.setK8Dashboard({
             loading: false,
@@ -207,7 +215,7 @@ export const SettingsService = {
           })
         )
       })
-      window.electronAPI.on(Channels.Cluster.ConfigureK8DashboardError, (error: string) => {
+      window.electronAPI.on(Channels.Cluster.ConfigureK8DashboardError, (clusterId: string, error: string) => {
         dispatch(
           SettingsAction.setK8Dashboard({
             loading: false,
@@ -216,7 +224,7 @@ export const SettingsService = {
           })
         )
       })
-      window.electronAPI.on(Channels.Shell.ConfigureIPFSDashboardResponse, (data: string) => {
+      window.electronAPI.on(Channels.Shell.ConfigureIPFSDashboardResponse, (clusterId: string, data: string) => {
         dispatch(
           SettingsAction.setIpfsDashboard({
             loading: false,
@@ -225,7 +233,7 @@ export const SettingsService = {
           })
         )
       })
-      window.electronAPI.on(Channels.Shell.ConfigureIPFSDashboardError, (error: string) => {
+      window.electronAPI.on(Channels.Shell.ConfigureIPFSDashboardError, (clusterId: string, error: string) => {
         dispatch(
           SettingsAction.setIpfsDashboard({
             loading: false,
@@ -234,7 +242,7 @@ export const SettingsService = {
           })
         )
       })
-      window.electronAPI.on(Channels.Engine.EnsureAdminAccessResponse, () => {
+      window.electronAPI.on(Channels.Engine.EnsureAdminAccessResponse, (clusterId: string) => {
         dispatch(
           SettingsAction.setAdminPanel({
             loading: false,
@@ -243,7 +251,7 @@ export const SettingsService = {
           })
         )
       })
-      window.electronAPI.on(Channels.Engine.EnsureAdminAccessError, (error: string) => {
+      window.electronAPI.on(Channels.Engine.EnsureAdminAccessError, (clusterId: string, error: string) => {
         dispatch(
           SettingsAction.setAdminPanel({
             loading: false,

@@ -23,8 +23,8 @@ class UtilitiesHandler implements IBaseHandler {
       }),
       ipcMain.handle(
         Channels.Utilities.SaveLog,
-        async (_event: IpcMainInvokeEvent, contents: string[], fileName: string) => {
-          return await Utilities.saveLog(contents, fileName, window)
+        async (_event: IpcMainInvokeEvent, clusterId: string, contents: string[], fileName: string) => {
+          return await Utilities.saveLog(clusterId, contents, fileName, window)
         }
       )
   }

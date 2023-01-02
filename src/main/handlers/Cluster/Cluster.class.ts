@@ -7,6 +7,7 @@ import { DeploymentAppModel } from 'models/AppStatus'
 // import { kill } from 'ps-node'
 import { Channels } from '../../../constants/Channels'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
+import { LogModel } from '../../../models/Log'
 // import Storage from '../../../constants/Storage'
 // import { AppModel } from '../../../models/AppStatus'
 // import Commands from '../../Clusters/Minikube/Minikube.commands'
@@ -22,10 +23,10 @@ class Cluster {
         return Minikube.getClusterStatus(cluster)
       }
     } catch (err) {
-      window.webContents.send(Channels.Utilities.Log, {
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'get cluster status',
         message: JSON.stringify(err)
-      })
+      } as LogModel)
     }
 
     return { appStatus: [], systemStatus: [], engineStatus: [] } as DeploymentAppModel
@@ -41,10 +42,10 @@ class Cluster {
         await Minikube.checkClusterStatus(window, cluster, deploymentApps)
       }
     } catch (err) {
-      window.webContents.send(Channels.Utilities.Log, {
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'check cluster status',
         message: JSON.stringify(err)
-      })
+      } as LogModel)
     }
   }
 
@@ -52,10 +53,10 @@ class Cluster {
   //   try {
   //     await checkAppStatus(window, appsStatus)
   //   } catch (err) {
-  //     window.webContents.send(Channels.Utilities.Log, {
+  //     window.webContents.send(Channels.Utilities.Log, cluster.id, {
   //       category: 'check minikube config',
   //       message: JSON.stringify(err)
-  //     })
+  //     } as LogModel)
   //   }
   // }
 
@@ -85,7 +86,7 @@ class Cluster {
   //     log.info(`Executing script ${configureScript}`)
 
   //     const onConfigureStd = (data: any) => {
-  //       window.webContents.send(Channels.Utilities.Log, { category, message: data })
+  //       window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: data } as LogModel)
   //     }
   //     const code = await execStream(
   //       `bash "${configureScript}" -a "${assetsFolder}" -c "${configsFolder}" -d "${flags[Storage.FORCE_DB_REFRESH]
@@ -119,7 +120,7 @@ class Cluster {
 
   //     const onFileServerStd = (data: any) => {
   //       try {
-  //         window.webContents.send(Channels.Utilities.Log, { category: 'file server', message: data })
+  //         window.webContents.send(Channels.Utilities.Log, cluster.id, { category: 'file server', message: data } as LogModel)
   //       } catch { }
   //     }
 
@@ -128,10 +129,10 @@ class Cluster {
   //     return true
   //   } catch (err) {
   //     log.error('Error in ConfigureMinikubeConfig.', err)
-  //     window.webContents.send(Channels.Utilities.Log, {
+  //     window.webContents.send(Channels.Utilities.Log, cluster.id, {
   //       category,
   //       message: JSON.stringify(err)
-  //     })
+  //     } as LogModel)
   //     return false
   //   }
   // }
@@ -141,24 +142,24 @@ class Cluster {
   //   try {
   //     const onStdout = (data: any) => {
   //       const stringData = typeof data === 'string' ? data.trim() : data
-  //       window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
+  //       window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
   //       if (isValidUrl(data)) {
   //         window.webContents.send(Channels.Cluster.ConfigureK8DashboardResponse, data)
   //       }
   //     }
   //     const onStderr = (data: any) => {
   //       const stringData = typeof data === 'string' ? data.trim() : data
-  //       window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
+  //       window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
   //       if (stringData.toString().startsWith('*') === false) {
   //         window.webContents.send(Channels.Cluster.ConfigureK8DashboardError, data)
   //       }
   //     }
   //     await execStream(Commands.MINIKUBE_DASHBOARD, onStdout, onStderr)
   //   } catch (err) {
-  //     window.webContents.send(Channels.Utilities.Log, {
+  //     window.webContents.send(Channels.Utilities.Log, cluster.id, {
   //       category,
   //       message: JSON.stringify(err)
-  //     })
+  //     } as LogModel)
   //     return err
   //   }
   // }

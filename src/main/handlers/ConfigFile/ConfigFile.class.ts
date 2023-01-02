@@ -2,11 +2,12 @@ import { app, BrowserWindow, dialog } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
 import { existsSync } from 'fs'
-import { ClusterType } from 'models/Cluster'
-import { ConfigFileModel } from 'models/ConfigFile'
 import path from 'path'
 
 import { Channels } from '../../../constants/Channels'
+import { ClusterType } from '../../../models/Cluster'
+import { ConfigFileModel } from '../../../models/ConfigFile'
+import { LogModel } from '../../../models/Log'
 import { getValue, insertOrUpdateValue } from '../../managers/StoreManager'
 import { getClusters, processConfigs, processVariables } from './ConfigFile-helper'
 
@@ -23,7 +24,7 @@ class ConfigFile {
       window.webContents.send(Channels.Utilities.Log, {
         category,
         message: JSON.stringify(err)
-      })
+      } as LogModel)
       throw err
     }
   }
@@ -37,12 +38,12 @@ class ConfigFile {
       window.webContents.send(Channels.Utilities.Log, {
         category,
         message: 'Configuration file saved.'
-      })
+      } as LogModel)
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, {
         category,
         message: JSON.stringify(err)
-      })
+      } as LogModel)
       throw err
     }
   }
@@ -67,7 +68,7 @@ class ConfigFile {
       window.webContents.send(Channels.Utilities.Log, {
         category: 'export configuration',
         message: JSON.stringify(err)
-      })
+      } as LogModel)
 
       throw err
     }
@@ -96,7 +97,7 @@ class ConfigFile {
       window.webContents.send(Channels.Utilities.Log, {
         category: 'import configuration',
         message: JSON.stringify(err)
-      })
+      } as LogModel)
 
       throw err
     }
@@ -110,7 +111,7 @@ class ConfigFile {
       window.webContents.send(Channels.Utilities.Log, {
         category: 'get default configs',
         message: JSON.stringify(err)
-      })
+      } as LogModel)
 
       throw err
     }
@@ -124,7 +125,7 @@ class ConfigFile {
       window.webContents.send(Channels.Utilities.Log, {
         category: 'get default variables',
         message: JSON.stringify(err)
-      })
+      } as LogModel)
 
       throw err
     }

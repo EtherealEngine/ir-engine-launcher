@@ -4,6 +4,7 @@ import os from 'os'
 import { Channels } from '../../../constants/Channels'
 import { AppModel, AppStatus, DeploymentAppModel } from '../../../models/AppStatus'
 import { ClusterModel } from '../../../models/Cluster'
+import { LogModel } from '../../../models/Log'
 import { SysRequirement } from '../../../models/SysRequirement'
 import { exec } from '../../managers/ShellManager'
 
@@ -65,8 +66,11 @@ class BaseCluster {
         }
       }
 
-      window.webContents.send(Channels.Utilities.Log, { category: status.name, message: status.detail })
-      window.webContents.send(Channels.Cluster.CheckSystemStatusResult, cluster, status)
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category: status.name,
+        message: status.detail
+      } as LogModel)
+      window.webContents.send(Channels.Cluster.CheckSystemStatusResult, cluster.id, status)
     }
   }
 
@@ -82,16 +86,16 @@ class BaseCluster {
         const { stdout, stderr } = response
 
         if (stdout) {
-          window.webContents.send(Channels.Utilities.Log, {
+          window.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: status.name,
             message: typeof stdout === 'string' ? stdout.trim() : stdout
-          })
+          } as LogModel)
         }
         if (stderr) {
-          window.webContents.send(Channels.Utilities.Log, {
+          window.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: status.name,
             message: typeof stderr === 'string' ? stderr.trim() : stderr
-          })
+          } as LogModel)
 
           if (!app.isOptional) {
             mandatoryConfigured = false
@@ -105,7 +109,7 @@ class BaseCluster {
         }
       }
 
-      window.webContents.send(Channels.Cluster.CheckAppStatusResult, cluster, status)
+      window.webContents.send(Channels.Cluster.CheckAppStatusResult, cluster.id, status)
     }
 
     return mandatoryConfigured
@@ -133,16 +137,16 @@ class BaseCluster {
         const { stdout, stderr } = response
 
         if (stdout) {
-          window.webContents.send(Channels.Utilities.Log, {
+          window.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: engineItem.name,
             message: typeof stdout === 'string' ? stdout.trim() : stdout
-          })
+          } as LogModel)
         }
         if (stderr) {
-          window.webContents.send(Channels.Utilities.Log, {
+          window.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: engineItem.name,
             message: typeof stderr === 'string' ? stderr.trim() : stderr
-          })
+          } as LogModel)
         }
 
         let detail: string | Buffer = `Ready Instances: ${stdout === '' || stdout === undefined ? 0 : stdout}`
@@ -162,7 +166,7 @@ class BaseCluster {
         }
       }
 
-      window.webContents.send(Channels.Cluster.CheckEngineStatusResult, cluster, status)
+      window.webContents.send(Channels.Cluster.CheckEngineStatusResult, cluster.id, status)
     }
   }
 }

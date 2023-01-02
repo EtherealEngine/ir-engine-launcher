@@ -6,6 +6,7 @@ import { openPathAction } from 'renderer/common/NotistackActions'
 
 import { store, useDispatch } from '../store'
 import { accessDeploymentState, DeploymentService } from './DeploymentService'
+import { LogService } from './LogService'
 import { accessSettingsState } from './SettingsService'
 
 //State
@@ -60,6 +61,7 @@ export const ConfigFileService = {
       const config: ConfigFileModel = await window.electronAPI.invoke(Channels.ConfigFile.LoadConfig)
 
       for (const cluster of config.clusters) {
+        LogService.setLogs(cluster.id)
         await DeploymentService.getDeploymentStatus(cluster)
       }
 
@@ -102,6 +104,7 @@ export const ConfigFileService = {
 
       await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
 
+      LogService.setLogs(cluster.id)
       await DeploymentService.getDeploymentStatus(cluster)
 
       dispatch(ConfigFileAction.setConfig(configFile))
@@ -141,6 +144,7 @@ export const ConfigFileService = {
         await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
 
         await DeploymentService.removeDeploymentStatus(clusterId)
+        LogService.removeLogs(clusterId)
 
         dispatch(ConfigFileAction.setConfig(configFile))
       }

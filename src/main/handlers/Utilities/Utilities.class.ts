@@ -5,6 +5,7 @@ import { EOL } from 'os'
 import path from 'path'
 
 import { Channels } from '../../../constants/Channels'
+import { LogModel } from '../../../models/Log'
 
 class Utilities {
   static copyClipboard = (copyText: string) => {
@@ -39,7 +40,7 @@ class Utilities {
     return ''
   }
 
-  static saveLog = async (contents: string[], fileName: string, window: BrowserWindow) => {
+  static saveLog = async (clusterId: string, contents: string[], fileName: string, window: BrowserWindow) => {
     try {
       const logPath = path.join(app.getPath('downloads'), fileName)
       const content = contents.join(EOL)
@@ -50,7 +51,10 @@ class Utilities {
       return logPath
     } catch (err) {
       log.error('Failed to save logs.', err)
-      window.webContents.send(Channels.Utilities.Log, { category: 'save logs', message: JSON.stringify(err) })
+      window.webContents.send(Channels.Utilities.Log, clusterId, {
+        category: 'save logs',
+        message: JSON.stringify(err)
+      } as LogModel)
 
       throw err
     }

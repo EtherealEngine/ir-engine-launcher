@@ -2,6 +2,8 @@ import { BrowserWindow } from 'electron'
 import log from 'electron-log'
 
 import { Channels } from '../../../constants/Channels'
+import { ClusterModel } from '../../../models/Cluster'
+import { LogModel } from '../../../models/Log'
 import { exec, execStream } from '../../managers/ShellManager'
 import { checkSudoPassword } from './Shell-helper'
 
@@ -19,7 +21,7 @@ class Shell {
     }
   }
 
-  static executeCommand = async (command: string, window: BrowserWindow) => {
+  static executeCommand = async (window: BrowserWindow, cluster: ClusterModel, command: string) => {
     const category = 'execute command'
     try {
       const output = await new Promise((resolve) => {
@@ -27,40 +29,40 @@ class Shell {
           command,
           (data: any) => {
             const stringData = typeof data === 'string' ? data.trim() : data
-            window.webContents.send(Channels.Utilities.Log, {
+            window.webContents.send(Channels.Utilities.Log, cluster.id, {
               category,
               message: stringData
-            })
+            } as LogModel)
 
             resolve(stringData)
           },
           (data: any) => {
             const stringData = typeof data === 'string' ? data.trim() : data
-            window.webContents.send(Channels.Utilities.Log, {
+            window.webContents.send(Channels.Utilities.Log, cluster.id, {
               category,
               message: stringData
-            })
+            } as LogModel)
           }
         )
       })
 
       return output
     } catch (err) {
-      window.webContents.send(Channels.Utilities.Log, {
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
         category,
         message: JSON.stringify(err)
-      })
+      } as LogModel)
       throw err
     }
   }
 
-  static configureIPFSDashboard = async (window: BrowserWindow) => {
+  static configureIPFSDashboard = async (window: BrowserWindow, cluster: ClusterModel) => {
     const category = 'ipfs dashboard'
     try {
       const onStdout = (data: any) => {
         const stringData = typeof data === 'string' ? data.trim() : data
         if (stringData.toString().startsWith('Handling connection')) {
-          window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
+          window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData })
         }
 
         if (stringData.toString().startsWith('Forwarding from 127.0.0.1')) {
@@ -72,7 +74,7 @@ class Shell {
       }
       const onStderr = (data: any) => {
         const stringData = typeof data === 'string' ? data.trim() : data
-        window.webContents.send(Channels.Utilities.Log, { category, message: stringData })
+        window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
         window.webContents.send(Channels.Shell.ConfigureIPFSDashboardError, data)
       }
       await execStream(
@@ -81,15 +83,15 @@ class Shell {
         onStderr
       )
     } catch (err) {
-      window.webContents.send(Channels.Utilities.Log, {
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
         category,
         message: JSON.stringify(err)
-      })
+      } as LogModel)
       return err
     }
   }
 
-  static executeRippledCommand = async (command: string, window: BrowserWindow) => {
+  static executeRippledCommand = async (window: BrowserWindow, cluster: ClusterModel, command: string) => {
     const category = 'rippled cli'
     try {
       const response = await exec(
@@ -109,10 +111,10 @@ class Shell {
 
       return output
     } catch (err) {
-      window.webContents.send(Channels.Utilities.Log, {
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
         category,
         message: JSON.stringify(err)
-      })
+      } as LogModel)
       throw err
     }
   }

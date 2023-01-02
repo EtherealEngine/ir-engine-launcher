@@ -1,4 +1,4 @@
-import { createState, useState } from '@speigg/hookstate'
+import { createState, none, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import { LogModel } from 'models/Log'
 import { openPathAction } from 'renderer/common/NotistackActions'
@@ -6,23 +6,67 @@ import { openPathAction } from 'renderer/common/NotistackActions'
 import { store, useDispatch } from '../store'
 import { accessSettingsState } from './SettingsService'
 
+type LogState = {
+  clusterId: string
+  isSaving: boolean
+  logs: LogModel[]
+}
+
 //State
-const state = createState({
-  isSavingLogs: false as boolean,
-  logs: [] as LogModel[]
-})
+const state = createState<LogState[]>([])
 
 store.receptors.push((action: LogActionType): void => {
   state.batch((s) => {
     switch (action.type) {
-      case 'SET_IS_SAVING':
-        return s.merge({
-          isSavingLogs: action.isSaving
-        })
-      case 'LOG_RECEIVED':
-        return s.logs.merge([action.log])
-      case 'LOG_CLEAR':
-        return s.logs.set([])
+      case 'SET_IS_SAVING': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s[index].isSaving.set(action.isSaving)
+        }
+        break
+      }
+      case 'SET_LOGS': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s.merge({
+            [index]: {
+              ...s[index].value,
+              isSaving: false,
+              logs: []
+            } as LogState
+          })
+        } else {
+          s.merge([
+            {
+              clusterId: action.clusterId,
+              isSaving: false,
+              logs: []
+            } as LogState
+          ])
+        }
+        break
+      }
+      case 'REMOVE_LOGS': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s[index].set(none)
+        }
+        break
+      }
+      case 'LOG_RECEIVED': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s[index].logs.merge([action.log])
+        }
+        break
+      }
+      case 'LOG_CLEAR': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s[index].logs.set([])
+        }
+        break
+      }
     }
   }, action.type)
 })
@@ -33,17 +77,31 @@ export const useLogState = () => useState(state) as any as typeof state
 
 //Service
 export const LogService = {
-  saveLogs: async () => {
+  setLogs: (clusterId: string) => {
+    const dispatch = useDispatch()
+    dispatch(LogAction.setLogs(clusterId))
+  },
+  removeLogs: (clusterId: string) => {
+    const dispatch = useDispatch()
+    dispatch(LogAction.removeLogs(clusterId))
+  },
+  saveLogs: async (clusterId: string) => {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
-    const { logs } = accessLogState().value
 
     const dispatch = useDispatch()
     try {
-      dispatch(LogAction.setIsSaving(true))
+      const logState = accessLogState().value.find((item) => item.clusterId === clusterId)
+      if (!logState) {
+        return
+      }
 
-      const contents = logs.map((log) => `${new Date(log.date).toLocaleTimeString()}: ${log.category} - ${log.message}`)
+      dispatch(LogAction.setIsSaving(clusterId, true))
+
+      const contents = logState.logs.map(
+        (log) => `${new Date(log.date).toLocaleTimeString()}: ${log.category} - ${log.message}`
+      )
       const fileName = `XRE-logs-${new Date().toJSON()}.txt`
-      const path = await window.electronAPI.invoke(Channels.Utilities.SaveLog, contents, fileName)
+      const path = await window.electronAPI.invoke(Channels.Utilities.SaveLog, clusterId, contents, fileName)
 
       enqueueSnackbar(`Logs saved ${fileName}.`, {
         variant: 'success',
@@ -56,42 +114,66 @@ export const LogService = {
         variant: 'error'
       })
     }
-    dispatch(LogAction.setIsSaving(false))
+    dispatch(LogAction.setIsSaving(clusterId, false))
   },
   listen: async () => {
     const dispatch = useDispatch()
     try {
-      window.electronAPI.on(Channels.Utilities.Log, (data: LogModel) => {
+      window.electronAPI.on(Channels.Utilities.Log, (clusterId: string | undefined = undefined, data: LogModel) => {
         data.date = new Date().toString()
-        dispatch(LogAction.logReceived(data))
+        if (clusterId) {
+          dispatch(LogAction.logReceived(clusterId, data))
+          return
+        }
+
+        // If no clusterId is specified then its a global log.
+        const logState = accessLogState().value
+        for (const item of logState) {
+          dispatch(LogAction.logReceived(item.clusterId, data))
+        }
       })
     } catch (error) {
       console.error(error)
     }
   },
-  clearLogs: async () => {
+  clearLogs: async (clusterId: string) => {
     const dispatch = useDispatch()
-    dispatch(LogAction.clearLogs())
+    dispatch(LogAction.clearLogs(clusterId))
   }
 }
 
 //Action
 export const LogAction = {
-  setIsSaving: (isSaving: boolean) => {
+  setIsSaving: (clusterId: string, isSaving: boolean) => {
     return {
       type: 'SET_IS_SAVING' as const,
-      isSaving: isSaving
+      clusterId,
+      isSaving
     }
   },
-  logReceived: (log: LogModel) => {
+  setLogs: (clusterId: string) => {
+    return {
+      type: 'SET_LOGS' as const,
+      clusterId
+    }
+  },
+  removeLogs: (clusterId: string) => {
+    return {
+      type: 'REMOVE_LOGS' as const,
+      clusterId
+    }
+  },
+  logReceived: (clusterId: string, log: LogModel) => {
     return {
       type: 'LOG_RECEIVED' as const,
+      clusterId,
       log: log
     }
   },
-  clearLogs: () => {
+  clearLogs: (clusterId: string) => {
     return {
-      type: 'LOG_CLEAR' as const
+      type: 'LOG_CLEAR' as const,
+      clusterId
     }
   }
 }

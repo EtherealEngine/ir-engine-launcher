@@ -3,12 +3,14 @@ import { BrowserWindow } from 'electron'
 // import log from 'electron-log'
 import { Channels } from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
+import { ClusterModel } from '../../../models/Cluster'
+import { LogModel } from '../../../models/Log'
 import { executeJS } from '../../managers/BrowserManager'
 import { exec } from '../../managers/ShellManager'
 import { delay } from '../../managers/UtilitiesManager'
 
 class Engine {
-  static ensureAdminAccess = async (parentWindow: BrowserWindow, enginePath: string) => {
+  static ensureAdminAccess = async (parentWindow: BrowserWindow, cluster: ClusterModel, enginePath: string) => {
     try {
       let adminWindow: BrowserWindow | null = null
       adminWindow = new BrowserWindow({
@@ -39,10 +41,10 @@ class Engine {
             adminWindow
           )
 
-          parentWindow.webContents.send(Channels.Utilities.Log, {
+          parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: 'admin panel',
             message: `User role is ${userRole.trim()}.`
-          })
+          } as LogModel)
 
           if (userRole !== 'admin') {
             const userId = await executeJS(
@@ -56,10 +58,10 @@ class Engine {
               throw 'Failed to find userId.'
             }
 
-            parentWindow.webContents.send(Channels.Utilities.Log, {
+            parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
               category: 'admin panel',
               message: `Making ${userId} admin.`
-            })
+            } as LogModel)
 
             const response = await exec(
               `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
@@ -71,14 +73,15 @@ class Engine {
             }
           }
 
-          parentWindow.webContents.send(Channels.Engine.EnsureAdminAccessResponse)
+          parentWindow.webContents.send(Channels.Engine.EnsureAdminAccessResponse, cluster.id)
         } catch (err) {
-          parentWindow.webContents.send(Channels.Utilities.Log, {
+          parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: 'admin panel',
             message: JSON.stringify(err)
-          })
+          } as LogModel)
           parentWindow.webContents.send(
             Channels.Engine.EnsureAdminAccessError,
+            cluster.id,
             `Failed to load admin panel. Please check logs.`
           )
         }
@@ -93,12 +96,13 @@ class Engine {
       await adminWindow.loadURL(Endpoints.LOGIN_PAGE)
       // adminWindow.show()
     } catch (err) {
-      parentWindow.webContents.send(Channels.Utilities.Log, {
+      parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'admin panel',
         message: JSON.stringify(err)
-      })
+      } as LogModel)
       parentWindow.webContents.send(
         Channels.Engine.EnsureAdminAccessError,
+        cluster.id,
         `Failed to load admin panel. Please check logs.`
       )
     }
