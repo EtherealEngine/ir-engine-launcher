@@ -49,17 +49,6 @@ class Cluster {
     }
   }
 
-  // static checkMinikubeAppConfig = async (appsStatus: AppModel[], window: BrowserWindow) => {
-  //   try {
-  //     await checkAppStatus(window, appsStatus)
-  //   } catch (err) {
-  //     window.webContents.send(Channels.Utilities.Log, cluster.id, {
-  //       category: 'check minikube config',
-  //       message: JSON.stringify(err)
-  //     } as LogModel)
-  //   }
-  // }
-
   // static configureMinikubeConfig = async (
   //   password: string,
   //   configs: Record<string, string>,

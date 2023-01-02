@@ -113,23 +113,6 @@ store.receptors.push((action: DeploymentActionType): void => {
         }
         break
       }
-      // case 'FETCH_APP_STATUS': {
-      //   s.isFetchingStatuses.set(true)
-
-      //   const defaultIds = DefaultAppsStatus.map((item) => item.id)
-
-      //   const removedKeys: any = {}
-      //   for (let index = 0; index < s.appStatus.length; index++) {
-      //     if (defaultIds.includes(s.appStatus.value[index].id) === false) {
-      //       removedKeys[index] = none
-      //     }
-      //   }
-
-      //   s.appStatus.merge(removedKeys)
-      //   s.appStatus.merge(action.appsStatus)
-
-      //   break
-      // }
       case 'SYSTEM_STATUS_RECEIVED': {
         const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
         if (index !== -1) {
@@ -256,16 +239,6 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     dispatch(DeploymentAction.setAdminPanel(clusterId))
   },
-  fetchAppStatus: async (appsStatus: AppModel[]) => {
-    // const dispatch = useDispatch()
-    // try {
-    //   dispatch(DeploymentAction.fetchAppStatus(cluster, appsStatus))
-    //   await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeAppConfig, clonedCluster, appsStatus)
-    // } catch (error) {
-    //   console.error(error)
-    // }
-    // dispatch(DeploymentAction.setFetchingStatuses(cluster, false))
-  },
   processConfigurations: async (
     password: string,
     configs: Record<string, string>,
@@ -382,13 +355,6 @@ export const DeploymentAction = {
       payload: { loading, data, error } as FetchableItem<boolean>
     }
   },
-  // fetchAppStatus: (clusterId: string, appsStatus: AppModel[]) => {
-  //   return {
-  //     type: 'FETCH_APP_STATUS' as const,
-  //     clusterId,
-  //     appsStatus: appsStatus
-  //   }
-  // },
   systemStatusReceived: (clusterId: string, systemStatus: AppModel) => {
     return {
       type: 'SYSTEM_STATUS_RECEIVED' as const,

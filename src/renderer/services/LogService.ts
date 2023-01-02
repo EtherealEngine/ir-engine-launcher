@@ -27,10 +27,7 @@ store.receptors.push((action: LogActionType): void => {
       }
       case 'SET_LOGS': {
         const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].isSaving.set(false)
-          s[index].logs.set([])
-        } else {
+        if (index === -1) {
           s.merge([
             {
               clusterId: action.clusterId,

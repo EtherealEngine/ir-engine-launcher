@@ -18,12 +18,6 @@ class ClusterHandler implements IBaseHandler {
       }
     )
     //   ipcMain.handle(
-    //     Channels.Cluster.CheckMinikubeAppConfig,
-    //     async (_event: IpcMainInvokeEvent, appsStatus: AppModel[]) => {
-    //       await Cluster.checkMinikubeAppConfig(appsStatus, window)
-    //     }
-    //   ),
-    //   ipcMain.handle(
     //     Channels.Cluster.ConfigureMinikubeConfig,
     //     async (
     //       _event: IpcMainInvokeEvent,

@@ -24,7 +24,6 @@ const Channels = {
   Cluster: {
     GetClusterStatus: 'GetClusterStatus',
     CheckClusterStatus: 'CheckClusterStatus',
-    CheckMinikubeAppConfig: 'CheckMinikubeAppConfig',
     CheckSystemStatusResult: 'CheckSystemStatusResult',
     CheckAppStatusResult: 'CheckAppStatusResult',
     CheckEngineStatusResult: 'CheckEngineStatusResult',

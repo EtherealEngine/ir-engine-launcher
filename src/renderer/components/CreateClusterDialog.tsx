@@ -4,7 +4,6 @@ import CryptoJS from 'crypto-js'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useEffect, useRef, useState } from 'react'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
-import { DeploymentService } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'

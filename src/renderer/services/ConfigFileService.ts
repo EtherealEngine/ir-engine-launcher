@@ -105,15 +105,9 @@ export const ConfigFileService = {
       await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
 
       LogService.setLogs(cluster.id)
-      await DeploymentService.getDeploymentStatus(cluster)
+      DeploymentService.fetchDeploymentStatus(cluster)
 
       dispatch(ConfigFileAction.setConfig(configFile))
-
-      // if (configs[Storage.ENABLE_RIPPLE_STACK] && configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
-      //   DeploymentService.fetchAppStatus([...DefaultRippleAppsStatus])
-      // } else if (configs[Storage.ENABLE_RIPPLE_STACK] && configs[Storage.ENABLE_RIPPLE_STACK] === 'false') {
-      //   DeploymentService.fetchAppStatus([])
-      // }
 
       return true
     } catch (error) {
