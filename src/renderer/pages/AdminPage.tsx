@@ -1,10 +1,9 @@
 import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
+import { useEffect } from 'react'
 import PageRoot from 'renderer/common/PageRoot'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
-import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
-import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
 import { Box } from '@mui/material'
 
@@ -12,13 +11,11 @@ import ErrorPage from './ErrorPage'
 import LoadingPage from './LoadingPage'
 
 const AdminPage = () => {
-  const settingsState = useSettingsState()
-  const { adminPanel } = settingsState.value
   const configFileState = useConfigFileState()
   const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
+  const currentDeployment = deploymentState.find((item) => item.clusterId.value === selectedClusterId)?.value
 
   const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
   const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
@@ -28,11 +25,17 @@ const AdminPage = () => {
   const engineChecking = currentDeployment?.engineStatus.find((engine) => engine.status === AppStatus.Checking)
   const checking = appChecking || engineChecking
 
-  useHookedEffect(() => {
-    if (!adminPanel.adminAccess && !adminPanel.loading && !adminPanel.error && allConfigured) {
-      SettingsService.fetchAdminPanelAccess()
+  useEffect(() => {
+    if (
+      selectedCluster &&
+      !currentDeployment?.adminPanel.data &&
+      !currentDeployment?.adminPanel.loading &&
+      !currentDeployment?.adminPanel.error &&
+      allConfigured
+    ) {
+      DeploymentService.fetchAdminPanelAccess(selectedCluster)
     }
-  }, [deploymentState, settingsState])
+  }, [])
 
   if (!selectedCluster) {
     return <></>
@@ -41,7 +44,7 @@ const AdminPage = () => {
   let loadingMessage = ''
   if (checking) {
     loadingMessage = 'Checking Ethereal Engine'
-  } else if (adminPanel.loading) {
+  } else if (currentDeployment?.adminPanel.loading) {
     loadingMessage = 'Loading Dashboard'
   }
 
@@ -52,10 +55,10 @@ const AdminPage = () => {
     errorMessage = 'Ethereal Engine Not Configured'
     errorDetail = 'Please configure Ethereal Engine before trying again.'
     errorRetry = () => DeploymentService.fetchDeploymentStatus(selectedCluster)
-  } else if (adminPanel.error) {
+  } else if (currentDeployment?.adminPanel.error) {
     errorMessage = 'Admin Panel Error'
-    errorDetail = adminPanel.error
-    errorRetry = () => SettingsService.fetchAdminPanelAccess()
+    errorDetail = currentDeployment?.adminPanel.error
+    errorRetry = () => DeploymentService.fetchAdminPanelAccess(selectedCluster)
   }
 
   if (loadingMessage) {

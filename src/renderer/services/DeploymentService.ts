@@ -1,7 +1,9 @@
 import { createState, none, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
+import Storage from 'constants/Storage'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'
 import { cloneCluster, ClusterModel } from 'models/Cluster'
+import { FetchableItem } from 'models/FetchableItem'
 
 import { store, useDispatch } from '../store'
 
@@ -10,6 +12,9 @@ type DeploymentState = {
   isConfiguring: boolean
   isFirstFetched: boolean
   isFetchingStatuses: boolean
+  ipfs: FetchableItem<string>
+  adminPanel: FetchableItem<boolean>
+  k8dashboard: FetchableItem<string>
   systemStatus: AppModel[]
   appStatus: AppModel[]
   engineStatus: AppModel[]
@@ -46,15 +51,10 @@ store.receptors.push((action: DeploymentActionType): void => {
       case 'SET_DEPLOYMENT_APPS': {
         const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
         if (index !== -1) {
-          s.merge({
-            [index]: {
-              ...s[index].value,
-              isFetchingStatuses: true,
-              systemStatus: [...action.deploymentApps.systemStatus],
-              appStatus: [...action.deploymentApps.appStatus],
-              engineStatus: [...action.deploymentApps.engineStatus]
-            } as DeploymentState
-          })
+          s[index].isFetchingStatuses.set(true)
+          s[index].systemStatus.set([...action.deploymentApps.systemStatus])
+          s[index].appStatus.set([...action.deploymentApps.appStatus])
+          s[index].engineStatus.set([...action.deploymentApps.engineStatus])
         } else {
           s.merge([
             {
@@ -62,6 +62,21 @@ store.receptors.push((action: DeploymentActionType): void => {
               isConfiguring: false,
               isFirstFetched: false,
               isFetchingStatuses: true,
+              ipfs: {
+                loading: false,
+                data: '',
+                error: ''
+              },
+              adminPanel: {
+                loading: false,
+                data: false,
+                error: ''
+              },
+              k8dashboard: {
+                loading: false,
+                data: '',
+                error: ''
+              },
               systemStatus: [...action.deploymentApps.systemStatus],
               appStatus: [...action.deploymentApps.appStatus],
               engineStatus: [...action.deploymentApps.engineStatus]
@@ -74,6 +89,27 @@ store.receptors.push((action: DeploymentActionType): void => {
         const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
         if (index !== -1) {
           s[index].set(none)
+        }
+        break
+      }
+      case 'SET_K8_DASHBOARD': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s[index].k8dashboard.set(action.payload)
+        }
+        break
+      }
+      case 'SET_IPFS_DASHBOARD': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s[index].ipfs.set(action.payload)
+        }
+        break
+      }
+      case 'SET_ADMIN_PANEL': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s[index].adminPanel.set(action.payload)
         }
         break
       }
@@ -166,18 +202,65 @@ export const DeploymentService = {
   },
   removeDeploymentStatus: async (clusterId: string) => {
     const dispatch = useDispatch()
-
+    dispatch(DeploymentAction.removeDeployment(clusterId))
+  },
+  fetchK8Dashboard: async (cluster: ClusterModel) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed,
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
+    const dispatch = useDispatch()
     try {
-      dispatch(DeploymentAction.removeDeployment(clusterId))
+      dispatch(DeploymentAction.setK8Dashboard(clonedCluster.id, '', true))
+      window.electronAPI.invoke(Channels.Cluster.ConfigureK8Dashboard, clonedCluster)
     } catch (error) {
       console.error(error)
     }
+  },
+  clearK8Dashboard: async (clusterId: string) => {
+    const dispatch = useDispatch()
+    dispatch(DeploymentAction.setK8Dashboard(clusterId))
+  },
+  fetchIpfsDashboard: async (cluster: ClusterModel) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed,
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
+    const dispatch = useDispatch()
+    try {
+      dispatch(DeploymentAction.setIpfsDashboard(clonedCluster.id, '', true))
+      window.electronAPI.invoke(Channels.Shell.ConfigureIPFSDashboard, clonedCluster)
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  clearIpfsDashboard: async (clusterId: string) => {
+    const dispatch = useDispatch()
+    dispatch(DeploymentAction.setIpfsDashboard(clusterId))
+  },
+  fetchAdminPanelAccess: async (cluster: ClusterModel) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed,
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
+    const dispatch = useDispatch()
+    try {
+      dispatch(DeploymentAction.setAdminPanel(clonedCluster.id, false, true))
+      window.electronAPI.invoke(
+        Channels.Engine.EnsureAdminAccess,
+        clonedCluster,
+        clonedCluster.configs[Storage.ENGINE_PATH]
+      )
+    } catch (error) {
+      console.error(error)
+    }
+  },
+  clearAdminPanelAccess: async (clusterId: string) => {
+    const dispatch = useDispatch()
+    dispatch(DeploymentAction.setAdminPanel(clusterId))
   },
   fetchAppStatus: async (appsStatus: AppModel[]) => {
     // const dispatch = useDispatch()
     // try {
     //   dispatch(DeploymentAction.fetchAppStatus(cluster, appsStatus))
-    //   await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeAppConfig, appsStatus)
+    //   await window.electronAPI.invoke(Channels.Cluster.CheckMinikubeAppConfig, clonedCluster, appsStatus)
     // } catch (error) {
     //   console.error(error)
     // }
@@ -195,6 +278,7 @@ export const DeploymentService = {
     //   dispatch(DeploymentAction.setConfiguring(clusterId, true))
     //   const response = await window.electronAPI.invoke(
     //     Channels.Cluster.ConfigureMinikubeConfig,
+    //     clonedCluster,
     //     password,
     //     configs,
     //     vars,
@@ -223,6 +307,24 @@ export const DeploymentService = {
       })
       window.electronAPI.on(Channels.Cluster.CheckEngineStatusResult, (clusterId: string, data: AppModel) => {
         dispatch(DeploymentAction.engineStatusReceived(clusterId, data))
+      })
+      window.electronAPI.on(Channels.Cluster.ConfigureK8DashboardResponse, (clusterId: string, data: string) => {
+        dispatch(DeploymentAction.setK8Dashboard(clusterId, data))
+      })
+      window.electronAPI.on(Channels.Cluster.ConfigureK8DashboardError, (clusterId: string, error: string) => {
+        dispatch(DeploymentAction.setK8Dashboard(clusterId, '', false, error))
+      })
+      window.electronAPI.on(Channels.Shell.ConfigureIPFSDashboardResponse, (clusterId: string, data: string) => {
+        dispatch(DeploymentAction.setIpfsDashboard(clusterId, data))
+      })
+      window.electronAPI.on(Channels.Shell.ConfigureIPFSDashboardError, (clusterId: string, error: string) => {
+        dispatch(DeploymentAction.setIpfsDashboard(clusterId, '', false, error))
+      })
+      window.electronAPI.on(Channels.Engine.EnsureAdminAccessResponse, (clusterId: string) => {
+        dispatch(DeploymentAction.setAdminPanel(clusterId, true))
+      })
+      window.electronAPI.on(Channels.Engine.EnsureAdminAccessError, (clusterId: string, error: string) => {
+        dispatch(DeploymentAction.setAdminPanel(clusterId, false, false, error))
       })
     } catch (error) {
       console.error(error)
@@ -257,6 +359,27 @@ export const DeploymentAction = {
       type: 'SET_DEPLOYMENT_APPS' as const,
       clusterId,
       deploymentApps
+    }
+  },
+  setK8Dashboard: (clusterId: string, data = '', loading = false, error = '') => {
+    return {
+      type: 'SET_K8_DASHBOARD' as const,
+      clusterId,
+      payload: { loading, data, error } as FetchableItem<string>
+    }
+  },
+  setIpfsDashboard: (clusterId: string, data = '', loading = false, error = '') => {
+    return {
+      type: 'SET_IPFS_DASHBOARD' as const,
+      clusterId,
+      payload: { loading, data, error } as FetchableItem<string>
+    }
+  },
+  setAdminPanel: (clusterId: string, data = false, loading = false, error = '') => {
+    return {
+      type: 'SET_ADMIN_PANEL' as const,
+      clusterId,
+      payload: { loading, data, error } as FetchableItem<boolean>
     }
   },
   // fetchAppStatus: (clusterId: string, appsStatus: AppModel[]) => {

@@ -17,7 +17,6 @@ if (isSplash) {
   render(<SplashScreen />, document.getElementById('root'))
 } else {
   LogService.listen()
-  SettingsService.listen()
   DeploymentService.listen()
   ConfigFileService.init()
   SettingsService.init()

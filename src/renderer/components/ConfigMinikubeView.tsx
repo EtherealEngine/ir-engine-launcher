@@ -7,7 +7,6 @@ import ErrorPage from 'renderer/pages/ErrorPage'
 import LoadingPage from 'renderer/pages/LoadingPage'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
-import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
 import { LoadingButton } from '@mui/lab'
 import {
@@ -97,13 +96,13 @@ const ConfigMinikubeView = ({ sx }: Props) => {
     setLoadingDiskStats(false)
   }
 
-  useHookedEffect(() => {
+  useEffect(() => {
     if (minikubeStatus?.status === AppStatus.Configured) {
       fetchDiskStats()
     } else if (minikubeStatus?.status === AppStatus.NotConfigured) {
       clearDiskStats()
     }
-  }, [deploymentState])
+  }, [])
 
   useEffect(() => {
     if (minikubeStatus?.status === AppStatus.Configured) {
