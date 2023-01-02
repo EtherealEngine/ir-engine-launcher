@@ -33,6 +33,7 @@ import ConfigConfigsView from './ConfigConfigsView'
 import ConfigFlagsView from './ConfigFlagsView'
 import ConfigSummaryView from './ConfigSummaryView'
 import ConfigVarsView from './ConfigVarsView'
+import { DeploymentService } from 'renderer/services/DeploymentService'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
@@ -151,7 +152,8 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         }
 
         ConfigFileService.setSelectedClusterId(createCluster.id)
-        // DeploymentService.processConfigurations(password, localConfigs, localVars, localFlags)
+        DeploymentService.processConfigurations(createCluster, password, localFlags)
+
         onClose()
 
         return

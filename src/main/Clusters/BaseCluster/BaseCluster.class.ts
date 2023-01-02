@@ -1,14 +1,20 @@
+import crypto from 'crypto'
 import { BrowserWindow } from 'electron'
 import os from 'os'
 
 import { Channels } from '../../../constants/Channels'
+import ConfigEnvMap from '../../../constants/ConfigEnvMap'
+import Storage from '../../../constants/Storage'
 import { AppModel, AppStatus, DeploymentAppModel } from '../../../models/AppStatus'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { SysRequirement } from '../../../models/SysRequirement'
+import { getEnvFile } from '../../managers/PathManager'
 import { exec } from '../../managers/ShellManager'
 
 class BaseCluster {
+  // #region Status Check Methods
+
   static checkClusterStatus = async (
     window: BrowserWindow,
     cluster: ClusterModel,
@@ -169,6 +175,50 @@ class BaseCluster {
       window.webContents.send(Channels.Cluster.CheckEngineStatusResult, cluster.id, status)
     }
   }
+
+  // #endregion Status Check Methods
+
+  // #region Ensure Methods
+
+  static ensureVariables = async (enginePath: string, vars: Record<string, string>) => {
+    // Ensure auth field has value
+    if (!vars[Storage.AUTH_SECRET_KEY]) {
+      // https://stackoverflow.com/a/40191779/2077741
+      vars[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
+    }
+
+    const envFile = await getEnvFile(enginePath)
+
+    // Ensure aws account id & sns topic name has value
+    if (!vars[Storage.AWS_ACCOUNT_ID_KEY] || !vars[Storage.SNS_TOPIC_NAME_KEY]) {
+      const topicEnv = envFile.find((item) => item.trim().startsWith(`${Storage.AWS_SMS_TOPIC_KEY}=`)) || ''
+      const topicEnvValue = topicEnv.trim().replace(`${Storage.AWS_SMS_TOPIC_KEY}=`, '')
+      const topicEnvSplit = topicEnvValue.split(':')
+
+      if (topicEnvSplit.length > 2) {
+        vars[Storage.AWS_ACCOUNT_ID_KEY] = vars[Storage.AWS_ACCOUNT_ID_KEY]
+          ? vars[Storage.AWS_ACCOUNT_ID_KEY]
+          : topicEnvSplit.at(-2) || ''
+        vars[Storage.SNS_TOPIC_NAME_KEY] = vars[Storage.SNS_TOPIC_NAME_KEY]
+          ? vars[Storage.SNS_TOPIC_NAME_KEY]
+          : topicEnvSplit.at(-1) || ''
+      }
+    }
+
+    const configKeys = Object.keys(ConfigEnvMap)
+
+    // Ensure rest of the values
+    for (const key in vars) {
+      if (!vars[key] && configKeys.includes(key)) {
+        const envKey = (ConfigEnvMap as any)[key]
+        const varEnv = envFile.find((item) => item.trim().startsWith(`${envKey}=`)) || ''
+
+        vars[key] = varEnv.trim().replace(`${envKey}=`, '')
+      }
+    }
+  }
+
+  // #endregion Ensure Methods
 }
 
 export default BaseCluster

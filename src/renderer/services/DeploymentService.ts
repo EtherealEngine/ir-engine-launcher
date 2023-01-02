@@ -6,6 +6,7 @@ import { cloneCluster, ClusterModel } from 'models/Cluster'
 import { FetchableItem } from 'models/FetchableItem'
 
 import { store, useDispatch } from '../store'
+import { accessSettingsState } from './SettingsService'
 
 type DeploymentState = {
   clusterId: string
@@ -239,35 +240,32 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     dispatch(DeploymentAction.setAdminPanel(clusterId))
   },
-  processConfigurations: async (
-    password: string,
-    configs: Record<string, string>,
-    vars: Record<string, string>,
-    flags: Record<string, string>
-  ) => {
-    // const { enqueueSnackbar } = accessSettingsState().value.notistack
-    // const dispatch = useDispatch()
-    // try {
-    //   dispatch(DeploymentAction.setConfiguring(clusterId, true))
-    //   const response = await window.electronAPI.invoke(
-    //     Channels.Cluster.ConfigureMinikubeConfig,
-    //     clonedCluster,
-    //     password,
-    //     configs,
-    //     vars,
-    //     flags
-    //   )
-    //   if (response) {
-    //     DeploymentService.fetchDeploymentStatus(cluster)
-    //   } else {
-    //     enqueueSnackbar('Failed to configure Ethereal Engine. Please check logs.', {
-    //       variant: 'error'
-    //     })
-    //   }
-    // } catch (error) {
-    //   console.error(error)
-    // }
-    // dispatch(DeploymentAction.setConfiguring(clusterId, false))
+  processConfigurations: async (cluster: ClusterModel, password: string, flags: Record<string, string>) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed,
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
+    const dispatch = useDispatch()
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    
+    try {
+      dispatch(DeploymentAction.setConfiguring(clonedCluster.id, true))
+      
+      await window.electronAPI.invoke(
+        Channels.Cluster.ConfigureCluster,
+        clonedCluster,
+        password,
+        flags
+      )
+
+      DeploymentService.fetchDeploymentStatus(clonedCluster)
+    } catch (error) {
+      console.error(error)
+
+      enqueueSnackbar('Failed to configure Ethereal Engine. Please check logs.', {
+        variant: 'error'
+      })
+    }
+    dispatch(DeploymentAction.setConfiguring(clonedCluster.id, false))
   },
   listen: async () => {
     const dispatch = useDispatch()

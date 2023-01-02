@@ -1,10 +1,23 @@
 import childProcess, { ExecException } from 'child_process'
 import { lookup, Program } from 'ps-node'
 
+export const execScriptFile = async (scriptFile: string, args: string[]) => {
+  return await exec(`bash "${scriptFile}" ${args.join(' ')}`)
+}
+
 export const exec = (command: string): Promise<ShellResponse> => {
   return new Promise((resolve) => {
     childProcess.exec(command, { shell: '/bin/bash' }, (error, stdout, stderr) => resolve({ error, stdout, stderr }))
   })
+}
+
+export const execStreamScriptFile = async (
+  scriptFile: string,
+  args: string[],
+  onStdout: (data: any) => void,
+  onStderr: (data: any) => void
+) => {
+  return await execStream(`bash "${scriptFile}" ${args.join(' ')}`, onStdout, onStderr)
 }
 
 export const execStream = (

@@ -22,19 +22,18 @@ class ClusterHandler implements IBaseHandler {
         async (_event: IpcMainInvokeEvent, cluster: ClusterModel) => {
           await Cluster.configureK8Dashboard(window, cluster)
         }
+      ),
+      ipcMain.handle(
+        Channels.Cluster.ConfigureCluster,
+        async (
+          _event: IpcMainInvokeEvent,
+          cluster: ClusterModel,
+          password: string,
+          flags: Record<string, string>
+        ) => {
+          await Cluster.configureCluster(window, cluster, password, flags)
+        }
       )
-    //   ipcMain.handle(
-    //     Channels.Cluster.ConfigureMinikubeConfig,
-    //     async (
-    //       _event: IpcMainInvokeEvent,
-    //       password: string,
-    //       configs: Record<string, string>,
-    //       vars: Record<string, string>,
-    //       flags: Record<string, string>
-    //     ) => {
-    //       return await Cluster.configureMinikubeConfig(password, configs, vars, flags, window)
-    //     }
-    //   )
   }
 }
 

@@ -14,7 +14,7 @@ const Endpoints = {
   VALIDATOR_TEMPLATE_PATH: 'packages/ops/rippled/config/validators.template.txt',
   RIPPLED_FILE_PATH: 'packages/ops/rippled/config/rippled.cfg',
   RIPPLED_TEMPLATE_PATH: 'packages/ops/rippled/config/rippled.template.cfg',
-  ENGINE_ENV_PATH: '.env.local.default',
+  ENGINE_ENV_PATH: '.env.local',
   ENGINE_ENV_DEFAULT_PATH: '.env.local.default',
   ENGINE_ENV_DEFAULT_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/.env.local.default',
   ENGINE_VALUES_FILE_NAME: 'engine.values.yaml',

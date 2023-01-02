@@ -30,7 +30,7 @@ const Channels = {
     ConfigureK8Dashboard: 'ConfigureK8Dashboard',
     ConfigureK8DashboardError: 'ConfigureK8DashboardError',
     ConfigureK8DashboardResponse: 'ConfigureK8DashboardResponse',
-    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig'
+    ConfigureCluster: 'ConfigureCluster'
   },
   Updates: {
     CheckUpdate: 'CheckUpdate',

@@ -111,20 +111,20 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         return
       }
     } else if (activeStep === 3) {
-      if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
-        const updatedCluster: ClusterModel = {
-          ...selectedCluster,
-          configs: { ...localConfigs },
-          variables: { ...localVars }
-        }
+      const updatedCluster: ClusterModel = {
+        ...selectedCluster,
+        configs: { ...localConfigs },
+        variables: { ...localVars }
+      }
 
+      if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
         const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
         if (!saved) {
           return
         }
       }
 
-      DeploymentService.processConfigurations(password, localConfigs, localVars, localFlags)
+      DeploymentService.processConfigurations(updatedCluster, password, localFlags)
       onClose()
 
       return

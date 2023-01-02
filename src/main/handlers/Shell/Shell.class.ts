@@ -1,16 +1,30 @@
 import { BrowserWindow } from 'electron'
 import log from 'electron-log'
+import path from 'path'
 
 import { Channels } from '../../../constants/Channels'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
-import { exec, execStream } from '../../managers/ShellManager'
-import { checkSudoPassword } from './Shell-helper'
+import { scriptsPath } from '../../managers/PathManager'
+import { exec, execScriptFile, execStream } from '../../managers/ShellManager'
 
 class Shell {
   static checkSudoPassword = async (password: string = '') => {
     try {
-      const validPassword = await checkSudoPassword(password)
+      let validPassword = false
+
+      const loginScript = path.join(scriptsPath(), 'sudo-login.sh')
+      log.info(`Executing script ${loginScript}`)
+
+      const response = await execScriptFile(loginScript, [password])
+      const { error } = response
+
+      if (error) {
+        log.error(`Error while executing script ${loginScript}.`, error)
+      } else {
+        validPassword = true
+      }
+
       if (validPassword === false) {
         throw password ? 'Invalid password.' : 'Not logged in.'
       }
