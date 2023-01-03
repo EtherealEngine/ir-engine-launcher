@@ -2,6 +2,7 @@ import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
+import { DeploymentService } from 'renderer/services/DeploymentService'
 import { useSettingsState } from 'renderer/services/SettingsService'
 
 import { TabContext, TabPanel } from '@mui/lab'
@@ -86,6 +87,8 @@ const SettingsDialog = ({ onClose }: Props) => {
     if (saved) {
       onClose()
     }
+
+    await DeploymentService.fetchDeploymentStatus(updatedCluster)
   }
 
   return (

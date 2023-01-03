@@ -8,6 +8,7 @@ import 'react-reflex/styles.css'
 import AlertDialog from 'renderer/common/AlertDialog'
 import PageRoot from 'renderer/common/PageRoot'
 import ConfigurationDialog from 'renderer/components/ConfigurationDialog'
+import GitView from 'renderer/components/GitView'
 import LogsView from 'renderer/components/LogsView'
 import SettingsDialog from 'renderer/components/SettingsDialog'
 import StatusView from 'renderer/components/StatusView'
@@ -86,7 +87,11 @@ const ConfigPage = () => {
                   : logoEngine
               }
             />
-            <Typography variant="h5">{selectedCluster.name}</Typography>
+            <Typography variant="h5" sx={{ mr: 3 }}>
+              {selectedCluster.name}
+            </Typography>
+
+            <GitView />
           </Box>
 
           <IconButton

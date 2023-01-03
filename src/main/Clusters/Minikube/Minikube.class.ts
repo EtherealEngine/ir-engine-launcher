@@ -101,6 +101,7 @@ class Minikube {
           `-c "${configsFolder}"`,
           `-d "${flags[Storage.FORCE_DB_REFRESH]}"`,
           `-f "${cluster.configs[Storage.ENGINE_PATH]}"`,
+          `-i "${cluster.id}"`,
           `-p "${password}"`,
           `-r "${cluster.configs[Storage.ENABLE_RIPPLE_STACK]}"`
         ],

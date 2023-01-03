@@ -135,6 +135,11 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         return
       }
 
+      if (type === ClusterType.MicroK8s) {
+        setError('Support for MicroK8s is coming soon.')
+        return
+      }
+
       if (activeStep === 2) {
         loadDefaultVariables(type)
       } else if (activeStep === 4) {

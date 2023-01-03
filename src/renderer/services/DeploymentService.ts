@@ -1,9 +1,9 @@
 import { createState, none, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
-import Storage from 'constants/Storage'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'
 import { cloneCluster, ClusterModel } from 'models/Cluster'
 import { FetchableItem } from 'models/FetchableItem'
+import { GitStatus } from 'models/GitStatus'
 
 import { store, useDispatch } from '../store'
 import { accessSettingsState } from './SettingsService'
@@ -13,6 +13,7 @@ type DeploymentState = {
   isConfiguring: boolean
   isFirstFetched: boolean
   isFetchingStatuses: boolean
+  gitStatus: FetchableItem<GitStatus | undefined>
   ipfs: FetchableItem<string>
   adminPanel: FetchableItem<boolean>
   k8dashboard: FetchableItem<string>
@@ -63,6 +64,11 @@ store.receptors.push((action: DeploymentActionType): void => {
               isConfiguring: false,
               isFirstFetched: false,
               isFetchingStatuses: false,
+              gitStatus: {
+                loading: false,
+                data: undefined,
+                error: ''
+              },
               ipfs: {
                 loading: false,
                 data: '',
@@ -90,6 +96,13 @@ store.receptors.push((action: DeploymentActionType): void => {
         const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
         if (index !== -1) {
           s[index].set(none)
+        }
+        break
+      }
+      case 'SET_GIT_STATUS': {
+        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          s[index].gitStatus.set(action.payload)
         }
         break
       }
@@ -174,6 +187,8 @@ export const DeploymentService = {
     const dispatch = useDispatch()
 
     try {
+      DeploymentService.fetchGitStatus(clonedCluster)
+
       const deploymentApps = await DeploymentService.getDeploymentStatus(clonedCluster)
       if (deploymentApps) {
         await window.electronAPI.invoke(Channels.Cluster.CheckClusterStatus, clonedCluster, deploymentApps)
@@ -204,6 +219,21 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     dispatch(DeploymentAction.setK8Dashboard(clusterId))
   },
+  fetchGitStatus: async (cluster: ClusterModel) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed,
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
+    const dispatch = useDispatch()
+
+    try {
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, undefined, true))
+      const gitStatus = await window.electronAPI.invoke(Channels.Git.GetCurrentConfigs, clonedCluster)
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, gitStatus, false))
+    } catch (error) {
+      console.error(error)
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, undefined, false))
+    }
+  },
   fetchIpfsDashboard: async (cluster: ClusterModel) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
@@ -227,11 +257,7 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     try {
       dispatch(DeploymentAction.setAdminPanel(clonedCluster.id, false, true))
-      window.electronAPI.invoke(
-        Channels.Engine.EnsureAdminAccess,
-        clonedCluster,
-        clonedCluster.configs[Storage.ENGINE_PATH]
-      )
+      window.electronAPI.invoke(Channels.Engine.EnsureAdminAccess, clonedCluster)
     } catch (error) {
       console.error(error)
     }
@@ -325,6 +351,13 @@ export const DeploymentAction = {
       type: 'SET_DEPLOYMENT_APPS' as const,
       clusterId,
       deploymentApps
+    }
+  },
+  setGitStatus: (clusterId: string, data: GitStatus | undefined, loading = false, error = '') => {
+    return {
+      type: 'SET_GIT_STATUS' as const,
+      clusterId,
+      payload: { loading, data, error } as FetchableItem<GitStatus | undefined>
     }
   },
   setK8Dashboard: (clusterId: string, data = '', loading = false, error = '') => {

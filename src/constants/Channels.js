@@ -16,6 +16,12 @@ const Channels = {
     Log: 'Log',
     SaveLog: 'SaveLog',
   },
+  Git: {
+    GetCurrentConfigs: 'GetCurrentConfigs',
+    ChangeBranch: 'ChangeBranch',
+    PullBranch: "PullBranch",
+    PushBranch: "PushBranch"
+  },
   Engine: {
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',

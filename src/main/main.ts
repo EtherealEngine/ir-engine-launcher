@@ -18,6 +18,7 @@ import Endpoints from '../constants/Endpoints'
 import ClusterHandler from './handlers/Cluster/Cluster.handler'
 import ConfigFileHandler from './handlers/ConfigFile/ConfigFile.handler'
 import EngineHandler from './handlers/Engine/Engine.handler'
+import GitHandler from './handlers/Git/Git.handler'
 import { IBaseHandler } from './handlers/IBaseHandler'
 import ShellHandler from './handlers/Shell/Shell.handler'
 import UpdatesHandler from './handlers/Updates/Updates.handler'
@@ -173,7 +174,8 @@ export const createMainWindow = async () => {
     new UtilitiesHandler(),
     new ShellHandler(),
     new EngineHandler(),
-    new ClusterHandler()
+    new ClusterHandler(),
+    new GitHandler()
   ]
 
   ipcHandlers.forEach((handler) => {

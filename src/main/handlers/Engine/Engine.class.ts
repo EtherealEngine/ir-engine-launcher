@@ -3,6 +3,7 @@ import { BrowserWindow } from 'electron'
 // import log from 'electron-log'
 import { Channels } from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
+import Storage from '../../../constants/Storage'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { executeJS } from '../../managers/BrowserManager'
@@ -10,7 +11,7 @@ import { exec } from '../../managers/ShellManager'
 import { delay } from '../../managers/UtilitiesManager'
 
 class Engine {
-  static ensureAdminAccess = async (parentWindow: BrowserWindow, cluster: ClusterModel, enginePath: string) => {
+  static ensureAdminAccess = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
     try {
       let adminWindow: BrowserWindow | null = null
       adminWindow = new BrowserWindow({
@@ -63,6 +64,7 @@ class Engine {
               message: `Making ${userId} admin.`
             } as LogModel)
 
+            const enginePath = cluster.configs[Storage.ENGINE_PATH]
             const response = await exec(
               `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
             )

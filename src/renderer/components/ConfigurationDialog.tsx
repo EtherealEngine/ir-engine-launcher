@@ -122,6 +122,8 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         if (!saved) {
           return
         }
+
+        await DeploymentService.fetchDeploymentStatus(updatedCluster)
       }
 
       DeploymentService.processConfigurations(updatedCluster, password, localFlags)

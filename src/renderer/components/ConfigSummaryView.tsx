@@ -5,7 +5,7 @@ import { Box, SxProps, Theme, Typography } from '@mui/material'
 
 interface Props {
   name?: string
-  type: ClusterType | ''
+  type?: ClusterType | ''
   localConfigs: Record<string, string>
   localVars: Record<string, string>
   localFlags: Record<string, string>

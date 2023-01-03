@@ -50,7 +50,7 @@ export const ensureConfigs = async (cluster: ClusterModel, templatePath: string,
   const valuesFileName = `${cluster.id}-${Endpoints.ENGINE_VALUES_FILE_NAME}`
   await _ensureConfigsFile(cluster, templatePath, templateUrl, valuesFileName)
 
-  if (cluster.configs[Storage.ENABLE_RIPPLE_STACK]) {
+  if (cluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
     await _ensureRippleConfigs(cluster)
   }
 }

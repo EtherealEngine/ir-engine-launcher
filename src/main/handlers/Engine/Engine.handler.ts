@@ -8,12 +8,9 @@ import Engine from './Engine.class'
 
 class EngineHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
-    ipcMain.handle(
-      Channels.Engine.EnsureAdminAccess,
-      async (_event: IpcMainInvokeEvent, cluster: ClusterModel, enginePath: string) => {
-        await Engine.ensureAdminAccess(window, cluster, enginePath)
-      }
-    )
+    ipcMain.handle(Channels.Engine.EnsureAdminAccess, async (_event: IpcMainInvokeEvent, cluster: ClusterModel) => {
+      await Engine.ensureAdminAccess(window, cluster)
+    })
   }
 }
 

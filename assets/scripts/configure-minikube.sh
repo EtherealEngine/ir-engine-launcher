@@ -4,12 +4,13 @@
 # Parameters
 #===========
 
-while getopts a:c:d:f:p:r: flag; do
+while getopts a:c:d:f:i:p:r: flag; do
     case "${flag}" in
     a) ASSETS_FOLDER=${OPTARG} ;;
     c) CONFIGS_FOLDER=${OPTARG} ;;
     d) FORCE_DB_REFRESH=${OPTARG} ;;
     f) ENGINE_FOLDER=${OPTARG} ;;
+    i) CLUSTER_ID=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
     r) ENABLE_RIPPLE_STACK=${OPTARG} ;;
     *)
@@ -19,7 +20,7 @@ while getopts a:c:d:f:p:r: flag; do
     esac
 done
 
-if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENGINE_FOLDER || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
+if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENGINE_FOLDER || -z $CLUSTER_ID || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
     echo "Missing arguments"
     exit 1
 fi
@@ -398,7 +399,7 @@ if [[ $ENABLE_RIPPLE_STACK == 'true' ]]; then
     else
         echo "ipfs is not deployed"
 
-        helm install -f "$CONFIGS_FOLDER/ipfs.values.yaml" local-ipfs ./packages/ops/ipfs/
+        helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-ipfs.values.yaml" local-ipfs ./packages/ops/ipfs/
         sleep 20
     fi
 
@@ -466,12 +467,12 @@ if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRES
     helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Installing Ethereal Engine deployment with populating database"
-    helm install -f "$CONFIGS_FOLDER/engine.values.yaml" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
+    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
     sleep 35
     helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
     echo "Installing Ethereal Engine deployment without populating database"
-    helm install -f "$CONFIGS_FOLDER/engine.values.yaml" local xrengine/xrengine
+    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" local xrengine/xrengine
 fi
 
 export RELEASE_NAME=local

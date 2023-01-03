@@ -188,7 +188,7 @@ class BaseCluster {
   static ensureVariables = async (cluster: ClusterModel) => {
     await BaseCluster._ensureEngineVariables(cluster)
 
-    if (cluster.configs[Storage.ENABLE_RIPPLE_STACK]) {
+    if (cluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
       await BaseCluster._ensureIPFSVariables(cluster)
     }
   }
