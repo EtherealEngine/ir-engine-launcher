@@ -1,6 +1,7 @@
 import { Channels } from 'constants/Channels'
 import Commands from 'main/Clusters/Minikube/Minikube.commands'
 import { AppStatus } from 'models/AppStatus'
+import { cloneCluster } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import ErrorPage from 'renderer/pages/ErrorPage'
@@ -54,6 +55,24 @@ const ConfigMinikubeView = ({ sx }: Props) => {
   const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
   const minikubeStatus = currentDeployment?.appStatus.find((app) => app.id === 'minikube')
 
+  useEffect(() => {
+    if (minikubeStatus?.status === AppStatus.Configured) {
+      fetchDiskStats()
+    } else if (minikubeStatus?.status === AppStatus.NotConfigured) {
+      clearDiskStats()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (minikubeStatus?.status === AppStatus.Configured) {
+      fetchDiskStats()
+    }
+  }, [])
+
+  if (!selectedCluster) {
+    return <></>
+  }
+
   const clearDiskStats = async () => {
     setLoadingDiskStats(false)
     setErrorDiskStats('')
@@ -65,7 +84,8 @@ const ConfigMinikubeView = ({ sx }: Props) => {
       setAlert(false)
       setProcessingDiskPrune(true)
 
-      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, Commands.DOCKER_PRUNE)
+      const clonedCluster = cloneCluster(selectedCluster)
+      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, Commands.DOCKER_PRUNE)
       await fetchDiskStats()
     } catch (err) {
       enqueueSnackbar('Failed to clear docker system.', { variant: 'error' })
@@ -83,7 +103,8 @@ const ConfigMinikubeView = ({ sx }: Props) => {
       setLoadingDiskStats(true)
       setErrorDiskStats('')
 
-      let output = await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, Commands.DOCKER_STATS)
+      const clonedCluster = cloneCluster(selectedCluster)
+      let output = await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, Commands.DOCKER_STATS)
       output = output.split('}').join('},').slice(0, -1)
       output = `[${output}]`
 
@@ -94,24 +115,6 @@ const ConfigMinikubeView = ({ sx }: Props) => {
     }
 
     setLoadingDiskStats(false)
-  }
-
-  useEffect(() => {
-    if (minikubeStatus?.status === AppStatus.Configured) {
-      fetchDiskStats()
-    } else if (minikubeStatus?.status === AppStatus.NotConfigured) {
-      clearDiskStats()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (minikubeStatus?.status === AppStatus.Configured) {
-      fetchDiskStats()
-    }
-  }, [])
-
-  if (!selectedCluster) {
-    return <></>
   }
 
   if (minikubeStatus?.status === AppStatus.Checking) {
