@@ -25,8 +25,8 @@ class ConfigFileHandler implements IBaseHandler {
     })
     ipcMain.handle(
       Channels.ConfigFile.GetDefaultVariables,
-      async (_event: IpcMainInvokeEvent, clusterType: ClusterType, enginePath: string) => {
-        return await ConfigFile.getDefaultVariables(window, clusterType, enginePath)
+      async (_event: IpcMainInvokeEvent, clusterType: ClusterType, clusterConfigs: Record<string, string>) => {
+        return await ConfigFile.getDefaultVariables(window, clusterType, clusterConfigs)
       }
     )
   }

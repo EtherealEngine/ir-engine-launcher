@@ -52,7 +52,7 @@ export const getEnvFile = async (enginePath: string) => {
 export const ensureConfigsFolder = async () => {
   const configsFolder = path.resolve(appConfigsPath())
   const configsFolderExists = await fileExists(configsFolder)
-  
+
   if (configsFolderExists === false) {
     await fs.mkdir(configsFolder, { recursive: true })
   }

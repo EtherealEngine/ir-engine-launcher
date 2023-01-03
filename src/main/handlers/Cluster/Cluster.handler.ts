@@ -25,12 +25,7 @@ class ClusterHandler implements IBaseHandler {
       ),
       ipcMain.handle(
         Channels.Cluster.ConfigureCluster,
-        async (
-          _event: IpcMainInvokeEvent,
-          cluster: ClusterModel,
-          password: string,
-          flags: Record<string, string>
-        ) => {
+        async (_event: IpcMainInvokeEvent, cluster: ClusterModel, password: string, flags: Record<string, string>) => {
           await Cluster.configureCluster(window, cluster, password, flags)
         }
       )

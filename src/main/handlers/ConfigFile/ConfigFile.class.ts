@@ -117,9 +117,13 @@ class ConfigFile {
     }
   }
 
-  static getDefaultVariables = async (window: BrowserWindow, clusterType: ClusterType, enginePath: string) => {
+  static getDefaultVariables = async (
+    window: BrowserWindow,
+    clusterType: ClusterType,
+    clusterConfigs: Record<string, string>
+  ) => {
     try {
-      return await processVariables(clusterType, enginePath)
+      return await processVariables(clusterType, clusterConfigs)
     } catch (err) {
       log.error('Failed to get default variables.', err)
       window.webContents.send(Channels.Utilities.Log, {

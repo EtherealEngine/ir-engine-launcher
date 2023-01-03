@@ -77,9 +77,11 @@ export const ConfigFileService = {
     dispatch(ConfigFileAction.setSelectedClusterId(clusterId))
 
     if (clusterId) {
-      const { isFirstFetched } = accessDeploymentState().find((item) => item.clusterId.value === clusterId)!.value
+      const { isFirstFetched, isFetchingStatuses } = accessDeploymentState().find(
+        (item) => item.clusterId.value === clusterId
+      )!.value
       const { selectedCluster } = accessConfigFileState().value
-      if (!isFirstFetched && selectedCluster) {
+      if (!isFirstFetched && !isFetchingStatuses && selectedCluster) {
         DeploymentService.fetchDeploymentStatus(selectedCluster)
       }
     }
@@ -206,14 +208,14 @@ export const ConfigFileService = {
       return {}
     }
   },
-  getDefaultVariables: async (clusterType: ClusterType, enginePath: string) => {
+  getDefaultVariables: async (clusterType: ClusterType, clusterConfigs: Record<string, string>) => {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
 
     try {
       const variables: Record<string, string> = await window.electronAPI.invoke(
         Channels.ConfigFile.GetDefaultVariables,
         clusterType,
-        enginePath
+        clusterConfigs
       )
       return variables
     } catch (error) {

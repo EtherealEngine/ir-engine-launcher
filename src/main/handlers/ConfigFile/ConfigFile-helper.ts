@@ -12,7 +12,7 @@ export const getClusters = async () => {
 
   for (const cluster of clusters) {
     cluster.configs = await processConfigs(cluster.configs)
-    cluster.variables = await processVariables(cluster.type, cluster.configs[Storage.ENGINE_PATH], cluster.variables)
+    cluster.variables = await processVariables(cluster.type, cluster.configs, cluster.variables)
   }
 
   return clusters
@@ -25,27 +25,48 @@ export const processConfigs = async (clusterConfigs: Record<string, string> = {}
   if (!clusterConfigs[Storage.ENABLE_RIPPLE_STACK]) {
     clusterConfigs[Storage.ENABLE_RIPPLE_STACK] = 'false'
   }
-
   return clusterConfigs
 }
 
 export const processVariables = async (
   clusterType: ClusterType,
-  enginePath: string,
+  clusterConfigs: Record<string, string>,
   clusterVars: Record<string, string> = {}
 ) => {
   if (clusterType === ClusterType.Minikube || clusterType === ClusterType.MicroK8s) {
-    return await processLocalVariables(enginePath, clusterVars)
+    const engineVars = await processVariablesFile(
+      clusterConfigs,
+      clusterVars,
+      Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_PATH,
+      Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_URL
+    )
+    clusterVars = { ...clusterVars, ...engineVars }
+  }
+
+  if (clusterConfigs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
+    const ipfsVars = await processVariablesFile(
+      clusterConfigs,
+      clusterVars,
+      Endpoints.IPFS_VALUES_TEMPLATE_PATH,
+      Endpoints.IPFS_VALUES_TEMPLATE_URL
+    )
+    clusterVars = { ...clusterVars, ...ipfsVars }
   }
 
   return clusterVars
 }
 
-const processLocalVariables = async (enginePath: string, clusterVars: Record<string, string>) => {
+export const processVariablesFile = async (
+  clusterConfigs: Record<string, string>,
+  clusterVars: Record<string, string>,
+  templatePath: string,
+  templateUrl: string
+) => {
   const vars: Record<string, string> = {}
 
-  const templatePath = path.join(enginePath, Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_PATH)
-  const yamlDoc = await getYamlDoc(templatePath, Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_URL)
+  const enginePath = clusterConfigs[Storage.ENGINE_PATH]
+  const templateFullPath = path.join(enginePath, templatePath)
+  const yamlDoc = await getYamlDoc(templateFullPath, templateUrl)
 
   const valuesKey = [] as string[]
   findRequiredValues(yamlDoc, valuesKey)

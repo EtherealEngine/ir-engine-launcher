@@ -3,6 +3,7 @@ import log from 'electron-log'
 import path from 'path'
 
 import { Channels } from '../../../constants/Channels'
+import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
 import { DeploymentAppModel } from '../../../models/AppStatus'
 import { ClusterModel } from '../../../models/Cluster'
@@ -10,6 +11,7 @@ import { LogModel } from '../../../models/Log'
 import { startFileServer } from '../../managers/FileServerManager'
 import { assetsPath, ensureConfigsFolder, isValidUrl, scriptsPath } from '../../managers/PathManager'
 import { execStream, execStreamScriptFile } from '../../managers/ShellManager'
+import { ensureConfigs } from '../../managers/YamlManager'
 import { DefaultEngineStatus, DefaultSystemStatus } from '../BaseCluster/BaseCluster.appstatus'
 import BaseCluster from '../BaseCluster/BaseCluster.class'
 import { MinikubeAppsStatus, MinikubeRippleAppsStatus } from './Minikube.appstatus'
@@ -74,39 +76,42 @@ class Minikube {
   ) => {
     const category = 'configure minikube'
     try {
-      // await BaseCluster.ensureVariables(cluster.configs[Storage.ENGINE_PATH], cluster.variables)
+      await BaseCluster.ensureVariables(cluster)
 
-      // const configsFolder = await ensureConfigsFolder()
+      const configsFolder = await ensureConfigsFolder()
 
-      // await ensureEngineConfigs(cluster.configs[Storage.ENGINE_PATH], cluster.variables)
-      // await ensureRippleConfigs(cluster.configs[Storage.ENGINE_PATH], cluster.configs[Storage.ENABLE_RIPPLE_STACK])
+      await ensureConfigs(
+        cluster,
+        Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_PATH,
+        Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_URL
+      )
 
-      // const scriptsFolder = scriptsPath()
-      // const assetsFolder = assetsPath()
-      // const configureScript = path.join(scriptsFolder, 'configure-minikube.sh')
-      // log.info(`Executing script ${configureScript}`)
+      const scriptsFolder = scriptsPath()
+      const assetsFolder = assetsPath()
+      const configureScript = path.join(scriptsFolder, 'configure-minikube.sh')
+      log.info(`Executing script ${configureScript}`)
 
-      // const onConfigureStd = (data: any) => {
-      //   window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: data } as LogModel)
-      // }
-      // const code = await execStreamScriptFile(
-      //   configureScript,
-      //   [
-      //     `-a "${assetsFolder}"`,
-      //     `-c "${configsFolder}"`,
-      //     `-d "${flags[Storage.FORCE_DB_REFRESH]}"`,
-      //     `-f "${cluster.configs[Storage.ENGINE_PATH]}"`,
-      //     `-p "${password}"`,
-      //     `-r "${cluster.configs[Storage.ENABLE_RIPPLE_STACK]}"`
-      //   ],
-      //   onConfigureStd,
-      //   onConfigureStd
-      // )
-      // if (code !== 0) {
-      //   throw `Failed with error code ${code}.`
-      // }
+      const onConfigureStd = (data: any) => {
+        window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: data } as LogModel)
+      }
+      const code = await execStreamScriptFile(
+        configureScript,
+        [
+          `-a "${assetsFolder}"`,
+          `-c "${configsFolder}"`,
+          `-d "${flags[Storage.FORCE_DB_REFRESH]}"`,
+          `-f "${cluster.configs[Storage.ENGINE_PATH]}"`,
+          `-p "${password}"`,
+          `-r "${cluster.configs[Storage.ENABLE_RIPPLE_STACK]}"`
+        ],
+        onConfigureStd,
+        onConfigureStd
+      )
+      if (code !== 0) {
+        throw `Failed with error code ${code}.`
+      }
 
-      // await startFileServer(window, cluster)
+      await startFileServer(window, cluster)
     } catch (err) {
       log.error('Error in ConfigureMinikubeConfig.', err)
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

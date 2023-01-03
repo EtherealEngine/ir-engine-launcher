@@ -62,7 +62,7 @@ store.receptors.push((action: DeploymentActionType): void => {
               clusterId: action.clusterId,
               isConfiguring: false,
               isFirstFetched: false,
-              isFetchingStatuses: true,
+              isFetchingStatuses: false,
               ipfs: {
                 loading: false,
                 data: '',
@@ -246,16 +246,11 @@ export const DeploymentService = {
     const clonedCluster = cloneCluster(cluster)
     const dispatch = useDispatch()
     const { enqueueSnackbar } = accessSettingsState().value.notistack
-    
+
     try {
       dispatch(DeploymentAction.setConfiguring(clonedCluster.id, true))
-      
-      await window.electronAPI.invoke(
-        Channels.Cluster.ConfigureCluster,
-        clonedCluster,
-        password,
-        flags
-      )
+
+      await window.electronAPI.invoke(Channels.Cluster.ConfigureCluster, clonedCluster, password, flags)
 
       DeploymentService.fetchDeploymentStatus(clonedCluster)
     } catch (error) {

@@ -1,16 +1,21 @@
 import crypto from 'crypto'
 import { BrowserWindow } from 'electron'
+import log from 'electron-log'
 import os from 'os'
+import PeerId from 'peer-id'
 
 import { Channels } from '../../../constants/Channels'
 import ConfigEnvMap from '../../../constants/ConfigEnvMap'
+import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
 import { AppModel, AppStatus, DeploymentAppModel } from '../../../models/AppStatus'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { SysRequirement } from '../../../models/SysRequirement'
+import { processVariablesFile } from '../../handlers/ConfigFile/ConfigFile-helper'
 import { getEnvFile } from '../../managers/PathManager'
 import { exec } from '../../managers/ShellManager'
+import Commands from './BaseCluster.commands'
 
 class BaseCluster {
   // #region Status Check Methods
@@ -178,29 +183,37 @@ class BaseCluster {
 
   // #endregion Status Check Methods
 
-  // #region Ensure Methods
+  // #region Ensure Variables Method
 
-  static ensureVariables = async (enginePath: string, vars: Record<string, string>) => {
+  static ensureVariables = async (cluster: ClusterModel) => {
+    await BaseCluster._ensureEngineVariables(cluster)
+
+    if (cluster.configs[Storage.ENABLE_RIPPLE_STACK]) {
+      await BaseCluster._ensureIPFSVariables(cluster)
+    }
+  }
+
+  private static _ensureEngineVariables = async (cluster: ClusterModel) => {
     // Ensure auth field has value
-    if (!vars[Storage.AUTH_SECRET_KEY]) {
+    if (!cluster.variables[Storage.AUTH_SECRET_KEY]) {
       // https://stackoverflow.com/a/40191779/2077741
-      vars[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
+      cluster.variables[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
     }
 
-    const envFile = await getEnvFile(enginePath)
+    const envFile = await getEnvFile(cluster.configs[Storage.ENGINE_PATH])
 
     // Ensure aws account id & sns topic name has value
-    if (!vars[Storage.AWS_ACCOUNT_ID_KEY] || !vars[Storage.SNS_TOPIC_NAME_KEY]) {
+    if (!cluster.variables[Storage.AWS_ACCOUNT_ID_KEY] || !cluster.variables[Storage.SNS_TOPIC_NAME_KEY]) {
       const topicEnv = envFile.find((item) => item.trim().startsWith(`${Storage.AWS_SMS_TOPIC_KEY}=`)) || ''
       const topicEnvValue = topicEnv.trim().replace(`${Storage.AWS_SMS_TOPIC_KEY}=`, '')
       const topicEnvSplit = topicEnvValue.split(':')
 
       if (topicEnvSplit.length > 2) {
-        vars[Storage.AWS_ACCOUNT_ID_KEY] = vars[Storage.AWS_ACCOUNT_ID_KEY]
-          ? vars[Storage.AWS_ACCOUNT_ID_KEY]
+        cluster.variables[Storage.AWS_ACCOUNT_ID_KEY] = cluster.variables[Storage.AWS_ACCOUNT_ID_KEY]
+          ? cluster.variables[Storage.AWS_ACCOUNT_ID_KEY]
           : topicEnvSplit.at(-2) || ''
-        vars[Storage.SNS_TOPIC_NAME_KEY] = vars[Storage.SNS_TOPIC_NAME_KEY]
-          ? vars[Storage.SNS_TOPIC_NAME_KEY]
+        cluster.variables[Storage.SNS_TOPIC_NAME_KEY] = cluster.variables[Storage.SNS_TOPIC_NAME_KEY]
+          ? cluster.variables[Storage.SNS_TOPIC_NAME_KEY]
           : topicEnvSplit.at(-1) || ''
       }
     }
@@ -208,17 +221,56 @@ class BaseCluster {
     const configKeys = Object.keys(ConfigEnvMap)
 
     // Ensure rest of the values
-    for (const key in vars) {
-      if (!vars[key] && configKeys.includes(key)) {
+    for (const key in cluster.variables) {
+      if (!cluster.variables[key] && configKeys.includes(key)) {
         const envKey = (ConfigEnvMap as any)[key]
         const varEnv = envFile.find((item) => item.trim().startsWith(`${envKey}=`)) || ''
 
-        vars[key] = varEnv.trim().replace(`${envKey}=`, '')
+        cluster.variables[key] = varEnv.trim().replace(`${envKey}=`, '')
       }
     }
   }
 
-  // #endregion Ensure Methods
+  private static _ensureIPFSVariables = async (cluster: ClusterModel) => {
+    const vars: Record<string, string> = {}
+
+    const varsData = await processVariablesFile(
+      cluster.configs,
+      cluster.variables,
+      Endpoints.IPFS_VALUES_TEMPLATE_PATH,
+      Endpoints.IPFS_VALUES_TEMPLATE_URL
+    )
+
+    for (const key of Object.keys(varsData)) {
+      const existingValue = varsData[key]
+
+      // Data already exists
+      if (existingValue) {
+        vars[key] = existingValue
+      } else if (key === Storage.IPFS_CLUSTER_SECRET) {
+        const response = await exec(Commands.IPFS_SECRET)
+        const { stdout, stderr } = response
+
+        if (stderr) {
+          log.error('Error in _ensureIPFSVariables', stderr)
+        }
+
+        if (stdout) {
+          vars[key] = stdout.toString()
+        }
+      } else if (key === Storage.IPFS_BOOTSTRAP_PEER_ID) {
+        const peerIdObj = await PeerId.create({ bits: 2048, keyType: 'Ed25519' })
+        const peerId = peerIdObj.toJSON()
+
+        if (peerId.privKey) {
+          vars[key] = peerId.id
+          vars[Storage.IPFS_BOOTSTRAP_PEER_PRIVATE_KEY] = peerId.privKey
+        }
+      }
+    }
+  }
+
+  // #endregion Ensure Variables Method
 }
 
 export default BaseCluster

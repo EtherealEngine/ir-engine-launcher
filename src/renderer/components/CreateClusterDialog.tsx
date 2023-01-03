@@ -4,6 +4,7 @@ import CryptoJS from 'crypto-js'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useEffect, useRef, useState } from 'react'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
+import { DeploymentService } from 'renderer/services/DeploymentService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
@@ -33,7 +34,6 @@ import ConfigConfigsView from './ConfigConfigsView'
 import ConfigFlagsView from './ConfigFlagsView'
 import ConfigSummaryView from './ConfigSummaryView'
 import ConfigVarsView from './ConfigVarsView'
-import { DeploymentService } from 'renderer/services/DeploymentService'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
@@ -108,7 +108,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
 
   const loadDefaultVariables = async (clusterType: ClusterType) => {
     setLoading(true)
-    const vars = await ConfigFileService.getDefaultVariables(clusterType, localConfigs[Storage.ENGINE_PATH])
+    const vars = await ConfigFileService.getDefaultVariables(clusterType, localConfigs)
     setDefaultVars(vars)
     setLoading(false)
   }

@@ -40,7 +40,7 @@ export const startFileServer = async (window: BrowserWindow, cluster: ClusterMod
     } catch {}
   }
 
-  await execStreamScriptFile(
+  execStreamScriptFile(
     fileServerScript,
     [`-f "${cluster.configs[Storage.ENGINE_PATH]}"`],
     onFileServerStd,
