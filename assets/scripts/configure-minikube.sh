@@ -290,7 +290,7 @@ set +e
 MINIKUBE_STATUS=$(minikube status --output json)
 set -e
 if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"Nonexistent"* ]]; then
-    minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress --driver virtualbox
+    minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress metrics-server --driver virtualbox
 elif [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
     minikube start
 fi

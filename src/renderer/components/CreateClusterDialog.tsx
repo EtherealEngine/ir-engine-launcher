@@ -80,7 +80,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     return ''
   })
   const [name, setName] = useState('')
-  const [type, setType] = useState<ClusterType | undefined>(undefined)
+  const [type, setType] = useState<ClusterType | ''>('')
   const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
   const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
@@ -113,7 +113,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     setLoading(false)
   }
 
-  const handleNext = async () => {
+  const handleNext = async (isConfigure: boolean) => {
     if (activeStep === 0) {
       setLoading(true)
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
@@ -151,10 +151,15 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           return
         }
 
-        ConfigFileService.setSelectedClusterId(createCluster.id)
-        DeploymentService.processConfigurations(createCluster, password, localFlags)
-
         onClose()
+
+        ConfigFileService.setSelectedClusterId(createCluster.id)
+
+        await DeploymentService.fetchDeploymentStatus(createCluster)
+
+        if (isConfigure) {
+          DeploymentService.processConfigurations(createCluster, password, localFlags)
+        }
 
         return
       }
@@ -204,7 +209,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           password={password}
           sx={{ marginLeft: 2, marginRight: 2 }}
           onChange={onChangePassword}
-          onEnter={handleNext}
+          onEnter={() => handleNext(false)}
         />
       )
     },
@@ -293,7 +298,8 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
-          <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Create' : 'Next'}</Button>
+          {activeStep === steps.length - 1 && <Button onClick={() => handleNext(true)}>Create & Configure</Button>}
+          <Button onClick={() => handleNext(false)}>{activeStep === steps.length - 1 ? 'Create' : 'Next'}</Button>
         </Box>
       </DialogActions>
     </Dialog>

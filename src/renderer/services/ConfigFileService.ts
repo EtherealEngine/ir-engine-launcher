@@ -106,10 +106,10 @@ export const ConfigFileService = {
 
       await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
 
-      LogService.setLogs(cluster.id)
-      DeploymentService.fetchDeploymentStatus(cluster)
-
       dispatch(ConfigFileAction.setConfig(configFile))
+
+      LogService.setLogs(cluster.id)
+      await DeploymentService.getDeploymentStatus(cluster)
 
       return true
     } catch (error) {
@@ -137,6 +137,7 @@ export const ConfigFileService = {
       } else {
         myClonedClusters.splice(index, 1)
 
+        await window.electronAPI.invoke(Channels.ConfigFile.RemoveFiles, clusterId)
         await window.electronAPI.invoke(Channels.ConfigFile.SaveConfig, configFile)
 
         await DeploymentService.removeDeploymentStatus(clusterId)

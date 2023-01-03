@@ -44,6 +44,7 @@ const Channels = {
     SaveConfig: 'SaveConfig',
     ExportConfig: "ExportConfig",
     ImportConfig: "ImportConfig",
+    RemoveFiles: "RemoveFiles",
     GetDefaultConfigs: 'GetDefaultConfigs',
     GetDefaultVariables: 'GetDefaultVariables'
   }

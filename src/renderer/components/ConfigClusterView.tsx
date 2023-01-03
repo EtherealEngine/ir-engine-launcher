@@ -4,7 +4,7 @@ import { Box, FormControl, InputLabel, MenuItem, Select, SxProps, TextField, The
 
 interface Props {
   name: string
-  type?: ClusterType
+  type: ClusterType | ''
   sx?: SxProps<Theme>
   onNameChange: (name: string) => void
   onTypeChange: (type: ClusterType) => void
@@ -37,7 +37,9 @@ const ConfigClusterView = ({ name, type, sx, onNameChange, onTypeChange }: Props
           {Object.keys(ClusterType)
             .filter((key) => isNaN(Number(key)))
             .map((item) => (
-              <MenuItem value={item}>{item}</MenuItem>
+              <MenuItem key={item} value={item}>
+                {item}
+              </MenuItem>
             ))}
         </Select>
       </FormControl>

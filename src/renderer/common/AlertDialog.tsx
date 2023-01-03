@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 
 interface Props {
@@ -22,7 +24,8 @@ const AlertDialog = ({ title, message, okButtonText, cancelButtonText, onClose, 
     <Dialog open onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>{message}</DialogContentText>
+        {React.isValidElement(message) === false && <DialogContentText>{message}</DialogContentText>}
+        {React.isValidElement(message) && message}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{cancelButtonText}</Button>

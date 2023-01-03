@@ -55,10 +55,8 @@ const ConfigPage = () => {
   }
 
   const handleDelete = async () => {
-    const deleted = await ConfigFileService.deleteConfig(selectedClusterId)
-    if (deleted) {
-      ConfigFileService.setSelectedClusterId('')
-    }
+    ConfigFileService.setSelectedClusterId('')
+    await ConfigFileService.deleteConfig(selectedClusterId)
   }
 
   if (!selectedCluster) {

@@ -14,6 +14,9 @@ class ConfigFileHandler implements IBaseHandler {
     ipcMain.handle(Channels.ConfigFile.SaveConfig, async (_event: IpcMainInvokeEvent, config: ConfigFileModel) => {
       return await ConfigFile.saveConfig(window, config)
     })
+    ipcMain.handle(Channels.ConfigFile.RemoveFiles, async (_event: IpcMainInvokeEvent, clusterId: string) => {
+      await ConfigFile.removeFiles(window, clusterId)
+    })
     ipcMain.handle(Channels.ConfigFile.ExportConfig, async (_event: IpcMainInvokeEvent, fileName: string) => {
       return await ConfigFile.exportConfig(window, fileName)
     })
