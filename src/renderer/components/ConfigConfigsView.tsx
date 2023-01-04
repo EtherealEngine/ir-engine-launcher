@@ -36,28 +36,34 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
 
   return (
     <Box sx={sx}>
-      <TextField
-        disabled
-        fullWidth
-        margin="dense"
-        size="small"
-        label={Storage.ENGINE_PATH.replaceAll('_', ' ')}
-        value={localConfigs[Storage.ENGINE_PATH]}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                edge="end"
-                title="Change Path"
-                disabled={loading}
-                onClick={() => changeFolder(Storage.ENGINE_PATH)}
-              >
-                <FolderOutlinedIcon />
-              </IconButton>
-            </InputAdornment>
-          )
-        }}
-      />
+      <Box display="flex" width="100%" alignItems="center">
+        <TextField
+          disabled
+          fullWidth
+          margin="dense"
+          size="small"
+          label={Storage.ENGINE_PATH.replaceAll('_', ' ')}
+          value={localConfigs[Storage.ENGINE_PATH]}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  edge="end"
+                  title="Change Path"
+                  disabled={loading}
+                  onClick={() => changeFolder(Storage.ENGINE_PATH)}
+                >
+                  <FolderOutlinedIcon />
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
+        />
+        <InfoTooltip
+          ml={1}
+          message="Folder for Ethereal Engine source code. This folder should be inside `Home` directory."
+        />
+      </Box>
 
       <FormControlLabel
         labelPlacement="start"

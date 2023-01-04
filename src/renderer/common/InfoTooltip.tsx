@@ -3,9 +3,14 @@ import { Tooltip, Typography } from '@mui/material'
 
 interface Props {
   message: React.ReactNode
+  ml?: number | string
 }
 
-const InfoTooltip = ({ message }: Props) => {
+const InfoTooltip = ({ message, ml }: Props) => {
+  if (!ml) {
+    ml = 2
+  }
+
   return (
     <Tooltip
       title={
@@ -19,7 +24,7 @@ const InfoTooltip = ({ message }: Props) => {
       }
       arrow
     >
-      <InfoOutlinedIcon color="primary" sx={{ marginLeft: 2, fontSize: '18px' }} />
+      <InfoOutlinedIcon color="primary" sx={{ ml, fontSize: '18px' }} />
     </Tooltip>
   )
 }
