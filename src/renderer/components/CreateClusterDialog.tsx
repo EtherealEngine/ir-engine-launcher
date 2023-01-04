@@ -63,7 +63,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   const { sudoPassword } = settingsState.value
 
   const configFileState = useConfigFileState()
-  const { loading } = configFileState.value
+  const { clusters, loading } = configFileState.value
 
   const [activeStep, setActiveStep] = useState(0)
   const [isLoading, setLoading] = useState(false)
@@ -135,12 +135,18 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         return
       }
 
-      if (type === ClusterType.MicroK8s) {
-        setError('Support for MicroK8s is coming soon.')
-        return
-      }
+      if (activeStep === 1) {
+        if (type === ClusterType.MicroK8s) {
+          setError('Support for MicroK8s is coming soon.')
+          return
+        }
 
-      if (activeStep === 2) {
+        const clusterCount = clusters.filter((item) => item.type === type)
+        if (clusterCount.length > 0) {
+          setError(`You already have a cluster of ${type}.`)
+          return
+        }
+      } else if (activeStep === 2) {
         loadDefaultVariables(type)
       } else if (activeStep === 4) {
         const createCluster: ClusterModel = {

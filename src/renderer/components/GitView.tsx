@@ -31,6 +31,17 @@ const GitView = () => {
     return <></>
   }
 
+  let branches: string[] = []
+  if (currentDeployment.gitStatus.data) {
+    branches = currentDeployment.gitStatus.data.branches
+
+    const current = currentDeployment.gitStatus.data.current
+    if (current && branches.includes(current) === false) {
+      branches = [current, ...branches]
+    }
+  }
+
+
   const handleBranchChange = async (event: SelectChangeEvent<string | null>) => {
     try {
       const { value } = event.target
@@ -121,7 +132,7 @@ const GitView = () => {
           value={currentDeployment.gitStatus.data?.current}
           onChange={handleBranchChange}
         >
-          {currentDeployment.gitStatus.data?.branches.map((branch) => (
+          {branches.map((branch) => (
             <MenuItem key={branch} value={branch}>
               {branch}
             </MenuItem>
@@ -142,7 +153,17 @@ const GitView = () => {
         </span>
       </Tooltip>
 
-      <Tooltip arrow title="Push/Ahead">
+      <Tooltip
+        arrow
+        title={
+          <>
+            Push/Ahead
+            <br />
+            <br />
+            Note: Please make sure your terminal is configured with git credentials.
+          </>
+        }
+      >
         <span>
           <Button
             disabled={!currentDeployment.gitStatus.data || currentDeployment.gitStatus.data?.ahead === 0}
