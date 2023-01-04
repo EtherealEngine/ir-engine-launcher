@@ -33,14 +33,16 @@ const GitView = () => {
 
   let branches: string[] = []
   if (currentDeployment.gitStatus.data) {
-    branches = currentDeployment.gitStatus.data.branches
+    const allowedBranches = ['dev', '/dev', 'master', '/master']
+    branches = currentDeployment.gitStatus.data.branches.filter((item) =>
+      allowedBranches.some((allowed) => item.endsWith(allowed))
+    )
 
     const current = currentDeployment.gitStatus.data.current
     if (current && branches.includes(current) === false) {
       branches = [current, ...branches]
     }
   }
-
 
   const handleBranchChange = async (event: SelectChangeEvent<string | null>) => {
     try {
