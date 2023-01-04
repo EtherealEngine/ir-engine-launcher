@@ -61,7 +61,7 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
         />
         <InfoTooltip
           ml={1}
-          message="Folder for Ethereal Engine source code. This folder should be inside `Home` directory."
+          message="Folder of Ethereal Engine source code. This folder should be inside `Home` directory."
         />
       </Box>
 

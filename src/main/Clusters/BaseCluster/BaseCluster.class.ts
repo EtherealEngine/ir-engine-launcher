@@ -194,13 +194,25 @@ class BaseCluster {
   }
 
   private static _ensureEngineVariables = async (cluster: ClusterModel) => {
+    const enginePath = cluster.configs[Storage.ENGINE_PATH]
+
+    // Ensure hostUploadFolder values
+    cluster.variables["OS_USER_NAME"] = enginePath.replace('/home/', '').split('/').shift() || ''
+    cluster.variables["ENGINE_FOLDER"] = enginePath.replace('/home/', '').replace(`${cluster.variables["OS_USER_NAME"]}/`, '')
+
+    // Ensure filepath field has value
+    if (!cluster.variables[Storage.AUTH_SECRET_KEY]) {
+      // https://stackoverflow.com/a/40191779/2077741
+      cluster.variables[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
+    }
+
     // Ensure auth field has value
     if (!cluster.variables[Storage.AUTH_SECRET_KEY]) {
       // https://stackoverflow.com/a/40191779/2077741
       cluster.variables[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
     }
 
-    const envFile = await getEnvFile(cluster.configs[Storage.ENGINE_PATH])
+    const envFile = await getEnvFile(enginePath)
 
     // Ensure aws account id & sns topic name has value
     if (!cluster.variables[Storage.AWS_ACCOUNT_ID_KEY] || !cluster.variables[Storage.SNS_TOPIC_NAME_KEY]) {
