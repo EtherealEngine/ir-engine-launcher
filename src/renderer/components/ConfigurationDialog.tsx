@@ -192,7 +192,15 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     },
     {
       label: 'Variables',
-      title: 'Provide configuration variables (Optional)',
+      title: (
+        <>
+          Provide configuration variables (Optional).
+          <br />
+          <span style={{ fontSize: 14, opacity: 0.6 }}>
+            If value is not provided, then the default ones from <b>.env.local</b> of Ethereal Engine repo will be used.
+          </span>
+        </>
+      ),
       content: <ConfigVarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
