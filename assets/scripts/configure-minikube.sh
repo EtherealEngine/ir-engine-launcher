@@ -457,19 +457,16 @@ fi
 
 echo "Force DB refresh is $FORCE_DB_REFRESH"
 
-REFRESH_TRUE_PATH="$ASSETS_FOLDER/files/db-refresh-true.values.yaml"
-REFRESH_FALSE_PATH="$ASSETS_FOLDER/files/db-refresh-false.values.yaml"
-
 if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Updating Ethereal Engine deployment to configure database"
-    helm upgrade --reuse-values -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
+    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-true.values.yaml" local xrengine/xrengine
     sleep 35
-    helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
+    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-false.values.yaml" local xrengine/xrengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Installing Ethereal Engine deployment with populating database"
-    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "$REFRESH_TRUE_PATH" local xrengine/xrengine
+    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "./packages/ops/configs/db-refresh-true.values.yaml" local xrengine/xrengine
     sleep 35
-    helm upgrade --reuse-values -f "$REFRESH_FALSE_PATH" local xrengine/xrengine
+    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-false.values.yaml" local xrengine/xrengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
     echo "Installing Ethereal Engine deployment without populating database"
     helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" local xrengine/xrengine
