@@ -33,12 +33,12 @@ export const processVariables = async (
   clusterConfigs: Record<string, string>,
   clusterVars: Record<string, string> = {}
 ) => {
-  if (clusterType === ClusterType.Minikube || clusterType === ClusterType.MicroK8s) {
+  if (clusterType === ClusterType.Minikube) {
     const engineVars = await processVariablesFile(
       clusterConfigs,
       clusterVars,
-      Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_PATH,
-      Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_URL
+      Endpoints.MINIKUBE_VALUES_TEMPLATE_PATH,
+      Endpoints.MINIKUBE_VALUES_TEMPLATE_URL
     )
     clusterVars = { ...clusterVars, ...engineVars }
   }

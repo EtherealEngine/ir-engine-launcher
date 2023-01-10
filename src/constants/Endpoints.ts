@@ -18,13 +18,14 @@ const Endpoints = {
   ENGINE_ENV_DEFAULT_PATH: '.env.local.default',
   ENGINE_ENV_DEFAULT_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/.env.local.default',
   ENGINE_VALUES_FILE_NAME: 'engine.values.yaml',
-  ENGINE_LOCAL_VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.template.values.yaml',
-  ENGINE_LOCAL_VALUES_TEMPLATE_URL:
-    'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.template.values.yaml',
+  MINIKUBE_VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.minikube.template.values.yaml',
+  MINIKUBE_VALUES_TEMPLATE_URL:
+    'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.minikube.template.values.yaml',
   IPFS_VALUES_FILE_NAME: 'ipfs.values.yaml',
   IPFS_VALUES_TEMPLATE_PATH: 'packages/ops/ipfs/values.yaml',
   IPFS_VALUES_TEMPLATE_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/ipfs/values.yaml',
-  RIPPLED_CLI_DOCS: 'https://xrpl.org/commandline-usage.html'
+  RIPPLED_CLI_DOCS: 'https://xrpl.org/commandline-usage.html',
+  FILE_SERVER_PATH: 'packages/server/upload'
 }
 
 export default Endpoints

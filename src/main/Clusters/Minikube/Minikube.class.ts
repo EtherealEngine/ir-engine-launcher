@@ -80,11 +80,7 @@ class Minikube {
 
       const configsFolder = await ensureConfigsFolder()
 
-      await ensureConfigs(
-        cluster,
-        Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_PATH,
-        Endpoints.ENGINE_LOCAL_VALUES_TEMPLATE_URL
-      )
+      await ensureConfigs(cluster, Endpoints.MINIKUBE_VALUES_TEMPLATE_PATH, Endpoints.MINIKUBE_VALUES_TEMPLATE_URL)
 
       const scriptsFolder = scriptsPath()
       const assetsFolder = assetsPath()

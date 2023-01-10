@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import { BrowserWindow } from 'electron'
 import log from 'electron-log'
 import os from 'os'
+import path from 'path'
 import PeerId from 'peer-id'
 
 import { Channels } from '../../../constants/Channels'
@@ -197,10 +198,10 @@ class BaseCluster {
     const enginePath = cluster.configs[Storage.ENGINE_PATH]
 
     // Ensure hostUploadFolder values
-    cluster.variables["OS_USER_NAME"] = enginePath.replace('/home/', '').split('/').shift() || ''
-    cluster.variables["ENGINE_FOLDER"] = enginePath.replace('/home/', '').replace(`${cluster.variables["OS_USER_NAME"]}/`, '')
+    cluster.variables['FILE_SERVER_FOLDER'] = path.join(enginePath, Endpoints.FILE_SERVER_PATH)
+    cluster.variables['FILE_SERVER_FOLDER'] = cluster.variables['FILE_SERVER_FOLDER'].replace('home/', 'hosthome/')
 
-    // Ensure filepath field has value
+    // Ensure auth secret field has value
     if (!cluster.variables[Storage.AUTH_SECRET_KEY]) {
       // https://stackoverflow.com/a/40191779/2077741
       cluster.variables[Storage.AUTH_SECRET_KEY] = crypto.randomBytes(16).toString('hex')
