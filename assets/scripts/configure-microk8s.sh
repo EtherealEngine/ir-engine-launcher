@@ -292,6 +292,8 @@ if [[ -f "/etc/docker/daemon.json" ]]; then
 else
     echo "$PASSWORD" | sudo -S -- sh -c "echo '{\"insecure-registries\" : [\"localhost:32000\"]}' >>/etc/docker/daemon.json"
     echo "daemon.json file created at /etc/docker/daemon.json"
+
+    echo "$PASSWORD" | sudo -S systemctl restart docker
 fi
 
 #================
@@ -302,7 +304,7 @@ fi
 #================
 
 ADD_DOMAIN=false
-if grep -q "localhost:32000" /etc/docker/daemon.json; then
+if grep -q "local.etherealengine.com" /etc/hosts; then
     if grep -q "127.0.0.1" /etc/hosts; then
         echo "*.etherealengine.com entries exists"
     else
