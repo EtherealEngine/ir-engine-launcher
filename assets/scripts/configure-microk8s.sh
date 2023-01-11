@@ -264,6 +264,8 @@ else
     echo "microk8s is not installed"
 
     echo "$PASSWORD" | sudo -S snap install microk8s --classic --channel=1.26/stable
+    echo "$PASSWORD" | sudo -S usermod -a -G microk8s hanzlamateen
+    echo "$PASSWORD" | sudo -S chown -R hanzlamateen ~/.kube
 fi
 
 MICROK8S_VERSION=$(microk8s version)
