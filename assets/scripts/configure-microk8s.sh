@@ -258,7 +258,7 @@ echo "helm version is $HELM_VERSION"
 # Verify MicroK8s
 #================
 
-if microk8s version >/dev/null; then
+if echo "$PASSWORD" | sudo -S microk8s version >/dev/null; then
     echo "microk8s is installed"
 else
     echo "microk8s is not installed"
@@ -266,16 +266,17 @@ else
     echo "$PASSWORD" | sudo -S snap install microk8s --classic --channel=1.26/stable
     echo "$PASSWORD" | sudo -S usermod -a -G microk8s hanzlamateen
     echo "$PASSWORD" | sudo -S chown -R hanzlamateen ~/.kube
+    echo "$PASSWORD" | sudo -S newgrp microk8s
 fi
 
-MICROK8S_VERSION=$(microk8s version)
+MICROK8S_VERSION=$(echo "$PASSWORD" | sudo -S microk8s version)
 echo "microk8s version is $MICROK8S_VERSION"
 
 echo "$PASSWORD" | sudo -S microk8s start
 echo "$PASSWORD" | sudo -S microk8s enable dashboard dns registry host-access ingress rbac hostpath-storage helm3
 echo "$PASSWORD" | sudo -S microk8s inspect
 
-MICROK8S_STATUS=$(microk8s status)
+MICROK8S_STATUS=$(echo "$PASSWORD" | sudo -S microk8s status)
 echo "microk8s status is $MICROK8S_STATUS"
 
 alias kubectl='microk8s kubectl' 
