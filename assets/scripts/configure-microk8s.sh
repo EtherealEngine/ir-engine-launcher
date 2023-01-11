@@ -68,7 +68,7 @@ if $INSTALL_NODE; then
         echo "nvm is not installed"
 
         echo "$PASSWORD" | sudo -S apt update -y
-        echo "$PASSWORD" | sudo -S apt install -y curl
+        echo "$PASSWORD" | sudo -S apt install curl -y
         curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
         source ~/.profile
 
@@ -219,22 +219,6 @@ else
     npm run dev-docker
 fi
 
-#==================
-# Verify VirtualBox
-#==================
-
-if vboxmanage --version >/dev/null; then
-    echo "virtualbox is installed"
-else
-    echo "virtualbox is not installed"
-
-    echo "$PASSWORD" | sudo -S apt update -y
-    echo "$PASSWORD" | sudo -S apt install -y virtualbox
-fi
-
-VIRTUALBOX_VERSION=$(vboxmanage --version)
-echo "vboxmanage version is $VIRTUALBOX_VERSION"
-
 #===============
 # Verify Kubectl
 #===============
@@ -271,33 +255,41 @@ HELM_VERSION=$(helm version)
 echo "helm version is $HELM_VERSION"
 
 #================
-# Verify Minikube
+# Verify MicroK8s
 #================
 
-if minikube version >/dev/null; then
-    echo "minikube is installed"
+if microk8s version >/dev/null; then
+    echo "microk8s is installed"
 else
-    echo "minikube is not installed"
+    echo "microk8s is not installed"
 
-    curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-    echo "$PASSWORD" | sudo -S install minikube-linux-amd64 /usr/local/bin/minikube
+    echo "$PASSWORD" | sudo -S snap install microk8s --classic --channel=1.26/stable
 fi
 
-MINIKUBE_VERSION=$(minikube version)
-echo "minikube version is $MINIKUBE_VERSION"
+MICROK8S_VERSION=$(microk8s version)
+echo "microk8s version is $MICROK8S_VERSION"
 
-# Since minikube status can return a non-zero result here
-set +e
-MINIKUBE_STATUS=$(minikube status --output json)
-set -e
-if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"Nonexistent"* ]]; then
-    minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress metrics-server --driver virtualbox
-elif [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
-    minikube start
+echo "$PASSWORD" | sudo -S microk8s start
+echo "$PASSWORD" | sudo -S microk8s enable dashboard dns registry host-access ingress rbac hostpath-storage helm3
+echo "$PASSWORD" | sudo -S microk8s inspect
+
+MICROK8S_STATUS=$(microk8s status)
+echo "microk8s status is $MICROK8S_STATUS"
+
+alias kubectl='microk8s kubectl' 
+alias helm='microk8s helm'
+
+#================================
+# Docker MicroK8s Registry access
+#================================
+
+
+if [[ -f "/etc/docker/daemon.json" ]]; then
+    echo "daemon.json file exists at /etc/docker/daemon.json"
+else
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '{\"insecure-registries\" : [\"localhost:32000\"]}' >>/etc/docker/daemon.json"
+    echo "daemon.json file created at /etc/docker/daemon.json"
 fi
-
-MINIKUBE_STATUS=$(minikube status)
-echo "minikube status is $MINIKUBE_STATUS"
 
 #================
 # Verify hostfile
@@ -306,30 +298,22 @@ echo "minikube status is $MINIKUBE_STATUS"
 # https://stackoverflow.com/a/18744367/2077741
 #================
 
-if grep -q "host.minikube.internal" /etc/hosts; then
-    echo "host.minikube.internal entry exists"
-else
-    echo "$PASSWORD" | sudo -S -- sh -c "echo '10.0.2.2 host.minikube.internal' >>/etc/hosts"
-    echo "host.minikube.internal entries added"
-fi
-
-MINIKUBE_IP=$(minikube ip)
-ADD_MINIKUBE_IP=false
-if grep -q "local.etherealengine.com" /etc/hosts; then
-    if grep -q "$MINIKUBE_IP" /etc/hosts; then
+ADD_DOMAIN=false
+if grep -q "localhost:32000" /etc/docker/daemon.json; then
+    if grep -q "127.0.0.1" /etc/hosts; then
         echo "*.etherealengine.com entries exists"
     else
         echo "*.etherealengine.com entries outdated"
         grep -v 'local.etherealengine.com' /etc/hosts >/tmp/hosts.tmp
         echo "$PASSWORD" | sudo -S cp /tmp/hosts.tmp /etc/hosts
-        ADD_MINIKUBE_IP=true
+        ADD_DOMAIN=true
     fi
 else
-    ADD_MINIKUBE_IP=true
+    ADD_DOMAIN=true
 fi
 
-if $ADD_MINIKUBE_IP; then
-    echo "$PASSWORD" | sudo -S -- sh -c "echo '$MINIKUBE_IP local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com' >>/etc/hosts"
+if $ADD_DOMAIN; then
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '127.0.0.1 local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com' >>/etc/hosts"
     echo "*.etherealengine.com entries added"
 fi
 
@@ -348,7 +332,7 @@ echo "helm repos added and updated"
 # Verify agones & redis
 #======================
 
-kubectl config use-context minikube
+kubectl config use-context microk8s
 
 if helm status agones >/dev/null; then
     echo "agones is already deployed"
@@ -435,7 +419,7 @@ fi
 echo "Ethereal Engine docker images build starting"
 export DOCKER_BUILDKIT=0
 export COMPOSE_DOCKER_CLI_BUILD=0
-./scripts/build_minikube.sh
+./scripts/build_microk8s.sh
 
 ENGINE_INSTALLED=false
 if helm status local >/dev/null; then
