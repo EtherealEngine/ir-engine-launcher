@@ -337,7 +337,7 @@ echo "helm repos added and updated"
 # Verify agones & redis
 #======================
 
-kubectl config use-context microk8s
+#kubectl config use-context microk8s
 
 if helm status agones >/dev/null; then
     echo "agones is already deployed"
