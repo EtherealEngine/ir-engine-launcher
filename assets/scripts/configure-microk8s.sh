@@ -271,7 +271,6 @@ else
 
     echo "$PASSWORD" | sudo -S usermod -a -G microk8s hanzlamateen
     echo "$PASSWORD" | sudo -S chown -R hanzlamateen ~/.kube
-    echo "$PASSWORD" | sudo -S newgrp microk8s
 
     # Remove previous context from config
     if kubectl config view --raw | grep -q 'microk8s'; then
@@ -440,6 +439,8 @@ if [[ -d $PROJECTS_PATH ]]; then
     echo "ethereal engine projects exists at $PROJECTS_PATH"
 else
     echo "ethereal engine projects does not exists at $PROJECTS_PATH"
+    
+    export MYSQL_HOST=localhost
     npm run install-projects
 fi
 

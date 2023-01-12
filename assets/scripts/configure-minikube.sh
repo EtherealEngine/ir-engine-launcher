@@ -433,6 +433,8 @@ if [[ -d $PROJECTS_PATH ]]; then
     echo "ethereal engine projects exists at $PROJECTS_PATH"
 else
     echo "ethereal engine projects does not exists at $PROJECTS_PATH"
+    
+    export MYSQL_HOST=localhost
     npm run install-projects
 fi
 
