@@ -300,8 +300,25 @@ MICROK8S_STATUS=$(echo "$PASSWORD" | sudo -S microk8s status)
 echo "microk8s status is $MICROK8S_STATUS"
 
 if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running'; then
+    echo "$PASSWORD" | sudo -S ufw allow in on cni0 && echo "$PASSWORD" | sudo -S ufw allow out on cni0
+    echo "$PASSWORD" | sudo -S ufw default allow routed
+    
     echo "$PASSWORD" | sudo -S microk8s start
-    echo "$PASSWORD" | sudo -S microk8s enable dashboard dns registry host-access ingress rbac hostpath-storage helm3
+
+    echo "$PASSWORD" | sudo -S microk8s enable dashboard
+    echo "$PASSWORD" | sudo -S microk8s enable dns
+    echo "$PASSWORD" | sudo -S microk8s enable registry
+    # Since below command can cause terminal to exit.
+    set +e
+    echo "$PASSWORD" | sudo -S microk8s enable host-access
+    set -e
+    echo "$PASSWORD" | sudo -S microk8s enable ingress
+    echo "$PASSWORD" | sudo -S microk8s enable rbac
+    echo "$PASSWORD" | sudo -S microk8s enable hostpath-storage
+    echo "$PASSWORD" | sudo -S microk8s enable helm3
+    
+    sleep 30
+
     echo "$PASSWORD" | sudo -S microk8s inspect
 
     MICROK8S_STATUS=$(echo "$PASSWORD" | sudo -S microk8s status)
