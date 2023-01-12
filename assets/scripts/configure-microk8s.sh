@@ -296,17 +296,26 @@ fi
 MICROK8S_VERSION=$(echo "$PASSWORD" | sudo -S microk8s version)
 echo "microk8s version is $MICROK8S_VERSION"
 
-echo "$PASSWORD" | sudo -S microk8s start
-echo "$PASSWORD" | sudo -S microk8s enable dashboard dns registry host-access ingress rbac hostpath-storage helm3
-echo "$PASSWORD" | sudo -S microk8s inspect
-
 MICROK8S_STATUS=$(echo "$PASSWORD" | sudo -S microk8s status)
 echo "microk8s status is $MICROK8S_STATUS"
+
+if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running'; then
+    echo "$PASSWORD" | sudo -S microk8s start
+    echo "$PASSWORD" | sudo -S microk8s enable dashboard dns registry host-access ingress rbac hostpath-storage helm3
+    echo "$PASSWORD" | sudo -S microk8s inspect
+
+    MICROK8S_STATUS=$(echo "$PASSWORD" | sudo -S microk8s status)
+    echo "microk8s status is $MICROK8S_STATUS"
+
+    if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running'; then
+        echo "There is something wrong in your microk8s. Please fix all warnings in 'sudo microk8s inspect' and reboot. If you still face this issue then, try 'sudo snap remove microk8s --purge'"
+        exit 3
+    fi
+fi
 
 #================================
 # Docker MicroK8s Registry access
 #================================
-
 
 if [[ -f "/etc/docker/daemon.json" ]]; then
     echo "daemon.json file exists at /etc/docker/daemon.json"
@@ -403,7 +412,6 @@ if [[ $ENABLE_RIPPLE_STACK == 'true' ]]; then
     RIPPLED_STATUS=$(helm status local-rippled)
     echo "rippled status is $RIPPLED_STATUS"
 
-
     if helm status local-ipfs >/dev/null; then
         echo "ipfs is already deployed"
     else
@@ -428,7 +436,6 @@ else
     fi
 fi
 
-
 #=======================
 # Verify Ethereal Engine
 #=======================
@@ -439,7 +446,7 @@ if [[ -d $PROJECTS_PATH ]]; then
     echo "ethereal engine projects exists at $PROJECTS_PATH"
 else
     echo "ethereal engine projects does not exists at $PROJECTS_PATH"
-    
+
     export MYSQL_HOST=localhost
     npm run install-projects
 fi
