@@ -247,6 +247,10 @@ else
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     echo "$PASSWORD" | sudo -S install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     rm kubectl -f
+
+    if [[ ! -d ~/.kube ]]; then
+        mkdir ~/.kube
+    fi
 fi
 
 KUBECTL_VERSION=$(kubectl version --client)

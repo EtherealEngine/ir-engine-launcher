@@ -231,6 +231,10 @@ else
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     echo "$PASSWORD" | sudo -S install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     rm kubectl -f
+
+    if [[ ! -d ~/.kube ]]; then
+        mkdir ~/.kube
+    fi
 fi
 
 KUBECTL_VERSION=$(kubectl version --client)
@@ -264,9 +268,30 @@ else
     echo "microk8s is not installed"
 
     echo "$PASSWORD" | sudo -S snap install microk8s --classic --channel=1.26/stable
+
     echo "$PASSWORD" | sudo -S usermod -a -G microk8s hanzlamateen
     echo "$PASSWORD" | sudo -S chown -R hanzlamateen ~/.kube
     echo "$PASSWORD" | sudo -S newgrp microk8s
+
+    # Remove previous context from config
+    if kubectl config view --raw | grep -q 'microk8s'; then
+        kubectl config delete-context microk8s
+    fi
+
+    # Remove previous cluster from config
+    if kubectl config view --raw | grep -q 'microk8s-cluster'; then
+        kubectl config delete-cluster microk8s-cluster
+    fi
+
+    # Remove previous user from config
+    if kubectl config view --raw | grep -q 'microk8s-admin'; then
+        kubectl config delete-user microk8s-admin
+    fi
+
+    # Ref: https://discuss.kubernetes.io/t/use-kubectl-with-microk8s/5313/6
+    kubectl config set-cluster microk8s --server=https://127.0.0.1:16443/ --certificate-authority=/var/snap/microk8s/current/certs/ca.crt
+    kubectl config set-credentials microk8s-admin --token="$(echo "$PASSWORD" | sudo -S microk8s kubectl config view --raw -o 'jsonpath={.users[0].user.token}')"
+    kubectl config set-context microk8s --cluster=microk8s --namespace=default --user=microk8s-admin
 fi
 
 MICROK8S_VERSION=$(echo "$PASSWORD" | sudo -S microk8s version)
@@ -278,9 +303,6 @@ echo "$PASSWORD" | sudo -S microk8s inspect
 
 MICROK8S_STATUS=$(echo "$PASSWORD" | sudo -S microk8s status)
 echo "microk8s status is $MICROK8S_STATUS"
-
-alias kubectl='microk8s kubectl' 
-alias helm='microk8s helm'
 
 #================================
 # Docker MicroK8s Registry access
@@ -337,7 +359,7 @@ echo "helm repos added and updated"
 # Verify agones & redis
 #======================
 
-#kubectl config use-context microk8s
+kubectl config use-context microk8s
 
 if helm status agones >/dev/null; then
     echo "agones is already deployed"
