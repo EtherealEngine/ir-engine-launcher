@@ -15,7 +15,7 @@ const K8DashboardPage = () => {
 
   const deploymentState = useDeploymentState()
   const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
-  const minikubeStatus = currentDeployment?.appStatus.find((app) => app.id === 'minikube')
+  const clusterStatus = currentDeployment?.appStatus.find((app) => app.id === selectedCluster?.type.toLowerCase())
 
   useEffect(() => {
     init()
@@ -26,14 +26,14 @@ const K8DashboardPage = () => {
       selectedCluster &&
       !currentDeployment?.k8dashboard.data &&
       !currentDeployment?.k8dashboard.loading &&
-      minikubeStatus?.status === AppStatus.Configured
+      clusterStatus?.status === AppStatus.Configured
     ) {
       DeploymentService.fetchK8Dashboard(selectedCluster)
     } else if (
       selectedCluster &&
       !currentDeployment?.k8dashboard.data &&
       !currentDeployment?.k8dashboard.loading &&
-      minikubeStatus?.status === AppStatus.NotConfigured
+      clusterStatus?.status === AppStatus.NotConfigured
     ) {
       DeploymentService.clearK8Dashboard(selectedCluster.id)
     }
@@ -44,8 +44,8 @@ const K8DashboardPage = () => {
   }
 
   let loadingMessage = ''
-  if (minikubeStatus?.status === AppStatus.Checking) {
-    loadingMessage = 'Checking Minikube'
+  if (clusterStatus?.status === AppStatus.Checking) {
+    loadingMessage = `Checking ${clusterStatus?.name}`
   } else if (currentDeployment?.k8dashboard.loading) {
     loadingMessage = 'Loading Dashboard'
   }
@@ -53,15 +53,15 @@ const K8DashboardPage = () => {
   let errorMessage = ''
   let errorDetail = ''
   let errorRetry = () => {}
-  if (minikubeStatus?.status === AppStatus.NotConfigured) {
-    errorMessage = 'Minikube Not Configured'
-    errorDetail = 'Please configure minikube before trying again.'
+  if (clusterStatus?.status === AppStatus.NotConfigured) {
+    errorMessage = `${clusterStatus?.name} Not Configured`
+    errorDetail = `Please configure ${clusterStatus?.id} before trying again.`
     errorRetry = async () => {
       await DeploymentService.fetchDeploymentStatus(selectedCluster)
       init()
     }
   } else if (currentDeployment?.k8dashboard.error) {
-    errorMessage = 'Minikube Dashboard Error'
+    errorMessage = `${clusterStatus?.name} Dashboard Error`
     errorDetail = currentDeployment?.k8dashboard.error
     errorRetry = () => DeploymentService.fetchK8Dashboard(selectedCluster)
   }
