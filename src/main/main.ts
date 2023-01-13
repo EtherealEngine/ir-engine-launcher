@@ -43,6 +43,24 @@ if (process.env.NODE_ENV === 'production') {
 // https://stackoverflow.com/a/51291249/2077741
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
+// To allow Engine certificate errors
+// https://stackoverflow.com/a/63924528/2077741
+// https://stackoverflow.com/a/46789486/2077741
+app.on('certificate-error', (event, webContents, url, error, cert, callback) => {
+  const { host } = new URL(url)
+
+  // Do some verification based on the URL to not allow potentially malicious certs:
+  if (Endpoints.ALLOW_CERTIFICATES.includes(host)) {
+    // Hint: For more security, you may actually perform some checks against
+    // the passed certificate (parameter "cert") right here
+
+    event.preventDefault() // Stop Chromium from rejecting the certificate
+    callback(true) // Trust this certificate
+  } else {
+    callback(false) // Let Chromium do its thing
+  }
+})
+
 let splashWindow: BrowserWindow | null = null
 let mainWindow: BrowserWindow | null = null
 

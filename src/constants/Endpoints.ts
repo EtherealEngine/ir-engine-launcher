@@ -6,7 +6,8 @@ const Endpoints = {
   ALLOW_CERTIFICATES: [
     'local.etherealengine.com',
     'api-local.etherealengine.com',
-    'instanceserver-local.etherealengine.com'
+    'instanceserver-local.etherealengine.com',
+    'localhost:8642'
   ],
   MYSQL_PORT: 3304,
   DEFAULT_ENGINE_FOLDER: 'xrengine',
@@ -21,6 +22,9 @@ const Endpoints = {
   MINIKUBE_VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.minikube.template.values.yaml',
   MINIKUBE_VALUES_TEMPLATE_URL:
     'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.minikube.template.values.yaml',
+  MICROK8S_VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.microk8s.template.values.yaml',
+  MICROK8S_VALUES_TEMPLATE_URL:
+    'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.microk8s.template.values.yaml',
   IPFS_VALUES_FILE_NAME: 'ipfs.values.yaml',
   IPFS_VALUES_TEMPLATE_PATH: 'packages/ops/ipfs/values.yaml',
   IPFS_VALUES_TEMPLATE_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/ipfs/values.yaml',
