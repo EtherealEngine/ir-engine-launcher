@@ -1,4 +1,5 @@
 import { Channels } from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import Storage, { generateUUID } from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { ClusterModel, ClusterType } from 'models/Cluster'
@@ -23,7 +24,8 @@ import {
   LinearProgress,
   Step,
   StepLabel,
-  Stepper
+  Stepper,
+  Typography
 } from '@mui/material'
 import { StepIconProps } from '@mui/material/StepIcon'
 
@@ -293,7 +295,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
               style={{ color: 'white' }}
               target="_blank"
               href={
-                selectedCluster?.type === ClusterType.Minikube
+                type === ClusterType.Minikube
                   ? Endpoints.MINIKUBE_LINUX_SCRIPT_URL
                   : Endpoints.MICROK8S_LINUX_SCRIPT_URL
               }
@@ -312,7 +314,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           </Typography>
         </Box>
       )}
-      
+
       {error && (
         <DialogContentText color={'red'} sx={{ marginLeft: 5, marginRight: 5 }}>
           Error: {error}
