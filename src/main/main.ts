@@ -46,7 +46,7 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 // To allow Engine certificate errors
 // https://stackoverflow.com/a/63924528/2077741
 // https://stackoverflow.com/a/46789486/2077741
-app.on('certificate-error', (event, webContents, url, error, cert, callback) => {
+app.on('certificate-error', (event, _webContents, url, _error, _cert, callback) => {
   const { host } = new URL(url)
 
   // Do some verification based on the URL to not allow potentially malicious certs:
