@@ -19,6 +19,10 @@ const Endpoints = {
   ENGINE_ENV_DEFAULT_PATH: '.env.local.default',
   ENGINE_ENV_DEFAULT_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/.env.local.default',
   ENGINE_VALUES_FILE_NAME: 'engine.values.yaml',
+  MINIKUBE_LINUX_SCRIPT_URL:
+    'https://raw.githubusercontent.com/XRFoundation/XREngine-Control-Center/master/assets/scripts/configure-minikube-linux.sh',
+  MICROK8S_LINUX_SCRIPT_URL:
+    'https://raw.githubusercontent.com/XRFoundation/XREngine-Control-Center/master/assets/scripts/configure-microk8s-linux.sh',
   MINIKUBE_VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.minikube.template.values.yaml',
   MINIKUBE_VALUES_TEMPLATE_URL:
     'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.minikube.template.values.yaml',
