@@ -80,7 +80,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     return ''
   })
   const [name, setName] = useState('')
-  const [type, setType] = useState<ClusterType | ''>('')
+  const [type, setType] = useState<ClusterType>(ClusterType.MicroK8s)
   const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
   const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
@@ -130,17 +130,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         return
       }
 
-      if (!type) {
-        setError('Please select a valid cluster type')
-        return
-      }
-
       if (activeStep === 1) {
-        if (type === ClusterType.MicroK8s) {
-          setError('Support for MicroK8s is coming soon.')
-          return
-        }
-
         const clusterCount = clusters.filter((item) => item.type === type)
         if (clusterCount.length > 0) {
           setError(`You already have a cluster of ${type}.`)

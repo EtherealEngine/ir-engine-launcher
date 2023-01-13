@@ -14,20 +14,20 @@ import { execStream, execStreamScriptFile } from '../../managers/ShellManager'
 import { ensureConfigs } from '../../managers/YamlManager'
 import { DefaultEngineStatus, DefaultSystemStatus } from '../BaseCluster/BaseCluster.appstatus'
 import BaseCluster from '../BaseCluster/BaseCluster.class'
-import { MinikubeAppsStatus, MinikubeRippleAppsStatus } from './Minikube.appstatus'
-import Commands from './Minikube.commands'
-import Requirements from './Minikube.requirements'
+import { MicroK8sAppsStatus, MicroK8sRippleAppsStatus } from './MicroK8s.appstatus'
+import Commands from './MicroK8s.commands'
+import Requirements from './MicroK8s.requirements'
 
-class Minikube {
+class MicroK8s {
   static getClusterStatus = (cluster: ClusterModel) => {
     const systemStatus = [...DefaultSystemStatus]
     const engineStatus = [...DefaultEngineStatus]
-    let appStatus = [...MinikubeAppsStatus]
+    let appStatus = [...MicroK8sAppsStatus]
 
     const enableRipple = cluster.configs[Storage.ENABLE_RIPPLE_STACK]
 
     if (enableRipple && enableRipple === 'true') {
-      appStatus = [...MinikubeAppsStatus, ...MinikubeRippleAppsStatus]
+      appStatus = [...MicroK8sAppsStatus, ...MicroK8sRippleAppsStatus]
     }
 
     return { systemStatus, engineStatus, appStatus } as DeploymentAppModel
@@ -74,21 +74,17 @@ class Minikube {
     password: string,
     flags: Record<string, string>
   ) => {
-    const category = 'configure minikube'
+    const category = 'configure microk8s'
     try {
-      await BaseCluster.ensureVariables(
-        cluster,
-        (variables) =>
-          (variables['FILE_SERVER_FOLDER'] = cluster.variables['FILE_SERVER_FOLDER'].replace('home/', 'hosthome/'))
-      )
+      await BaseCluster.ensureVariables(cluster)
 
       const configsFolder = await ensureConfigsFolder()
 
-      await ensureConfigs(cluster, Endpoints.MINIKUBE_VALUES_TEMPLATE_PATH, Endpoints.MINIKUBE_VALUES_TEMPLATE_URL)
+      await ensureConfigs(cluster, Endpoints.MICROK8S_VALUES_TEMPLATE_PATH, Endpoints.MICROK8S_VALUES_TEMPLATE_URL)
 
       const scriptsFolder = scriptsPath()
       const assetsFolder = assetsPath()
-      const configureScript = path.join(scriptsFolder, 'configure-minikube-linux.sh')
+      const configureScript = path.join(scriptsFolder, 'configure-microk8s-linux.sh')
       log.info(`Executing script ${configureScript}`)
 
       const onConfigureStd = (data: any) => {
@@ -114,7 +110,7 @@ class Minikube {
 
       await startFileServer(window, cluster)
     } catch (err) {
-      log.error('Error in configureCluster Minikube.', err)
+      log.error('Error in configureCluster MicroK8s.', err)
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
         category,
         message: JSON.stringify(err)
@@ -124,4 +120,4 @@ class Minikube {
   }
 }
 
-export default Minikube
+export default MicroK8s

@@ -186,11 +186,18 @@ class BaseCluster {
 
   // #region Ensure Variables Method
 
-  static ensureVariables = async (cluster: ClusterModel) => {
+  static ensureVariables = async (
+    cluster: ClusterModel,
+    onOverrideVariables?: (variables: Record<string, string>) => void
+  ) => {
     await BaseCluster._ensureEngineVariables(cluster)
 
     if (cluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
       await BaseCluster._ensureIPFSVariables(cluster)
+    }
+
+    if (onOverrideVariables) {
+      onOverrideVariables(cluster.variables)
     }
   }
 
@@ -199,7 +206,6 @@ class BaseCluster {
 
     // Ensure hostUploadFolder values
     cluster.variables['FILE_SERVER_FOLDER'] = path.join(enginePath, Endpoints.FILE_SERVER_PATH)
-    cluster.variables['FILE_SERVER_FOLDER'] = cluster.variables['FILE_SERVER_FOLDER'].replace('home/', 'hosthome/')
 
     // Ensure auth secret field has value
     if (!cluster.variables[Storage.AUTH_SECRET_KEY]) {
