@@ -293,6 +293,8 @@ else
     kubectl config set-context microk8s --cluster=microk8s --namespace=default --user=microk8s-admin
 fi
 
+kubectl config use-context microk8s
+
 MICROK8S_VERSION=$(echo "$PASSWORD" | sudo -S microk8s version)
 echo "microk8s version is $MICROK8S_VERSION"
 
@@ -302,9 +304,11 @@ echo "microk8s status is $MICROK8S_STATUS"
 if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running'; then
     echo "$PASSWORD" | sudo -S ufw allow in on cni0 && echo "$PASSWORD" | sudo -S ufw allow out on cni0
     echo "$PASSWORD" | sudo -S ufw default allow routed
-    
+
+    # Start microk8s
     echo "$PASSWORD" | sudo -S microk8s start
 
+    # Enable Addons
     echo "$PASSWORD" | sudo -S microk8s enable dashboard
     echo "$PASSWORD" | sudo -S microk8s enable dns
     echo "$PASSWORD" | sudo -S microk8s enable registry
@@ -316,11 +320,18 @@ if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running
     echo "$PASSWORD" | sudo -S microk8s enable rbac
     echo "$PASSWORD" | sudo -S microk8s enable hostpath-storage
     echo "$PASSWORD" | sudo -S microk8s enable helm3
-    
+
     sleep 30
 
+    # Update kubernetes dashboard to allow skip login and update user role to have access to metrics.
+    kubectl patch deployment kubernetes-dashboard -n kube-system --type 'json' -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
+    kubectl delete clusterrolebinding kubernetes-dashboard -n kube-system
+    kubectl apply -f "$ASSETS_FOLDER/files/microk8s-dashboard.yaml"
+
+    # Inspect microk8s
     echo "$PASSWORD" | sudo -S microk8s inspect
 
+    # Check microk8s status
     MICROK8S_STATUS=$(echo "$PASSWORD" | sudo -S microk8s status)
     echo "microk8s status is $MICROK8S_STATUS"
 
@@ -383,8 +394,6 @@ echo "helm repos added and updated"
 #======================
 # Verify agones & redis
 #======================
-
-kubectl config use-context microk8s
 
 if helm status agones >/dev/null; then
     echo "agones is already deployed"

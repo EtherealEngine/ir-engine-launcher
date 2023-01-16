@@ -212,6 +212,7 @@
     "electron-log": "^4.4.4",
     "electron-store": "^8.1.0",
     "electron-updater": "^4.6.5",
+    "find-process": "^1.4.7",
     "fix-path": "^4.0.0",
     "history": "^5.2.0",
     "js-yaml": "^4.1.0",

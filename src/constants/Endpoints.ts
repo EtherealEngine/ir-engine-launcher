@@ -4,10 +4,11 @@ const Endpoints = {
   LOGIN_PAGE: 'https://local.etherealengine.com/',
   LAUNCH_PAGE: 'https://local.etherealengine.com/location/apartment',
   ALLOW_CERTIFICATES: [
-    'local.etherealengine.com',
-    'api-local.etherealengine.com',
-    'instanceserver-local.etherealengine.com',
-    'localhost:8642'
+    'local.etherealengine.com', // Client
+    'api-local.etherealengine.com', // API Server
+    'instanceserver-local.etherealengine.com', // Instance Server
+    'localhost:8642', // File Server
+    'localhost:10443' // Microk8s Dashboard
   ],
   MYSQL_PORT: 3304,
   DEFAULT_ENGINE_FOLDER: 'xrengine',

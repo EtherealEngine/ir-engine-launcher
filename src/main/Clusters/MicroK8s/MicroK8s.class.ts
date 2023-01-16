@@ -1,6 +1,8 @@
 import { BrowserWindow } from 'electron'
 import log from 'electron-log'
+import findProcess from 'find-process'
 import path from 'path'
+import { kill } from 'ps-node'
 
 import { Channels } from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
@@ -8,9 +10,11 @@ import Storage from '../../../constants/Storage'
 import { DeploymentAppModel } from '../../../models/AppStatus'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
+import { executeWebViewJS } from '../../managers/BrowserManager'
 import { startFileServer } from '../../managers/FileServerManager'
-import { assetsPath, ensureConfigsFolder, isValidUrl, scriptsPath } from '../../managers/PathManager'
+import { assetsPath, ensureConfigsFolder, scriptsPath } from '../../managers/PathManager'
 import { execStream, execStreamScriptFile } from '../../managers/ShellManager'
+import { delay } from '../../managers/UtilitiesManager'
 import { ensureConfigs } from '../../managers/YamlManager'
 import { DefaultEngineStatus, DefaultSystemStatus } from '../BaseCluster/BaseCluster.appstatus'
 import BaseCluster from '../BaseCluster/BaseCluster.class'
@@ -43,27 +47,51 @@ class MicroK8s {
 
   static configureK8Dashboard = async (window: BrowserWindow, cluster: ClusterModel) => {
     const category = 'K8s dashboard'
-    try {
-      const onStdout = (data: any) => {
-        const stringData = typeof data === 'string' ? data.trim() : data
-        window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
-        if (isValidUrl(data)) {
-          window.webContents.send(Channels.Cluster.ConfigureK8DashboardResponse, cluster.id, data)
-        }
+
+    const onStderr = (data: any) => {
+      const stringData = typeof data === 'string' ? data.trim() : data
+
+      let overrideError = ''
+      if (stringData.includes('unable to listen')) {
+        overrideError =
+          'It seems like your port 10443 is already in use. To view the PID using this port run: `lsof -i :10443`\nAfterwards run this command to kill the task: `kill -9 {PID}`'
       }
-      const onStderr = (data: any) => {
-        const stringData = typeof data === 'string' ? data.trim() : data
-        window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
-        if (stringData.toString().startsWith('*') === false) {
-          window.webContents.send(Channels.Cluster.ConfigureK8DashboardError, cluster.id, data)
-        }
-      }
-      await execStream(Commands.DASHBOARD, onStdout, onStderr)
-    } catch (err) {
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
         category,
-        message: JSON.stringify(err)
+        message: `${stringData}${overrideError ? `\n\n${overrideError}` : ''}`
       } as LogModel)
+      window.webContents.send(
+        Channels.Cluster.ConfigureK8DashboardError,
+        cluster.id,
+        overrideError ? overrideError : data
+      )
+    }
+
+    const onStdout = async (data: any) => {
+      const stringData = typeof data === 'string' ? data.trim() : data
+      window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
+
+      if (data.includes('Forwarding from 127.0.0.1:10443')) {
+        const dashboardUrl = 'https://localhost:10443/'
+
+        window.webContents.send(Channels.Cluster.ConfigureK8DashboardResponse, cluster.id, dashboardUrl)
+
+        await delay(1000)
+        await executeWebViewJS(`document.querySelector('button[type=\\"button\\"]').click()`, window)
+      }
+    }
+
+    try {
+      // Ensure port is not in use
+      const processes = await findProcess('port', 10443)
+      for (const process of processes) {
+        kill(process.pid)
+      }
+
+      // Start dashboard port-forward
+      await execStream(Commands.DASHBOARD, onStdout, onStderr)
+    } catch (err) {
+      onStderr(JSON.stringify(err))
       throw err
     }
   }

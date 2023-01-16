@@ -1,4 +1,5 @@
 import { AppStatus } from 'models/AppStatus'
+import { ClusterType } from 'models/Cluster'
 import { useEffect } from 'react'
 import PageRoot from 'renderer/common/PageRoot'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
@@ -75,7 +76,12 @@ const K8DashboardPage = () => {
   return (
     <PageRoot full>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <iframe height="100%" style={{ border: 0 }} src={currentDeployment?.k8dashboard.data}></iframe>
+        {selectedCluster.type === ClusterType.Minikube && (
+          <iframe height="100%" style={{ border: 0 }} src={currentDeployment?.k8dashboard.data}></iframe>
+        )}
+        {selectedCluster.type === ClusterType.MicroK8s && (
+          <webview style={{ border: 0, height: '100%' }} src={currentDeployment?.k8dashboard.data}></webview>
+        )}
       </Box>
     </PageRoot>
   )

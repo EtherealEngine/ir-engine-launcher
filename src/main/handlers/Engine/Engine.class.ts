@@ -13,8 +13,7 @@ import { delay } from '../../managers/UtilitiesManager'
 class Engine {
   static ensureAdminAccess = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
     try {
-      let adminWindow: BrowserWindow | null = null
-      adminWindow = new BrowserWindow({
+      let adminWindow: BrowserWindow | null = new BrowserWindow({
         width: 1000,
         height: 800,
         show: false,
