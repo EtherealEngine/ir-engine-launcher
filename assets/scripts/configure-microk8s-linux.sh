@@ -287,6 +287,9 @@ else
         kubectl config delete-user microk8s-admin
     fi
 
+    # Ensure the certificate is accessible. Ref: https://askubuntu.com/a/720000/1558816
+    echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/certs/ca.crt
+
     # Ref: https://discuss.kubernetes.io/t/use-kubectl-with-microk8s/5313/6
     kubectl config set-cluster microk8s --server=https://127.0.0.1:16443/ --certificate-authority=/var/snap/microk8s/current/certs/ca.crt
     kubectl config set-credentials microk8s-admin --token="$(echo "$PASSWORD" | sudo -S microk8s kubectl config view --raw -o 'jsonpath={.users[0].user.token}')"
