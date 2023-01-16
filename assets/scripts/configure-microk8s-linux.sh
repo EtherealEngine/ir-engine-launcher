@@ -288,6 +288,7 @@ else
     fi
 
     # Ensure the certificate is accessible. Ref: https://askubuntu.com/a/720000/1558816
+    echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/certs/
     echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/certs/ca.crt
 
     # Ref: https://discuss.kubernetes.io/t/use-kubectl-with-microk8s/5313/6
@@ -340,7 +341,7 @@ if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running
 
     if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running'; then
         echo "There is something wrong in your microk8s. Please fix all warnings in 'sudo microk8s inspect' and reboot. If you still face this issue then, try 'sudo snap remove microk8s --purge'"
-        exit 3
+        exit 4
     fi
 fi
 
