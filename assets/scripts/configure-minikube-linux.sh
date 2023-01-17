@@ -435,6 +435,7 @@ else
     echo "ethereal engine projects does not exists at $PROJECTS_PATH"
     
     export MYSQL_HOST=localhost
+    npm run dev-docker
     npm run install-projects
 fi
 
