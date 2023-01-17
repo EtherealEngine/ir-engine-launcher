@@ -404,4 +404,4 @@ export const DeploymentAction = {
   }
 }
 
-export type DeploymentActionType = ReturnType<typeof DeploymentAction[keyof typeof DeploymentAction]>
+export type DeploymentActionType = ReturnType<(typeof DeploymentAction)[keyof typeof DeploymentAction]>
