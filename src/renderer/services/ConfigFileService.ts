@@ -251,4 +251,4 @@ export const ConfigFileAction = {
   }
 }
 
-export type ConfigFileActionType = ReturnType<typeof ConfigFileAction[keyof typeof ConfigFileAction]>
+export type ConfigFileActionType = ReturnType<(typeof ConfigFileAction)[keyof typeof ConfigFileAction]>

@@ -170,4 +170,4 @@ export const LogAction = {
   }
 }
 
-export type LogActionType = ReturnType<typeof LogAction[keyof typeof LogAction]>
+export type LogActionType = ReturnType<(typeof LogAction)[keyof typeof LogAction]>

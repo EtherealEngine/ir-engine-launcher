@@ -91,4 +91,4 @@ export const SettingsAction = {
   }
 }
 
-export type SettingsActionType = ReturnType<typeof SettingsAction[keyof typeof SettingsAction]>
+export type SettingsActionType = ReturnType<(typeof SettingsAction)[keyof typeof SettingsAction]>
