@@ -4,9 +4,11 @@ const Endpoints = {
   LOGIN_PAGE: 'https://local.etherealengine.com/',
   LAUNCH_PAGE: 'https://local.etherealengine.com/location/apartment',
   ALLOW_CERTIFICATES: [
-    'local.etherealengine.com',
-    'api-local.etherealengine.com',
-    'instanceserver-local.etherealengine.com'
+    'local.etherealengine.com', // Client
+    'api-local.etherealengine.com', // API Server
+    'instanceserver-local.etherealengine.com', // Instance Server
+    'localhost:8642', // File Server
+    'localhost:10443' // Microk8s Dashboard
   ],
   MYSQL_PORT: 3304,
   DEFAULT_ENGINE_FOLDER: 'xrengine',
@@ -18,9 +20,16 @@ const Endpoints = {
   ENGINE_ENV_DEFAULT_PATH: '.env.local.default',
   ENGINE_ENV_DEFAULT_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/.env.local.default',
   ENGINE_VALUES_FILE_NAME: 'engine.values.yaml',
+  MINIKUBE_LINUX_SCRIPT_URL:
+    'https://raw.githubusercontent.com/XRFoundation/XREngine-Control-Center/master/assets/scripts/configure-minikube-linux.sh',
+  MICROK8S_LINUX_SCRIPT_URL:
+    'https://raw.githubusercontent.com/XRFoundation/XREngine-Control-Center/master/assets/scripts/configure-microk8s-linux.sh',
   MINIKUBE_VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.minikube.template.values.yaml',
   MINIKUBE_VALUES_TEMPLATE_URL:
     'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.minikube.template.values.yaml',
+  MICROK8S_VALUES_TEMPLATE_PATH: 'packages/ops/configs/local.microk8s.template.values.yaml',
+  MICROK8S_VALUES_TEMPLATE_URL:
+    'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.microk8s.template.values.yaml',
   IPFS_VALUES_FILE_NAME: 'ipfs.values.yaml',
   IPFS_VALUES_TEMPLATE_PATH: 'packages/ops/ipfs/values.yaml',
   IPFS_VALUES_TEMPLATE_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/ipfs/values.yaml',

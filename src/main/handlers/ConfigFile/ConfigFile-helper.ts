@@ -41,6 +41,14 @@ export const processVariables = async (
       Endpoints.MINIKUBE_VALUES_TEMPLATE_URL
     )
     clusterVars = { ...clusterVars, ...engineVars }
+  } else if (clusterType === ClusterType.MicroK8s) {
+    const engineVars = await processVariablesFile(
+      clusterConfigs,
+      clusterVars,
+      Endpoints.MICROK8S_VALUES_TEMPLATE_PATH,
+      Endpoints.MICROK8S_VALUES_TEMPLATE_URL
+    )
+    clusterVars = { ...clusterVars, ...engineVars }
   }
 
   if (clusterConfigs[Storage.ENABLE_RIPPLE_STACK] === 'true') {

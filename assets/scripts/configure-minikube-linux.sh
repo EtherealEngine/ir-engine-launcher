@@ -68,7 +68,7 @@ if $INSTALL_NODE; then
         echo "nvm is not installed"
 
         echo "$PASSWORD" | sudo -S apt update -y
-        echo "$PASSWORD" | sudo -S apt install curl
+        echo "$PASSWORD" | sudo -S apt install -y curl
         curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
         source ~/.profile
 
@@ -247,6 +247,10 @@ else
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     echo "$PASSWORD" | sudo -S install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     rm kubectl -f
+
+    if [[ ! -d ~/.kube ]]; then
+        mkdir ~/.kube
+    fi
 fi
 
 KUBECTL_VERSION=$(kubectl version --client)
@@ -429,6 +433,9 @@ if [[ -d $PROJECTS_PATH ]]; then
     echo "ethereal engine projects exists at $PROJECTS_PATH"
 else
     echo "ethereal engine projects does not exists at $PROJECTS_PATH"
+    
+    export MYSQL_HOST=localhost
+    npm run dev-docker
     npm run install-projects
 fi
 

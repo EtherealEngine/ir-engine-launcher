@@ -4,6 +4,7 @@ import { DeploymentAppModel } from 'models/AppStatus'
 import { Channels } from '../../../constants/Channels'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
+import MicroK8s from '../../Clusters/MicroK8s/MicroK8s.class'
 import Minikube from '../../Clusters/Minikube/Minikube.class'
 
 class Cluster {
@@ -11,6 +12,8 @@ class Cluster {
     try {
       if (cluster.type === ClusterType.Minikube) {
         return Minikube.getClusterStatus(cluster)
+      } else if (cluster.type === ClusterType.MicroK8s) {
+        return MicroK8s.getClusterStatus(cluster)
       }
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
@@ -30,6 +33,8 @@ class Cluster {
     try {
       if (cluster.type === ClusterType.Minikube) {
         await Minikube.checkClusterStatus(window, cluster, deploymentApps)
+      } else if (cluster.type === ClusterType.MicroK8s) {
+        await MicroK8s.checkClusterStatus(window, cluster, deploymentApps)
       }
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
@@ -43,6 +48,8 @@ class Cluster {
     try {
       if (cluster.type === ClusterType.Minikube) {
         await Minikube.configureK8Dashboard(window, cluster)
+      } else if (cluster.type === ClusterType.MicroK8s) {
+        await MicroK8s.configureK8Dashboard(window, cluster)
       }
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
@@ -62,10 +69,12 @@ class Cluster {
     try {
       if (cluster.type === ClusterType.Minikube) {
         await Minikube.configureCluster(window, cluster, password, flags)
+      } else if (cluster.type === ClusterType.MicroK8s) {
+        await MicroK8s.configureCluster(window, cluster, password, flags)
       }
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
-        category: 'configure minikube',
+        category: 'configure cluster',
         message: JSON.stringify(err)
       } as LogModel)
       throw err

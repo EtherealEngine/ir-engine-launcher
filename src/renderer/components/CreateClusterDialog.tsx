@@ -1,4 +1,5 @@
 import { Channels } from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import Storage, { generateUUID } from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { ClusterModel, ClusterType } from 'models/Cluster'
@@ -23,7 +24,8 @@ import {
   LinearProgress,
   Step,
   StepLabel,
-  Stepper
+  Stepper,
+  Typography
 } from '@mui/material'
 import { StepIconProps } from '@mui/material/StepIcon'
 
@@ -80,7 +82,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     return ''
   })
   const [name, setName] = useState('')
-  const [type, setType] = useState<ClusterType | ''>('')
+  const [type, setType] = useState<ClusterType>(ClusterType.MicroK8s)
   const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
   const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
@@ -130,17 +132,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         return
       }
 
-      if (!type) {
-        setError('Please select a valid cluster type')
-        return
-      }
-
       if (activeStep === 1) {
-        if (type === ClusterType.MicroK8s) {
-          setError('Support for MicroK8s is coming soon.')
-          return
-        }
-
         const clusterCount = clusters.filter((item) => item.type === type)
         if (clusterCount.length > 0) {
           setError(`You already have a cluster of ${type}.`)
@@ -290,6 +282,38 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       </DialogTitle>
 
       <DialogContentText sx={{ margin: 3, marginBottom: 0 }}>{steps[activeStep].title}</DialogContentText>
+
+      {steps[activeStep].label === 'Summary' && (
+        <Box ml={3} mr={3} mt={1}>
+          <Typography fontSize={14}>
+            Note:{' '}
+            <span style={{ fontSize: 14, opacity: 0.6 }}>
+              Control Center will install missing packages and make changes in your system configurations. To review
+              these changes you can checkout the script{' '}
+            </span>
+            <a
+              style={{ color: 'white' }}
+              target="_blank"
+              href={
+                type === ClusterType.Minikube
+                  ? Endpoints.MINIKUBE_LINUX_SCRIPT_URL
+                  : Endpoints.MICROK8S_LINUX_SCRIPT_URL
+              }
+            >
+              here
+            </a>
+            .
+          </Typography>
+          <Typography mt={1} fontSize={14}>
+            Note:{' '}
+            <span style={{ fontSize: 14, opacity: 0.6 }}>
+              The configuration may fail the 1st time you are trying to run it. You can try, running the configuration
+              wizard again, or relaunching the control center app, or reboot your PC. This is because some changes
+              require you to perform these actions. If you still face the same issue then report it.
+            </span>
+          </Typography>
+        </Box>
+      )}
 
       {error && (
         <DialogContentText color={'red'} sx={{ marginLeft: 5, marginRight: 5 }}>

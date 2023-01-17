@@ -4,7 +4,7 @@ import { Box, FormControl, InputLabel, MenuItem, Select, SxProps, TextField, The
 
 interface Props {
   name: string
-  type: ClusterType | ''
+  type: ClusterType
   sx?: SxProps<Theme>
   onNameChange: (name: string) => void
   onTypeChange: (type: ClusterType) => void

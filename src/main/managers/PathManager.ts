@@ -22,6 +22,10 @@ export const scriptsPath = () => {
   return path.join(assetsPath(), 'scripts')
 }
 
+export const filesPath = () => {
+  return path.join(assetsPath(), 'files')
+}
+
 export const getEnvFile = async (enginePath: string) => {
   let envContent = ''
 
