@@ -269,8 +269,8 @@ else
 
     echo "$PASSWORD" | sudo -S snap install microk8s --classic --channel=1.26/stable
 
-    echo "$PASSWORD" | sudo -S usermod -a -G microk8s hanzlamateen
-    echo "$PASSWORD" | sudo -S chown -R hanzlamateen ~/.kube
+    echo "$PASSWORD" | sudo -S usermod -a -G microk8s $USER
+    echo "$PASSWORD" | sudo -S chown -R $USER ~/.kube
 
     # Remove previous context from config
     if kubectl config view --raw | grep -q 'microk8s'; then
