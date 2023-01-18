@@ -231,10 +231,10 @@ else
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     echo "$PASSWORD" | sudo -S install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
     rm kubectl -f
+fi
 
-    if [[ ! -d ~/.kube ]]; then
-        mkdir ~/.kube
-    fi
+if [[ ! -d ~/.kube ]]; then
+    mkdir ~/.kube
 fi
 
 KUBECTL_VERSION=$(kubectl version --client)
@@ -367,7 +367,7 @@ fi
 
 ADD_DOMAIN=false
 if grep -q "local.etherealengine.com" /etc/hosts; then
-    if grep -q "127.0.0.1" /etc/hosts; then
+    if grep -q "127.0.0.1 local.etherealengine.com" /etc/hosts; then
         echo "*.etherealengine.com entries exists"
     else
         echo "*.etherealengine.com entries outdated"
