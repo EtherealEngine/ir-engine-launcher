@@ -51,7 +51,7 @@ class Shell {
 
     // First make sure WSL is installed.
     const wslResponse = await exec('wsl --status')
-    const wslResponseOutput = cleanseString(wslResponse.stdout?.toString() || "")
+    const wslResponseOutput = cleanseString(wslResponse.stdout?.toString() || '')
     log.info(`WSL status ${wslResponseOutput}`)
 
     if (wslResponse.error || wslResponse.stderr) {

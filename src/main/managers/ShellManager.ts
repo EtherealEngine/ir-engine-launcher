@@ -4,7 +4,7 @@ import os from 'os'
 import { lookup, Program } from 'ps-node'
 
 const _getWSLfilePath = async (scriptFile: string) => {
-  scriptFile = scriptFile.replaceAll('\\','\\\\')
+  scriptFile = scriptFile.replaceAll('\\', '\\\\')
   const wslPathResponse = await exec(`wsl wslpath ${scriptFile}`)
 
   if (wslPathResponse.error || wslPathResponse.stderr) {
