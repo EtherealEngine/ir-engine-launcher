@@ -34,7 +34,9 @@ const Endpoints = {
   IPFS_VALUES_TEMPLATE_PATH: 'packages/ops/ipfs/values.yaml',
   IPFS_VALUES_TEMPLATE_URL: 'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/ipfs/values.yaml',
   RIPPLED_CLI_DOCS: 'https://xrpl.org/commandline-usage.html',
-  FILE_SERVER_PATH: 'packages/server/upload'
+  FILE_SERVER_PATH: 'packages/server/upload',
+  DOCS_INSTALL_WSL: 'https://xrfoundation.github.io/ethereal-engine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl',
+  DOCS_INSTALL_DOCKER: 'https://xrfoundation.github.io/ethereal-engine-docs/docs/devops_deployment/microk8s_windows/#install-docker-desktop'
 }
 
 export default Endpoints

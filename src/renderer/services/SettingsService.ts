@@ -2,13 +2,18 @@ import { createState, useState } from '@speigg/hookstate'
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
+import { AppModel } from 'models/AppStatus'
+import { AppSysInfo, OSType } from 'models/AppSysInfo'
 import { SnackbarProvider } from 'notistack'
 
 import { store, useDispatch } from '../store'
 
 //State
 const state = createState({
-  appVersion: '',
+  appSysInfo: {
+    osType: OSType.Undefined,
+    appVersion: ''
+  } as AppSysInfo,
   sudoPassword: '',
   showCreateClusterDialog: false,
   notistack: {} as SnackbarProvider
@@ -17,9 +22,9 @@ const state = createState({
 store.receptors.push((action: SettingsActionType): void => {
   state.batch((s) => {
     switch (action.type) {
-      case 'SET_APP_VERSION':
+      case 'SET_APP_SYS_INFO':
         return s.merge({
-          appVersion: action.payload
+          appSysInfo: action.payload
         })
       case 'SET_SUDO_PASSWORD':
         return s.merge({
@@ -45,8 +50,8 @@ export const useSettingsState = () => useState(state) as any as typeof state
 export const SettingsService = {
   init: async () => {
     const dispatch = useDispatch()
-    const version = await window.electronAPI.invoke(Channels.Utilities.GetVersion)
-    dispatch(SettingsAction.setAppVersion(version))
+    const appSysInfo: AppSysInfo = await window.electronAPI.invoke(Channels.Utilities.GetAppSysInfo)
+    dispatch(SettingsAction.setAppSysInfo(appSysInfo))
   },
   setNotiStack: async (callback: SnackbarProvider) => {
     const dispatch = useDispatch()
@@ -60,14 +65,22 @@ export const SettingsService = {
   setCreateClusterDialog: (isVisible: boolean) => {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setCreateClusterDialog(isVisible))
+  },
+  getPrerequisites: async () => {
+    const statuses: AppModel[] = await window.electronAPI.invoke(Channels.Utilities.GetPrerequisites)
+    return statuses
+  },
+  checkPrerequisites: async () => {
+    const statuses: AppModel[] = await window.electronAPI.invoke(Channels.Utilities.CheckPrerequisites)
+    return statuses
   }
 }
 
 //Action
 export const SettingsAction = {
-  setAppVersion: (payload: string) => {
+  setAppSysInfo: (payload: AppSysInfo) => {
     return {
-      type: 'SET_APP_VERSION' as const,
+      type: 'SET_APP_SYS_INFO' as const,
       payload
     }
   },

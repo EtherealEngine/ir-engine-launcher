@@ -36,7 +36,7 @@ const SettingsDialog = ({ onClose }: Props) => {
   const configFileState = useConfigFileState()
   const { loading, selectedCluster } = configFileState.value
   const settingsState = useSettingsState()
-  const { appVersion } = settingsState.value
+  const { appVersion } = settingsState.value.appSysInfo
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
 

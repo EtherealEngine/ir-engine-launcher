@@ -9,12 +9,14 @@ const Channels = {
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',
-    GetVersion: 'GetVersion',
+    GetAppSysInfo: 'GetAppSysInfo',
     OpenExternal: 'OpenExternal',
     OpenPath: 'OpenPath',
     SelectFolder: 'SelectFolder',
     Log: 'Log',
     SaveLog: 'SaveLog',
+    GetPrerequisites: 'GetPrerequisites',
+    CheckPrerequisites: 'CheckPrerequisites'
   },
   Git: {
     GetCurrentConfigs: 'GetCurrentConfigs',

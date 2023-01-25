@@ -50,6 +50,14 @@ export const MicroK8sAppsStatus: AppModel[] = [
 ]
 
 export const MicroK8sRippleAppsStatus: AppModel[] = [
-  getAppModel('rippled', 'Rippled', microk8sDependantScript('helm status local-rippled;'), undefined, undefined, true),
-  getAppModel('ipfs', 'IPFS', microk8sDependantScript('helm status local-ipfs;'), undefined, undefined, true)
+  getAppModel(
+    'rippled',
+    'Rippled',
+    microk8sDependantScript('helm status local-rippled;'),
+    undefined,
+    undefined,
+    undefined,
+    true
+  ),
+  getAppModel('ipfs', 'IPFS', microk8sDependantScript('helm status local-ipfs;'), undefined, undefined, undefined, true)
 ]
