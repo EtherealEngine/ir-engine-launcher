@@ -1,4 +1,4 @@
-import Paths from 'constants/Paths'
+import Routes from 'constants/Routes'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -25,9 +25,9 @@ const HotBar = () => {
 
   useEffect(() => {
     if (selectedClusterId) {
-      navigate(Paths.CONFIG)
+      navigate(Routes.CONFIG)
     } else {
-      navigate(Paths.ROOT)
+      navigate(Routes.ROOT)
     }
   }, [selectedClusterId])
 

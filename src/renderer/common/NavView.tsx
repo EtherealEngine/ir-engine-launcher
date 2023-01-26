@@ -1,4 +1,4 @@
-import Paths from 'constants/Paths'
+import Routes from 'constants/Routes'
 import Storage from 'constants/Storage'
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -51,26 +51,26 @@ const NavView = () => {
   if (selectedCluster) {
     pages.push({
       title: 'Config',
-      path: Paths.CONFIG
+      path: Routes.CONFIG
     })
     pages.push({
       title: 'Admin',
-      path: Paths.ADMIN
+      path: Routes.ADMIN
     })
     pages.push({
       title: 'K8 Dashboard',
-      path: Paths.K8DASHBOARD
+      path: Routes.K8DASHBOARD
     })
   }
 
   if (enableRippleStack) {
     pages.push({
       title: 'IPFS',
-      path: Paths.IPFS
+      path: Routes.IPFS
     })
     pages.push({
       title: 'Rippled CLI',
-      path: Paths.RIPPLED
+      path: Routes.RIPPLED
     })
   }
 

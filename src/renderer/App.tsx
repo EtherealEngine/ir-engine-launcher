@@ -1,8 +1,8 @@
-import Paths from 'constants/Paths'
+import Routes from 'constants/Routes'
 import Storage from 'constants/Storage'
 import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
-import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes as RouterRoutes } from 'react-router-dom'
 
 import { Box, PaletteMode } from '@mui/material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
@@ -79,15 +79,15 @@ const App = () => {
             <Box display="flex">
               <HotBar />
               <Box width={'calc(100vw - 100px) !important'}>
-                <Routes>
-                  <Route path={Paths.ROOT} element={<WelcomePage />} />
-                  <Route path={Paths.CONFIG} element={<ConfigPage />} />
-                  <Route path={Paths.ADMIN} element={<AdminPage />} />
-                  <Route path={Paths.K8DASHBOARD} element={<K8DashboardPage />} />
-                  {enableRippleStack && <Route path={Paths.IPFS} element={<IPFSPage />} />}
-                  {enableRippleStack && <Route path={Paths.RIPPLED} element={<RippledPage />} />}
-                  <Route path="*" element={<Navigate to={Paths.ROOT} replace />} />
-                </Routes>
+                <RouterRoutes>
+                  <Route path={Routes.ROOT} element={<WelcomePage />} />
+                  <Route path={Routes.CONFIG} element={<ConfigPage />} />
+                  <Route path={Routes.ADMIN} element={<AdminPage />} />
+                  <Route path={Routes.K8DASHBOARD} element={<K8DashboardPage />} />
+                  {enableRippleStack && <Route path={Routes.IPFS} element={<IPFSPage />} />}
+                  {enableRippleStack && <Route path={Routes.RIPPLED} element={<RippledPage />} />}
+                  <Route path="*" element={<Navigate to={Routes.ROOT} replace />} />
+                </RouterRoutes>
               </Box>
             </Box>
           </HashRouter>

@@ -119,6 +119,11 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   }
 
   const handleNext = async (isConfigure: boolean) => {
+    if (appSysInfo.osType === OSType.Windows && type !== ClusterType.MicroK8s) {
+      setError('On Windows, only MicroK8s is currently supported')
+      return
+    }
+
     if (!name || name.length < 3) {
       setError('Please select a cluster name of minimum 3 words')
       return

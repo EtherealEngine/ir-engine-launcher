@@ -1,4 +1,4 @@
-const Paths = {
+const Routes = {
   ROOT: '/',
   CONFIG: '/config',
   ADMIN: '/admin',
@@ -7,4 +7,4 @@ const Paths = {
   RIPPLED: '/rippled'
 }
 
-export default Paths
+export default Routes
