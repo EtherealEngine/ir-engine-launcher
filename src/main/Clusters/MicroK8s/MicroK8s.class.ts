@@ -108,7 +108,7 @@ class MicroK8s {
 
       const configsFolder = await ensureConfigsFolder()
 
-      await ensureConfigs(cluster, Endpoints.MICROK8S_VALUES_TEMPLATE_PATH, Endpoints.MICROK8S_VALUES_TEMPLATE_URL)
+      await ensureConfigs(cluster, Endpoints.Paths.MICROK8S_VALUES_TEMPLATE, Endpoints.Urls.MICROK8S_VALUES_TEMPLATE)
 
       const scriptsFolder = scriptsPath()
       const assetsFolder = assetsPath()

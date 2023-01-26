@@ -205,7 +205,7 @@ class BaseCluster {
     const enginePath = cluster.configs[Storage.ENGINE_PATH]
 
     // Ensure hostUploadFolder values
-    cluster.variables['FILE_SERVER_FOLDER'] = path.join(enginePath, Endpoints.FILE_SERVER_PATH)
+    cluster.variables['FILE_SERVER_FOLDER'] = path.join(enginePath, Endpoints.Paths.FILE_SERVER)
 
     // Ensure auth secret field has value
     if (!cluster.variables[Storage.AUTH_SECRET_KEY]) {
@@ -256,8 +256,8 @@ class BaseCluster {
     const varsData = await processVariablesFile(
       cluster.configs,
       cluster.variables,
-      Endpoints.IPFS_VALUES_TEMPLATE_PATH,
-      Endpoints.IPFS_VALUES_TEMPLATE_URL
+      Endpoints.Paths.IPFS_VALUES_TEMPLATE,
+      Endpoints.Urls.IPFS_VALUES_TEMPLATE
     )
 
     for (const key of Object.keys(varsData)) {

@@ -120,7 +120,7 @@ const RippledPage = () => {
               message={
                 <Typography variant="body2">
                   Here you can run rippled server cli commands.{' '}
-                  <a href={Endpoints.RIPPLED_CLI_DOCS} target="_blank">
+                  <a href={Endpoints.Urls.RIPPLED_CLI_DOCS} target="_blank">
                     More Info
                   </a>
                 </Typography>

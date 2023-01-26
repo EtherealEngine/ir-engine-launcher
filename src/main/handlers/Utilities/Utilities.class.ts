@@ -1,4 +1,3 @@
-import Endpoints from '../../../constants/Endpoints'
 import { app, BrowserWindow, clipboard, dialog, shell } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
@@ -6,6 +5,7 @@ import os from 'os'
 import path from 'path'
 
 import { Channels } from '../../../constants/Channels'
+import Endpoints from '../../../constants/Endpoints'
 import { AppModel, AppStatus } from '../../../models/AppStatus'
 import { AppSysInfo, OSType } from '../../../models/AppSysInfo'
 import { LogModel } from '../../../models/Log'

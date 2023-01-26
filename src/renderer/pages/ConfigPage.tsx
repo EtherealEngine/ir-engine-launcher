@@ -50,7 +50,7 @@ const ConfigPage = () => {
   const onLaunch = async () => {
     setLaunching(true)
 
-    await window.electronAPI.invoke(Channels.Utilities.OpenExternal, Endpoints.LAUNCH_PAGE)
+    await window.electronAPI.invoke(Channels.Utilities.OpenExternal, Endpoints.Urls.LAUNCH_PAGE)
 
     setLaunching(false)
   }

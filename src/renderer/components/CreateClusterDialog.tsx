@@ -315,8 +315,8 @@ const CreateClusterDialog = ({ onClose }: Props) => {
               target="_blank"
               href={
                 type === ClusterType.Minikube
-                  ? Endpoints.MINIKUBE_LINUX_SCRIPT_URL
-                  : Endpoints.MICROK8S_LINUX_SCRIPT_URL
+                  ? Endpoints.Urls.MINIKUBE_LINUX_SCRIPT
+                  : Endpoints.Urls.MICROK8S_LINUX_SCRIPT
               }
             >
               here

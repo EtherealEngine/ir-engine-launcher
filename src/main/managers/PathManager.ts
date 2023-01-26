@@ -64,21 +64,21 @@ export const getEnvFile = async (enginePath: string) => {
   let envContent = ''
 
   // First look into .env.local
-  const envPath = path.join(enginePath, Endpoints.ENGINE_ENV_PATH)
+  const envPath = path.join(enginePath, Endpoints.Paths.ENGINE_ENV)
   const envFileExists = await fileExists(envPath)
 
   if (envFileExists) {
     envContent = await fs.readFile(envPath, 'utf8')
   } else {
     // Secondly, look into .env.local.default
-    const envDefaultPath = path.join(enginePath, Endpoints.ENGINE_ENV_DEFAULT_PATH)
+    const envDefaultPath = path.join(enginePath, Endpoints.Paths.ENGINE_ENV_DEFAULT)
     const envDefaultFileExists = await fileExists(envDefaultPath)
 
     if (envDefaultFileExists) {
       envContent = await fs.readFile(envPath, 'utf8')
     } else {
       // Thirdly, get it from github
-      const response = await axios.get(Endpoints.ENGINE_ENV_DEFAULT_URL)
+      const response = await axios.get(Endpoints.Urls.ENGINE_ENV_DEFAULT)
       envContent = response.data
     }
   }

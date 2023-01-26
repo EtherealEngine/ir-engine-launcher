@@ -37,16 +37,16 @@ export const processVariables = async (
     const engineVars = await processVariablesFile(
       clusterConfigs,
       clusterVars,
-      Endpoints.MINIKUBE_VALUES_TEMPLATE_PATH,
-      Endpoints.MINIKUBE_VALUES_TEMPLATE_URL
+      Endpoints.Paths.MINIKUBE_VALUES_TEMPLATE,
+      Endpoints.Urls.MINIKUBE_VALUES_TEMPLATE
     )
     clusterVars = { ...clusterVars, ...engineVars }
   } else if (clusterType === ClusterType.MicroK8s) {
     const engineVars = await processVariablesFile(
       clusterConfigs,
       clusterVars,
-      Endpoints.MICROK8S_VALUES_TEMPLATE_PATH,
-      Endpoints.MICROK8S_VALUES_TEMPLATE_URL
+      Endpoints.Paths.MICROK8S_VALUES_TEMPLATE,
+      Endpoints.Urls.MICROK8S_VALUES_TEMPLATE
     )
     clusterVars = { ...clusterVars, ...engineVars }
   }
@@ -55,8 +55,8 @@ export const processVariables = async (
     const ipfsVars = await processVariablesFile(
       clusterConfigs,
       clusterVars,
-      Endpoints.IPFS_VALUES_TEMPLATE_PATH,
-      Endpoints.IPFS_VALUES_TEMPLATE_URL
+      Endpoints.Paths.IPFS_VALUES_TEMPLATE,
+      Endpoints.Urls.IPFS_VALUES_TEMPLATE
     )
     clusterVars = { ...clusterVars, ...ipfsVars }
   }

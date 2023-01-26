@@ -94,7 +94,7 @@ class Engine {
         adminWindow = null
       })
 
-      await adminWindow.loadURL(Endpoints.LOGIN_PAGE)
+      await adminWindow.loadURL(Endpoints.Urls.LOGIN_PAGE)
       // adminWindow.show()
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {

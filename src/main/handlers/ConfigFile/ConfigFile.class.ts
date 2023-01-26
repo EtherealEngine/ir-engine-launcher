@@ -54,8 +54,8 @@ class ConfigFile {
     const category = 'remove files'
     try {
       const fileNames = [
-        `${clusterId}-${Endpoints.ENGINE_VALUES_FILE_NAME}`,
-        `${clusterId}-${Endpoints.IPFS_VALUES_FILE_NAME}`
+        `${clusterId}-${Endpoints.Paths.ENGINE_VALUES_FILE_NAME}`,
+        `${clusterId}-${Endpoints.Paths.IPFS_VALUES_FILE_NAME}`
       ]
 
       for (const fileName of fileNames) {
