@@ -1,4 +1,5 @@
 import { BrowserWindow } from 'electron'
+import os from 'os'
 import { CheckRepoActions, simpleGit, SimpleGit } from 'simple-git'
 
 import { Channels } from '../../../constants/Channels'
@@ -6,17 +7,23 @@ import Storage from '../../../constants/Storage'
 import { ClusterModel } from '../../../models/Cluster'
 import { GitStatus } from '../../../models/GitStatus'
 import { LogModel } from '../../../models/Log'
+import { getWSLToWindowsPath } from '../../managers/PathManager'
 
 class Git {
-  private static _getGit = (gitPath: string) => {
-    const git: SimpleGit = simpleGit(gitPath)
+  private static _getGit = (cluster: ClusterModel) => {
+    let enginePath = cluster.configs[Storage.ENGINE_PATH]
+
+    if (os.type() === 'Windows_NT') {
+      enginePath = getWSLToWindowsPath(enginePath)
+    }
+
+    const git: SimpleGit = simpleGit(enginePath)
     return git
   }
 
   static getCurrentConfigs = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
     try {
-      const enginePath = cluster.configs[Storage.ENGINE_PATH]
-      const git = Git._getGit(enginePath)
+      const git = Git._getGit(cluster)
 
       const isRepo = await git.checkIsRepo(CheckRepoActions.IS_REPO_ROOT)
 
@@ -46,8 +53,7 @@ class Git {
 
   static changeBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, branch: string) => {
     try {
-      const enginePath = cluster.configs[Storage.ENGINE_PATH]
-      const git = Git._getGit(enginePath)
+      const git = Git._getGit(cluster)
 
       if (branch.startsWith('remotes/')) {
         let localBranch = branch.split('/').pop()
@@ -79,8 +85,7 @@ class Git {
 
   static pullBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
     try {
-      const enginePath = cluster.configs[Storage.ENGINE_PATH]
-      const git = Git._getGit(enginePath)
+      const git = Git._getGit(cluster)
 
       await git.pull()
 
@@ -96,8 +101,7 @@ class Git {
 
   static pushBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
     try {
-      const enginePath = cluster.configs[Storage.ENGINE_PATH]
-      const git = Git._getGit(enginePath)
+      const git = Git._getGit(cluster)
 
       await git.push()
 

@@ -18,6 +18,8 @@ const Endpoints = {
       'https://raw.githubusercontent.com/XRFoundation/XREngine-Control-Center/master/assets/scripts/configure-minikube-linux.sh',
     MICROK8S_LINUX_SCRIPT:
       'https://raw.githubusercontent.com/XRFoundation/XREngine-Control-Center/master/assets/scripts/configure-microk8s-linux.sh',
+    MICROK8S_WINDOWS_SCRIPT:
+      'https://raw.githubusercontent.com/XRFoundation/XREngine-Control-Center/master/assets/scripts/configure-microk8s-windows.ps1',
     MINIKUBE_VALUES_TEMPLATE:
       'https://raw.githubusercontent.com/XRFoundation/XREngine/dev/packages/ops/configs/local.minikube.template.values.yaml',
     MICROK8S_VALUES_TEMPLATE:

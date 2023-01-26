@@ -260,6 +260,8 @@ const ConfigurationDialog = ({ onClose }: Props) => {
               href={
                 selectedCluster?.type === ClusterType.Minikube
                   ? Endpoints.Urls.MINIKUBE_LINUX_SCRIPT
+                  : appSysInfo.osType === OSType.Windows
+                  ? Endpoints.Urls.MICROK8S_WINDOWS_SCRIPT
                   : Endpoints.Urls.MICROK8S_LINUX_SCRIPT
               }
             >

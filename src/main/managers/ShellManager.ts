@@ -2,7 +2,7 @@ import childProcess, { ExecException } from 'child_process'
 import os from 'os'
 import { lookup, Program } from 'ps-node'
 
-import { getWSLFilePath } from './PathManager'
+import { getWindowsToWSLPath } from './PathManager'
 
 export const execScriptFile = async (scriptFile: string, args: string[]) => {
   const type = os.type()
@@ -11,7 +11,7 @@ export const execScriptFile = async (scriptFile: string, args: string[]) => {
   if (scriptFile.endsWith('.ps1')) {
     command = `. "${scriptFile}" ${args.join(' ')}`
   } else if (type === 'Windows_NT') {
-    scriptFile = await getWSLFilePath(scriptFile)
+    scriptFile = await getWindowsToWSLPath(scriptFile)
     command = `wsl bash "${scriptFile}" ${args.join(' ')}`
   } else {
     command = `bash "${scriptFile}" ${args.join(' ')}`
@@ -45,7 +45,7 @@ export const execStreamScriptFile = async (
   if (scriptFile.endsWith('.ps1')) {
     command = `. "${scriptFile}" ${args.join(' ')}`
   } else if (type === 'Windows_NT') {
-    scriptFile = await getWSLFilePath(scriptFile)
+    scriptFile = await getWindowsToWSLPath(scriptFile)
     command = `wsl bash "${scriptFile}" ${args.join(' ')}`
   } else {
     command = `bash "${scriptFile}" ${args.join(' ')}`

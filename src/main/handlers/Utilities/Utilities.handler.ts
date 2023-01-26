@@ -1,6 +1,7 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 
 import { Channels } from '../../../constants/Channels'
+import { AppModel } from '../../../models/AppStatus'
 import { IBaseHandler } from '../IBaseHandler'
 import Utilities from './Utilities.class'
 
@@ -30,9 +31,12 @@ class UtilitiesHandler implements IBaseHandler {
       ipcMain.handle(Channels.Utilities.GetPrerequisites, async (_event: IpcMainInvokeEvent) => {
         return await Utilities.getPrerequisites()
       }),
-      ipcMain.handle(Channels.Utilities.CheckPrerequisites, async (_event: IpcMainInvokeEvent) => {
-        return await Utilities.checkPrerequisites()
-      })
+      ipcMain.handle(
+        Channels.Utilities.CheckPrerequisite,
+        async (_event: IpcMainInvokeEvent, prerequisite: AppModel) => {
+          return await Utilities.checkPrerequisite(prerequisite)
+        }
+      )
   }
 }
 

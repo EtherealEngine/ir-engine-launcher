@@ -30,49 +30,55 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
     const initialStatuses = await SettingsService.getPrerequisites()
     setStatuses(initialStatuses)
 
-    // Display prerequisites with checked status
-    const checkedStatuses = await SettingsService.checkPrerequisites()
+    const checkedStatuses = [...initialStatuses]
+
+    for (const status of initialStatuses) {
+      // Display prerequisite with checked status
+      const checkedStatus = await SettingsService.CheckPrerequisite(status)
+
+      // Add description for corrective actions to be displayed in dialog
+      if (checkedStatus.status !== AppStatus.Configured) {
+        processDescriptions(checkedStatus)
+      }
+
+      const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
+      checkedStatuses[currentIndex] = checkedStatus
+
+      setStatuses(checkedStatuses)
+    }
+
     const allConfigured =
       checkedStatuses.length > 0 && checkedStatuses.every((item) => item.status === AppStatus.Configured)
 
     // Callback to enabled next button in dialog
     onChange(allConfigured)
-
-    // Add description for corrective actions to be displayed in dialog
-    if (!allConfigured) {
-      processDescriptions(checkedStatuses)
-    }
-
-    setStatuses(checkedStatuses)
   }
 
-  const processDescriptions = (statuses: AppModel[]) => {
-    for (const status of statuses) {
-      if (status.id === 'wsl' || status.id === 'wslUbuntu') {
-        status.description = (
-          <Typography fontSize={14}>
-            <span style={{ fontSize: 14, opacity: 0.6 }}>
-              Make sure WSL is installed and Ubuntu is selected as default distribution.{' '}
-            </span>
-            <a style={{ color: 'white' }} target="_blank" href={Endpoints.Docs.INSTALL_WSL}>
-              Install WSL
-            </a>
-            .
-          </Typography>
-        )
-      } else if (status.id === 'dockerDesktop' || status.id === 'dockerDesktopUbuntu') {
-        status.description = (
-          <Typography fontSize={14}>
-            <span style={{ fontSize: 14, opacity: 0.6 }}>
-              Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.{' '}
-            </span>
-            <a style={{ color: 'white' }} target="_blank" href={Endpoints.Docs.INSTALL_DOCKER}>
-              Install Docker Desktop
-            </a>
-            .
-          </Typography>
-        )
-      }
+  const processDescriptions = (status: AppModel) => {
+    if (status.id === 'wsl' || status.id === 'wslUbuntu') {
+      status.description = (
+        <Typography fontSize={14}>
+          <span style={{ fontSize: 14, opacity: 0.6 }}>
+            Make sure WSL is installed and Ubuntu is selected as default distribution.{' '}
+          </span>
+          <a style={{ color: 'white' }} target="_blank" href={Endpoints.Docs.INSTALL_WSL}>
+            Install WSL
+          </a>
+          .
+        </Typography>
+      )
+    } else if (status.id === 'dockerDesktop' || status.id === 'dockerDesktopUbuntu') {
+      status.description = (
+        <Typography fontSize={14}>
+          <span style={{ fontSize: 14, opacity: 0.6 }}>
+            Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.{' '}
+          </span>
+          <a style={{ color: 'white' }} target="_blank" href={Endpoints.Docs.INSTALL_DOCKER}>
+            Install Docker Desktop
+          </a>
+          .
+        </Typography>
+      )
     }
   }
 

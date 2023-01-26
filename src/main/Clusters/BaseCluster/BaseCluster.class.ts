@@ -14,6 +14,7 @@ import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { SysRequirement } from '../../../models/SysRequirement'
 import { processVariablesFile } from '../../handlers/ConfigFile/ConfigFile-helper'
+import Utilities from '../../handlers/Utilities/Utilities.class'
 import { getEnvFile } from '../../managers/PathManager'
 import { exec } from '../../managers/ShellManager'
 import Commands from './BaseCluster.commands'
@@ -76,6 +77,8 @@ class BaseCluster {
               : AppStatus.Configured
             : AppStatus.Pending
         }
+      } else {
+        status = await Utilities.checkPrerequisite(app)
       }
 
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

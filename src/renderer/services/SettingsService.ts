@@ -70,9 +70,9 @@ export const SettingsService = {
     const statuses: AppModel[] = await window.electronAPI.invoke(Channels.Utilities.GetPrerequisites)
     return statuses
   },
-  checkPrerequisites: async () => {
-    const statuses: AppModel[] = await window.electronAPI.invoke(Channels.Utilities.CheckPrerequisites)
-    return statuses
+  CheckPrerequisite: async (prerequisite: AppModel) => {
+    const status: AppModel = await window.electronAPI.invoke(Channels.Utilities.CheckPrerequisite, prerequisite)
+    return status
   }
 }
 

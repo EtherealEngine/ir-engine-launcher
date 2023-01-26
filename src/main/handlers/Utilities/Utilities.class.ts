@@ -5,11 +5,10 @@ import os from 'os'
 import path from 'path'
 
 import { Channels } from '../../../constants/Channels'
-import Endpoints from '../../../constants/Endpoints'
 import { AppModel, AppStatus } from '../../../models/AppStatus'
 import { AppSysInfo, OSType } from '../../../models/AppSysInfo'
 import { LogModel } from '../../../models/Log'
-import { getHomePath } from '../../managers/PathManager'
+import { getHomePath, getWSLToWindowsPath } from '../../managers/PathManager'
 import { cleanseString, exec } from '../../managers/ShellManager'
 import { WindowsPrerequisites } from './Prerequisites'
 
@@ -50,7 +49,7 @@ class Utilities {
 
     if (os.type() === 'Windows_NT') {
       const homePath = await getHomePath()
-      defaultPath = `${Endpoints.Paths.WSL_PREFIX}${homePath.replaceAll('/', '\\')}`
+      defaultPath = getWSLToWindowsPath(homePath)
     }
 
     const { filePaths } = await dialog.showOpenDialog({
@@ -98,55 +97,46 @@ class Utilities {
     return []
   }
 
-  static checkPrerequisites = async () => {
+  static checkPrerequisite = async (prerequisite: AppModel) => {
     try {
-      const type = os.type()
-      if (type === 'Windows_NT') {
-        return await Utilities._checkWindowsPrerequisites()
-      }
-    } catch (err) {
-      log.error('Failed to check prerequisites.', err)
-    }
-
-    return []
-  }
-
-  private static _checkWindowsPrerequisites = async () => {
-    const statuses: AppModel[] = []
-
-    for (const prerequisites of WindowsPrerequisites) {
       let status = AppStatus.NotConfigured
 
-      const { stdout, stderr, error } = await exec(prerequisites.checkCommand)
+      const { stdout, stderr, error } = await exec(prerequisite.checkCommand)
       const stdOutput = cleanseString(stdout?.toString() || '')
 
       log.info(`Check command response: ${stdOutput}`)
 
       if (error || stderr) {
         log.error(
-          `Error while executing check ${prerequisites.name} command: ${prerequisites.checkCommand}.`,
+          `Error while executing check ${prerequisite.name} command: ${prerequisite.checkCommand}.`,
           error,
           stderr
         )
       }
 
       if (
-        (prerequisites.id === 'wsl' && stdOutput) ||
-        (prerequisites.id === 'wslUbuntu' && stdOutput.includes('Default Distribution: Ubuntu')) ||
-        ((prerequisites.id === 'dockerDesktop' || prerequisites.id === 'dockerDesktopUbuntu') &&
+        (prerequisite.id === 'wsl' && stdOutput) ||
+        (prerequisite.id === 'wslUbuntu' && stdOutput.includes('Default Distribution: Ubuntu')) ||
+        ((prerequisite.id === 'dockerDesktop' || prerequisite.id === 'dockerDesktopUbuntu') &&
           stdOutput.includes('Server: Docker Desktop'))
       ) {
         status = AppStatus.Configured
       }
 
-      statuses.push({
-        ...prerequisites,
+      return {
+        ...prerequisite,
         detail: stderr ? stderr : stdOutput,
         status
-      })
-    }
+      } as AppModel
+    } catch (err) {
+      log.error('Failed to check prerequisite.', err)
 
-    return statuses
+      return {
+        ...prerequisite,
+        detail: err,
+        status: AppStatus.NotConfigured
+      } as AppModel
+    }
   }
 }
 

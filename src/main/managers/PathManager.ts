@@ -48,12 +48,16 @@ export const filesPath = () => {
   return path.join(assetsPath(), 'files')
 }
 
-export const getWSLFilePath = async (scriptFile: string) => {
-  scriptFile = scriptFile.replaceAll('\\', '\\\\')
-  const wslPathResponse = await exec(`wsl wslpath ${scriptFile}`)
+export const getWSLToWindowsPath = (filePath: string) => {
+  return `${Endpoints.Paths.WSL_PREFIX}${filePath.replaceAll('/', '\\')}`
+}
+
+export const getWindowsToWSLPath = async (filePath: string) => {
+  filePath = filePath.replaceAll('\\', '\\\\')
+  const wslPathResponse = await exec(`wsl wslpath ${filePath}`)
 
   if (wslPathResponse.error || wslPathResponse.stderr) {
-    log.error(`Error while executing wslpath ${scriptFile}.`, wslPathResponse.error, wslPathResponse.stderr)
+    log.error(`Error while executing wslpath ${filePath}.`, wslPathResponse.error, wslPathResponse.stderr)
     throw 'Unable to convert path to wsl path'
   }
 

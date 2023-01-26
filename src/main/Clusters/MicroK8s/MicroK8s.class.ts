@@ -10,6 +10,7 @@ import Storage from '../../../constants/Storage'
 import { DeploymentAppModel } from '../../../models/AppStatus'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
+import Utilities from '../../handlers/Utilities/Utilities.class'
 import { executeWebViewJS } from '../../managers/BrowserManager'
 import { startFileServer } from '../../managers/FileServerManager'
 import { assetsPath, ensureConfigsFolder, scriptsPath } from '../../managers/PathManager'
@@ -24,7 +25,9 @@ import Requirements from './MicroK8s.requirements'
 
 class MicroK8s {
   static getClusterStatus = (cluster: ClusterModel) => {
-    const systemStatus = [...DefaultSystemStatus]
+    const prerequisites = Utilities.getPrerequisites()
+
+    const systemStatus = [...DefaultSystemStatus, ...prerequisites]
     const engineStatus = [...DefaultEngineStatus]
     let appStatus = [...MicroK8sAppsStatus]
 
