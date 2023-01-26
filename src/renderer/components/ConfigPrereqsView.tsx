@@ -54,7 +54,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
             <span style={{ fontSize: 14, opacity: 0.6 }}>
               Make sure WSL is installed and Ubuntu is selected as default distribution.{' '}
             </span>
-            <a style={{ color: 'white' }} target="_blank" href={Endpoints.DOCS_INSTALL_WSL}>
+            <a style={{ color: 'white' }} target="_blank" href={Endpoints.Docs.INSTALL_WSL}>
               Install WSL
             </a>
             .
@@ -66,7 +66,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
             <span style={{ fontSize: 14, opacity: 0.6 }}>
               Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.{' '}
             </span>
-            <a style={{ color: 'white' }} target="_blank" href={Endpoints.DOCS_INSTALL_DOCKER}>
+            <a style={{ color: 'white' }} target="_blank" href={Endpoints.Docs.INSTALL_DOCKER}>
               Install Docker Desktop
             </a>
             .

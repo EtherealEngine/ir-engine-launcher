@@ -1,4 +1,5 @@
 import { Channels } from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
 import { OSType } from 'models/AppSysInfo'
 import { useSnackbar } from 'notistack'
@@ -40,8 +41,8 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
     if (path) {
       // On windows we need to make sure its WSL folder.
       if (appSysInfo.osType === OSType.Windows) {
-        if (path.startsWith('\\\\wsl$\\Ubuntu\\')) {
-          path = path.replace('\\\\wsl$\\Ubuntu', '').replaceAll('\\', '/')
+        if (path.startsWith(Endpoints.Paths.WSL_PREFIX)) {
+          path = path.replace(Endpoints.Paths.WSL_PREFIX, '').replaceAll('\\', '/')
         } else {
           enqueueSnackbar('Please select a folder in your WSL Ubuntu distribution.', { variant: 'error' })
           return

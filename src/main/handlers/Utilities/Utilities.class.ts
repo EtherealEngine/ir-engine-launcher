@@ -1,3 +1,4 @@
+import Endpoints from '../../../constants/Endpoints'
 import { app, BrowserWindow, clipboard, dialog, shell } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
@@ -49,7 +50,7 @@ class Utilities {
 
     if (os.type() === 'Windows_NT') {
       const homePath = await getHomePath()
-      defaultPath = `\\\\wsl$\\Ubuntu${homePath.replaceAll('/', '\\')}`
+      defaultPath = `${Endpoints.Paths.WSL_PREFIX}${homePath.replaceAll('/', '\\')}`
     }
 
     const { filePaths } = await dialog.showOpenDialog({
