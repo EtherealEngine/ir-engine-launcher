@@ -240,7 +240,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
           <Typography fontSize={14}>
             Note:{' '}
             <span style={{ fontSize: 14, opacity: 0.6 }}>
-              On Windows, this is the password for your WSL Ubuntu distribution
+              On Windows, this is the password of your WSL Ubuntu distribution
             </span>
           </Typography>
         </Box>

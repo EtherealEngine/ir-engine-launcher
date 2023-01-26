@@ -1,19 +1,8 @@
 import childProcess, { ExecException } from 'child_process'
-import log from 'electron-log'
 import os from 'os'
 import { lookup, Program } from 'ps-node'
 
-const _getWSLfilePath = async (scriptFile: string) => {
-  scriptFile = scriptFile.replaceAll('\\', '\\\\')
-  const wslPathResponse = await exec(`wsl wslpath ${scriptFile}`)
-
-  if (wslPathResponse.error || wslPathResponse.stderr) {
-    log.error(`Error while executing wslpath ${scriptFile}.`, wslPathResponse.error, wslPathResponse.stderr)
-    throw 'Unable to convert path to wsl path'
-  }
-
-  return wslPathResponse.stdout!.toString().trim()
-}
+import { getWSLFilePath } from './PathManager'
 
 export const execScriptFile = async (scriptFile: string, args: string[]) => {
   const type = os.type()
@@ -22,7 +11,7 @@ export const execScriptFile = async (scriptFile: string, args: string[]) => {
   if (scriptFile.endsWith('.ps1')) {
     command = `. "${scriptFile}" ${args.join(' ')}`
   } else if (type === 'Windows_NT') {
-    scriptFile = await _getWSLfilePath(scriptFile)
+    scriptFile = await getWSLFilePath(scriptFile)
     command = `wsl bash "${scriptFile}" ${args.join(' ')}`
   } else {
     command = `bash "${scriptFile}" ${args.join(' ')}`
@@ -56,7 +45,7 @@ export const execStreamScriptFile = async (
   if (scriptFile.endsWith('.ps1')) {
     command = `. "${scriptFile}" ${args.join(' ')}`
   } else if (type === 'Windows_NT') {
-    scriptFile = await _getWSLfilePath(scriptFile)
+    scriptFile = await getWSLFilePath(scriptFile)
     command = `wsl bash "${scriptFile}" ${args.join(' ')}`
   } else {
     command = `bash "${scriptFile}" ${args.join(' ')}`

@@ -23,6 +23,9 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
   }, [])
 
   const loadPrerequisites = async () => {
+    // Callback to disable next button in dialog
+    onChange(false)
+
     // load and display prerequisites with loading status
     const initialStatuses = await SettingsService.getPrerequisites()
     setStatuses(initialStatuses)
@@ -84,7 +87,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
       </Typography>
 
       {statuses.map((status) => (
-        <StatusViewItem titleVariant="body2" status={status} />
+        <StatusViewItem key={status.id} titleVariant="body2" status={status} />
       ))}
     </Box>
   )

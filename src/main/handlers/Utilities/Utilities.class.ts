@@ -8,6 +8,7 @@ import { Channels } from '../../../constants/Channels'
 import { AppModel, AppStatus } from '../../../models/AppStatus'
 import { AppSysInfo, OSType } from '../../../models/AppSysInfo'
 import { LogModel } from '../../../models/Log'
+import { getHomePath } from '../../managers/PathManager'
 import { cleanseString, exec } from '../../managers/ShellManager'
 import { WindowsPrerequisites } from './Prerequisites'
 
@@ -44,8 +45,16 @@ class Utilities {
   }
 
   static selectFolder = async () => {
+    let defaultPath: string | undefined = undefined
+
+    if (os.type() === 'Windows_NT') {
+      const homePath = await getHomePath()
+      defaultPath = `\\\\wsl$\\Ubuntu${homePath.replaceAll('/', '\\')}`
+    }
+
     const { filePaths } = await dialog.showOpenDialog({
-      properties: ['openDirectory']
+      properties: ['openDirectory'],
+      defaultPath
     })
 
     if (filePaths.length > 0) {

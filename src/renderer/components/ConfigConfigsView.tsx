@@ -1,6 +1,9 @@
 import { Channels } from 'constants/Channels'
 import Storage from 'constants/Storage'
+import { OSType } from 'models/AppSysInfo'
+import { useSnackbar } from 'notistack'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
+import { useSettingsState } from 'renderer/services/SettingsService'
 
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import {
@@ -24,12 +27,27 @@ interface Props {
 }
 
 const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
+  const { enqueueSnackbar } = useSnackbar()
+
   const configFileState = useConfigFileState()
   const { loading } = configFileState.value
+  const settingsState = useSettingsState()
+  const { appSysInfo } = settingsState.value
 
   const changeFolder = async (key: string) => {
-    const path = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
+    let path: string = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
+
     if (path) {
+      // On windows we need to make sure its WSL folder.
+      if (appSysInfo.osType === OSType.Windows) {
+        if (path.startsWith('\\\\wsl$\\Ubuntu\\')) {
+          path = path.replace('\\\\wsl$\\Ubuntu', '').replaceAll('\\', '/')
+        } else {
+          enqueueSnackbar('Please select a folder in your WSL Ubuntu distribution.', { variant: 'error' })
+          return
+        }
+      }
+
       onChange(key, path)
     }
   }

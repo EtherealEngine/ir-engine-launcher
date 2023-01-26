@@ -1,13 +1,35 @@
 import axios from 'axios'
 import { app } from 'electron'
+import log from 'electron-log'
 import { promises as fs } from 'fs'
+import os from 'os'
 import path from 'path'
 
 import Endpoints from '../../constants/Endpoints'
+import { exec } from './ShellManager'
 
-export const getEngineDefaultPath = () => {
-  const defaultPath = path.join(app.getPath('home'), Endpoints.DEFAULT_ENGINE_FOLDER)
+export const getEngineDefaultPath = async () => {
+  let homePath = await getHomePath()
+
+  const defaultPath = [homePath, Endpoints.DEFAULT_ENGINE_FOLDER].join('/')
   return defaultPath
+}
+
+export const getHomePath = async () => {
+  let homePath = app.getPath('home')
+
+  if (os.type() === 'Windows_NT') {
+    const wslHomePathResponse = await exec(`wsl eval echo ~$USER`)
+
+    if (wslHomePathResponse.error || wslHomePathResponse.stderr) {
+      log.error(`Error while executing get wsl home path.`, wslHomePathResponse.error, wslHomePathResponse.stderr)
+      throw 'Unable to get wsl home path'
+    }
+
+    homePath = wslHomePathResponse.stdout!.toString().trim()
+  }
+
+  return homePath
 }
 
 export const appConfigsPath = () => {
@@ -24,6 +46,18 @@ export const scriptsPath = () => {
 
 export const filesPath = () => {
   return path.join(assetsPath(), 'files')
+}
+
+export const getWSLFilePath = async (scriptFile: string) => {
+  scriptFile = scriptFile.replaceAll('\\', '\\\\')
+  const wslPathResponse = await exec(`wsl wslpath ${scriptFile}`)
+
+  if (wslPathResponse.error || wslPathResponse.stderr) {
+    log.error(`Error while executing wslpath ${scriptFile}.`, wslPathResponse.error, wslPathResponse.stderr)
+    throw 'Unable to convert path to wsl path'
+  }
+
+  return wslPathResponse.stdout!.toString().trim()
 }
 
 export const getEnvFile = async (enginePath: string) => {
