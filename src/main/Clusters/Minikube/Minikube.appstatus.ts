@@ -4,7 +4,7 @@ const minikubeDependantScript = (script: string) => {
   return `
   MINIKUBE_STATUS=$(minikube status --output json);
   if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"Nonexistent"* ]] || [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
-    echo "Minikube not configured" >&2;
+    echo 'Minikube not configured' >&2;
     exit 1;
   else
     ${script}
@@ -39,11 +39,11 @@ export const MinikubeAppsStatus: AppModel[] = [
     'Local File Server',
     `
   if lsof -Pi :8642 -sTCP:LISTEN -t >/dev/null ; then
-    echo "File server configured:"
+    echo 'File server configured:'
     lsof -Pi :8642 -sTCP:LISTEN
     exit 0;
   else
-    echo "File server not configured" >&2;
+    echo 'File server not configured' >&2;
     exit 1;
   fi
   `
