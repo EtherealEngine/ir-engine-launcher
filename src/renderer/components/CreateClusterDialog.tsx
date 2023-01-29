@@ -102,13 +102,11 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     localVars[key] = key in tempVars ? tempVars[key] : defaultVars[key]
   }
 
-  useEffect(() => {
-    loadDefaultConfigs()
-  }, [])
-
   const loadDefaultConfigs = async () => {
+    setLoading(true)
     const configs = await ConfigFileService.getDefaultConfigs()
     setDefaultConfigs(configs)
+    setLoading(false)
   }
 
   const loadDefaultVariables = async (clusterType: ClusterType) => {
@@ -139,12 +137,15 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       setLoading(true)
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
       setLoading(false)
+
       if (sudoLoggedIn) {
         SettingsService.setSudoPassword(password)
       } else {
         setError('Invalid password')
         return
       }
+
+      await loadDefaultConfigs()
     } else if (activeStep === 2) {
       loadDefaultVariables(type)
     } else if (activeStep === 4) {
