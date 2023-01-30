@@ -74,7 +74,7 @@ const StatusView = ({ statuses, title }: Props) => {
       {showStatus && (
         <Grid container>
           {statuses.map((status) => (
-            <StatusViewItem status={status} />
+            <StatusViewItem key={status.id} status={status} />
           ))}
         </Grid>
       )}
