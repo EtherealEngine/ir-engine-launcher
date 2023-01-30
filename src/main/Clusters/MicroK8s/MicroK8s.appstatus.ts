@@ -72,6 +72,57 @@ export const MicroK8sAppsStatus: AppModel[] = [
   fi
   ${scriptPostfix}`
   ),
+  getAppModel(
+    'hostfile',
+    'Hostfile',
+    os.type() === 'Windows_NT'
+      ? `
+      $content = Get-Content "$env:SystemRoot\\System32\\drivers\\etc\\hosts"
+      $wslIps = wsl hostname -I
+
+      if ($wslIps -like "* *") {
+      	$wslIp = $wslIps.split(" ")[0]
+
+        if ($content -like "*local.etherealengine.com*") {
+          if ($content -like "*$wslIp*") {
+              Write-Host "*.etherealengine.com entries exists"
+          } else {
+              throw "*.etherealengine.com entries outdated"
+          }
+        } else {
+          throw "*.etherealengine.com entries does not exist"
+        }
+
+        if ($content -like "*microk8s.registry*") {
+          if ($content -like "*$wslIp*") {
+              Write-Host "microk8s.registry entries exists"
+          } else {
+              throw "microk8s.registry entries outdated"
+          }
+        } else {
+          throw "microk8s.registry entries does not exist"
+        }
+      } else {
+      	throw "Kindly make sure WSL is installed and Ubuntu distro is set as default."
+      }
+      `
+      : microk8sDependantScript(
+          `
+      if grep -q 'local.etherealengine.com' /etc/hosts; then
+          if grep -q '127.0.0.1 local.etherealengine.com' /etc/hosts; then
+              echo '*.etherealengine.com entries exists'
+              exit 0;
+          else
+            echo '*.etherealengine.com entries outdated' >&2;
+            exit 1;
+          fi
+      else
+        echo '*.etherealengine.com entries does not exist' >&2;
+        exit 1;
+      fi
+    `
+        )
+  ),
   getAppModel('engine', 'Ethereal Engine', microk8sDependantScript(`helm status local;`))
 ]
 

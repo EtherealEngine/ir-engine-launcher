@@ -48,6 +48,27 @@ export const MinikubeAppsStatus: AppModel[] = [
   fi
   `
   ),
+  getAppModel(
+    'hostfile',
+    'Hostfile',
+    minikubeDependantScript(
+      `
+      MINIKUBE_IP=$(minikube ip)
+      if grep -q "local.etherealengine.com" /etc/hosts; then
+          if grep -q "$MINIKUBE_IP" /etc/hosts; then
+              echo "*.etherealengine.com entries exists";
+              exit 0;
+          else
+              echo "*.etherealengine.com entries outdated" >&2;
+              exit 1;
+          fi
+      else
+        echo "*.etherealengine.com entries does not exist" >&2;
+        exit 1;
+      fi
+    `
+    )
+  ),
   getAppModel('engine', 'Ethereal Engine', minikubeDependantScript('helm status local;'))
 ]
 
