@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron'
 import os from 'os'
-import { CheckRepoActions, simpleGit, SimpleGit } from 'simple-git'
+import { CheckRepoActions, GitResponseError, simpleGit, SimpleGit } from 'simple-git'
 
 import { Channels } from '../../../constants/Channels'
 import Storage from '../../../constants/Storage'
@@ -45,7 +45,7 @@ class Git {
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'git configs',
-        message: JSON.stringify(err)
+        message: JSON.stringify((err as GitResponseError).message)
       } as LogModel)
       return undefined
     }
@@ -77,7 +77,7 @@ class Git {
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'git change branch',
-        message: JSON.stringify(err)
+        message: JSON.stringify((err as GitResponseError).message)
       } as LogModel)
       return false
     }
@@ -93,7 +93,7 @@ class Git {
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'git pull branch',
-        message: JSON.stringify(err)
+        message: JSON.stringify((err as GitResponseError).message)
       } as LogModel)
       return false
     }
@@ -109,7 +109,7 @@ class Git {
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'git push branch',
-        message: JSON.stringify(err)
+        message: JSON.stringify((err as GitResponseError).message)
       } as LogModel)
       return false
     }
