@@ -270,7 +270,7 @@ class BaseCluster {
       if (existingValue) {
         vars[key] = existingValue
       } else if (key === Storage.IPFS_CLUSTER_SECRET) {
-        const response = await exec(Commands.IPFS_SECRET)
+        const response = await exec(Commands.IPFS_SECRET, true)
         const { stdout, stderr } = response
 
         if (stderr) {

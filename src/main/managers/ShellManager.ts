@@ -20,12 +20,20 @@ export const execScriptFile = async (scriptFile: string, args: string[]) => {
   return await exec(command)
 }
 
-export const exec = (command: string): Promise<ShellResponse> => {
+export const exec = (command: string, isLinuxCommand?: boolean): Promise<ShellResponse> => {
   const type = os.type()
 
   let shell = '/bin/bash'
   if (type === 'Windows_NT') {
     shell = 'powershell.exe'
+
+    if (isLinuxCommand) {
+      if (command.includes("npm") || command.includes("node")) {
+        command = `source ~/.nvm/nvm.sh [ -x '$(command -v nvm)' ] && ${command}`
+      }
+
+      command = `wsl bash -c "${command}"`
+    }
   }
 
   return new Promise((resolve) => {

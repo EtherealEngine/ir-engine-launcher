@@ -1,5 +1,4 @@
 import { BrowserWindow } from 'electron'
-
 // import log from 'electron-log'
 import { Channels } from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
@@ -64,9 +63,9 @@ class Engine {
             } as LogModel)
 
             const enginePath = cluster.configs[Storage.ENGINE_PATH]
-            const response = await exec(
-              `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
-            )
+
+            const command = `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
+            const response = await exec(command, true)
             const { error } = response
 
             if (error) {
