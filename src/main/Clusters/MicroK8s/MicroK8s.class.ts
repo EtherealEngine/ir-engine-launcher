@@ -1,6 +1,7 @@
 import { BrowserWindow } from 'electron'
 import log from 'electron-log'
 import findProcess from 'find-process'
+import os from 'os'
 import path from 'path'
 import { kill } from 'ps-node'
 
@@ -85,6 +86,8 @@ class MicroK8s {
     }
 
     try {
+      const type = os.type()
+
       // Ensure port is not in use
       const processes = await findProcess('port', 10443)
       for (const process of processes) {
@@ -92,7 +95,11 @@ class MicroK8s {
       }
 
       // Start dashboard port-forward
-      await execStream(Commands.DASHBOARD, onStdout, onStderr)
+      let command = Commands.DASHBOARD
+      if (type === 'Windows_NT') {
+        command = `wsl /snap/bin/${command}`
+      }
+      await execStream(command, onStdout, onStderr)
     } catch (err) {
       onStderr(JSON.stringify(err))
       throw err
