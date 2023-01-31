@@ -77,10 +77,20 @@ export const MinikubeRippleAppsStatus: AppModel[] = [
     'rippled',
     'Rippled',
     minikubeDependantScript('helm status local-rippled;'),
+    true,
     undefined,
     undefined,
     undefined,
     true
   ),
-  getAppModel('ipfs', 'IPFS', minikubeDependantScript('helm status local-ipfs;'), undefined, undefined, undefined, true)
+  getAppModel(
+    'ipfs',
+    'IPFS',
+    minikubeDependantScript('helm status local-ipfs;'),
+    true,
+    undefined,
+    undefined,
+    undefined,
+    true
+  )
 ]

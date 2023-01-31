@@ -101,7 +101,7 @@ class Utilities {
     try {
       let status = AppStatus.NotConfigured
 
-      const { stdout, stderr, error } = await exec(prerequisite.checkCommand)
+      const { stdout, stderr, error } = await exec(prerequisite.checkCommand, prerequisite.isLinuxCommand)
       const stdOutput = cleanseString(stdout?.toString() || '')
 
       log.info(`Check command response: ${stdOutput}`)

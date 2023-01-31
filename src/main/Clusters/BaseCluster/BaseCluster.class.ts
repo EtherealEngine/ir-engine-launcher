@@ -97,7 +97,7 @@ class BaseCluster {
       }
 
       if (app.checkCommand) {
-        const response = await exec(app.checkCommand)
+        const response = await exec(app.checkCommand, app.isLinuxCommand)
         const { stdout, stderr } = response
 
         if (stdout) {
@@ -148,7 +148,7 @@ class BaseCluster {
           status: AppStatus.NotConfigured
         }
       } else if (engineItem.checkCommand) {
-        const response = await exec(engineItem.checkCommand)
+        const response = await exec(engineItem.checkCommand, engineItem.isLinuxCommand)
         const { stdout, stderr } = response
 
         if (stdout) {
@@ -270,7 +270,7 @@ class BaseCluster {
       if (existingValue) {
         vars[key] = existingValue
       } else if (key === Storage.IPFS_CLUSTER_SECRET) {
-        const response = await exec(Commands.IPFS_SECRET, true)
+        const response = await exec(Commands.IPFS_SECRET)
         const { stdout, stderr } = response
 
         if (stderr) {

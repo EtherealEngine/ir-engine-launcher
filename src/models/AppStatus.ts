@@ -5,6 +5,7 @@ export type AppModel = {
   name: string
   description?: React.ReactNode
   checkCommand: string
+  isLinuxCommand: boolean
   detail: React.ReactNode | undefined
   status: AppStatus
   isOptional?: boolean
@@ -27,10 +28,11 @@ export const getAppModel = (
   id: string,
   name: string,
   checkCommand: string = '',
+  isLinuxCommand: boolean = true,
   description: string = '',
   detail: string = '',
   status: AppStatus = AppStatus.Checking,
   isOptional?: boolean
 ) => {
-  return { id, name, checkCommand, description, detail, status, isOptional }
+  return { id, name, checkCommand, isLinuxCommand, description, detail, status, isOptional }
 }

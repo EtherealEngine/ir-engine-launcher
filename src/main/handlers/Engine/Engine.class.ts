@@ -66,7 +66,7 @@ class Engine {
             const enginePath = cluster.configs[Storage.ENGINE_PATH]
 
             const command = `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
-            const response = await exec(command, true)
+            const response = await exec(command)
             const { error } = response
 
             if (error) {

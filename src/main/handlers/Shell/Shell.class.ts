@@ -50,7 +50,7 @@ class Shell {
     let validPassword = false
 
     // First make sure WSL is installed.
-    const wslResponse = await exec('wsl --status')
+    const wslResponse = await exec('wsl --status', false)
     const wslResponseOutput = cleanseString(wslResponse.stdout?.toString() || '')
     log.info(`WSL status ${wslResponseOutput}`)
 
@@ -152,7 +152,7 @@ class Shell {
     const category = 'rippled cli'
     try {
       command = `podname=$(kubectl get pods -l app.kubernetes.io/instance=local-rippled --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl exec -i $podname -- bash -c '${command}';`
-      const response = await exec(command, true)
+      const response = await exec(command)
       const { stdout, stderr } = response
 
       let output = ''

@@ -19,7 +19,7 @@ export const getHomePath = async () => {
   let homePath = app.getPath('home')
 
   if (os.type() === 'Windows_NT') {
-    const wslHomePathResponse = await exec(`wsl eval echo ~$USER`)
+    const wslHomePathResponse = await exec(`wsl eval echo ~$USER`, false)
 
     if (wslHomePathResponse.error || wslHomePathResponse.stderr) {
       log.error(`Error while executing get wsl home path.`, wslHomePathResponse.error, wslHomePathResponse.stderr)
@@ -54,7 +54,7 @@ export const getWSLToWindowsPath = (filePath: string) => {
 
 export const getWindowsToWSLPath = async (filePath: string) => {
   filePath = filePath.replaceAll('\\', '\\\\')
-  const wslPathResponse = await exec(`wsl wslpath ${filePath}`)
+  const wslPathResponse = await exec(`wsl wslpath ${filePath}`, false)
 
   if (wslPathResponse.error || wslPathResponse.stderr) {
     log.error(`Error while executing wslpath ${filePath}.`, wslPathResponse.error, wslPathResponse.stderr)
