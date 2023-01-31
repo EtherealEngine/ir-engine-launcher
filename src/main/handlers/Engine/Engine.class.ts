@@ -1,4 +1,5 @@
 import { BrowserWindow } from 'electron'
+
 // import log from 'electron-log'
 import { Channels } from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'

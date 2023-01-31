@@ -28,7 +28,7 @@ export const exec = (command: string, isLinuxCommand?: boolean): Promise<ShellRe
     shell = 'powershell.exe'
 
     if (isLinuxCommand) {
-      if (command.includes("npm") || command.includes("node")) {
+      if (command.includes('npm') || command.includes('node')) {
         command = `source ~/.nvm/nvm.sh [ -x '$(command -v nvm)' ] && ${command}`
       }
 
