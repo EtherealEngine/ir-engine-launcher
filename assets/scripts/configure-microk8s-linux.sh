@@ -29,12 +29,11 @@ fi
 # Login
 #======
 
-LOGIN=$(echo "$PASSWORD" | sudo -S echo "User logged in")
-if [[ $LOGIN == *"User logged in"* ]]; then
-    echo "user logged in"
-else
-    echo "user not logged in"
-    exit 2
+./check-login.sh "$PASSWORD"
+
+exit_status=$?
+if [ $exit_status -ne 0 ]; then
+    exit $exit_status
 fi
 
 set -e

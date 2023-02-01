@@ -12,7 +12,7 @@ import { cleanseString, exec, execScriptFile, execStream } from '../../managers/
 class Shell {
   static checkSudoPassword = async (password: string = '') => {
     try {
-      const loginScript = path.join(scriptsPath(), 'sudo-login.sh')
+      const loginScript = path.join(scriptsPath(), 'check-login.sh')
 
       const type = os.type()
       if (type === 'Windows_NT') {
