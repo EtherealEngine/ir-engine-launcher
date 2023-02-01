@@ -7,14 +7,19 @@ import { getWindowsToWSLPath } from './PathManager'
 export const execScriptFile = async (scriptFile: string, args: string[]) => {
   const type = os.type()
 
+  if (type === 'Windows_NT') {
+    scriptFile = await getWindowsToWSLPath(scriptFile)
+  }
+
   let command = ''
   if (scriptFile.endsWith('.ps1')) {
-    command = `. "${scriptFile}" ${args.join(' ')}`
-  } else if (type === 'Windows_NT') {
-    scriptFile = await getWindowsToWSLPath(scriptFile)
-    command = `wsl bash "${scriptFile}" ${args.join(' ')}`
+    command = `. '${scriptFile}' ${args.join(' ')}`
   } else {
-    command = `bash "${scriptFile}" ${args.join(' ')}`
+    command = `'${scriptFile}' ${args.join(' ')}`
+  }
+
+  if (type !== 'Windows_NT') {
+    command = `bash ${command}`
   }
 
   return await exec(command)
