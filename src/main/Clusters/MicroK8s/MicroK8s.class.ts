@@ -14,7 +14,7 @@ import { LogModel } from '../../../models/Log'
 import Utilities from '../../handlers/Utilities/Utilities.class'
 import { executeWebViewJS } from '../../managers/BrowserManager'
 import { startFileServer } from '../../managers/FileServerManager'
-import { assetsPath, ensureConfigsFolder, scriptsPath } from '../../managers/PathManager'
+import { assetsPath, ensureConfigsFolder, ensureWindowsToWSLPath, scriptsPath } from '../../managers/PathManager'
 import { execStream, execStreamScriptFile } from '../../managers/ShellManager'
 import { delay } from '../../managers/UtilitiesManager'
 import { ensureConfigs } from '../../managers/YamlManager'
@@ -114,15 +114,25 @@ class MicroK8s {
   ) => {
     const category = 'configure microk8s'
     try {
+      const type = os.type()
+
       await BaseCluster.ensureVariables(cluster)
 
-      const configsFolder = await ensureConfigsFolder()
+      let configsFolder = await ensureConfigsFolder()
+      configsFolder = await ensureWindowsToWSLPath(configsFolder)
 
       await ensureConfigs(cluster, Endpoints.Paths.MICROK8S_VALUES_TEMPLATE, Endpoints.Urls.MICROK8S_VALUES_TEMPLATE)
 
       const scriptsFolder = scriptsPath()
-      const assetsFolder = assetsPath()
-      const configureScript = path.join(scriptsFolder, 'configure-microk8s-linux.sh')
+      let assetsFolder = assetsPath()
+      assetsFolder = await ensureWindowsToWSLPath(assetsFolder)
+
+      let configFile = 'configure-microk8s-linux.sh'
+      if (type === 'Windows_NT') {
+        configFile = 'configure-microk8s-windows.ps1'
+      }
+
+      const configureScript = path.join(scriptsFolder, configFile)
       log.info(`Executing script ${configureScript}`)
 
       const onConfigureStd = (data: any) => {

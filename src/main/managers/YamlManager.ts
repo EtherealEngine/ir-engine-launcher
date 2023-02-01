@@ -6,7 +6,7 @@ import path from 'path'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { ClusterModel } from '../../models/Cluster'
-import { appConfigsPath, fileExists } from './PathManager'
+import { appConfigsPath, fileExists, ensureWSLToWindowsPath } from './PathManager'
 
 export const getYamlDoc = async (templatePath: string, templateUrl: string) => {
   let yamlContent = ''
@@ -61,7 +61,7 @@ const _ensureConfigsFile = async (
   templateUrl: string,
   valuesFileName: string
 ) => {
-  const enginePath = cluster.configs[Storage.ENGINE_PATH]
+  const enginePath = ensureWSLToWindowsPath(cluster.configs[Storage.ENGINE_PATH])
   const templateFullPath = path.join(enginePath, templatePath)
   const yamlDoc = await getYamlDoc(templateFullPath, templateUrl)
 
@@ -89,7 +89,7 @@ const _ensureRippleConfigs = async (cluster: ClusterModel) => {
 }
 
 const _ensureRippledConfigs = async (cluster: ClusterModel) => {
-  const enginePath = cluster.configs[Storage.ENGINE_PATH]
+  const enginePath = ensureWSLToWindowsPath(cluster.configs[Storage.ENGINE_PATH])
   const rippledCfgPath = path.join(enginePath, Endpoints.Paths.RIPPLED_FILE)
   const rippledCfgExists = await fileExists(rippledCfgPath)
   if (rippledCfgExists === false) {

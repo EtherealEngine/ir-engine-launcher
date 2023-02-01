@@ -8,7 +8,7 @@ import { Channels } from '../../../constants/Channels'
 import { AppModel, AppStatus } from '../../../models/AppStatus'
 import { AppSysInfo, OSType } from '../../../models/AppSysInfo'
 import { LogModel } from '../../../models/Log'
-import { getHomePath, getWSLToWindowsPath } from '../../managers/PathManager'
+import { getHomePath, ensureWSLToWindowsPath } from '../../managers/PathManager'
 import { cleanseString, exec } from '../../managers/ShellManager'
 import { WindowsPrerequisites } from './Prerequisites'
 
@@ -49,7 +49,7 @@ class Utilities {
 
     if (os.type() === 'Windows_NT') {
       const homePath = await getHomePath()
-      defaultPath = getWSLToWindowsPath(homePath)
+      defaultPath = ensureWSLToWindowsPath(homePath)
     }
 
     const { filePaths } = await dialog.showOpenDialog({

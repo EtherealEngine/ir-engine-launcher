@@ -3,7 +3,7 @@ import path from 'path'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
-import { getEngineDefaultPath } from '../../managers/PathManager'
+import { getEngineDefaultPath, ensureWSLToWindowsPath } from '../../managers/PathManager'
 import { getValue } from '../../managers/StoreManager'
 import { findRequiredValues, getYamlDoc } from '../../managers/YamlManager'
 
@@ -72,7 +72,7 @@ export const processVariablesFile = async (
 ) => {
   const vars: Record<string, string> = {}
 
-  const enginePath = clusterConfigs[Storage.ENGINE_PATH]
+  const enginePath = ensureWSLToWindowsPath(clusterConfigs[Storage.ENGINE_PATH])
   const templateFullPath = path.join(enginePath, templatePath)
   const yamlDoc = await getYamlDoc(templateFullPath, templateUrl)
 

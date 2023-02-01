@@ -1,5 +1,4 @@
 import { BrowserWindow } from 'electron'
-import os from 'os'
 import { CheckRepoActions, GitResponseError, simpleGit, SimpleGit } from 'simple-git'
 
 import { Channels } from '../../../constants/Channels'
@@ -7,15 +6,11 @@ import Storage from '../../../constants/Storage'
 import { ClusterModel } from '../../../models/Cluster'
 import { GitStatus } from '../../../models/GitStatus'
 import { LogModel } from '../../../models/Log'
-import { getWSLToWindowsPath } from '../../managers/PathManager'
+import { ensureWSLToWindowsPath } from '../../managers/PathManager'
 
 class Git {
   private static _getGit = (cluster: ClusterModel) => {
-    let enginePath = cluster.configs[Storage.ENGINE_PATH]
-
-    if (os.type() === 'Windows_NT') {
-      enginePath = getWSLToWindowsPath(enginePath)
-    }
+    let enginePath = ensureWSLToWindowsPath(cluster.configs[Storage.ENGINE_PATH])
 
     const git: SimpleGit = simpleGit(enginePath)
     return git

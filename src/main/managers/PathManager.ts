@@ -8,6 +8,8 @@ import path from 'path'
 import Endpoints from '../../constants/Endpoints'
 import { exec } from './ShellManager'
 
+const type = os.type()
+
 export const getEngineDefaultPath = async () => {
   let homePath = await getHomePath()
 
@@ -18,7 +20,7 @@ export const getEngineDefaultPath = async () => {
 export const getHomePath = async () => {
   let homePath = app.getPath('home')
 
-  if (os.type() === 'Windows_NT') {
+  if (type === 'Windows_NT') {
     const wslHomePathResponse = await exec(`wsl eval echo ~$USER`, false)
 
     if (wslHomePathResponse.error || wslHomePathResponse.stderr) {
@@ -48,24 +50,33 @@ export const filesPath = () => {
   return path.join(assetsPath(), 'files')
 }
 
-export const getWSLToWindowsPath = (filePath: string) => {
-  return `${Endpoints.Paths.WSL_PREFIX}${filePath.replaceAll('/', '\\')}`
-}
-
-export const getWindowsToWSLPath = async (filePath: string) => {
-  filePath = filePath.replaceAll('\\', '\\\\')
-  const wslPathResponse = await exec(`wsl wslpath ${filePath}`, false)
-
-  if (wslPathResponse.error || wslPathResponse.stderr) {
-    log.error(`Error while executing wslpath ${filePath}.`, wslPathResponse.error, wslPathResponse.stderr)
-    throw 'Unable to convert path to wsl path'
+export const ensureWSLToWindowsPath = (filePath: string) => {
+  if (type === 'Windows_NT') {
+    return `${Endpoints.Paths.WSL_PREFIX}${filePath.replaceAll('/', '\\')}`
   }
 
-  return wslPathResponse.stdout!.toString().trim()
+  return filePath
+}
+
+export const ensureWindowsToWSLPath = async (filePath: string) => {
+  if (type === 'Windows_NT') {
+    filePath = filePath.replaceAll('\\', '\\\\')
+    const wslPathResponse = await exec(`wsl wslpath ${filePath}`, false)
+  
+    if (wslPathResponse.error || wslPathResponse.stderr) {
+      log.error(`Error while executing wslpath ${filePath}.`, wslPathResponse.error, wslPathResponse.stderr)
+      throw 'Unable to convert path to wsl path'
+    }
+  
+    return wslPathResponse.stdout!.toString().trim()
+  }
+
+  return filePath
 }
 
 export const getEnvFile = async (enginePath: string) => {
   let envContent = ''
+  enginePath = ensureWSLToWindowsPath(enginePath)
 
   // First look into .env.local
   const envPath = path.join(enginePath, Endpoints.Paths.ENGINE_ENV)
