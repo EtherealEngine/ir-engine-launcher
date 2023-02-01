@@ -90,16 +90,16 @@ const _ensureRippleConfigs = async (cluster: ClusterModel) => {
 
 const _ensureRippledConfigs = async (cluster: ClusterModel) => {
   const enginePath = cluster.configs[Storage.ENGINE_PATH]
-  const rippledCfgPath = path.join(enginePath, Endpoints.Paths.RIPPLED_FILE_PATH)
+  const rippledCfgPath = path.join(enginePath, Endpoints.Paths.RIPPLED_FILE)
   const rippledCfgExists = await fileExists(rippledCfgPath)
   if (rippledCfgExists === false) {
-    await fs.copyFile(path.join(enginePath, Endpoints.Paths.RIPPLED_TEMPLATE_PATH), rippledCfgPath)
+    await fs.copyFile(path.join(enginePath, Endpoints.Paths.RIPPLED_TEMPLATE), rippledCfgPath)
   }
 
-  const validatorCfgPath = path.join(enginePath, Endpoints.Paths.VALIDATOR_FILE_PATH)
+  const validatorCfgPath = path.join(enginePath, Endpoints.Paths.VALIDATOR_FILE)
   const validatorCfgExists = await fileExists(validatorCfgPath)
   if (validatorCfgExists === false) {
-    await fs.copyFile(path.join(enginePath, Endpoints.Paths.VALIDATOR_TEMPLATE_PATH), validatorCfgPath)
+    await fs.copyFile(path.join(enginePath, Endpoints.Paths.VALIDATOR_TEMPLATE), validatorCfgPath)
   }
 }
 
