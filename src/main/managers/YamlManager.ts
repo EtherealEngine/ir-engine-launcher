@@ -6,7 +6,7 @@ import path from 'path'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { ClusterModel } from '../../models/Cluster'
-import { appConfigsPath, fileExists, ensureWSLToWindowsPath } from './PathManager'
+import { appConfigsPath, ensureWSLToWindowsPath, fileExists } from './PathManager'
 
 export const getYamlDoc = async (templatePath: string, templateUrl: string) => {
   let yamlContent = ''

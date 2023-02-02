@@ -62,12 +62,12 @@ export const ensureWindowsToWSLPath = async (filePath: string) => {
   if (type === 'Windows_NT') {
     filePath = filePath.replaceAll('\\', '\\\\')
     const wslPathResponse = await exec(`wsl wslpath ${filePath}`, false)
-  
+
     if (wslPathResponse.error || wslPathResponse.stderr) {
       log.error(`Error while executing wslpath ${filePath}.`, wslPathResponse.error, wslPathResponse.stderr)
       throw 'Unable to convert path to wsl path'
     }
-  
+
     return wslPathResponse.stdout!.toString().trim()
   }
 

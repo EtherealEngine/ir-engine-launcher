@@ -3,7 +3,7 @@ import path from 'path'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
-import { getEngineDefaultPath, ensureWSLToWindowsPath } from '../../managers/PathManager'
+import { ensureWSLToWindowsPath, getEngineDefaultPath } from '../../managers/PathManager'
 import { getValue } from '../../managers/StoreManager'
 import { findRequiredValues, getYamlDoc } from '../../managers/YamlManager'
 

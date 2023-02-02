@@ -8,7 +8,7 @@ import { Channels } from '../../../constants/Channels'
 import { AppModel, AppStatus } from '../../../models/AppStatus'
 import { AppSysInfo, OSType } from '../../../models/AppSysInfo'
 import { LogModel } from '../../../models/Log'
-import { getHomePath, ensureWSLToWindowsPath } from '../../managers/PathManager'
+import { ensureWSLToWindowsPath, getHomePath } from '../../managers/PathManager'
 import { cleanseString, exec } from '../../managers/ShellManager'
 import { WindowsPrerequisites } from './Prerequisites'
 
