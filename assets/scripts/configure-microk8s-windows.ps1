@@ -1,4 +1,27 @@
 
+#==========
+# Functions
+#==========
+
+function checkExitCode() { 
+    if ($LastExitCode -ne 0) {
+        exit $LastExitCode;
+    }
+}
+function cleanseString($inputSt) { 
+    $finalString = ''
+    $inputString = $inputSt -join "`n" | Out-String
+    
+    for ($index = 0; $index -lt $inputString.Length; $index++) {
+        $codePoints = [int][char]$inputString[$index]
+        if ($codePoints -ne 0) {
+            $finalString += $inputString[$index]
+        }
+    }
+
+    return $finalString
+}
+
 #===========
 # Parameters
 #===========
@@ -7,6 +30,7 @@
 for ( $i = 0; $i -lt $args.count; $i += 2 ) {
     if ($args[$i] -eq "-a") {
         $ASSETS_FOLDER = $args[$i + 1]
+        $SCRIPTS_FOLDER = "$ASSETS_FOLDER/scripts"
     }
     elseif ($args[$i] -eq "-c") {
         $CONFIGS_FOLDER = $args[$i + 1]
@@ -43,6 +67,37 @@ if ([string]::IsNullOrEmpty($ASSETS_FOLDER) -or
     exit 1
 }
 
+#==============
+# Prerequisites
+#==============
+
+$wslStatus = cleanseString(wsl --status);
+Write-Host "WSL Status: `n$wslStatus";
+
+if ([string]::IsNullOrEmpty($wslStatus) -or $wslStatus -notlike '*Default Distribution: Ubuntu*') {
+    throw "Make sure WSL is installed and Ubuntu is selected as default distribution.`nhttps://xrfoundation.github.io/ethereal-engine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl";
+    exit 1;
+}
+
+$dockerVersion = cleanseString(docker version);
+Write-Host "Docker Version: `n$dockerVersion";
+$wslDockerVersion = cleanseString(wsl docker version);
+Write-Host "WSL Docker version: `n$wslDockerVersion";
+
+if ($dockerVersion -notlike '*Server: Docker Desktop*' -or $wslDockerVersion -notlike '*Server: Docker Desktop*') {
+    throw "Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.`nhttps://xrfoundation.github.io/ethereal-engine-docs/docs/devops_deployment/microk8s_windows/#install-docker-desktop";
+    exit 1;
+}
+
+#==========
+# WSL Login
+#==========
+
+wsl bash "$SCRIPTS_FOLDER/check-login.sh" "$PASSWORD"
+
+checkExitCode;
+
+
 # Reference: https://stackoverflow.com/a/52628883/2077741
 # $processes = Get-Process "*Docker Desktop*"
 # if ($processes.Count -gt 0)
@@ -66,3 +121,4 @@ if ([string]::IsNullOrEmpty($ASSETS_FOLDER) -or
 # wsl bash -c "echo '111Hanzla' | sudo -S /snap/bin/microk8s status"
 
 # wsl bash -c "echo '111Hanzla' | sudo -S /snap/bin/microk8s start"
+
