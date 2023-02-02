@@ -14,7 +14,7 @@ while getopts a:c:d:f:i:p:r: flag; do
     p) PASSWORD=${OPTARG} ;;
     r) ENABLE_RIPPLE_STACK=${OPTARG} ;;
     *)
-        echo "Invalid arguments passed" >&2
+        echo "Invalid argument passed" >&2
         exit 1
         ;;
     esac
