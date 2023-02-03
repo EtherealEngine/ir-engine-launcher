@@ -1,5 +1,12 @@
 
 #==========
+# Variables
+#==========
+
+$wslRestart = $false;
+$dockerRestart = $false;
+
+#==========
 # Functions
 #==========
 
@@ -89,6 +96,17 @@ if ($dockerVersion -notlike '*Server: Docker Desktop*' -or $wslDockerVersion -no
     exit 1;
 }
 
+# Reference: If you have WSL from the Windows Store then WslService service should be there. 
+# Else it would be LxssManager. https://github.com/microsoft/WSL/issues/8644#issuecomment-1194772945
+$wslWindowsService = Get-Service WslService
+if ($wslWindowsService) {
+    Write-Host "You have WSL from the Windows Store.";
+}
+else {
+    throw "You do not have WSL from the Windows Store.";
+    exit 1;
+}
+
 #==========
 # WSL Login
 #==========
@@ -97,16 +115,77 @@ wsl bash "$SCRIPTS_FOLDER/check-login.sh" "$PASSWORD"
 
 checkExitCode;
 
+#======================
+# Enable systemd in WSL
+#======================
 
-# Reference: https://stackoverflow.com/a/52628883/2077741
-# $processes = Get-Process "*Docker Desktop*"
-# if ($processes.Count -gt 0)
-# {
-#     $processes[0].Kill()
-#     $processes[0].WaitForExit()
-# }
-# Start-Process "C:\Program Files\Docker\Docker\Docker Desktop.exe"
+wsl bash "$SCRIPTS_FOLDER/check-wsl-systemd.sh" "$PASSWORD"
 
+if ($LastExitCode -eq 1) {
+    $wslRestart = $true;
+}
+
+#==================================
+# Enable localhostForwarding in WSL
+#==================================
+
+& "$PSScriptRoot\check-wsl-localhostForwarding.ps1"
+
+if ($LastExitCode -eq 1) {
+    $wslRestart = $true;
+}
+
+#================================
+# Docker MicroK8s Registry access
+#================================
+
+& "$PSScriptRoot\check-microk8s-docker-daemon.ps1"
+
+if ($LastExitCode -eq 1) {
+    $dockerRestart = $true;
+}
+
+#=====================
+# WSL & Docker Restart
+#=====================
+
+if ($wslRestart) {
+    Write-Host "Restarting WSL";
+
+    wsl -t Ubuntu
+    wsl -d Ubuntu echo "Starting WSL"
+}
+
+if ($wslRestart -or $dockerRestart) {
+    Write-Host "Restarting Docker Desktop";
+
+    # Reference: https://stackoverflow.com/a/52628883/2077741
+    # $processes = Get-Process "*Docker Desktop*"
+
+    # if ($processes.Count -gt 0) {
+    #     $processes[0].Kill()
+    #     $processes[0].WaitForExit()
+    # }
+
+    #Reference: https://forums.docker.com/t/shutting-down-docker-desktop-on-windows-10-programmatically/107395
+    TASKKILL.exe /f /IM "Docker Desktop.exe" /T
+
+    Start-Sleep -Seconds 10;
+    
+    Start-Process "$env:PROGRAMFILES\Docker\Docker\Docker Desktop.exe"
+
+    Start-Sleep -Seconds 10;
+
+    # Ensure docker is up and running again
+    do {
+        Start-Sleep -Seconds 5;
+
+        $wslDockerVersion = cleanseString(wsl docker version);
+        Write-Host "Checking WSL Docker Status";
+    } while ($wslDockerVersion -notlike '*Server: Docker Desktop*')
+}
+
+Write-Host "All Done";
 
 # $status = wsl bash -c "echo '111Hanzla' | sudo -S /snap/bin/microk8s status"
 

@@ -69,7 +69,7 @@ export const MicroK8sAppsStatus: AppModel[] = [
     'Hostfile',
     type === 'Windows_NT'
       ? `
-      $content = Get-Content "$env:SystemRoot\\System32\\drivers\\etc\\hosts"
+      $content = Get-Content "$env:SystemRoot\\System32\\drivers\\etc\\hosts" -Raw
       $wslIps = wsl hostname -I
 
       if ($wslIps -like "* *") {
