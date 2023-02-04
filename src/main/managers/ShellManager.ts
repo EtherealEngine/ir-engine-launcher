@@ -7,6 +7,8 @@ import { ensureWindowsToWSLPath } from './PathManager'
 export const execScriptFile = async (scriptFile: string, args: string[]) => {
   const type = os.type()
 
+  args = args.map((item) => (item.startsWith('-') ? item : `"${item}"`))
+  
   scriptFile = await ensureWindowsToWSLPath(scriptFile)
 
   let command = ''
