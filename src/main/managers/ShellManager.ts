@@ -2,6 +2,7 @@ import childProcess, { ExecException } from 'child_process'
 import { lookup, Program } from 'ps-node'
 
 export const execScriptFile = async (scriptFile: string, args: string[]) => {
+  args = args.map((item) => (item.startsWith('-') ? item : `"${item}"`))
   return await exec(`bash "${scriptFile}" ${args.join(' ')}`)
 }
 
