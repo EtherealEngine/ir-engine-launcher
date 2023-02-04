@@ -181,7 +181,7 @@ if ($wslRestart -or $dockerRestart) {
         Start-Sleep -Seconds 5;
 
         $wslDockerVersion = cleanseString(wsl docker version);
-        Write-Host "Checking WSL Docker Status";
+        Write-Host "Checking Docker Restart Status";
     } while ($wslDockerVersion -notlike '*Server: Docker Desktop*')
 }
 
