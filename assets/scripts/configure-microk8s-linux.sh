@@ -250,13 +250,13 @@ fi
 # Verify agones & redis
 #======================
 
-./check-agones-redis.sh
+./check-agones-redis.sh "$ENGINE_FOLDER"
 
 #====================
 # Verify ripple stack
 #====================
 
-./check-ripple.sh "$ENABLE_RIPPLE_STACK"
+./check-ripple.sh "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER"
 
 #=======================
 # Verify Ethereal Engine

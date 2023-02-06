@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#===========
+# Parameters
+#===========
+
+ENGINE_FOLDER=$1
+
 #======================
 # Verify agones & redis
 #======================
@@ -9,7 +15,7 @@ if helm status agones >/dev/null; then
 else
     echo "agones is not deployed"
 
-    helm install -f packages/ops/configs/agones-default-values.yaml agones agones/agones
+    helm install -f "$ENGINE_FOLDER/packages/ops/configs/agones-default-values.yaml" agones agones/agones
     sleep 20
 fi
 

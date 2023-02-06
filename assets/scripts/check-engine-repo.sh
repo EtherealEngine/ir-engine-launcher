@@ -17,7 +17,7 @@ else
     git clone https://github.com/XRFoundation/XREngine "$ENGINE_FOLDER"
 fi
 
-cd "$ENGINE_FOLDER"
+cd "$ENGINE_FOLDER" || exit
 
 if [[ -f ".env.local" ]]; then
     echo "env file exists at $ENGINE_FOLDER/.env.local"

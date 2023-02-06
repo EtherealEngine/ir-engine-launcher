@@ -30,6 +30,8 @@ echo "Ethereal Engine docker images build starting"
 export DOCKER_BUILDKIT=0
 export COMPOSE_DOCKER_CLI_BUILD=0
 
+cd "$ENGINE_FOLDER" || exit
+
 if [[ $CLUSTER_TYPE == 'microk8s' ]]; then
     ./scripts/build_microk8s.sh
 elif [[ $CLUSTER_TYPE == 'minikube' ]]; then

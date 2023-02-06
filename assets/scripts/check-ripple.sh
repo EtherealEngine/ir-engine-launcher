@@ -5,6 +5,7 @@
 #===========
 
 ENABLE_RIPPLE_STACK=$1
+ENGINE_FOLDER=$2
 
 #====================
 # Verify ripple stack
@@ -18,7 +19,7 @@ if [[ $ENABLE_RIPPLE_STACK == 'true' ]]; then
     else
         echo "rippled is not deployed"
 
-        helm install local-rippled ./packages/ops/rippled/
+        helm install local-rippled "$ENGINE_FOLDER/packages/ops/rippled/"
         sleep 20
     fi
 
@@ -30,7 +31,7 @@ if [[ $ENABLE_RIPPLE_STACK == 'true' ]]; then
     else
         echo "ipfs is not deployed"
 
-        helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-ipfs.values.yaml" local-ipfs ./packages/ops/ipfs/
+        helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-ipfs.values.yaml" local-ipfs "$ENGINE_FOLDER/packages/ops/ipfs/"
         sleep 20
     fi
 
