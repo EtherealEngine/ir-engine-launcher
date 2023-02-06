@@ -64,119 +64,43 @@ checkExitCode
 # Verify Python 3
 #================
 
-if pip3 --version >/dev/null; then
-    echo "python is installed"
-else
-    echo "python is not installed"
-
-    echo "$PASSWORD" | sudo -S apt-get update -y
-    echo "$PASSWORD" | sudo -S apt-get install -y python3-pip
-fi
-
-PYTHON_VERSION=$(python3 --version)
-echo "python version is $PYTHON_VERSION"
+./check-python.sh "$PASSWORD"
 
 #=============
 # Verify Make
 #=============
 
-if make --version >/dev/null; then
-    echo "make is installed"
-else
-    echo "make is not installed"
-
-    echo "$PASSWORD" | sudo -S apt-get update -y
-    echo "$PASSWORD" | sudo -S apt-get install -y build-essential
-fi
-
-MAKE_VERSION=$(make --version)
-echo "make version is $MAKE_VERSION"
+./check-make.sh "$PASSWORD"
 
 #=============
 # Verify Git
 #=============
 
-if git --version >/dev/null; then
-    echo "git is installed"
-else
-    echo "git is not installed"
-
-    echo "$PASSWORD" | sudo -S apt-get update -y
-    echo "$PASSWORD" | sudo -S apt-get install -y git
-fi
-
-GIT_VERSION=$(git --version)
-echo "git version is $GIT_VERSION"
+./check-git.sh "$PASSWORD"
 
 #=============
 # Get Engine
 #=============
 
-if [[ -d $ENGINE_FOLDER ]] && [[ -f "$ENGINE_FOLDER/package.json" ]]; then
-    echo "ethereal engine repo exists at $ENGINE_FOLDER"
-else
-    echo "cloning ethereal engine in $ENGINE_FOLDER"
-    git clone https://github.com/XRFoundation/XREngine "$ENGINE_FOLDER"
-fi
-
-cd "$ENGINE_FOLDER"
-
-if [[ -f ".env.local" ]]; then
-    echo "env file exists at $ENGINE_FOLDER/.env.local"
-else
-    cp ".env.local.default" ".env.local"
-    echo "env file created at $ENGINE_FOLDER/.env.local"
-fi
-
-echo "running npm install"
-npm install
-echo "completed npm install"
+./check-engine-repo.sh "$ENGINE_FOLDER"
 
 #==============
 # Verify Docker
 #==============
 
-if docker --version >/dev/null; then
-    echo "docker is installed"
-else
-    echo "docker is not installed"
-
-    curl -fsSL https://get.docker.com -o get-docker.sh
-    echo "$PASSWORD" | sudo -S sh get-docker.sh
-    rm ./get-docker.sh -f
-fi
-
-DOCKER_VERSION=$(docker --version)
-echo "docker version is $DOCKER_VERSION"
+./check-docker.sh "$PASSWORD"
 
 #======================
 # Verify Docker Compose
 #======================
 
-if docker-compose --version >/dev/null; then
-    echo "docker-compose is installed"
-else
-    echo "docker-compose is not installed"
-
-    echo "$PASSWORD" | sudo -S curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    echo "$PASSWORD" | sudo -S chmod +x /usr/local/bin/docker-compose
-fi
-
-DOCKER_COMPOSE_VERSION=$(docker-compose --version)
-echo "docker-compose version is $DOCKER_COMPOSE_VERSION"
+./check-docker-compose.sh "$PASSWORD"
 
 #============================
 # Ensure DB and Redis Running
 #============================
 
-if docker top xrengine_minikube_db; then
-    echo "mysql is running"
-else
-    echo "mysql is not running"
-
-    echo "$PASSWORD" | sudo -S chmod 666 /var/run/docker.sock
-    npm run dev-docker
-fi
+./check-mysql.sh "$PASSWORD"
 
 #==================
 # Verify VirtualBox
@@ -198,40 +122,13 @@ echo "vboxmanage version is $VIRTUALBOX_VERSION"
 # Verify Kubectl
 #===============
 
-if kubectl version --client >/dev/null; then
-    echo "kubectl is installed"
-else
-    echo "kubectl is not installed"
-
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    echo "$PASSWORD" | sudo -S install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-    rm kubectl -f
-
-    if [[ ! -d ~/.kube ]]; then
-        mkdir ~/.kube
-    fi
-fi
-
-KUBECTL_VERSION=$(kubectl version --client)
-echo "kubectl version is $KUBECTL_VERSION"
+./check-kubectl.sh "$PASSWORD"
 
 #============
 # Verify Helm
 #============
 
-if helm version >/dev/null; then
-    echo "helm is installed"
-else
-    echo "helm is not installed"
-
-    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-    echo "$PASSWORD" | sudo -S chmod 700 get_helm.sh
-    echo "$PASSWORD" | sudo -S bash get_helm.sh
-    rm get_helm.sh -f
-fi
-
-HELM_VERSION=$(helm version)
-echo "helm version is $HELM_VERSION"
+./check-helm.sh "$PASSWORD"
 
 #================
 # Verify Minikube
@@ -261,6 +158,8 @@ fi
 
 MINIKUBE_STATUS=$(minikube status)
 echo "minikube status is $MINIKUBE_STATUS"
+
+kubectl config use-context minikube
 
 #================
 # Verify hostfile
@@ -300,148 +199,24 @@ fi
 # Verify Helm Repos
 #==================
 
-helm repo add agones https://agones.dev/chart/stable
-helm repo add redis https://charts.bitnami.com/bitnami
-helm repo add xrengine https://helm.xrengine.io
-
-helm repo update
-echo "helm repos added and updated"
+./check-helm-repos.sh
 
 #======================
 # Verify agones & redis
 #======================
 
-kubectl config use-context minikube
-
-if helm status agones >/dev/null; then
-    echo "agones is already deployed"
-else
-    echo "agones is not deployed"
-
-    helm install -f packages/ops/configs/agones-default-values.yaml agones agones/agones
-    sleep 20
-fi
-
-AGONES_STATUS=$(helm status agones)
-echo "agones status is $AGONES_STATUS"
-
-if helm status local-redis >/dev/null; then
-    echo "redis is already deployed"
-else
-    echo "redis is not deployed"
-
-    helm install local-redis redis/redis
-    sleep 20
-fi
-
-REDIS_STATUS=$(helm status local-redis)
-echo "redis status is $REDIS_STATUS"
+./check-agones-redis.sh
 
 #====================
 # Verify ripple stack
 #====================
 
-echo "Enable ripple stack is $ENABLE_RIPPLE_STACK"
-
-if [[ $ENABLE_RIPPLE_STACK == 'true' ]]; then
-    if helm status local-rippled >/dev/null; then
-        echo "rippled is already deployed"
-    else
-        echo "rippled is not deployed"
-
-        helm install local-rippled ./packages/ops/rippled/
-        sleep 20
-    fi
-
-    RIPPLED_STATUS=$(helm status local-rippled)
-    echo "rippled status is $RIPPLED_STATUS"
-
-
-    if helm status local-ipfs >/dev/null; then
-        echo "ipfs is already deployed"
-    else
-        echo "ipfs is not deployed"
-
-        helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-ipfs.values.yaml" local-ipfs ./packages/ops/ipfs/
-        sleep 20
-    fi
-
-    IPFS_STATUS=$(helm status local-ipfs)
-    echo "ipfs status is $IPFS_STATUS"
-
-else
-    if helm status local-rippled >/dev/null; then
-        helm uninstall local-rippled
-        echo "rippled deployment removed"
-    fi
-
-    if helm status local-ipfs >/dev/null; then
-        helm uninstall local-ipfs
-        echo "ipfs deployment removed"
-    fi
-fi
-
+./check-ripple.sh "$ENABLE_RIPPLE_STACK"
 
 #=======================
 # Verify Ethereal Engine
 #=======================
 
-PROJECTS_PATH="$ENGINE_FOLDER/packages/projects/projects/"
-
-if [[ -d $PROJECTS_PATH ]]; then
-    echo "ethereal engine projects exists at $PROJECTS_PATH"
-else
-    echo "ethereal engine projects does not exists at $PROJECTS_PATH"
-    
-    export MYSQL_HOST=localhost
-    npm run dev-docker
-    npm run install-projects
-fi
-
-echo "Ethereal Engine docker images build starting"
-export DOCKER_BUILDKIT=0
-export COMPOSE_DOCKER_CLI_BUILD=0
-./scripts/build_minikube.sh
-
-ENGINE_INSTALLED=false
-if helm status local >/dev/null; then
-    ENGINE_INSTALLED=true
-    echo "Ethereal Engine is installed"
-else
-    echo "Ethereal Engine is not installed"
-fi
-
-export MYSQL_PORT=3304
-DB_STATUS=$(npm run check-db-exists-only)
-DB_EXISTS=false
-if [[ $DB_STATUS == *"database found"* ]]; then
-    DB_EXISTS=true
-    echo "Existing database populated"
-elif [[ $DB_STATUS == *"database not found"* ]]; then
-    echo "Existing database not populated"
-fi
-
-echo "Force DB refresh is $FORCE_DB_REFRESH"
-
-if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
-    echo "Updating Ethereal Engine deployment to configure database"
-    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-true.values.yaml" local xrengine/xrengine
-    sleep 35
-    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-false.values.yaml" local xrengine/xrengine
-elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
-    echo "Installing Ethereal Engine deployment with populating database"
-    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "./packages/ops/configs/db-refresh-true.values.yaml" local xrengine/xrengine
-    sleep 35
-    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-false.values.yaml" local xrengine/xrengine
-elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
-    echo "Installing Ethereal Engine deployment without populating database"
-    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" local xrengine/xrengine
-fi
-
-export RELEASE_NAME=local
-./scripts/check-engine.sh
-
-ENGINE_STATUS=$(helm status local)
-echo "Ethereal Engine status is $ENGINE_STATUS"
+./check-engine-deployment.sh "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "minikube"
 
 exit 0
