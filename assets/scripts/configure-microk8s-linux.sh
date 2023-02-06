@@ -40,7 +40,7 @@ fi
 # Login
 #======
 
-./check-login.sh "$PASSWORD"
+bash ./check-login.sh "$PASSWORD"
 
 checkExitCode
 
@@ -50,13 +50,13 @@ set -e
 # Verify Node
 #=============
 
-./check-node.sh "$PASSWORD"
+bash ./check-node.sh "$PASSWORD"
 
 #=============
 # Verify Npm
 #=============
 
-./check-npm.sh
+bash ./check-npm.sh
 
 checkExitCode
 
@@ -64,55 +64,55 @@ checkExitCode
 # Verify Python 3
 #================
 
-./check-python.sh "$PASSWORD"
+bash ./check-python.sh "$PASSWORD"
 
 #=============
 # Verify Make
 #=============
 
-./check-make.sh "$PASSWORD"
+bash ./check-make.sh "$PASSWORD"
 
 #=============
 # Verify Git
 #=============
 
-./check-git.sh "$PASSWORD"
+bash ./check-git.sh "$PASSWORD"
 
 #=============
 # Get Engine
 #=============
 
-./check-engine-repo.sh "$ENGINE_FOLDER"
+bash ./check-engine-repo.sh "$ENGINE_FOLDER"
 
 #==============
 # Verify Docker
 #==============
 
-./check-docker.sh "$PASSWORD"
+bash ./check-docker.sh "$PASSWORD"
 
 #======================
 # Verify Docker Compose
 #======================
 
-./check-docker-compose.sh "$PASSWORD"
+bash ./check-docker-compose.sh "$PASSWORD"
 
 #============================
 # Ensure DB and Redis Running
 #============================
 
-./check-mysql.sh "$PASSWORD"
+bash ./check-mysql.sh "$PASSWORD"
 
 #===============
 # Verify Kubectl
 #===============
 
-./check-kubectl.sh "$PASSWORD"
+bash ./check-kubectl.sh "$PASSWORD"
 
 #============
 # Verify Helm
 #============
 
-./check-helm.sh "$PASSWORD"
+bash ./check-helm.sh "$PASSWORD"
 
 #================
 # Verify MicroK8s
@@ -211,7 +211,7 @@ else
     if [[ ! -d "/etc/docker" ]]; then
         mkdir "/etc/docker"
     fi
-    
+
     echo "$PASSWORD" | sudo -S -- sh -c "echo '{\"insecure-registries\" : [\"localhost:32000\"]}' >>/etc/docker/daemon.json"
     echo "daemon.json file created at /etc/docker/daemon.json"
 
@@ -248,24 +248,24 @@ fi
 # Verify Helm Repos
 #==================
 
-./check-helm-repos.sh
+bash ./check-helm-repos.sh
 
 #======================
 # Verify agones & redis
 #======================
 
-./check-agones-redis.sh "$ENGINE_FOLDER"
+bash ./check-agones-redis.sh "$ENGINE_FOLDER"
 
 #====================
 # Verify ripple stack
 #====================
 
-./check-ripple.sh "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER"
+bash ./check-ripple.sh "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER"
 
 #=======================
 # Verify Ethereal Engine
 #=======================
 
-./check-engine-deployment.sh "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8s"
+bash ./check-engine-deployment.sh "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8s"
 
 exit 0
