@@ -37,6 +37,11 @@ if $INSTALL_NODE; then
         echo "$PASSWORD" | sudo -S apt update -y
         echo "$PASSWORD" | sudo -S apt install curl -y
         curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+        source ~/.profile
+
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
     fi
 
     NVM_VERSION=$(nvm --version)
