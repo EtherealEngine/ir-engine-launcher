@@ -142,7 +142,7 @@ bash ./check-docker-compose.sh "$PASSWORD"
 # Ensure DB and Redis Running
 #============================
 
-bash ./check-mysql.sh "$PASSWORD"
+bash ./check-mysql.sh "$PASSWORD" "$ENGINE_FOLDER"
 
 #===============
 # Verify Kubectl
