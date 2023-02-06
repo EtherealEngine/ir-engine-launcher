@@ -208,6 +208,10 @@ fi
 if [[ -f "/etc/docker/daemon.json" ]]; then
     echo "daemon.json file exists at /etc/docker/daemon.json"
 else
+    if [[ ! -d "/etc/docker" ]]; then
+        mkdir "/etc/docker"
+    fi
+    
     echo "$PASSWORD" | sudo -S -- sh -c "echo '{\"insecure-registries\" : [\"localhost:32000\"]}' >>/etc/docker/daemon.json"
     echo "daemon.json file created at /etc/docker/daemon.json"
 
