@@ -261,4 +261,6 @@ bash ./check-ripple.sh "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER"
 
 bash ./check-engine-deployment.sh "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "minikube"
 
+echo "All Done"
+
 exit 0

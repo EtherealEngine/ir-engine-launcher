@@ -111,7 +111,7 @@ else {
 # WSL Login
 #==========
 
-wsl bash "$SCRIPTS_FOLDER/check-login.sh" "$PASSWORD"
+wsl bash "$SCRIPTS_FOLDER/check-login.sh" "$PASSWORD";
 
 checkExitCode;
 
@@ -119,7 +119,7 @@ checkExitCode;
 # Enable systemd in WSL
 #======================
 
-wsl bash "$SCRIPTS_FOLDER/check-wsl-systemd.sh" "$PASSWORD"
+wsl bash "$SCRIPTS_FOLDER/check-wsl-systemd.sh" "$PASSWORD";
 
 if ($LastExitCode -eq 1) {
     $wslRestart = $true;
@@ -129,7 +129,7 @@ if ($LastExitCode -eq 1) {
 # Enable localhostForwarding in WSL
 #==================================
 
-& "$PSScriptRoot\check-wsl-localhostForwarding.ps1"
+& "$PSScriptRoot\check-wsl-localhostForwarding.ps1";
 
 if ($LastExitCode -eq 1) {
     $wslRestart = $true;
@@ -152,8 +152,8 @@ if ($LastExitCode -eq 1) {
 if ($wslRestart) {
     Write-Host "Restarting WSL";
 
-    wsl -t Ubuntu
-    wsl -d Ubuntu echo "Starting WSL"
+    wsl -t Ubuntu;
+    wsl -d Ubuntu echo "Starting WSL";
 }
 
 if ($wslRestart -or $dockerRestart) {
@@ -185,19 +185,130 @@ if ($wslRestart -or $dockerRestart) {
     } while ($wslDockerVersion -notlike '*Server: Docker Desktop*')
 }
 
+#================
+# Verify hostfile
+#================
+
+& "$PSScriptRoot\check-hostfile.ps1" "readonly"
+
+if ($LastExitCode -eq 1) {
+    Start-Process powershell -verb runas -ArgumentList "-file $PSScriptRoot\check-hostfile.ps1"
+}
+
+#============
+# Verify Node
+#============
+
+wsl bash "$SCRIPTS_FOLDER/check-node.sh" "$PASSWORD";
+
+#=============
+# Verify Npm
+#=============
+
+wsl bash "$SCRIPTS_FOLDER/check-npm.sh";
+
+checkExitCode;
+
+#================
+# Verify Python 3
+#================
+
+wsl bash "$SCRIPTS_FOLDER/check-python.sh" "$PASSWORD";
+
+#=============
+# Verify Make
+#=============
+
+wsl bash "$SCRIPTS_FOLDER/check-make.sh" "$PASSWORD";
+
+#==============
+# Verify Docker
+#==============
+
+$dockerVersion = wsl bash -c "docker --version";
+
+if ($dockerVersion) {    
+    Write-Host "docker is installed";
+}
+else {
+    Write-Host "docker is not installed";
+    exit 1;
+}
+
+Write-Host "docker version is $dockerVersion";
+
+#======================
+# Verify Docker Compose
+#======================
+
+$dockerComposeVersion = wsl bash -c "docker-compose --version";
+
+if ($dockerComposeVersion) {    
+    Write-Host "docker-compose is installed";
+}
+else {
+    Write-Host "docker-compose is not installed";
+    exit 1;
+}
+
+Write-Host "docker-compose version is $dockerComposeVersion";
+
+#===============
+# Verify Kubectl
+#===============
+
+wsl bash "$SCRIPTS_FOLDER/check-kubectl.sh" "$PASSWORD";
+
+#============
+# Verify Helm
+#============
+
+wsl bash "$SCRIPTS_FOLDER/check-helm.sh" "$PASSWORD";
+
+#================
+# Verify MicroK8s
+#================
+
+wsl bash "$SCRIPTS_FOLDER/check-microk8s.sh" "$PASSWORD" "$ASSETS_FOLDER";
+
+checkExitCode;
+
+#=============
+# Get Engine
+#=============
+
+wsl bash "$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER";
+
+#============================
+# Ensure DB and Redis Running
+#============================
+
+wsl bash "$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER";
+
+#==================
+# Verify Helm Repos
+#==================
+
+wsl bash "$SCRIPTS_FOLDER/check-helm-repos.sh";
+
+#======================
+# Verify agones & redis
+#======================
+
+wsl bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$ENGINE_FOLDER";
+
+#====================
+# Verify ripple stack
+#====================
+
+wsl bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID"
+
+#=======================
+# Verify Ethereal Engine
+#=======================
+
+wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8s"
+
 Write-Host "All Done";
 
-# $status = wsl bash -c "echo '111Hanzla' | sudo -S /snap/bin/microk8s status"
-
-# Write-Host $status
-    
-# if ($status) {
-#     Write-Host "Installed"
-# } else {
-#     Write-Host "Not Installed"
-# }
-
-# wsl bash -c "echo '111Hanzla' | sudo -S /snap/bin/microk8s status"
-
-# wsl bash -c "echo '111Hanzla' | sudo -S /snap/bin/microk8s start"
-
+exit 0;

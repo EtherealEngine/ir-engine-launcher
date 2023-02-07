@@ -6,6 +6,8 @@
 
 ENABLE_RIPPLE_STACK=$1
 ENGINE_FOLDER=$2
+CONFIGS_FOLDER=$3
+CLUSTER_ID=$4
 
 #====================
 # Verify ripple stack

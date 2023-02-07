@@ -70,10 +70,10 @@ export const MicroK8sAppsStatus: AppModel[] = [
     type === 'Windows_NT'
       ? `
       $content = Get-Content "$env:SystemRoot\\System32\\drivers\\etc\\hosts" -Raw
-      $wslIps = wsl hostname -I
+      $wslIp = wsl hostname -I
 
-      if ($wslIps -like "* *") {
-      	$wslIp = $wslIps.split(" ")[0]
+      if ($wslIp -like "* *") {
+      	$wslIp = $wslIp.split(" ")[0]
 
         if ($content -like "*local.etherealengine.com*") {
           if ($content -like "*$wslIp*") {
