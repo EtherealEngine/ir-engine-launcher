@@ -10,23 +10,29 @@ import { scriptsPath } from './PathManager'
 import { execStreamScriptFile, getProcessList } from './ShellManager'
 
 export const startFileServer = async (window: BrowserWindow, cluster: ClusterModel) => {
-  // Below block of code is to ensure file server is stopped when app is closed.
   const existingServer = await getProcessList('http-server')
-  if (existingServer && existingServer.length === 0) {
-    app.on('before-quit', async (e) => {
-      try {
-        e.preventDefault()
-
-        const existingServers = await getProcessList('http-server')
-        existingServers.forEach((httpProcess) => {
-          kill(httpProcess.pid)
-        })
-      } catch {}
-
-      app.quit()
-      process.exit()
-    })
+  if (existingServer.length > 0) {
+    window.webContents.send(Channels.Utilities.Log, cluster.id, {
+      category: 'file server',
+      message: `File server already running. http-server count: ${existingServer.length}`
+    } as LogModel)
+    return
   }
+
+  // Below block of code is to ensure file server is stopped when app is closed.
+  app.on('before-quit', async (e) => {
+    try {
+      e.preventDefault()
+
+      const existingServers = await getProcessList('http-server')
+      existingServers.forEach((httpProcess) => {
+        kill(httpProcess.pid)
+      })
+    } catch {}
+
+    app.quit()
+    process.exit()
+  })
 
   const scriptsFolder = scriptsPath()
   const fileServerScript = path.join(scriptsFolder, 'configure-file-server.sh')

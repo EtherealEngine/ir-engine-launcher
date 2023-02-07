@@ -1,13 +1,14 @@
 import childProcess, { ExecException } from 'child_process'
 import os from 'os'
 import { lookup, Program } from 'ps-node'
+import TableParser from 'table-parser'
 
 import { ensureWindowsToWSLPath } from './PathManager'
 
-export const execScriptFile = async (scriptFile: string, args: string[]) => {
-  const type = os.type()
+const type = os.type()
 
-  args = args.map((item) => (item.startsWith('-') ? item : `"${item}"`))
+export const execScriptFile = async (scriptFile: string, args: string[]) => {
+  args = args.map((item) => (item.startsWith('-') ? item : `'${item}'`))
 
   scriptFile = await ensureWindowsToWSLPath(scriptFile)
 
@@ -26,8 +27,6 @@ export const execScriptFile = async (scriptFile: string, args: string[]) => {
 }
 
 export const exec = (command: string, isLinuxCommand: boolean = true): Promise<ShellResponse> => {
-  const type = os.type()
-
   let shell = '/bin/bash'
   if (type === 'Windows_NT') {
     shell = 'powershell.exe'
@@ -53,8 +52,6 @@ export const execStreamScriptFile = async (
   onStdout: (data: any) => void,
   onStderr: (data: any) => void
 ) => {
-  const type = os.type()
-
   let command = ''
   if (scriptFile.endsWith('.ps1')) {
     command = `. "${scriptFile}" ${args.join(' ')}`
@@ -94,21 +91,25 @@ export const execStream = (
   })
 }
 
-export const getProcessList = (command: string) => {
-  return new Promise<Program[]>((resolve, reject) => {
-    lookup(
-      {
-        command
-      },
-      (err, resultList) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(resultList)
+export const getProcessList = async (command: string) => {
+  if (type === 'Windows_NT') {
+    return await getWSLProcessList(command)
+  } else {
+    return new Promise<Program[]>((resolve, reject) => {
+      lookup(
+        {
+          command
+        },
+        (err, resultList) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(resultList)
+          }
         }
-      }
-    )
-  })
+      )
+    })
+  }
 }
 
 export const cleanseString = (inputString: string) => {
@@ -121,6 +122,66 @@ export const cleanseString = (inputString: string) => {
   }
 
   return finalString
+}
+
+const getWSLProcessList = async (command: string) => {
+  const programs: Program[] = []
+
+  const { stdout } = await exec('ps lx', true)
+  const processList = parseGrid(stdout)
+
+  for (const process of processList) {
+    if (process.command === command) {
+      programs.push(process)
+    }
+  }
+
+  return programs
+}
+
+/**
+ * Parse the stdout into readable object.
+ * @param {String} output
+ * Ref: https://github.com/neekey/ps/blob/master/lib/index.js
+ */
+
+function parseGrid(output: any) {
+  if (!output) {
+    return []
+  }
+  return formatOutput(TableParser.parse(output))
+}
+
+/**
+ * format the structure, extract pid, command, arguments, ppid
+ * @param data
+ * @return {Array}
+ * Ref: https://github.com/neekey/ps/blob/master/lib/index.js
+ */
+
+function formatOutput(data: any) {
+  var formattedData: Program[] = []
+  data.forEach(function (d: any) {
+    var pid = (d.PID && d.PID[0]) || (d.ProcessId && d.ProcessId[0]) || undefined
+    var cmd = d.CMD || d.CommandLine || d.COMMAND || undefined
+
+    if (pid && cmd) {
+      var command = cmd[0]
+      var args = ''
+
+      if (cmd.length > 1) {
+        args = cmd.slice(1)
+      }
+
+      formattedData.push({
+        pid: pid,
+        command: command,
+        arguments: [args]
+      })
+    }
+  })
+
+  return formattedData
 }
 
 type ShellResponse = {
