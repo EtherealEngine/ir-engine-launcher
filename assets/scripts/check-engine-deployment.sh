@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 #===========
 # Parameters
 #===========
@@ -13,6 +15,10 @@ CLUSTER_TYPE=$5
 #=======================
 # Verify Ethereal Engine
 #=======================
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
 
 cd "$ENGINE_FOLDER" || exit
 
@@ -33,9 +39,13 @@ export DOCKER_BUILDKIT=0
 export COMPOSE_DOCKER_CLI_BUILD=0
 
 if [[ $CLUSTER_TYPE == 'microk8s' ]]; then
-    ./scripts/build_microk8s.sh
+    bash ./scripts/build_microk8s.sh
+elif [[ $CLUSTER_TYPE == 'microk8sWindows' ]]; then
+    export REGISTRY_HOST=microk8s.registry;
+    export MYSQL_HOST=kubernetes.docker.internal;
+    bash ./scripts/build_minikube.sh
 elif [[ $CLUSTER_TYPE == 'minikube' ]]; then
-    ./scripts/build_minikube.sh
+    bash ./scripts/build_minikube.sh
 fi
 
 ENGINE_INSTALLED=false
@@ -74,7 +84,7 @@ elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
 fi
 
 export RELEASE_NAME=local
-./scripts/check-engine.sh
+bash ./scripts/check-engine.sh
 
 ENGINE_STATUS=$(helm status local)
 echo "Ethereal Engine status is $ENGINE_STATUS"
