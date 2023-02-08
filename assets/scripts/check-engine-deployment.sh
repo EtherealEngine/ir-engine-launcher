@@ -41,9 +41,28 @@ export COMPOSE_DOCKER_CLI_BUILD=0
 if [[ $CLUSTER_TYPE == 'microk8s' ]]; then
     bash ./scripts/build_microk8s.sh
 elif [[ $CLUSTER_TYPE == 'microk8sWindows' ]]; then
-    export REGISTRY_HOST=microk8s.registry;
-    export MYSQL_HOST=kubernetes.docker.internal;
-    bash ./scripts/build_minikube.sh
+    export REGISTRY_HOST=microk8s.registry
+    export MYSQL_HOST=kubernetes.docker.internal
+
+    set +e
+    retry=1
+    while [ "$retry" -le 6 ]; do
+        echo "Trying: $retry"
+
+        bash ./scripts/build_microk8s.sh
+
+        exit_status=$?
+        if [ $exit_status -eq 0 ]; then
+            break
+        fi
+
+        ((retry = retry + 1))
+    done
+    set -e
+
+    if [ "$exit_status" -ne 0 ]; then
+        exit "$exit_status"
+    fi
 elif [[ $CLUSTER_TYPE == 'minikube' ]]; then
     bash ./scripts/build_minikube.sh
 fi
