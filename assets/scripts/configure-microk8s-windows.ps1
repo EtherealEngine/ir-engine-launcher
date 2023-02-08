@@ -201,6 +201,8 @@ if ($LastExitCode -eq 1) {
 
 wsl bash "$SCRIPTS_FOLDER/check-node.sh" "$PASSWORD";
 
+checkExitCode;
+
 #=============
 # Verify Npm
 #=============
@@ -215,11 +217,15 @@ checkExitCode;
 
 wsl bash "$SCRIPTS_FOLDER/check-python.sh" "$PASSWORD";
 
+checkExitCode;
+
 #=============
 # Verify Make
 #=============
 
 wsl bash "$SCRIPTS_FOLDER/check-make.sh" "$PASSWORD";
+
+checkExitCode;
 
 #==============
 # Verify Docker
@@ -259,11 +265,15 @@ Write-Host "docker-compose version is $dockerComposeVersion";
 
 wsl bash "$SCRIPTS_FOLDER/check-kubectl.sh" "$PASSWORD";
 
+checkExitCode;
+
 #============
 # Verify Helm
 #============
 
 wsl bash "$SCRIPTS_FOLDER/check-helm.sh" "$PASSWORD";
+
+checkExitCode;
 
 #================
 # Verify MicroK8s
@@ -279,11 +289,15 @@ checkExitCode;
 
 wsl bash "$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER";
 
+checkExitCode;
+
 #============================
 # Ensure DB and Redis Running
 #============================
 
 wsl bash "$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER";
+
+checkExitCode;
 
 #==================
 # Verify Helm Repos
@@ -291,11 +305,15 @@ wsl bash "$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER";
 
 wsl bash "$SCRIPTS_FOLDER/check-helm-repos.sh";
 
+checkExitCode;
+
 #======================
 # Verify agones & redis
 #======================
 
 wsl bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$ENGINE_FOLDER";
+
+checkExitCode;
 
 #====================
 # Verify ripple stack
@@ -303,11 +321,15 @@ wsl bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$ENGINE_FOLDER";
 
 wsl bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID"
 
+checkExitCode;
+
 #=======================
 # Verify Ethereal Engine
 #=======================
 
 wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows"
+
+checkExitCode;
 
 Write-Host "All Done";
 
