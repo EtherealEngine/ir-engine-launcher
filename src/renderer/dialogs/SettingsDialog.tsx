@@ -21,10 +21,10 @@ import {
 } from '@mui/material'
 
 import logo from '../../../assets/icon.svg'
-import ConfigBackupView from './ConfigBackupView'
-import ConfigConfigsView from './ConfigConfigsView'
-import ConfigMinikubeView from './ConfigMinikubeView'
-import ConfigVarsView from './ConfigVarsView'
+import ConfigBackupView from '../components/ConfigBackupView'
+import ConfigConfigsView from '../components/ConfigConfigsView'
+import ConfigMinikubeView from '../components/ConfigMinikubeView'
+import ConfigVarsView from '../components/ConfigVarsView'
 
 interface Props {
   onClose: () => void

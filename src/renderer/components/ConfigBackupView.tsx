@@ -5,8 +5,8 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
 import { Box, Button, FormControlLabel, SxProps, Theme, Typography } from '@mui/material'
 
-import AlertDialog from '../common/AlertDialog'
 import InfoTooltip from '../common/InfoTooltip'
+import AlertDialog from '../dialogs/AlertDialog'
 
 interface Props {
   hasPendingChanges: boolean

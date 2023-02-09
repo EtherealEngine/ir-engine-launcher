@@ -25,8 +25,8 @@ import {
   Typography
 } from '@mui/material'
 
-import AlertDialog from '../common/AlertDialog'
 import InfoTooltip from '../common/InfoTooltip'
+import AlertDialog from '../dialogs/AlertDialog'
 
 interface Props {
   sx?: SxProps<Theme>
