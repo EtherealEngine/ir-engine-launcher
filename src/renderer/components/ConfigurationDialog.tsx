@@ -2,6 +2,7 @@ import { Channels } from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
+import { OSType } from 'models/AppSysInfo'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
@@ -60,7 +61,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
   const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
-  const { sudoPassword } = settingsState.value
+  const { appSysInfo, sudoPassword } = settingsState.value
 
   const configFileState = useConfigFileState()
   const { loading, selectedCluster } = configFileState.value
@@ -234,6 +235,17 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
       <DialogContentText sx={{ margin: 3, marginBottom: 0 }}>{steps[activeStep].title}</DialogContentText>
 
+      {steps[activeStep].label === 'Authenticate' && appSysInfo.osType === OSType.Windows && (
+        <Box ml={3} mr={3} mt={1}>
+          <Typography fontSize={14}>
+            Note:{' '}
+            <span style={{ fontSize: 14, opacity: 0.6 }}>
+              On Windows, this is the password of your WSL Ubuntu distribution
+            </span>
+          </Typography>
+        </Box>
+      )}
+
       {steps[activeStep].label === 'Summary' && (
         <Box ml={3} mr={3} mt={1}>
           <Typography fontSize={14}>
@@ -247,8 +259,10 @@ const ConfigurationDialog = ({ onClose }: Props) => {
               target="_blank"
               href={
                 selectedCluster?.type === ClusterType.Minikube
-                  ? Endpoints.MINIKUBE_LINUX_SCRIPT_URL
-                  : Endpoints.MICROK8S_LINUX_SCRIPT_URL
+                  ? Endpoints.Urls.MINIKUBE_LINUX_SCRIPT
+                  : appSysInfo.osType === OSType.Windows
+                  ? Endpoints.Urls.MICROK8S_WINDOWS_SCRIPT
+                  : Endpoints.Urls.MICROK8S_LINUX_SCRIPT
               }
             >
               here

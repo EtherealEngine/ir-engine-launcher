@@ -4,7 +4,7 @@ const minikubeDependantScript = (script: string) => {
   return `
   MINIKUBE_STATUS=$(minikube status --output json);
   if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"Nonexistent"* ]] || [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
-    echo "Minikube not configured" >&2;
+    echo 'Minikube not configured' >&2;
     exit 1;
   else
     ${script}
@@ -39,19 +39,58 @@ export const MinikubeAppsStatus: AppModel[] = [
     'Local File Server',
     `
   if lsof -Pi :8642 -sTCP:LISTEN -t >/dev/null ; then
-    echo "File server configured:"
+    echo 'File server configured:'
     lsof -Pi :8642 -sTCP:LISTEN
     exit 0;
   else
-    echo "File server not configured" >&2;
+    echo 'File server not configured' >&2;
     exit 1;
   fi
   `
+  ),
+  getAppModel(
+    'hostfile',
+    'Hostfile',
+    minikubeDependantScript(
+      `
+      MINIKUBE_IP=$(minikube ip)
+      if grep -q "local.etherealengine.com" /etc/hosts; then
+          if grep -q "$MINIKUBE_IP" /etc/hosts; then
+              echo "*.etherealengine.com entries exists";
+              exit 0;
+          else
+              echo "*.etherealengine.com entries outdated" >&2;
+              exit 1;
+          fi
+      else
+        echo "*.etherealengine.com entries does not exist" >&2;
+        exit 1;
+      fi
+    `
+    )
   ),
   getAppModel('engine', 'Ethereal Engine', minikubeDependantScript('helm status local;'))
 ]
 
 export const MinikubeRippleAppsStatus: AppModel[] = [
-  getAppModel('rippled', 'Rippled', minikubeDependantScript('helm status local-rippled;'), undefined, undefined, true),
-  getAppModel('ipfs', 'IPFS', minikubeDependantScript('helm status local-ipfs;'), undefined, undefined, true)
+  getAppModel(
+    'rippled',
+    'Rippled',
+    minikubeDependantScript('helm status local-rippled;'),
+    true,
+    undefined,
+    undefined,
+    undefined,
+    true
+  ),
+  getAppModel(
+    'ipfs',
+    'IPFS',
+    minikubeDependantScript('helm status local-ipfs;'),
+    true,
+    undefined,
+    undefined,
+    undefined,
+    true
+  )
 ]

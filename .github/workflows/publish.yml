@@ -44,7 +44,7 @@ jobs:
         run: |
           npm run postinstall
           npm run build
-          npm exec electron-builder -- --publish always --linux
+          npm exec electron-builder -- --publish always --linux --win
 
         # npm exec electron-builder -- --publish always --linux deb AppImage
         # npm exec electron-builder -- --publish always --linux rpm -c.productName=XREngineControlCenter

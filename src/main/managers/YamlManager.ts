@@ -6,7 +6,7 @@ import path from 'path'
 import Endpoints from '../../constants/Endpoints'
 import Storage from '../../constants/Storage'
 import { ClusterModel } from '../../models/Cluster'
-import { appConfigsPath, fileExists } from './PathManager'
+import { appConfigsPath, ensureWSLToWindowsPath, fileExists } from './PathManager'
 
 export const getYamlDoc = async (templatePath: string, templateUrl: string) => {
   let yamlContent = ''
@@ -47,7 +47,7 @@ export const findRequiredValues = async (yaml: any, values: string[]) => {
 }
 
 export const ensureConfigs = async (cluster: ClusterModel, templatePath: string, templateUrl: string) => {
-  const valuesFileName = `${cluster.id}-${Endpoints.ENGINE_VALUES_FILE_NAME}`
+  const valuesFileName = `${cluster.id}-${Endpoints.Paths.ENGINE_VALUES_FILE_NAME}`
   await _ensureConfigsFile(cluster, templatePath, templateUrl, valuesFileName)
 
   if (cluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true') {
@@ -61,7 +61,7 @@ const _ensureConfigsFile = async (
   templateUrl: string,
   valuesFileName: string
 ) => {
-  const enginePath = cluster.configs[Storage.ENGINE_PATH]
+  const enginePath = ensureWSLToWindowsPath(cluster.configs[Storage.ENGINE_PATH])
   const templateFullPath = path.join(enginePath, templatePath)
   const yamlDoc = await getYamlDoc(templateFullPath, templateUrl)
 
@@ -79,27 +79,27 @@ const _ensureConfigsFile = async (
 const _ensureRippleConfigs = async (cluster: ClusterModel) => {
   await _ensureRippledConfigs(cluster)
 
-  const valuesFileName = `${cluster.id}-${Endpoints.IPFS_VALUES_FILE_NAME}`
+  const valuesFileName = `${cluster.id}-${Endpoints.Paths.IPFS_VALUES_FILE_NAME}`
   await _ensureConfigsFile(
     cluster,
-    Endpoints.IPFS_VALUES_TEMPLATE_PATH,
-    Endpoints.IPFS_VALUES_TEMPLATE_URL,
+    Endpoints.Paths.IPFS_VALUES_TEMPLATE,
+    Endpoints.Urls.IPFS_VALUES_TEMPLATE,
     valuesFileName
   )
 }
 
 const _ensureRippledConfigs = async (cluster: ClusterModel) => {
-  const enginePath = cluster.configs[Storage.ENGINE_PATH]
-  const rippledCfgPath = path.join(enginePath, Endpoints.RIPPLED_FILE_PATH)
+  const enginePath = ensureWSLToWindowsPath(cluster.configs[Storage.ENGINE_PATH])
+  const rippledCfgPath = path.join(enginePath, Endpoints.Paths.RIPPLED_FILE)
   const rippledCfgExists = await fileExists(rippledCfgPath)
   if (rippledCfgExists === false) {
-    await fs.copyFile(path.join(enginePath, Endpoints.RIPPLED_TEMPLATE_PATH), rippledCfgPath)
+    await fs.copyFile(path.join(enginePath, Endpoints.Paths.RIPPLED_TEMPLATE), rippledCfgPath)
   }
 
-  const validatorCfgPath = path.join(enginePath, Endpoints.VALIDATOR_FILE_PATH)
+  const validatorCfgPath = path.join(enginePath, Endpoints.Paths.VALIDATOR_FILE)
   const validatorCfgExists = await fileExists(validatorCfgPath)
   if (validatorCfgExists === false) {
-    await fs.copyFile(path.join(enginePath, Endpoints.VALIDATOR_TEMPLATE_PATH), validatorCfgPath)
+    await fs.copyFile(path.join(enginePath, Endpoints.Paths.VALIDATOR_TEMPLATE), validatorCfgPath)
   }
 }
 

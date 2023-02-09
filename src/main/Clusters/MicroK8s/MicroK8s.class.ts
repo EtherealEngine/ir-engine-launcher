@@ -1,6 +1,7 @@
 import { BrowserWindow } from 'electron'
 import log from 'electron-log'
 import findProcess from 'find-process'
+import os from 'os'
 import path from 'path'
 import { kill } from 'ps-node'
 
@@ -10,9 +11,10 @@ import Storage from '../../../constants/Storage'
 import { DeploymentAppModel } from '../../../models/AppStatus'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
+import Utilities from '../../handlers/Utilities/Utilities.class'
 import { executeWebViewJS } from '../../managers/BrowserManager'
 import { startFileServer } from '../../managers/FileServerManager'
-import { assetsPath, ensureConfigsFolder, scriptsPath } from '../../managers/PathManager'
+import { assetsPath, ensureConfigsFolder, ensureWindowsToWSLPath, scriptsPath } from '../../managers/PathManager'
 import { execStream, execStreamScriptFile } from '../../managers/ShellManager'
 import { delay } from '../../managers/UtilitiesManager'
 import { ensureConfigs } from '../../managers/YamlManager'
@@ -24,7 +26,9 @@ import Requirements from './MicroK8s.requirements'
 
 class MicroK8s {
   static getClusterStatus = (cluster: ClusterModel) => {
-    const systemStatus = [...DefaultSystemStatus]
+    const prerequisites = Utilities.getPrerequisites()
+
+    const systemStatus = [...DefaultSystemStatus, ...prerequisites]
     const engineStatus = [...DefaultEngineStatus]
     let appStatus = [...MicroK8sAppsStatus]
 
@@ -82,6 +86,8 @@ class MicroK8s {
     }
 
     try {
+      const type = os.type()
+
       // Ensure port is not in use
       const processes = await findProcess('port', 10443)
       for (const process of processes) {
@@ -89,7 +95,11 @@ class MicroK8s {
       }
 
       // Start dashboard port-forward
-      await execStream(Commands.DASHBOARD, onStdout, onStderr)
+      let command = Commands.DASHBOARD
+      if (type === 'Windows_NT') {
+        command = `wsl /snap/bin/${command}`
+      }
+      await execStream(command, onStdout, onStderr)
     } catch (err) {
       onStderr(JSON.stringify(err))
       throw err
@@ -104,15 +114,25 @@ class MicroK8s {
   ) => {
     const category = 'configure microk8s'
     try {
+      const type = os.type()
+
       await BaseCluster.ensureVariables(cluster)
 
-      const configsFolder = await ensureConfigsFolder()
+      let configsFolder = await ensureConfigsFolder()
+      configsFolder = await ensureWindowsToWSLPath(configsFolder)
 
-      await ensureConfigs(cluster, Endpoints.MICROK8S_VALUES_TEMPLATE_PATH, Endpoints.MICROK8S_VALUES_TEMPLATE_URL)
+      await ensureConfigs(cluster, Endpoints.Paths.MICROK8S_VALUES_TEMPLATE, Endpoints.Urls.MICROK8S_VALUES_TEMPLATE)
 
       const scriptsFolder = scriptsPath()
-      const assetsFolder = assetsPath()
-      const configureScript = path.join(scriptsFolder, 'configure-microk8s-linux.sh')
+      let assetsFolder = assetsPath()
+      assetsFolder = await ensureWindowsToWSLPath(assetsFolder)
+
+      let configFile = 'configure-microk8s-linux.sh'
+      if (type === 'Windows_NT') {
+        configFile = 'configure-microk8s-windows.ps1'
+      }
+
+      const configureScript = path.join(scriptsFolder, configFile)
       log.info(`Executing script ${configureScript}`)
 
       const onConfigureStd = (data: any) => {

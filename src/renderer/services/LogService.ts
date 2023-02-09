@@ -92,7 +92,9 @@ export const LogService = {
       const contents = logState.logs.map(
         (log) => `${new Date(log.date).toLocaleTimeString()}: ${log.category} - ${log.message}`
       )
-      const fileName = `XRE-logs-${new Date().toJSON()}.txt`
+
+      // https://stackoverflow.com/questions/42210199/remove-illegal-characters-from-a-file-name-but-leave-spaces
+      const fileName = `XRE-logs-${new Date().toJSON()}.txt`.replace(/[/\\?%*:|"<>]/g, '-')
       const path = await window.electronAPI.invoke(Channels.Utilities.SaveLog, clusterId, contents, fileName)
 
       enqueueSnackbar(`Logs saved ${fileName}.`, {

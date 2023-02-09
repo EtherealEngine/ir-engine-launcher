@@ -2,7 +2,6 @@ import crypto from 'crypto'
 import { BrowserWindow } from 'electron'
 import log from 'electron-log'
 import os from 'os'
-import path from 'path'
 import PeerId from 'peer-id'
 
 import { Channels } from '../../../constants/Channels'
@@ -14,6 +13,7 @@ import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { SysRequirement } from '../../../models/SysRequirement'
 import { processVariablesFile } from '../../handlers/ConfigFile/ConfigFile-helper'
+import Utilities from '../../handlers/Utilities/Utilities.class'
 import { getEnvFile } from '../../managers/PathManager'
 import { exec } from '../../managers/ShellManager'
 import Commands from './BaseCluster.commands'
@@ -76,6 +76,8 @@ class BaseCluster {
               : AppStatus.Configured
             : AppStatus.Pending
         }
+      } else {
+        status = await Utilities.checkPrerequisite(app)
       }
 
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
@@ -94,7 +96,7 @@ class BaseCluster {
       }
 
       if (app.checkCommand) {
-        const response = await exec(app.checkCommand)
+        const response = await exec(app.checkCommand, app.isLinuxCommand)
         const { stdout, stderr } = response
 
         if (stdout) {
@@ -145,7 +147,7 @@ class BaseCluster {
           status: AppStatus.NotConfigured
         }
       } else if (engineItem.checkCommand) {
-        const response = await exec(engineItem.checkCommand)
+        const response = await exec(engineItem.checkCommand, engineItem.isLinuxCommand)
         const { stdout, stderr } = response
 
         if (stdout) {
@@ -205,7 +207,7 @@ class BaseCluster {
     const enginePath = cluster.configs[Storage.ENGINE_PATH]
 
     // Ensure hostUploadFolder values
-    cluster.variables['FILE_SERVER_FOLDER'] = path.join(enginePath, Endpoints.FILE_SERVER_PATH)
+    cluster.variables['FILE_SERVER_FOLDER'] = `${enginePath}/${Endpoints.Paths.FILE_SERVER}`
 
     // Ensure auth secret field has value
     if (!cluster.variables[Storage.AUTH_SECRET_KEY]) {
@@ -256,8 +258,8 @@ class BaseCluster {
     const varsData = await processVariablesFile(
       cluster.configs,
       cluster.variables,
-      Endpoints.IPFS_VALUES_TEMPLATE_PATH,
-      Endpoints.IPFS_VALUES_TEMPLATE_URL
+      Endpoints.Paths.IPFS_VALUES_TEMPLATE,
+      Endpoints.Urls.IPFS_VALUES_TEMPLATE
     )
 
     for (const key of Object.keys(varsData)) {

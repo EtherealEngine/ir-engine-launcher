@@ -160,7 +160,8 @@ export const ConfigFileService = {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
 
     try {
-      const fileName = `config-${new Date().toJSON()}.json`
+      // https://stackoverflow.com/questions/42210199/remove-illegal-characters-from-a-file-name-but-leave-spaces
+      const fileName = `config-${new Date().toJSON()}.json`.replace(/[/\\?%*:|"<>]/g, '-')
       const path = await window.electronAPI.invoke(Channels.ConfigFile.ExportConfig, fileName)
 
       enqueueSnackbar(`Settings exported ${fileName}.`, {

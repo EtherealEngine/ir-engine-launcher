@@ -34,44 +34,53 @@ class Engine {
 
       adminWindow.once('ready-to-show', async () => {
         try {
-          await delay(3000)
+          let userId = ''
+          let retry = 0
 
-          const userRole = await executeJS(
-            'function getUserRole() { return document.getElementById("user-role").innerHTML } getUserRole()',
-            adminWindow
-          )
+          do {
+            await delay(3000)
 
-          parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
-            category: 'admin panel',
-            message: `User role is ${userRole.trim()}.`
-          } as LogModel)
-
-          if (userRole !== 'admin') {
-            const userId = await executeJS(
-              `const delay = async (delayInms) => { return new Promise(resolve => setTimeout(resolve, delayInms)); }
-            const getUserId = async () => { document.getElementById("show-user-id").click(); await delay(1000); return document.getElementById("user-id").value; } 
-            getUserId()`,
+            const userRole = await executeJS(
+              'function getUserRole() { return document.getElementById("user-role").innerHTML } getUserRole()',
               adminWindow
             )
 
-            if (!userId) {
-              throw 'Failed to find userId.'
-            }
-
             parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
               category: 'admin panel',
-              message: `Making ${userId} admin.`
+              message: `User role is ${userRole.trim()}.`
             } as LogModel)
 
-            const enginePath = cluster.configs[Storage.ENGINE_PATH]
-            const response = await exec(
-              `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
-            )
-            const { error } = response
+            if (userRole !== 'admin') {
+              userId = await executeJS(
+                `const delay = async (delayInms) => { return new Promise(resolve => setTimeout(resolve, delayInms)); }
+            const getUserId = async () => { document.getElementById("show-user-id").click(); await delay(1000); return document.getElementById("user-id").value; } 
+            getUserId()`,
+                adminWindow
+              )
 
-            if (error) {
-              throw JSON.stringify(error)
+              if (userId) {
+                parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
+                  category: 'admin panel',
+                  message: `Making ${userId} admin.`
+                } as LogModel)
+
+                const enginePath = cluster.configs[Storage.ENGINE_PATH]
+
+                const command = `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
+                const response = await exec(command)
+                const { error } = response
+
+                if (error) {
+                  throw JSON.stringify(error)
+                }
+              }
             }
+
+            retry++
+          } while (!userId && retry < 5)
+
+          if (!userId) {
+            throw 'Failed to find userId.'
           }
 
           parentWindow.webContents.send(Channels.Engine.EnsureAdminAccessResponse, cluster.id)
@@ -94,7 +103,7 @@ class Engine {
         adminWindow = null
       })
 
-      await adminWindow.loadURL(Endpoints.LOGIN_PAGE)
+      await adminWindow.loadURL(Endpoints.Urls.LOGIN_PAGE)
       // adminWindow.show()
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {

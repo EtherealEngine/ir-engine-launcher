@@ -10,16 +10,16 @@ export const DefaultEngineStatus: AppModel[] = [
   getAppModel(
     'client',
     'Client',
-    'kubectl get deployment local-xrengine-client -o "jsonpath={.status.availableReplicas}"'
+    "kubectl get deployment local-xrengine-client -o 'jsonpath={.status.availableReplicas}'"
   ),
   getAppModel(
     'apiserver',
     'API Server',
-    'kubectl get deployment local-xrengine-api -o "jsonpath={.status.availableReplicas}"'
+    "kubectl get deployment local-xrengine-api -o 'jsonpath={.status.availableReplicas}'"
   ),
   getAppModel(
     'instanceserver',
     'Instance Server',
-    'kubectl get fleets local-instanceserver -o "jsonpath={.status.readyReplicas}"'
+    "kubectl get fleets local-instanceserver -o 'jsonpath={.status.readyReplicas}'"
   )
 ]
