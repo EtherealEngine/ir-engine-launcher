@@ -31,6 +31,7 @@ else
 
     export MYSQL_HOST=localhost
     npm run dev-docker
+    npm run dev-reinit
     npm run install-projects
 fi
 
