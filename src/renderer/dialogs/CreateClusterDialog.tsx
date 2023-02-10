@@ -85,7 +85,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   })
   const [name, setName] = useState('')
   const [type, setType] = useState<ClusterType>(ClusterType.MicroK8s)
-  const [prereqsPassed, setPrereqsPassed] = useState(false)
+  const [prereqsPassed, setPrereqsPassed] = useState(appSysInfo.osType !== OSType.Windows)
   const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
   const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
