@@ -12,7 +12,9 @@ if (type === 'Windows_NT') {
 
 const microk8sDependantScript = (script: string, sudoPassword?: string) => {
   // Escape special characters.
-  script = script.replaceAll('$', '`$')
+  if (type === 'Windows_NT') {
+    script = script.replaceAll('$', '`$')
+  }
 
   if (sudoPassword) {
     microk8sPrefix = `echo '${sudoPassword}' | sudo -S ${microk8sPrefix}`
