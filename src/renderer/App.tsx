@@ -12,6 +12,7 @@ import './App.css'
 import HotBar from './common/HotBar'
 import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
+import AuthenticationDialog from './dialogs/AuthenticationDialog'
 import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
 import ConfigPage from './pages/ConfigPage'
@@ -20,15 +21,17 @@ import K8DashboardPage from './pages/K8DashboardPage'
 import RippledPage from './pages/RippledPage'
 import WelcomePage from './pages/WelcomePage'
 import { useConfigFileState } from './services/ConfigFileService'
-import { SettingsService } from './services/SettingsService'
+import { SettingsService, useSettingsState } from './services/SettingsService'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
 const App = () => {
   const notistackRef = React.createRef<SnackbarProvider>()
   const { selectedCluster } = useConfigFileState().value
-
   const enableRippleStack = selectedCluster && selectedCluster.configs[Storage.ENABLE_RIPPLE_STACK] === 'true'
+
+  const settingsState = useSettingsState()
+  const { showAuthenticationDialog } = settingsState.value
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const defaultMode = (prefersDarkMode ? 'dark' : 'light') as PaletteMode
@@ -89,6 +92,10 @@ const App = () => {
                   <Route path="*" element={<Navigate to={Routes.ROOT} replace />} />
                 </RouterRoutes>
               </Box>
+
+              {showAuthenticationDialog && (
+                <AuthenticationDialog onClose={() => SettingsService.setAuthenticationDialog(false)} />
+              )}
             </Box>
           </HashRouter>
         </SnackbarProvider>

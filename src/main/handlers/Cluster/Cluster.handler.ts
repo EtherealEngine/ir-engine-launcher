@@ -8,9 +8,12 @@ import Cluster from './Cluster.class'
 
 class ClusterHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
-    ipcMain.handle(Channels.Cluster.GetClusterStatus, (_event: IpcMainInvokeEvent, cluster: ClusterModel) => {
-      return Cluster.getClusterStatus(window, cluster)
-    })
+    ipcMain.handle(
+      Channels.Cluster.GetClusterStatus,
+      async (_event: IpcMainInvokeEvent, cluster: ClusterModel, sudoPassword?: string) => {
+        return await Cluster.getClusterStatus(window, cluster, sudoPassword)
+      }
+    )
     ipcMain.handle(
       Channels.Cluster.CheckClusterStatus,
       async (_event: IpcMainInvokeEvent, cluster: ClusterModel, deploymentApps: DeploymentAppModel) => {

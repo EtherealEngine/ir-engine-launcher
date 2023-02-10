@@ -1,7 +1,7 @@
+import { decryptPassword } from 'common/UtilitiesManager'
 import { Channels } from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
-import CryptoJS from 'crypto-js'
 import { OSType } from 'models/AppSysInfo'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
@@ -70,15 +70,8 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [password, setPassword] = useState(() => {
-    if (sudoPassword) {
-      let decrypted = CryptoJS.AES.decrypt(sudoPassword, Storage.PASSWORD_KEY).toString(CryptoJS.enc.Utf8)
-      decrypted = decrypted.startsWith('"') ? decrypted.substring(1) : decrypted
-      decrypted = decrypted.endsWith('"') ? decrypted.substring(0, decrypted.length - 1) : decrypted
-
-      return decrypted
-    }
-
-    return ''
+    const decrypted = decryptPassword(sudoPassword)
+    return decrypted
   })
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)

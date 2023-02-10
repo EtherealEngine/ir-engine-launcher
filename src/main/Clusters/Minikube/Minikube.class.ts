@@ -19,7 +19,7 @@ import Commands from './Minikube.commands'
 import Requirements from './Minikube.requirements'
 
 class Minikube {
-  static getClusterStatus = (cluster: ClusterModel) => {
+  static getClusterStatus = async (cluster: ClusterModel, _sudoPassword?: string) => {
     const systemStatus = [...DefaultSystemStatus]
     const engineStatus = [...DefaultEngineStatus]
     let appStatus = [...MinikubeAppsStatus]

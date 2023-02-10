@@ -5,6 +5,7 @@ import os from 'os'
 import path from 'path'
 import { kill } from 'ps-node'
 
+import { delay } from '../../../common/UtilitiesManager'
 import { Channels } from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
@@ -16,7 +17,6 @@ import { executeWebViewJS } from '../../managers/BrowserManager'
 import { startFileServer } from '../../managers/FileServerManager'
 import { assetsPath, ensureConfigsFolder, ensureWindowsToWSLPath, scriptsPath } from '../../managers/PathManager'
 import { execStream, execStreamScriptFile } from '../../managers/ShellManager'
-import { delay } from '../../managers/UtilitiesManager'
 import { ensureConfigs } from '../../managers/YamlManager'
 import { DefaultEngineStatus, DefaultSystemStatus } from '../BaseCluster/BaseCluster.appstatus'
 import BaseCluster from '../BaseCluster/BaseCluster.class'
@@ -25,17 +25,17 @@ import Commands from './MicroK8s.commands'
 import Requirements from './MicroK8s.requirements'
 
 class MicroK8s {
-  static getClusterStatus = (cluster: ClusterModel) => {
+  static getClusterStatus = async (cluster: ClusterModel, sudoPassword?: string) => {
     const prerequisites = Utilities.getPrerequisites()
 
     const systemStatus = [...DefaultSystemStatus, ...prerequisites]
     const engineStatus = [...DefaultEngineStatus]
-    let appStatus = [...MicroK8sAppsStatus]
+    let appStatus = [...MicroK8sAppsStatus(sudoPassword)]
 
     const enableRipple = cluster.configs[Storage.ENABLE_RIPPLE_STACK]
 
     if (enableRipple && enableRipple === 'true') {
-      appStatus = [...MicroK8sAppsStatus, ...MicroK8sRippleAppsStatus]
+      appStatus = [...MicroK8sAppsStatus(sudoPassword), ...MicroK8sRippleAppsStatus(sudoPassword)]
     }
 
     return { systemStatus, engineStatus, appStatus } as DeploymentAppModel

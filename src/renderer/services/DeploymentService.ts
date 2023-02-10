@@ -1,12 +1,14 @@
 import { createState, none, useState } from '@speigg/hookstate'
+import { decryptPassword, delay } from 'common/UtilitiesManager'
 import { Channels } from 'constants/Channels'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'
+import { OSType } from 'models/AppSysInfo'
 import { cloneCluster, ClusterModel } from 'models/Cluster'
 import { FetchableItem } from 'models/FetchableItem'
 import { GitStatus } from 'models/GitStatus'
 
 import { store, useDispatch } from '../store'
-import { accessSettingsState } from './SettingsService'
+import { accessSettingsState, SettingsService } from './SettingsService'
 
 type DeploymentState = {
   clusterId: string
@@ -161,7 +163,7 @@ export const useDeploymentState = () => useState(state) as any as typeof state
 
 //Service
 export const DeploymentService = {
-  getDeploymentStatus: async (cluster: ClusterModel) => {
+  getDeploymentStatus: async (cluster: ClusterModel, sudoPassword?: string) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
@@ -170,7 +172,8 @@ export const DeploymentService = {
     try {
       const deploymentApps: DeploymentAppModel = await window.electronAPI.invoke(
         Channels.Cluster.GetClusterStatus,
-        clonedCluster
+        clonedCluster,
+        sudoPassword
       )
 
       dispatch(DeploymentAction.setDeploymentApps(clonedCluster.id, deploymentApps))
@@ -184,12 +187,30 @@ export const DeploymentService = {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
+
+    let appSysInfo = accessSettingsState().value.appSysInfo
+    let sudoPassword = accessSettingsState().value.sudoPassword
     const dispatch = useDispatch()
 
     try {
+      let password: undefined | string = undefined
+
+      if (appSysInfo.osType !== OSType.Windows) {
+        if (!sudoPassword) {
+          SettingsService.setAuthenticationDialog(true)
+
+          while (!sudoPassword) {
+            await delay(1000)
+            sudoPassword = accessSettingsState().value.sudoPassword
+          }
+        }
+
+        password = decryptPassword(sudoPassword)
+      }
+
       DeploymentService.fetchGitStatus(clonedCluster)
 
-      const deploymentApps = await DeploymentService.getDeploymentStatus(clonedCluster)
+      const deploymentApps = await DeploymentService.getDeploymentStatus(clonedCluster, password)
       if (deploymentApps) {
         await window.electronAPI.invoke(Channels.Cluster.CheckClusterStatus, clonedCluster, deploymentApps)
       }
