@@ -56,11 +56,12 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
       'ingress',
       'Ingress',
       microk8sDependantScript(
-        "kubectl exec -i -n ingress $(kubectl get pods -n ingress -l name=nginx-ingress-microk8s --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}') -- /nginx-ingress-controller --version;"
+        "kubectl exec -i -n ingress $(kubectl get pods -n ingress -l name=nginx-ingress-microk8s --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}') -- /nginx-ingress-controller --version;",
+        sudoPassword
       )
     ),
-    getAppModel('redis', 'Redis', microk8sDependantScript(`helm status local-redis;`)),
-    getAppModel('agones', 'Agones', microk8sDependantScript(`helm status agones;`)),
+    getAppModel('redis', 'Redis', microk8sDependantScript(`helm status local-redis;`, sudoPassword)),
+    getAppModel('agones', 'Agones', microk8sDependantScript(`helm status agones;`, sudoPassword)),
     getAppModel(
       'fileserver',
       'Local File Server',
@@ -123,11 +124,12 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
           echo '*.etherealengine.com entries does not exist' >&2;
           exit 1;
         fi
-      `
+      `,
+            sudoPassword
           ),
       type !== 'Windows_NT'
     ),
-    getAppModel('engine', 'Ethereal Engine', microk8sDependantScript(`helm status local;`))
+    getAppModel('engine', 'Ethereal Engine', microk8sDependantScript(`helm status local;`, sudoPassword))
   ]
 }
 
@@ -140,7 +142,7 @@ export const MicroK8sRippleAppsStatus = (sudoPassword?: string): AppModel[] => {
     getAppModel(
       'rippled',
       'Rippled',
-      microk8sDependantScript('helm status local-rippled;'),
+      microk8sDependantScript('helm status local-rippled;', sudoPassword),
       true,
       undefined,
       undefined,
@@ -150,7 +152,7 @@ export const MicroK8sRippleAppsStatus = (sudoPassword?: string): AppModel[] => {
     getAppModel(
       'ipfs',
       'IPFS',
-      microk8sDependantScript('helm status local-ipfs;'),
+      microk8sDependantScript('helm status local-ipfs;', sudoPassword),
       true,
       undefined,
       undefined,
