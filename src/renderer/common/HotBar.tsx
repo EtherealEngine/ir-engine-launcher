@@ -2,7 +2,7 @@ import Routes from 'constants/Routes'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import CreateClusterDialog from 'renderer/components/CreateClusterDialog'
+import CreateClusterDialog from 'renderer/dialogs/CreateClusterDialog'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
 

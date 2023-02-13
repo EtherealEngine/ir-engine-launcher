@@ -8,12 +8,12 @@ import MicroK8s from '../../Clusters/MicroK8s/MicroK8s.class'
 import Minikube from '../../Clusters/Minikube/Minikube.class'
 
 class Cluster {
-  static getClusterStatus = (window: BrowserWindow, cluster: ClusterModel) => {
+  static getClusterStatus = async (window: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
     try {
       if (cluster.type === ClusterType.Minikube) {
-        return Minikube.getClusterStatus(cluster)
+        return await Minikube.getClusterStatus(cluster, sudoPassword)
       } else if (cluster.type === ClusterType.MicroK8s) {
-        return MicroK8s.getClusterStatus(cluster)
+        return await MicroK8s.getClusterStatus(cluster, sudoPassword)
       }
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

@@ -15,6 +15,7 @@ const state = createState({
     appVersion: ''
   } as AppSysInfo,
   sudoPassword: '',
+  showAuthenticationDialog: false,
   showCreateClusterDialog: false,
   notistack: {} as SnackbarProvider
 })
@@ -29,6 +30,10 @@ store.receptors.push((action: SettingsActionType): void => {
       case 'SET_SUDO_PASSWORD':
         return s.merge({
           sudoPassword: action.payload
+        })
+      case 'SET_AUTHENTICATION_DIALOG':
+        return s.merge({
+          showAuthenticationDialog: action.payload
         })
       case 'SET_CREATE_CLUSTER_DIALOG':
         return s.merge({
@@ -62,6 +67,10 @@ export const SettingsService = {
     const encryptedPassword = CryptoJS.AES.encrypt(JSON.stringify(password), Storage.PASSWORD_KEY).toString()
     dispatch(SettingsAction.setSudoPassword(encryptedPassword))
   },
+  setAuthenticationDialog: (isVisible: boolean) => {
+    const dispatch = useDispatch()
+    dispatch(SettingsAction.setAuthenticationDialog(isVisible))
+  },
   setCreateClusterDialog: (isVisible: boolean) => {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setCreateClusterDialog(isVisible))
@@ -87,6 +96,12 @@ export const SettingsAction = {
   setSudoPassword: (payload: string) => {
     return {
       type: 'SET_SUDO_PASSWORD' as const,
+      payload
+    }
+  },
+  setAuthenticationDialog: (payload: boolean) => {
+    return {
+      type: 'SET_AUTHENTICATION_DIALOG' as const,
       payload
     }
   },

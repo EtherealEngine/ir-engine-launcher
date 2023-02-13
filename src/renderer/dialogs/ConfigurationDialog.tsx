@@ -1,9 +1,10 @@
+import { decryptPassword } from 'common/UtilitiesManager'
 import { Channels } from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
-import Storage, { generateUUID } from 'constants/Storage'
-import CryptoJS from 'crypto-js'
+import Storage from 'constants/Storage'
 import { OSType } from 'models/AppSysInfo'
 import { ClusterModel, ClusterType } from 'models/Cluster'
+import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
@@ -13,7 +14,6 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import AppsIcon from '@mui/icons-material/Apps'
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
-import ViewListIcon from '@mui/icons-material/ViewList'
 import {
   Box,
   Button,
@@ -30,24 +30,21 @@ import {
 } from '@mui/material'
 import { StepIconProps } from '@mui/material/StepIcon'
 
-import { ColorlibConnector, ColorlibStepIconRoot } from './Colorlib'
-import ConfigAuthView from './ConfigAuthView'
-import ConfigClusterView from './ConfigClusterView'
-import ConfigConfigsView from './ConfigConfigsView'
-import ConfigFlagsView from './ConfigFlagsView'
-import ConfigPrereqsView from './ConfigPrereqsView'
-import ConfigSummaryView from './ConfigSummaryView'
-import ConfigVarsView from './ConfigVarsView'
+import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
+import ConfigAuthView from '../components/ConfigAuthView'
+import ConfigConfigsView from '../components/ConfigConfigsView'
+import ConfigFlagsView from '../components/ConfigFlagsView'
+import ConfigSummaryView from '../components/ConfigSummaryView'
+import ConfigVarsView from '../components/ConfigVarsView'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
 
   const icons: { [index: string]: React.ReactElement } = {
     1: <AdminPanelSettingsIcon />,
-    2: <ViewListIcon />,
-    3: <DisplaySettingsIcon />,
-    4: <AppsIcon />,
-    5: <PlaylistAddCheckIcon />
+    2: <DisplaySettingsIcon />,
+    3: <AppsIcon />,
+    4: <PlaylistAddCheckIcon />
   }
 
   return (
@@ -56,121 +53,77 @@ const ColorlibStepIcon = (props: StepIconProps) => {
     </ColorlibStepIconRoot>
   )
 }
-
 interface Props {
   onClose: () => void
 }
 
-const CreateClusterDialog = ({ onClose }: Props) => {
+const ConfigurationDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
+  const { enqueueSnackbar } = useSnackbar()
   const settingsState = useSettingsState()
   const { appSysInfo, sudoPassword } = settingsState.value
 
   const configFileState = useConfigFileState()
-  const { clusters, loading } = configFileState.value
+  const { loading, selectedCluster } = configFileState.value
 
   const [activeStep, setActiveStep] = useState(0)
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [password, setPassword] = useState(() => {
-    if (sudoPassword) {
-      let decrypted = CryptoJS.AES.decrypt(sudoPassword, Storage.PASSWORD_KEY).toString(CryptoJS.enc.Utf8)
-      decrypted = decrypted.startsWith('"') ? decrypted.substring(1) : decrypted
-      decrypted = decrypted.endsWith('"') ? decrypted.substring(0, decrypted.length - 1) : decrypted
-
-      return decrypted
-    }
-
-    return ''
+    const decrypted = decryptPassword(sudoPassword)
+    return decrypted
   })
-  const [name, setName] = useState('')
-  const [type, setType] = useState<ClusterType>(ClusterType.MicroK8s)
-  const [prereqsPassed, setPrereqsPassed] = useState(false)
-  const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
-  const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
   const [localFlags, setLocalFlags] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
 
+  useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
+
+  if (!selectedCluster) {
+    enqueueSnackbar('Please select a cluster.', { variant: 'error' })
+    onClose()
+    return <></>
+  }
+
   const localConfigs = {} as Record<string, string>
-  for (const key in defaultConfigs) {
-    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : defaultConfigs[key]
+  for (const key in selectedCluster.configs) {
+    localConfigs[key] = key in tempConfigs ? tempConfigs[key] : selectedCluster.configs[key]
   }
 
   const localVars = {} as Record<string, string>
-  for (const key in defaultVars) {
-    localVars[key] = key in tempVars ? tempVars[key] : defaultVars[key]
+  for (const key in selectedCluster.variables) {
+    localVars[key] = key in tempVars ? tempVars[key] : selectedCluster.variables[key]
   }
 
-  const loadDefaultConfigs = async () => {
-    setLoading(true)
-    const configs = await ConfigFileService.getDefaultConfigs()
-    setDefaultConfigs(configs)
-    setLoading(false)
-  }
-
-  const loadDefaultVariables = async (clusterType: ClusterType) => {
-    setLoading(true)
-    const vars = await ConfigFileService.getDefaultVariables(clusterType, localConfigs)
-    setDefaultVars(vars)
-    setLoading(false)
-  }
-
-  const handleNext = async (isConfigure: boolean) => {
-    if (appSysInfo.osType === OSType.Windows && type !== ClusterType.MicroK8s) {
-      setError('On Windows, only MicroK8s is currently supported')
-      return
-    }
-
-    if (!name || name.length < 3) {
-      setError('Please select a cluster name of minimum 3 words')
-      return
-    }
-
+  const handleNext = async () => {
     if (activeStep === 0) {
-      const clusterCount = clusters.filter((item) => item.type === type)
-      if (clusterCount.length > 0) {
-        setError(`You already have a cluster of ${type}.`)
-        return
-      }
-    } else if (activeStep === 1) {
       setLoading(true)
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
       setLoading(false)
-
       if (sudoLoggedIn) {
         SettingsService.setSudoPassword(password)
       } else {
         setError('Invalid password')
         return
       }
-
-      await loadDefaultConfigs()
-    } else if (activeStep === 2) {
-      loadDefaultVariables(type)
-    } else if (activeStep === 4) {
-      const createCluster: ClusterModel = {
-        id: generateUUID(),
-        name,
-        type,
+    } else if (activeStep === 3) {
+      const updatedCluster: ClusterModel = {
+        ...selectedCluster,
         configs: { ...localConfigs },
         variables: { ...localVars }
       }
 
-      const inserted = await ConfigFileService.insertOrUpdateConfig(createCluster)
-      if (!inserted) {
-        return
+      if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
+        const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
+        if (!saved) {
+          return
+        }
+
+        await DeploymentService.fetchDeploymentStatus(updatedCluster)
       }
 
+      DeploymentService.processConfigurations(updatedCluster, password, localFlags)
       onClose()
-
-      ConfigFileService.setSelectedClusterId(createCluster.id)
-
-      await DeploymentService.fetchDeploymentStatus(createCluster)
-
-      if (isConfigure) {
-        DeploymentService.processConfigurations(createCluster, password, localFlags)
-      }
 
       return
     }
@@ -212,27 +165,6 @@ const CreateClusterDialog = ({ onClose }: Props) => {
 
   const steps = [
     {
-      label: 'Cluster',
-      title: 'Provide cluster information',
-      content: (
-        <Box sx={{ marginLeft: 2, marginRight: 2 }}>
-          <ConfigClusterView
-            name={name}
-            type={type}
-            onNameChange={(name) => {
-              setName(name)
-              setError('')
-            }}
-            onTypeChange={(type) => {
-              setType(type)
-              setError('')
-            }}
-          />
-          <ConfigPrereqsView onChange={(value) => setPrereqsPassed(value)} />
-        </Box>
-      )
-    },
-    {
       label: 'Authenticate',
       title: 'Provide sudo admin password to authenticate',
       content: (
@@ -240,7 +172,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           password={password}
           sx={{ marginLeft: 2, marginRight: 2 }}
           onChange={onChangePassword}
-          onEnter={() => handleNext(false)}
+          onEnter={handleNext}
         />
       )
     },
@@ -256,7 +188,15 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     },
     {
       label: 'Variables',
-      title: 'Provide configuration variables (Optional)',
+      title: (
+        <>
+          Provide configuration variables (Optional).
+          <br />
+          <span style={{ fontSize: 14, opacity: 0.6 }}>
+            If value is not provided, then the default ones from <b>.env.local</b> of Ethereal Engine repo will be used.
+          </span>
+        </>
+      ),
       content: <ConfigVarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
@@ -264,8 +204,6 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       title: 'Review configurations before finalizing',
       content: (
         <ConfigSummaryView
-          name={name}
-          type={type}
           localConfigs={localConfigs}
           localVars={localVars}
           localFlags={localFlags}
@@ -274,8 +212,6 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       )
     }
   ]
-
-  useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
 
   return (
     <Dialog open fullWidth maxWidth="sm">
@@ -315,7 +251,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
               style={{ color: 'white' }}
               target="_blank"
               href={
-                type === ClusterType.Minikube
+                selectedCluster?.type === ClusterType.Minikube
                   ? Endpoints.Urls.MINIKUBE_LINUX_SCRIPT
                   : appSysInfo.osType === OSType.Windows
                   ? Endpoints.Urls.MICROK8S_WINDOWS_SCRIPT
@@ -355,14 +291,11 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
-          {activeStep === steps.length - 1 && <Button onClick={() => handleNext(true)}>Create & Configure</Button>}
-          <Button disabled={!prereqsPassed} onClick={() => handleNext(false)}>
-            {activeStep === steps.length - 1 ? 'Create' : 'Next'}
-          </Button>
+          <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Configure' : 'Next'}</Button>
         </Box>
       </DialogActions>
     </Dialog>
   )
 }
 
-export default CreateClusterDialog
+export default ConfigurationDialog

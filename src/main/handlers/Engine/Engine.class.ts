@@ -1,5 +1,6 @@
 import { BrowserWindow } from 'electron'
 
+import { delay } from '../../../common/UtilitiesManager'
 // import log from 'electron-log'
 import { Channels } from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
@@ -8,7 +9,6 @@ import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { executeJS } from '../../managers/BrowserManager'
 import { exec } from '../../managers/ShellManager'
-import { delay } from '../../managers/UtilitiesManager'
 
 class Engine {
   static ensureAdminAccess = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
