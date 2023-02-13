@@ -86,6 +86,8 @@ elif [[ $DB_STATUS == *"database not found"* ]]; then
     echo "Existing database not populated"
 fi
 
+npm run prepare-database
+
 echo "Force DB refresh is $FORCE_DB_REFRESH"
 
 if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
