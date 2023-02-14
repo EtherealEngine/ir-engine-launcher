@@ -115,11 +115,15 @@ checkExitCode
 
 bash ./check-python.sh "$PASSWORD"
 
+checkExitCode
+
 #=============
 # Verify Make
 #=============
 
 bash ./check-make.sh "$PASSWORD"
+
+checkExitCode
 
 #=============
 # Verify Git
@@ -127,11 +131,15 @@ bash ./check-make.sh "$PASSWORD"
 
 bash ./check-git.sh "$PASSWORD"
 
+checkExitCode
+
 #=============
 # Get Engine
 #=============
 
 bash ./check-engine-repo.sh "$ENGINE_FOLDER"
+
+checkExitCode
 
 #==============
 # Verify Docker
@@ -139,17 +147,23 @@ bash ./check-engine-repo.sh "$ENGINE_FOLDER"
 
 bash ./check-docker.sh "$PASSWORD"
 
+checkExitCode
+
 #======================
 # Verify Docker Compose
 #======================
 
 bash ./check-docker-compose.sh "$PASSWORD"
 
+checkExitCode
+
 #============================
 # Ensure DB and Redis Running
 #============================
 
 bash ./check-mysql.sh "$PASSWORD" "$ENGINE_FOLDER"
+
+checkExitCode
 
 #==================
 # Verify VirtualBox
@@ -173,11 +187,15 @@ echo "vboxmanage version is $VIRTUALBOX_VERSION"
 
 bash ./check-kubectl.sh "$PASSWORD"
 
+checkExitCode
+
 #============
 # Verify Helm
 #============
 
 bash ./check-helm.sh "$PASSWORD"
+
+checkExitCode
 
 #================
 # Verify Minikube
@@ -250,11 +268,15 @@ fi
 
 bash ./check-helm-repos.sh
 
+checkExitCode
+
 #======================
 # Verify agones & redis
 #======================
 
 bash ./check-agones-redis.sh "$ENGINE_FOLDER"
+
+checkExitCode
 
 #====================
 # Verify ripple stack
@@ -262,11 +284,15 @@ bash ./check-agones-redis.sh "$ENGINE_FOLDER"
 
 bash ./check-ripple.sh "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER"
 
+checkExitCode
+
 #=======================
 # Verify Ethereal Engine
 #=======================
 
 bash ./check-engine-deployment.sh "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "minikube"
+
+checkExitCode
 
 echo "All Done"
 
