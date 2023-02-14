@@ -156,14 +156,6 @@ bash ./check-kubectl.sh "$PASSWORD"
 
 bash ./check-helm.sh "$PASSWORD"
 
-#================
-# Verify MicroK8s
-#================
-
-bash ./check-microk8s.sh "$PASSWORD" "$ASSETS_FOLDER"
-
-checkExitCode
-
 #================================
 # Docker MicroK8s Registry access
 #================================
@@ -180,6 +172,14 @@ else
 
     echo "$PASSWORD" | sudo -S systemctl restart docker
 fi
+
+#================
+# Verify MicroK8s
+#================
+
+bash ./check-microk8s.sh "$PASSWORD" "$ASSETS_FOLDER"
+
+checkExitCode
 
 #================
 # Verify hostfile

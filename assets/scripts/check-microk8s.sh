@@ -76,7 +76,6 @@ else
         if $ADD_HOSTNAME; then
             echo "$PASSWORD" | sudo -S -- sh -c "echo '--hostname-override=microk8s-node' >>/var/snap/microk8s/current/args/kubelet"
             echo "kubelet hostname-override entry added"
-            sleep 30
         fi
 
     else
@@ -96,6 +95,9 @@ if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running
     echo "$PASSWORD" | sudo -S ufw allow in on cni0 && echo "$PASSWORD" | sudo -S ufw allow out on cni0
     echo "$PASSWORD" | sudo -S ufw default allow routed
 
+    # To fix: IPtables FORWARD policy is DROP
+    echo "$PASSWORD" | sudo -S iptables -P FORWARD ACCEPT
+    
     # Start microk8s
     echo "$PASSWORD" | sudo -S microk8s start
 
