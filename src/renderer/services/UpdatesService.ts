@@ -143,4 +143,4 @@ export const UpdatesAction = {
   }
 }
 
-export type UpdatesActionType = ReturnType<(typeof UpdatesAction)[keyof typeof UpdatesAction]>
+export type UpdatesActionType = ReturnType<typeof UpdatesAction[keyof typeof UpdatesAction]>
