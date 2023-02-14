@@ -36,6 +36,13 @@ if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENG
     exit 1
 fi
 
+#================================
+# Set script directory as current
+# Ref: https://stackoverflow.com/a/64168461/2077741
+#================================
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
 #======
 # Login
 #======
