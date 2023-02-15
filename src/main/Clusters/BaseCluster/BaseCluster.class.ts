@@ -94,14 +94,14 @@ class BaseCluster {
       let status: AppModel = {
         ...app
       }
-      
+
       if (app.checkCommand) {
         const response = await exec(app.checkCommand, app.isLinuxCommand)
         const { stdout, stderr } = response
 
         if (stdout) {
           const message = typeof stdout === 'string' ? stdout.trim() : stdout.toString()
-          
+
           window.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: status.name,
             message
