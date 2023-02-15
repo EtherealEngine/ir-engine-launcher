@@ -41,13 +41,13 @@ fi
 # Ref: https://stackoverflow.com/a/64168461/2077741
 #================================
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+SCRIPTS_FOLDER="$(dirname "${BASH_SOURCE[0]}")"
 
 #======
 # Login
 #======
 
-bash ./check-login.sh "$PASSWORD"
+bash "$SCRIPTS_FOLDER/check-login.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -105,7 +105,7 @@ echo "node version is $NODE_VERSION"
 # Verify Npm
 #=============
 
-bash ./check-npm.sh
+bash "$SCRIPTS_FOLDER/check-npm.sh"
 
 checkExitCode
 
@@ -113,7 +113,7 @@ checkExitCode
 # Verify Python 3
 #================
 
-bash ./check-python.sh "$PASSWORD"
+bash "$SCRIPTS_FOLDER/check-python.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -121,7 +121,7 @@ checkExitCode
 # Verify Make
 #=============
 
-bash ./check-make.sh "$PASSWORD"
+bash "$SCRIPTS_FOLDER/check-make.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -129,7 +129,7 @@ checkExitCode
 # Verify Git
 #=============
 
-bash ./check-git.sh "$PASSWORD"
+bash "$SCRIPTS_FOLDER/check-git.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -137,7 +137,7 @@ checkExitCode
 # Get Engine
 #=============
 
-bash ./check-engine-repo.sh "$ENGINE_FOLDER"
+bash "$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER"
 
 checkExitCode
 
@@ -145,7 +145,7 @@ checkExitCode
 # Verify Docker
 #==============
 
-bash ./check-docker.sh "$PASSWORD"
+bash "$SCRIPTS_FOLDER/check-docker.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -153,7 +153,7 @@ checkExitCode
 # Verify Docker Compose
 #======================
 
-bash ./check-docker-compose.sh "$PASSWORD"
+bash "$SCRIPTS_FOLDER/check-docker-compose.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -161,7 +161,7 @@ checkExitCode
 # Ensure DB and Redis Running
 #============================
 
-bash ./check-mysql.sh "$PASSWORD" "$ENGINE_FOLDER"
+bash "$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER"
 
 checkExitCode
 
@@ -185,7 +185,7 @@ echo "vboxmanage version is $VIRTUALBOX_VERSION"
 # Verify Kubectl
 #===============
 
-bash ./check-kubectl.sh "$PASSWORD"
+bash "$SCRIPTS_FOLDER/check-kubectl.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -193,7 +193,7 @@ checkExitCode
 # Verify Helm
 #============
 
-bash ./check-helm.sh "$PASSWORD"
+bash "$SCRIPTS_FOLDER/check-helm.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -266,7 +266,7 @@ fi
 # Verify Helm Repos
 #==================
 
-bash ./check-helm-repos.sh
+bash "$SCRIPTS_FOLDER/check-helm-repos.sh"
 
 checkExitCode
 
@@ -274,7 +274,7 @@ checkExitCode
 # Verify agones & redis
 #======================
 
-bash ./check-agones-redis.sh "$ENGINE_FOLDER"
+bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$ENGINE_FOLDER"
 
 checkExitCode
 
@@ -282,7 +282,7 @@ checkExitCode
 # Verify ripple stack
 #====================
 
-bash ./check-ripple.sh "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER"
+bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER"
 
 checkExitCode
 
@@ -290,7 +290,7 @@ checkExitCode
 # Verify Ethereal Engine
 #=======================
 
-bash ./check-engine-deployment.sh "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "minikube"
+bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "minikube"
 
 checkExitCode
 
