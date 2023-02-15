@@ -13,12 +13,12 @@ const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
   // https://stackoverflow.com/a/44758924/2077741
   return `
   mk8sStatus=$(${microk8sPrefix}microk8s status 2>/dev/null)
-  if grep -q 'microk8s is not running' <<< "$mk8sStatus"; then
-    echo 'MicroK8s not configured' >&2;
-    exit 1;
-  else
+  if grep -q 'microk8s is running' <<< "$mk8sStatus"; then
     ${script}
     exit 0;
+  else
+    echo 'MicroK8s not configured' >&2;
+    exit 1;
   fi
   `
 }
