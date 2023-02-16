@@ -34,6 +34,18 @@ Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html)
 sudo apt-get install fuse libfuse2 -y
 ```
 
+### Reporting an Issue
+
+If you face an issue please report it to [Issues](https://github.com/canonical/microk8s/issues) or reach out to us on [Discord](https://discord.gg/xrf). Also please share following log files:
+
+1. Non-UI logs found at following path:
+  
+    - on Linux: `~/.config/etherealengine-control-center/logs/main.log`
+    - on macOS: `~/Library/Logs/etherealengine-control-center/main.log`
+    - on Windows: `%USERPROFILE%\AppData\Roaming\etherealengine-control-center\logs\main.log`
+
+2. UI logs found using download button in app as shown in below image.
+
 ## Install Development Release
 
 Clone the repo and install dependencies:
