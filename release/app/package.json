@@ -1,6 +1,6 @@
 {
   "name": "etherealengine-control-center",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "A desktop app for managing Ethereal Engine cluster.",
   "main": "./dist/main/main.js",
   "author": {
