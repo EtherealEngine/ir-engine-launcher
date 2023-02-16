@@ -100,15 +100,19 @@ class BaseCluster {
         const { stdout, stderr } = response
 
         if (stdout) {
+          const message = typeof stdout === 'string' ? stdout.trim() : stdout.toString()
+
           window.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: status.name,
-            message: typeof stdout === 'string' ? stdout.trim() : stdout
+            message
           } as LogModel)
         }
         if (stderr) {
+          const message = typeof stderr === 'string' ? stderr.trim() : stderr.toString()
+
           window.webContents.send(Channels.Utilities.Log, cluster.id, {
             category: status.name,
-            message: typeof stderr === 'string' ? stderr.trim() : stderr
+            message
           } as LogModel)
 
           if (!app.isOptional) {
