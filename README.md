@@ -45,6 +45,7 @@ If you face an issue please report it to [Issues](https://github.com/canonical/m
     - on Windows: `%USERPROFILE%\AppData\Roaming\etherealengine-control-center\logs\main.log`
 
 2. UI logs found using download button in app as shown in below image.
+![LogsDownload](https://user-images.githubusercontent.com/10975502/219317443-5cdf19fd-1e60-4907-a124-56cec72bb633.jpg)
 
 ## Install Development Release
 
