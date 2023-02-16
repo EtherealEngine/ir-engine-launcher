@@ -135,11 +135,6 @@ if $CONFIGURE_MICROK8S; then
 
     sleep 30
 
-    # Update kubernetes dashboard to allow skip login and update user role to have access to metrics.
-    kubectl patch deployment kubernetes-dashboard -n kube-system --type 'json' -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
-    kubectl delete clusterrolebinding kubernetes-dashboard -n kube-system
-    kubectl apply -f "$ASSETS_FOLDER/files/microk8s-dashboard.yaml"
-
     # Inspect microk8s
     echo "$PASSWORD" | sudo -S microk8s inspect
 
@@ -151,4 +146,9 @@ if $CONFIGURE_MICROK8S; then
         echo "There is something wrong in your microk8s. Please fix all warnings in 'sudo microk8s inspect' and reboot. If you still face this issue then, try 'sudo snap remove microk8s --purge'"
         exit 4
     fi
+
+    # Update kubernetes dashboard to allow skip login and update user role to have access to metrics.
+    kubectl patch deployment kubernetes-dashboard -n kube-system --type 'json' -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
+    kubectl delete clusterrolebinding kubernetes-dashboard -n kube-system
+    kubectl apply -f "$ASSETS_FOLDER/files/microk8s-dashboard.yaml"
 fi
