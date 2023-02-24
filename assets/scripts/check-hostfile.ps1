@@ -3,6 +3,8 @@
 # Parameters
 #===========
 
+Write-Host "Checking hostfile for etherealengine entries";
+
 $EXITCODE = 0;
 $IS_READONLY = $false;
 
@@ -10,7 +12,7 @@ if ($args[0] -eq 'readonly') {
     $IS_READONLY = $true;
 }
 
-Write-Host "$IS_READONLY";
+Write-Host "Readonly: $IS_READONLY";
 
 #=======================
 # Update system hostfile
