@@ -34,10 +34,8 @@ if (Test-Path $hostFilePath) {
         else {
             Write-Host "*.etherealengine.com host entry outdated";
 
-            if ($IS_READONLY -eq $true) {
-                $EXITCODE = 1
-            }
-            else {
+            $EXITCODE = 1
+            if ($IS_READONLY -eq $false) {
                 $updatedContent = Get-Content $hostFilePath;
                 $linenumber = $updatedContent | select-string "local.etherealengine.com";
                 $updatedContent[$linenumber.LineNumber - 1] = "$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com";
@@ -48,14 +46,15 @@ if (Test-Path $hostFilePath) {
     else {
         Write-Host "*.etherealengine.com host entry needs to be added";
 
-        if ($IS_READONLY -eq $true) {
-            $EXITCODE = 1
-        }
-        else {
+        $EXITCODE = 1
+        if ($IS_READONLY -eq $false) {
             Add-Content -Path $hostFilePath -value "$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com";
         }
     }
     
+    # Added this delay to ensure both hostfile entries gets updated, else it was skipping one of them.
+    Start-Sleep -Seconds 1
+
     if ($hostFileContent -like "*microk8s.registry*") {
         if ($hostFileContent -like "*$wslIp microk8s.registry*") {
             Write-Host "microk8s.registry host entry exists";
@@ -63,10 +62,8 @@ if (Test-Path $hostFilePath) {
         else {
             Write-Host "microk8s.registry host entry outdated";
             
-            if ($IS_READONLY -eq $true) {
-                $EXITCODE = 1
-            }
-            else {
+            $EXITCODE = 1
+            if ($IS_READONLY -eq $false) {
                 $updatedContent = Get-Content $hostFilePath;
                 $linenumber = $updatedContent | select-string "microk8s.registry";
                 $updatedContent[$linenumber.LineNumber - 1] = "$wslIp microk8s.registry";
@@ -77,10 +74,8 @@ if (Test-Path $hostFilePath) {
     else {
         Write-Host "microk8s.registry host entry needs to be added";
 
-        if ($IS_READONLY -eq $true) {
-            $EXITCODE = 1
-        }
-        else {
+        $EXITCODE = 1
+        if ($IS_READONLY -eq $false) {
             Add-Content -Path $hostFilePath -value "$wslIp microk8s.registry";
         }
     }
@@ -88,10 +83,8 @@ if (Test-Path $hostFilePath) {
 else {
     Write-Host "*.etherealengine.com & microk8s.registry host entries needs to be created";
     
-    if ($IS_READONLY -eq $true) {
-        $EXITCODE = 1
-    }
-    else {
+    $EXITCODE = 1
+    if ($IS_READONLY -eq $false) {
         Set-Content $hostFilePath "$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com`n$wslIp microk8s.registry";
     }
 }
