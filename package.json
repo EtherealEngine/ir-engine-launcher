@@ -178,6 +178,7 @@
     "jest": "^27.4.5",
     "lint-staged": "^12.1.4",
     "mini-css-extract-plugin": "^2.4.5",
+    "npm": "^9.4.1",
     "opencollective-postinstall": "^2.0.3",
     "peer-id": "^0.16.0",
     "prettier": "^2.5.1",
