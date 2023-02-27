@@ -25,7 +25,9 @@ if ($wslIp -like "* *") {
 }
 
 if (Test-Path $hostFilePath) {
-    $hostFileContent = Get-Content $hostFilePath -Raw;
+    # Added round brackets around get-content to fix file is in user issue.
+    #Ref: https://stackoverflow.com/a/10480811
+    $hostFileContent = (Get-Content $hostFilePath -Raw);
 
     if ($hostFileContent -like "*local.etherealengine.com*") {
         if ($hostFileContent -like "*$wslIp local.etherealengine.com*") {
@@ -36,7 +38,9 @@ if (Test-Path $hostFilePath) {
 
             $EXITCODE = 1
             if ($IS_READONLY -eq $false) {
-                $updatedContent = Get-Content $hostFilePath;
+                # Added round brackets around get-content to fix file is in user issue.
+                #Ref: https://stackoverflow.com/a/10480811
+                $updatedContent = (Get-Content $hostFilePath);
                 $linenumber = $updatedContent | select-string "local.etherealengine.com";
                 $updatedContent[$linenumber.LineNumber - 1] = "$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com";
                 Set-Content $hostFilePath $updatedContent;
@@ -48,12 +52,12 @@ if (Test-Path $hostFilePath) {
 
         $EXITCODE = 1
         if ($IS_READONLY -eq $false) {
-            Add-Content -Path $hostFilePath -value "$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com";
+            Add-Content -Path $hostFilePath -value "`n$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com";
         }
     }
     
     # Added this delay to ensure both hostfile entries gets updated, else it was skipping one of them.
-    Start-Sleep -Seconds 1
+    Start-Sleep -Seconds 1;
 
     if ($hostFileContent -like "*microk8s.registry*") {
         if ($hostFileContent -like "*$wslIp microk8s.registry*") {
@@ -64,7 +68,9 @@ if (Test-Path $hostFilePath) {
             
             $EXITCODE = 1
             if ($IS_READONLY -eq $false) {
-                $updatedContent = Get-Content $hostFilePath;
+                # Added round brackets around get-content to fix file is in user issue.
+                #Ref: https://stackoverflow.com/a/10480811
+                $updatedContent = (Get-Content $hostFilePath);
                 $linenumber = $updatedContent | select-string "microk8s.registry";
                 $updatedContent[$linenumber.LineNumber - 1] = "$wslIp microk8s.registry";
                 Set-Content $hostFilePath $updatedContent;
@@ -76,7 +82,7 @@ if (Test-Path $hostFilePath) {
 
         $EXITCODE = 1
         if ($IS_READONLY -eq $false) {
-            Add-Content -Path $hostFilePath -value "$wslIp microk8s.registry";
+            Add-Content -Path $hostFilePath -value "`n$wslIp microk8s.registry";
         }
     }
 }
@@ -85,7 +91,7 @@ else {
     
     $EXITCODE = 1
     if ($IS_READONLY -eq $false) {
-        Set-Content $hostFilePath "$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com`n$wslIp microk8s.registry";
+        Set-Content $hostFilePath "`n$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com`n$wslIp microk8s.registry";
     }
 }
 
