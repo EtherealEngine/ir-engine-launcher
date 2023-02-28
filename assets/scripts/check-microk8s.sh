@@ -27,17 +27,17 @@ else
     echo "$PASSWORD" | sudo -S chown -R $USER ~/.kube
 
     # Remove previous context from config
-    if kubectl config view --raw | grep -q 'microk8s'; then
+    if kubectl config view -o jsonpath='{.contexts}' | grep -q 'microk8s'; then
         kubectl config delete-context microk8s
     fi
 
     # Remove previous cluster from config
-    if kubectl config view --raw | grep -q 'microk8s-cluster'; then
+    if kubectl config view -o jsonpath='{.clusters}' | grep -q 'microk8s-cluster'; then
         kubectl config delete-cluster microk8s-cluster
     fi
 
     # Remove previous user from config
-    if kubectl config view --raw | grep -q 'microk8s-admin'; then
+    if kubectl config view -o jsonpath='{.users}' | grep -q 'microk8s-admin'; then
         kubectl config delete-user microk8s-admin
     fi
 
