@@ -194,13 +194,14 @@ if ($wslRestart -or $dockerRestart) {
 if ($LastExitCode -eq 1) {
     $hostfileProcess = Start-Process powershell -PassThru -Wait -verb runas -ArgumentList "-file $PSScriptRoot\check-hostfile.ps1"
 
-        
     if ($hostfileProcess.ExitCode -eq 0) {
         Write-Host "Hostfile already up to date";
     } elseif ($hostfileProcess.ExitCode -eq 1) {
         Write-Host "Hostfile updated";
     } else {
-        Write-Host "Hostfile update exited with: $hostfileProcess.ExitCode";
+        Write-Host "Hostfile update exited with:";
+        Write-Host $hostfileProcess.ExitCode;
+        Write-host "Failed in check-hostfile"
         exit $hostfileProcess.ExitCode;
     }
 }
