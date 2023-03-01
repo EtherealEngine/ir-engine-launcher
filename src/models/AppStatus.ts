@@ -102,7 +102,7 @@ export const DefaultAppsStatus: AppModel[] = [
   {
     id: 'mysql',
     name: 'MySql',
-    checkCommand: 'docker top xrengine_minikube_db;',
+    checkCommand: 'docker top etherealengine_minikube_db;',
     detail: '',
     status: AppStatus.Checking
   },
@@ -174,8 +174,8 @@ export const DefaultAppsStatus: AppModel[] = [
     status: AppStatus.Checking
   },
   {
-    id: 'xrengine',
-    name: 'XREngine',
+    id: 'etherealengine',
+    name: 'Ethereal Engine',
     checkCommand: minikubeDependantScript('helm status local;'),
     detail: '',
     status: AppStatus.Checking
@@ -203,14 +203,14 @@ export const DefaultClusterStatus: AppModel[] = [
   {
     id: 'client',
     name: 'Client',
-    checkCommand: 'kubectl get deployment local-xrengine-client -o "jsonpath={.status.availableReplicas}"',
+    checkCommand: 'kubectl get deployment local-etherealengine-client -o "jsonpath={.status.availableReplicas}"',
     detail: '',
     status: AppStatus.Checking
   },
   {
     id: 'api',
     name: 'API Server',
-    checkCommand: 'kubectl get deployment local-xrengine-api -o "jsonpath={.status.availableReplicas}"',
+    checkCommand: 'kubectl get deployment local-etherealengine-api -o "jsonpath={.status.availableReplicas}"',
     detail: '',
     status: AppStatus.Checking
   },

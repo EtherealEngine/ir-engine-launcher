@@ -21,7 +21,7 @@ import SettingsHandler from './handlers/SettingsHandler'
 import ShellHandler from './handlers/ShellHandler'
 import UpdatesHandler from './handlers/UpdatesHandler'
 import UtilitiesHandler from './handlers/UtilitiesHandler'
-import XREngineHandler from './handlers/XREngineHandler'
+import EtherealEngineHandler from './handlers/EngineHandler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 
@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'production') {
   prodFixes.loadProdConfigs()
 }
 
-// To allow XREngine certificate errors
+// To allow Engine certificate errors
 // https://stackoverflow.com/a/51291249/2077741
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
 
@@ -103,8 +103,8 @@ const createWindow = async () => {
   autoUpdater.autoDownload = false
   autoUpdater.setFeedURL({
     provider: 'github',
-    owner: 'xrfoundation',
-    repo: 'xrengine-control-center'
+    owner: 'etherealengine',
+    repo: 'etherealengine-control-center'
   })
 
   log.transports.file.level = 'info'
@@ -157,7 +157,7 @@ export const createMainWindow = async () => {
     }
   })
 
-  // To allow XREngine certificate errors
+  // To allow Engine certificate errors
   // https://github.com/electron/electron/issues/14885#issuecomment-770953041
   mainWindow.webContents.session.setCertificateVerifyProc((request, callback) => {
     const { hostname } = request
@@ -171,7 +171,7 @@ export const createMainWindow = async () => {
   const ipcHandlers: IBaseHandler[] = [
     new UtilitiesHandler(),
     new ShellHandler(),
-    new XREngineHandler(),
+    new EtherealEngineHandler(),
     new SettingsHandler()
   ]
 

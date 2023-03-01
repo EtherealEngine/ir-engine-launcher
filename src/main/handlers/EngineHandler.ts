@@ -4,11 +4,11 @@ import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 import { Channels } from '../../constants/Channels'
 import Endpoints from '../../constants/Endpoints'
 import { delay, exec, executeJS, IBaseHandler } from './IBaseHandler'
-import { getXREnginePath } from './SettingsHandler'
+import { getEnginePath } from './SettingsHandler'
 
-class XREngineHandler implements IBaseHandler {
+class EtherealEngineHandler implements IBaseHandler {
   configure = (window: BrowserWindow) => {
-    ipcMain.handle(Channels.XREngine.EnsureAdminAccess, async (_event: IpcMainInvokeEvent) => {
+    ipcMain.handle(Channels.Engine.EnsureAdminAccess, async (_event: IpcMainInvokeEvent) => {
       await ensureAdminAccess(window)
     })
   }
@@ -25,7 +25,7 @@ const ensureAdminAccess = async (parentWindow: BrowserWindow) => {
       webPreferences: { webSecurity: false, nodeIntegration: false }
     })
 
-    // To allow XREngine certificate errors
+    // To allow engine certificate errors
     // https://github.com/electron/electron/issues/14885#issuecomment-770953041
     adminWindow.webContents.session.setCertificateVerifyProc((request, callback) => {
       const { hostname } = request
@@ -65,9 +65,9 @@ const ensureAdminAccess = async (parentWindow: BrowserWindow) => {
             message: `Making ${userId} admin.`
           })
 
-          const xrenginePath = await getXREnginePath()
+          const enginePath = await getEnginePath()
           const response = await exec(
-            `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${xrenginePath};npm run make-user-admin -- --id=${userId}`
+            `export MYSQL_PORT=${Endpoints.MYSQL_PORT};cd ${enginePath};npm run make-user-admin -- --id=${userId}`
           )
           const { error } = response
 
@@ -76,11 +76,11 @@ const ensureAdminAccess = async (parentWindow: BrowserWindow) => {
           }
         }
 
-        parentWindow.webContents.send(Channels.XREngine.EnsureAdminAccessResponse)
+        parentWindow.webContents.send(Channels.Engine.EnsureAdminAccessResponse)
       } catch (err) {
         parentWindow.webContents.send(Channels.Utilities.Log, { category: 'admin panel', message: JSON.stringify(err) })
         parentWindow.webContents.send(
-          Channels.XREngine.EnsureAdminAccessError,
+          Channels.Engine.EnsureAdminAccessError,
           `Failed to load admin panel. Please check logs.`
         )
       }
@@ -100,9 +100,9 @@ const ensureAdminAccess = async (parentWindow: BrowserWindow) => {
       message: JSON.stringify(err)
     })
     parentWindow.webContents.send(
-      Channels.XREngine.EnsureAdminAccessError,
+      Channels.Engine.EnsureAdminAccessError,
       `Failed to load admin panel. Please check logs.`
     )
   }
 }
-export default XREngineHandler
+export default EtherealEngineHandler

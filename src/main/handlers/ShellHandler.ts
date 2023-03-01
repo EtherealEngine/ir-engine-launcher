@@ -80,7 +80,7 @@ class ShellHandler implements IBaseHandler {
         ) => {
           const category = 'configure minikube'
           try {
-            await ensureVariables(configs[Storage.XRENGINE_PATH], vars)
+            await ensureVariables(configs[Storage.ENGINE_PATH], vars)
 
             const configsFolder = path.resolve(appConfigsPath())
             const configsFolderExists = await fileExists(configsFolder)
@@ -88,8 +88,8 @@ class ShellHandler implements IBaseHandler {
               await fs.mkdir(configsFolder, { recursive: true })
             }
 
-            await ensureEngineConfigs(configs[Storage.XRENGINE_PATH], vars)
-            await ensureRippleConfigs(configs[Storage.XRENGINE_PATH], configs[Storage.ENABLE_RIPPLE_STACK])
+            await ensureEngineConfigs(configs[Storage.ENGINE_PATH], vars)
+            await ensureRippleConfigs(configs[Storage.ENGINE_PATH], configs[Storage.ENABLE_RIPPLE_STACK])
 
             const scriptsFolder = scriptsPath()
             const assetsFolder = assetsPath()
@@ -102,7 +102,7 @@ class ShellHandler implements IBaseHandler {
             const code = await execStream(
               `bash "${configureScript}" -a "${assetsFolder}" -c "${configsFolder}" -d "${
                 flags[Storage.FORCE_DB_REFRESH]
-              }" -f "${configs[Storage.XRENGINE_PATH]}" -p "${password}" -r "${configs[Storage.ENABLE_RIPPLE_STACK]}"`,
+              }" -f "${configs[Storage.ENGINE_PATH]}" -p "${password}" -r "${configs[Storage.ENABLE_RIPPLE_STACK]}"`,
               onConfigureStd,
               onConfigureStd
             )
@@ -137,7 +137,7 @@ class ShellHandler implements IBaseHandler {
             }
 
             execStream(
-              `bash "${fileServerScript}" -f "${configs[Storage.XRENGINE_PATH]}"`,
+              `bash "${fileServerScript}" -f "${configs[Storage.ENGINE_PATH]}"`,
               onFileServerStd,
               onFileServerStd
             )
@@ -379,7 +379,7 @@ const checkClusterStatus = async (window: BrowserWindow, mandatoryConfigured: bo
     if (mandatoryConfigured == false) {
       status = {
         ...clusterItem,
-        detail: 'XREngine required apps not configured',
+        detail: 'Engine required apps not configured',
         status: AppStatus.NotConfigured
       }
     } else if (clusterItem.checkCommand) {

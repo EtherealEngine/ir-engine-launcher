@@ -28,4 +28,5 @@ npm-debug.log.*
 *.scss.d.ts
 package-lock.json
 xrengine.db
+etherealengine.db
 local.values.yaml

@@ -43,9 +43,9 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
         fullWidth
         margin="dense"
         size="small"
-        label={Storage.XRENGINE_PATH.replaceAll('_', ' ')}
+        label={Storage.ENGINE_PATH.replaceAll('_', ' ')}
         variant="standard"
-        value={localConfigs[Storage.XRENGINE_PATH]}
+        value={localConfigs[Storage.ENGINE_PATH]}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
@@ -53,7 +53,7 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
                 edge="end"
                 title="Change Path"
                 disabled={configs.loading}
-                onClick={() => changeFolder(Storage.XRENGINE_PATH)}
+                onClick={() => changeFolder(Storage.ENGINE_PATH)}
               >
                 <FolderOutlinedIcon />
               </IconButton>

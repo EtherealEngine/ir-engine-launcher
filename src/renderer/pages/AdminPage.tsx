@@ -32,7 +32,7 @@ const AdminPage = () => {
 
   let loadingMessage = ''
   if (checking) {
-    loadingMessage = 'Checking XREngine'
+    loadingMessage = 'Checking Ethereal Engine'
   } else if (adminPanel.loading) {
     loadingMessage = 'Loading Dashboard'
   }
@@ -41,8 +41,8 @@ const AdminPage = () => {
   let errorDetail = ''
   let errorRetry = () => {}
   if (!allConfigured) {
-    errorMessage = 'XREngine Not Configured'
-    errorDetail = 'Please configure XREngine before trying again.'
+    errorMessage = 'Ethereal Engine Not Configured'
+    errorDetail = 'Please configure Ethereal Engine before trying again.'
     errorRetry = () => DeploymentService.fetchDeploymentStatus()
   } else if (adminPanel.error) {
     errorMessage = 'Admin Panel Error'
