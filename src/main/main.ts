@@ -15,13 +15,14 @@ import os from 'os'
 import path from 'path'
 
 import Endpoints from '../constants/Endpoints'
-import { initDB } from './dbManager'
+import ClusterHandler from './handlers/Cluster/Cluster.handler'
+import ConfigFileHandler from './handlers/ConfigFile/ConfigFile.handler'
+import EngineHandler from './handlers/Engine/Engine.handler'
+import GitHandler from './handlers/Git/Git.handler'
 import { IBaseHandler } from './handlers/IBaseHandler'
-import SettingsHandler from './handlers/SettingsHandler'
-import ShellHandler from './handlers/ShellHandler'
-import UpdatesHandler from './handlers/UpdatesHandler'
-import UtilitiesHandler from './handlers/UtilitiesHandler'
-import EtherealEngineHandler from './handlers/EngineHandler'
+import ShellHandler from './handlers/Shell/Shell.handler'
+import UpdatesHandler from './handlers/Updates/Updates.handler'
+import UtilitiesHandler from './handlers/Utilities/Utilities.handler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 
@@ -41,6 +42,24 @@ if (process.env.NODE_ENV === 'production') {
 // To allow Engine certificate errors
 // https://stackoverflow.com/a/51291249/2077741
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+
+// To allow Engine certificate errors
+// https://stackoverflow.com/a/63924528/2077741
+// https://stackoverflow.com/a/46789486/2077741
+app.on('certificate-error', (event, _webContents, url, _error, _cert, callback) => {
+  const { host } = new URL(url)
+
+  // Do some verification based on the URL to not allow potentially malicious certs:
+  if (Endpoints.ALLOW_CERTIFICATES.includes(host)) {
+    // Hint: For more security, you may actually perform some checks against
+    // the passed certificate (parameter "cert") right here
+
+    event.preventDefault() // Stop Chromium from rejecting the certificate
+    callback(true) // Trust this certificate
+  } else {
+    callback(false) // Let Chromium do its thing
+  }
+})
 
 let splashWindow: BrowserWindow | null = null
 let mainWindow: BrowserWindow | null = null
@@ -153,7 +172,8 @@ export const createMainWindow = async () => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
+      preload: path.join(__dirname, 'preload.js'),
+      webviewTag: true
     }
   })
 
@@ -169,10 +189,12 @@ export const createMainWindow = async () => {
   })
 
   const ipcHandlers: IBaseHandler[] = [
+    new ConfigFileHandler(),
     new UtilitiesHandler(),
     new ShellHandler(),
-    new EtherealEngineHandler(),
-    new SettingsHandler()
+    new EngineHandler(),
+    new ClusterHandler(),
+    new GitHandler()
   ]
 
   ipcHandlers.forEach((handler) => {
@@ -226,8 +248,6 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(async () => {
-    await initDB()
-
     createWindow()
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the

@@ -1,11 +1,14 @@
 import { Channels } from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
+import { OSType } from 'models/AppSysInfo'
+import { useSnackbar } from 'notistack'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { useSettingsState } from 'renderer/services/SettingsService'
 
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined'
 import {
   Box,
-  DialogContentText,
   FormControlLabel,
   IconButton,
   InputAdornment,
@@ -16,7 +19,7 @@ import {
   Typography
 } from '@mui/material'
 
-import InfoTooltip from './InfoTooltip'
+import InfoTooltip from '../common/InfoTooltip'
 
 interface Props {
   localConfigs: Record<string, string>
@@ -25,43 +28,61 @@ interface Props {
 }
 
 const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
+  const { enqueueSnackbar } = useSnackbar()
+
+  const configFileState = useConfigFileState()
+  const { loading } = configFileState.value
   const settingsState = useSettingsState()
-  const { configs } = settingsState.value
+  const { appSysInfo } = settingsState.value
 
   const changeFolder = async (key: string) => {
-    const path = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
+    let path: string = await window.electronAPI.invoke(Channels.Utilities.SelectFolder)
+
     if (path) {
+      // On windows we need to make sure its WSL folder.
+      if (appSysInfo.osType === OSType.Windows) {
+        if (path.startsWith(Endpoints.Paths.WSL_PREFIX)) {
+          path = path.replace(Endpoints.Paths.WSL_PREFIX, '').replaceAll('\\', '/')
+        } else {
+          enqueueSnackbar('Please select a folder in your WSL Ubuntu distribution.', { variant: 'error' })
+          return
+        }
+      }
+
       onChange(key, path)
     }
   }
 
   return (
     <Box sx={sx}>
-      {configs.error && <DialogContentText color={'red'}>Error: {configs.error}</DialogContentText>}
-      <TextField
-        disabled
-        fullWidth
-        margin="dense"
-        size="small"
-        label={Storage.ENGINE_PATH.replaceAll('_', ' ')}
-        variant="standard"
-        value={localConfigs[Storage.ENGINE_PATH]}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                edge="end"
-                title="Change Path"
-                disabled={configs.loading}
-                onClick={() => changeFolder(Storage.ENGINE_PATH)}
-              >
-                <FolderOutlinedIcon />
-              </IconButton>
-            </InputAdornment>
-          )
-        }}
-      />
-
+      <Box display="flex" width="100%" alignItems="center">
+        <TextField
+          disabled
+          fullWidth
+          margin="dense"
+          size="small"
+          label={Storage.ENGINE_PATH.replaceAll('_', ' ')}
+          value={localConfigs[Storage.ENGINE_PATH]}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  edge="end"
+                  title="Change Path"
+                  disabled={loading}
+                  onClick={() => changeFolder(Storage.ENGINE_PATH)}
+                >
+                  <FolderOutlinedIcon />
+                </IconButton>
+              </InputAdornment>
+            )
+          }}
+        />
+        <InfoTooltip
+          ml={1}
+          message="Folder of Ethereal Engine source code. This folder should be inside `Home` directory."
+        />
+      </Box>
       <FormControlLabel
         labelPlacement="start"
         label={

@@ -1,4 +1,4 @@
-import PageRoot from 'renderer/components/PageRoot'
+import PageRoot from 'renderer/common/PageRoot'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'

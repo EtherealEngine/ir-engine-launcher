@@ -1,4 +1,4 @@
-import PageRoot from 'renderer/components/PageRoot'
+import PageRoot from 'renderer/common/PageRoot'
 
 import { Box, CircularProgress, Typography } from '@mui/material'
 import { Variant } from '@mui/material/styles/createTypography'

@@ -1,11 +1,21 @@
 body {
   margin: 0px;
   overflow: hidden;
+  color: var(--text);
 }
 
 .settingTabs .MuiTabs-flexContainer {
   padding: 12px;
   align-items: flex-start;
+}
+
+.blankTabs .MuiTab-root {
+  opacity: 1;
+  padding: 0;
+}
+
+.blankTabs .MuiTabs-indicator {
+  display: none;
 }
 
 /* https://stackoverflow.com/a/44823888/2077741 */

@@ -1,6 +1,6 @@
 {
   "name": "etherealengine-control-center",
-  "version": "0.0.8",
+  "version": "0.1.1",
   "description": "A desktop app for managing Ethereal Engine cluster.",
   "main": "./dist/main/main.js",
   "author": {
@@ -13,8 +13,6 @@
     "link-modules": "node -r ts-node/register ../../.electron/scripts/link-modules.ts",
     "postinstall": "npm run electron-rebuild && npm run link-modules"
   },
-  "dependencies": {
-    "sqlite3": "^5.0.4"
-  },
+  "dependencies": {},
   "license": "MIT"
 }

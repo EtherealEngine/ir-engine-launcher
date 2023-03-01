@@ -1,13 +1,12 @@
 # Ethereal Engine Control Center
 
-Want to build the spatial web on your website? Looking for a place to start?  Run a web metaverse cluster yourself on your own computer. 
+Want to build the spatial web on your website? Looking for a place to start? Run a web metaverse cluster yourself on your own computer.
 
-The Ethereal Engine Control Center is a self-contained Metaverse world in a box.  Take what you need or launch the full stack.  Ethereal Engine Control Center is a desktop app to manage a metaverse cluster.
+The Ethereal Engine Control Center is a self-contained Metaverse world in a box. Take what you need or launch the full stack.  Ethereal Engine Control Center is a desktop app to manage a metaverse cluster.
 
-We know it's been complicated to build with #EtherealEngine and we've made this tool to give the community easy access to the engine for development and creation. The full Kubernetes cluster can run on mac and any Debian Linux distro with at least 16 GB of ram.
+We know it's been complicated to build with #EtherealEngine and we've made this tool to give the community easy access to the engine for development and creation. The full Kubernetes cluster can run on Windows and any Debian Linux distro with at least 16 GB of ram.
 
-
-We would love to see your creations and invite you all to come build with us.  We've got a long backlog and need your help to build the Open Metaverse.  Come build with us!
+We would love to see your creations and invite you all to come build with us. We've got a long backlog and need your help to build the Open Metaverse. Come build with us!
 
 ### [DOWNLOAD HERE](https://github.com/etherealengine/EtherealEngine-Control-Center/releases)
 
@@ -23,24 +22,42 @@ https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-
 2. For AppImage: Once downloaded, right click and go to **Properties**. In **Permissions** tab check 'Allow executing file as program'.
 3. Double click on AppImage to launch the app.
 
-> Note: Currently the app is tested on Ubuntu 20.04 & 22.04 only.
+> Note: Currently the app is tested on Windows 11 and Ubuntu 20.04 & 22.04.
+
+## Troubleshooting
+
+### App not launching in Ubuntu 22.04
+
+Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html)
+
+```bash
+git clone https://github.com/etherealengine/EtherealEngine-control-center.git ethereal-control-center
+cd ethereal-control-center
+npm install
+sudo apt-get install fuse libfuse2 -y
+```
+
+### Reporting an Issue
+
+If you face an issue please report it to [Issues](https://github.com/canonical/microk8s/issues) or reach out to us on [Discord](https://discord.gg/xrf). Also please share following log files:
+
+1. Non-UI logs found at following path:
+  
+    - on Linux: `~/.config/etherealengine-control-center/logs/main.log`
+    - on macOS: `~/Library/Logs/etherealengine-control-center/main.log`
+    - on Windows: `%USERPROFILE%\AppData\Roaming\etherealengine-control-center\logs\main.log`
+
+2. UI logs found using download button in app as shown in below image.
+![LogsDownload](https://user-images.githubusercontent.com/10975502/219317443-5cdf19fd-1e60-4907-a124-56cec72bb633.jpg)
 
 ## Install Development Release
 
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/etherealengine/EtherealEngine-control-center.git ethereal-control-center
-cd ethereal-control-center
+git clone https://github.com/etherealengine/etherealengine-control-center.git ethereal-engine-control-center
+cd ethereal-engine-control-center
 npm install
-```
-
-Not working: 
-
-Install Fuse https://docs.appimage.org/user-guide/troubleshooting/fuse.html
-
-```bash
-sudo apt-get install fuse libfuse2
 ```
 
 ## Starting Development
@@ -67,19 +84,18 @@ We are always hiring talented people who want to be leaders in what is to come. 
 
 ### [Join our Discord](https://discord.gg/xrf)  [![Discord Chat](https://img.shields.io/discord/692672143053422678.svg)](https://discord.gg/xrf)
 
-
-**Your own sandbox in the Metaverse. Take what you need, or launch the full stack. 
+**Your own sandbox in the Metaverse. Take what you need, or launch the full stack.
 Ethereal Engine Control Center is a desktop app for managing Ethereal Engine cluster.**
 
 Electron based Ethereal Engine Server Cluster Creator app
+
 - Ability to fully manage an on premises server.
 - Electron K8S Cluster Creator and Manager App
-- Easy setup and install deps (microk8s / minikube, docker etc) https://microk8s.io/ 
+- Easy setup and install deps (microk8s / minikube, docker etc) <https://microk8s.io/>
 - Wrap all K8S CLI into a GUI
 - Electron app with client for access to admin panel, supply link to open location in browser
-- Multiple electron apps with same k8s control plane 
+- Multiple electron apps with same k8s control plane
 - Benchmark tool - minimum specs of 4 CPU cores and 16-24GB of ram.
-
 
 We [Ethereal Engine](https://github.com/etherealengine) believe that the Metaverse, Web AR, VR. XR should be easy.
 

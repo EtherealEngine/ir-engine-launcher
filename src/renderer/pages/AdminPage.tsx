@@ -1,9 +1,9 @@
 import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
-import PageRoot from 'renderer/components/PageRoot'
+import { useEffect } from 'react'
+import PageRoot from 'renderer/common/PageRoot'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
-import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
-import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
 import { Box } from '@mui/material'
 
@@ -11,29 +11,40 @@ import ErrorPage from './ErrorPage'
 import LoadingPage from './LoadingPage'
 
 const AdminPage = () => {
-  const settingsState = useSettingsState()
-  const { adminPanel } = settingsState.value
+  const configFileState = useConfigFileState()
+  const { selectedCluster, selectedClusterId } = configFileState.value
 
   const deploymentState = useDeploymentState()
-  const { appStatus, clusterStatus } = deploymentState.value
-  const allAppsConfigured = appStatus.every((app) => app.status === AppStatus.Configured)
-  const allClusterConfigured = clusterStatus.every((cluster) => cluster.status === AppStatus.Configured)
-  const allConfigured = allAppsConfigured && allClusterConfigured
+  const currentDeployment = deploymentState.find((item) => item.clusterId.value === selectedClusterId)?.value
 
-  const appChecking = appStatus.find((app) => app.status === AppStatus.Checking)
-  const clusterChecking = clusterStatus.find((cluster) => cluster.status === AppStatus.Checking)
-  const checking = appChecking || clusterChecking
+  const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
+  const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
+  const allConfigured = allAppsConfigured && allEngineConfigured
 
-  useHookedEffect(() => {
-    if (!adminPanel.adminAccess && !adminPanel.loading && !adminPanel.error && allConfigured) {
-      SettingsService.fetchAdminPanelAccess()
+  const appChecking = currentDeployment?.appStatus.find((app) => app.status === AppStatus.Checking)
+  const engineChecking = currentDeployment?.engineStatus.find((engine) => engine.status === AppStatus.Checking)
+  const checking = appChecking || engineChecking
+
+  useEffect(() => {
+    if (
+      selectedCluster &&
+      !currentDeployment?.adminPanel.data &&
+      !currentDeployment?.adminPanel.loading &&
+      !currentDeployment?.adminPanel.error &&
+      allConfigured
+    ) {
+      DeploymentService.fetchAdminPanelAccess(selectedCluster)
     }
-  }, [deploymentState, settingsState])
+  }, [])
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   let loadingMessage = ''
   if (checking) {
     loadingMessage = 'Checking Ethereal Engine'
-  } else if (adminPanel.loading) {
+  } else if (currentDeployment?.adminPanel.loading) {
     loadingMessage = 'Loading Dashboard'
   }
 
@@ -43,11 +54,11 @@ const AdminPage = () => {
   if (!allConfigured) {
     errorMessage = 'Ethereal Engine Not Configured'
     errorDetail = 'Please configure Ethereal Engine before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus()
-  } else if (adminPanel.error) {
+    errorRetry = () => DeploymentService.fetchDeploymentStatus(selectedCluster)
+  } else if (currentDeployment?.adminPanel.error) {
     errorMessage = 'Admin Panel Error'
-    errorDetail = adminPanel.error
-    errorRetry = () => SettingsService.fetchAdminPanelAccess()
+    errorDetail = currentDeployment?.adminPanel.error
+    errorRetry = () => DeploymentService.fetchAdminPanelAccess(selectedCluster)
   }
 
   if (loadingMessage) {
@@ -59,7 +70,12 @@ const AdminPage = () => {
   return (
     <PageRoot full>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <iframe height="100%" style={{ border: 0 }} allow="xr-spatial-tracking" src={Endpoints.ADMIN_PORTAL}></iframe>
+        <iframe
+          height="100%"
+          style={{ border: 0 }}
+          allow="xr-spatial-tracking"
+          src={Endpoints.Urls.ADMIN_PORTAL}
+        ></iframe>
       </Box>
     </PageRoot>
   )

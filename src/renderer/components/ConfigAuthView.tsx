@@ -22,7 +22,6 @@ const ConfigAuthView = ({ password, sx, onChange, onEnter }: Props) => {
         margin="dense"
         size="small"
         label="Sudo Password"
-        variant="standard"
         value={password}
         type={showPassword ? 'text' : 'password'}
         onChange={(event) => onChange(event.target.value)}

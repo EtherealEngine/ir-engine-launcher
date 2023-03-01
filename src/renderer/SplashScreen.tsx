@@ -8,7 +8,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles'
 
 import logo from '../../assets/icon.svg'
 import './App.css'
-import PageRoot from './components/PageRoot'
+import PageRoot from './common/PageRoot'
 import MUITheme from './MUITheme'
 import { UpdatesService, UpdateStatus, useUpdatesState } from './services/UpdatesService'
 

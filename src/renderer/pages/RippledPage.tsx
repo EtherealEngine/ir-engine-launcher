@@ -3,8 +3,9 @@ import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
 import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
-import InfoTooltip from 'renderer/components/InfoTooltip'
-import PageRoot from 'renderer/components/PageRoot'
+import InfoTooltip from 'renderer/common/InfoTooltip'
+import PageRoot from 'renderer/common/PageRoot'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 
 import PlaylistRemoveOutlinedIcon from '@mui/icons-material/PlaylistRemoveOutlined'
@@ -22,9 +23,12 @@ const RippledPage = () => {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [outputs, setOutputs] = useState<string[]>([])
 
+  const configFileState = useConfigFileState()
+  const { selectedCluster, selectedClusterId } = configFileState.value
+
   const deploymentState = useDeploymentState()
-  const { appStatus } = deploymentState.value
-  const rippledStatus = appStatus.find((app) => app.id === 'rippled')
+  const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
+  const rippledStatus = currentDeployment?.appStatus.find((app) => app.id === 'rippled')
 
   const onCommandChange = (value: string) => {
     setCommand(value)
@@ -80,6 +84,10 @@ const RippledPage = () => {
     ;(outputEndRef.current as any)?.scrollIntoView({ behavior: 'smooth' })
   }, [outputs])
 
+  if (!selectedCluster) {
+    return <></>
+  }
+
   let loadingMessage = ''
   if (rippledStatus?.status === AppStatus.Checking) {
     loadingMessage = 'Checking Rippled'
@@ -91,7 +99,7 @@ const RippledPage = () => {
   if (rippledStatus?.status === AppStatus.NotConfigured) {
     errorMessage = 'Rippled Not Configured'
     errorDetail = 'Please configure Rippled before trying again.'
-    errorRetry = () => DeploymentService.fetchDeploymentStatus()
+    errorRetry = () => DeploymentService.fetchDeploymentStatus(selectedCluster)
   }
 
   if (loadingMessage) {
@@ -112,7 +120,7 @@ const RippledPage = () => {
               message={
                 <Typography variant="body2">
                   Here you can run rippled server cli commands.{' '}
-                  <a href={Endpoints.RIPPLED_CLI_DOCS} target="_blank">
+                  <a href={Endpoints.Urls.RIPPLED_CLI_DOCS} target="_blank">
                     More Info
                   </a>
                 </Typography>

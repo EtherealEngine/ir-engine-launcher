@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { LogService, useLogState } from 'renderer/services/LogService'
 import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
@@ -9,8 +10,11 @@ import { Box, CircularProgress, FormControlLabel, IconButton, Switch, Typography
 const LogsView = () => {
   const [showLogs, setShowLogs] = useState(true)
 
+  const configFileState = useConfigFileState()
+  const { selectedCluster, selectedClusterId } = configFileState.value
+
   const logState = useLogState()
-  const { isSavingLogs, logs } = logState.value
+  const currentLogs = logState.value.find((item) => item.clusterId === selectedClusterId)
 
   const logsEndRef = useRef(null)
 
@@ -21,7 +25,11 @@ const LogsView = () => {
   // Scroll to bottom of logs
   useHookedEffect(() => {
     scrollLogsToBottom()
-  }, [logState.logs, showLogs])
+  }, [logState, showLogs])
+
+  if (!selectedCluster) {
+    return <></>
+  }
 
   return (
     <Box sx={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
@@ -30,10 +38,15 @@ const LogsView = () => {
           Logs
         </Typography>
         <Box sx={{ position: 'relative' }}>
-          <IconButton title="Download Logs" color="primary" disabled={isSavingLogs} onClick={LogService.saveLogs}>
+          <IconButton
+            title="Download Logs"
+            color="primary"
+            disabled={currentLogs?.isSaving}
+            onClick={() => LogService.saveLogs(selectedClusterId)}
+          >
             <DownloadIcon />
           </IconButton>
-          {isSavingLogs && (
+          {currentLogs?.isSaving && (
             <CircularProgress
               size={40}
               sx={{
@@ -45,7 +58,7 @@ const LogsView = () => {
             />
           )}
         </Box>
-        <IconButton title="Clear Logs" color="primary" onClick={LogService.clearLogs}>
+        <IconButton title="Clear Logs" color="primary" onClick={() => LogService.clearLogs(selectedClusterId)}>
           <PlaylistRemoveOutlinedIcon />
         </IconButton>
         <FormControlLabel
@@ -58,7 +71,7 @@ const LogsView = () => {
       </Box>
       {showLogs && (
         <Box sx={{ overflow: 'auto' }}>
-          {logs.map((log, index) => (
+          {currentLogs?.logs.map((log, index) => (
             <pre key={`log-${index}`}>
               {new Date(log.date).toLocaleTimeString()}: {log.category} - {log.message}
             </pre>

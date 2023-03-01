@@ -51,7 +51,7 @@
   },
   "build": {
     "productName": "Ethereal Engine Control Center",
-    "appId": "org.etherealengine.EtherealEngineControlCenter",
+    "appId": "org.etherealengine.controlcenter",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -155,7 +155,6 @@
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "@types/react-test-renderer": "^17.0.1",
-    "@types/sqlite3": "^3.1.8",
     "@types/terser-webpack-plugin": "^5.0.4",
     "@types/webpack-env": "^1.16.3",
     "browserslist-config-erb": "^0.0.3",
@@ -179,6 +178,7 @@
     "jest": "^27.4.5",
     "lint-staged": "^12.1.4",
     "mini-css-extract-plugin": "^2.4.5",
+    "npm": "^9.4.1",
     "opencollective-postinstall": "^2.0.3",
     "peer-id": "^0.16.0",
     "prettier": "^2.5.1",
@@ -211,7 +211,9 @@
     "axios": "^0.26.1",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.4",
+    "electron-store": "^8.1.0",
     "electron-updater": "^4.6.5",
+    "find-process": "^1.4.7",
     "fix-path": "^4.0.0",
     "history": "^5.2.0",
     "js-yaml": "^4.1.0",
@@ -220,7 +222,9 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-reflex": "^4.0.6",
-    "react-router-dom": "^6.2.1"
+    "react-router-dom": "^6.2.1",
+    "simple-git": "^3.15.1",
+    "table-parser": "^1.0.1"
   },
   "devEngines": {
     "node": ">=14.x",

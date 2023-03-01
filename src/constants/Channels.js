@@ -1,14 +1,5 @@
 const Channels = {
   Shell: {
-    CheckMinikubeConfig: 'CheckMinikubeConfig',
-    CheckMinikubeAppConfig: 'CheckMinikubeAppConfig',
-    CheckSystemStatusResult: 'CheckSystemStatusResult',
-    CheckAppStatusResult: 'CheckAppStatusResult',
-    CheckClusterStatusResult: 'CheckClusterStatusResult',
-    ConfigureMinikubeConfig: 'ConfigureMinikubeConfig',
-    ConfigureMinikubeDashboard: 'ConfigureMinikubeDashboard',
-    ConfigureMinikubeDashboardError: 'ConfigureMinikubeDashboardError',
-    ConfigureMinikubeDashboardResponse: 'ConfigureMinikubeDashboardResponse',
     ConfigureIPFSDashboard: 'ConfigureIPFSDashboard',
     ConfigureIPFSDashboardError: 'ConfigureIPFSDashboardError',
     ConfigureIPFSDashboardResponse: 'ConfigureIPFSDashboardResponse',
@@ -18,24 +9,36 @@ const Channels = {
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',
-    GetVersion: 'GetVersion',
+    GetAppSysInfo: 'GetAppSysInfo',
     OpenExternal: 'OpenExternal',
     OpenPath: 'OpenPath',
     SelectFolder: 'SelectFolder',
     Log: 'Log',
     SaveLog: 'SaveLog',
+    GetPrerequisites: 'GetPrerequisites',
+    CheckPrerequisite: 'CheckPrerequisite'
+  },
+  Git: {
+    GetCurrentConfigs: 'GetCurrentConfigs',
+    ChangeBranch: 'ChangeBranch',
+    PullBranch: "PullBranch",
+    PushBranch: "PushBranch"
   },
   Engine: {
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
   },
-  Settings: {
-    CheckConfigs: 'CheckConfigs',
-    CheckVars: 'CheckVars',
-    GetCurrentAppConfigs: 'GetCurrentAppConfigs',
-    SaveConfigs: 'SaveConfigs',
-    SaveVars: 'SaveVars'
+  Cluster: {
+    GetClusterStatus: 'GetClusterStatus',
+    CheckClusterStatus: 'CheckClusterStatus',
+    CheckSystemStatusResult: 'CheckSystemStatusResult',
+    CheckAppStatusResult: 'CheckAppStatusResult',
+    CheckEngineStatusResult: 'CheckEngineStatusResult',
+    ConfigureK8Dashboard: 'ConfigureK8Dashboard',
+    ConfigureK8DashboardError: 'ConfigureK8DashboardError',
+    ConfigureK8DashboardResponse: 'ConfigureK8DashboardResponse',
+    ConfigureCluster: 'ConfigureCluster'
   },
   Updates: {
     CheckUpdate: 'CheckUpdate',
@@ -43,6 +46,15 @@ const Channels = {
     DownloadProgress: 'DownloadProgress',
     LaunchApp: 'LaunchApp',
     QuitAndUpdate: 'QuitAndUpdate',
+  },
+  ConfigFile: {
+    LoadConfig: 'LoadConfig',
+    SaveConfig: 'SaveConfig',
+    ExportConfig: "ExportConfig",
+    ImportConfig: "ImportConfig",
+    RemoveFiles: "RemoveFiles",
+    GetDefaultConfigs: 'GetDefaultConfigs',
+    GetDefaultVariables: 'GetDefaultVariables'
   }
 }
 
