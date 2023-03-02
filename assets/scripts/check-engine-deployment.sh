@@ -96,22 +96,25 @@ if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRES
     echo "Updating Ethereal Engine deployment to configure database"
 
     helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-true.values.yaml" local xrengine/xrengine
-    
+
     # Added this wait to ensure previous pod is deleted.
-    sleep 35
+    sleep 60
 
     # Wait until the api pod is ready
-    apiName="local-xrengine-api"
-
-    apiCount=$(kubectl get deploy $apiName -o jsonpath='{.status.availableReplicas}')
+    apiCount=$(kubectl get deploy local-xrengine-api -o jsonpath='{.status.availableReplicas}')
+    if [ -z "$apiCount" ]; then
+        apiCount=0
+    fi
     echo "Waiting for API pod to be ready. API ready count: $apiCount"
 
     # Wait until api count is 1.
-    until [ $apiCount -ge 1 ]
-    do
+    until [ "${apiCount}" -ge 1 ]; do
         sleep 5
 
-        apiCount=$(kubectl get deploy $apiName -o jsonpath='{.status.availableReplicas}')
+        apiCount=$(kubectl get deploy local-xrengine-api -o jsonpath='{.status.availableReplicas}')
+        if [ -z "$apiCount" ]; then
+            apiCount=0
+        fi
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
 
@@ -121,18 +124,20 @@ elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REF
 
     helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "./packages/ops/configs/db-refresh-true.values.yaml" local xrengine/xrengine
 
-    # Wait until the api pod is ready
-    apiName="local-xrengine-api"
-
-    apiCount=$(kubectl get deploy $apiName -o jsonpath='{.status.availableReplicas}')
+    apiCount=$(kubectl get deploy local-xrengine-api -o jsonpath='{.status.availableReplicas}')
+    if [ -z "$apiCount" ]; then
+        apiCount=0
+    fi
     echo "Waiting for API pod to be ready. API ready count: $apiCount"
 
     # Wait until api count is 1.
-    until [ $apiCount -ge 1 ]
-    do
+    until [ "${apiCount}" -ge 1 ]; do
         sleep 5
 
-        apiCount=$(kubectl get deploy $apiName -o jsonpath='{.status.availableReplicas}')
+        apiCount=$(kubectl get deploy local-xrengine-api -o jsonpath='{.status.availableReplicas}')
+        if [ -z "$apiCount" ]; then
+            apiCount=0
+        fi
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
 
