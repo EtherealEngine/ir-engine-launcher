@@ -83,7 +83,6 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
           message="Folder of Ethereal Engine source code. This folder should be inside `Home` directory."
         />
       </Box>
-
       <FormControlLabel
         labelPlacement="start"
         label={

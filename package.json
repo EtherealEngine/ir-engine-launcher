@@ -1,7 +1,7 @@
 {
   "name": "etherealengine-control-center",
   "description": "A desktop app for managing Ethereal Engine cluster.",
-  "homepage": "etherealengine.com",
+  "homepage": "etherealengine.org",
   "keywords": [
     "electron",
     "kubernetes",
@@ -18,15 +18,15 @@
   ],
   "author": {
     "name": "Ethereal Engine",
-    "email": "info@etherealengine.com",
-    "url": "https://etherealengine.com"
+    "email": "hello@etherealengine.org",
+    "url": "https://etherealengine.org"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/xrfoundation/xrengine-control-center.git"
+    "url": "git+https://github.com/etherealengine/etherealengine-control-center.git"
   },
   "bugs": {
-    "url": "https://github.com/xrfoundation/xrengine-control-center/issues"
+    "url": "https://github.com/etherealengine/etherealengine-control-center/issues"
   },
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -109,8 +109,8 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "xrfoundation",
-      "repo": "xrengine-control-center"
+      "owner": "etherealengine",
+      "repo": "etherealengine-control-center"
     }
   },
   "jest": {

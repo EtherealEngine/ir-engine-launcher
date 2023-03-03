@@ -122,8 +122,8 @@ const createWindow = async () => {
   autoUpdater.autoDownload = false
   autoUpdater.setFeedURL({
     provider: 'github',
-    owner: 'xrfoundation',
-    repo: 'xrengine-control-center'
+    owner: 'etherealengine',
+    repo: 'etherealengine-control-center'
   })
 
   log.transports.file.level = 'info'

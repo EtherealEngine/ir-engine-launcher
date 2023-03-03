@@ -5,8 +5,8 @@
   "main": "./dist/main/main.js",
   "author": {
     "name": "Ethereal Engine",
-    "email": "info@etherealengine.com",
-    "url": "https://etherealengine.com"
+    "email": "hello@etherealengine.org",
+    "url": "https://etherealengine.org"
   },
   "scripts": {
     "electron-rebuild": "node -r ts-node/register ../../.electron/scripts/electron-rebuild.js",

@@ -20,7 +20,7 @@ if [[ -d $ENGINE_FOLDER ]] && [[ -f "$ENGINE_FOLDER/package.json" ]]; then
     echo "ethereal engine repo exists at $ENGINE_FOLDER"
 else
     echo "cloning ethereal engine in $ENGINE_FOLDER"
-    git clone https://github.com/XRFoundation/XREngine "$ENGINE_FOLDER"
+    git clone https://github.com/etherealengine/etherealengine "$ENGINE_FOLDER"
 fi
 
 cd "$ENGINE_FOLDER" || exit

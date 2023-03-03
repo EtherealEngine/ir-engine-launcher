@@ -82,7 +82,7 @@ $wslStatus = cleanseString(wsl --status);
 Write-Host "WSL Status: `n$wslStatus";
 
 if ([string]::IsNullOrEmpty($wslStatus) -or $wslStatus -notlike '*Default Distribution: Ubuntu*') {
-    throw "Make sure WSL is installed and Ubuntu is selected as default distribution.`nhttps://xrfoundation.github.io/ethereal-engine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl";
+    throw "Make sure WSL is installed and Ubuntu is selected as default distribution.`nhttps://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl";
     exit 1;
 }
 
@@ -92,7 +92,7 @@ $wslDockerVersion = cleanseString(wsl docker version);
 Write-Host "WSL Docker version: `n$wslDockerVersion";
 
 if ($dockerVersion -notlike '*Server: Docker Desktop*' -or $wslDockerVersion -notlike '*Server: Docker Desktop*') {
-    throw "Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.`nhttps://xrfoundation.github.io/ethereal-engine-docs/docs/devops_deployment/microk8s_windows/#install-docker-desktop";
+    throw "Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.`nhttps://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-docker-desktop";
     exit 1;
 }
 

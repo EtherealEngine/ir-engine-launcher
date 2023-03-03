@@ -214,12 +214,12 @@ checkExitCode
 #================
 
 ADD_DOMAIN=false
-if grep -q "local.etherealengine.com" /etc/hosts; then
-    if grep -q "127.0.0.1 local.etherealengine.com" /etc/hosts; then
-        echo "*.etherealengine.com entries exists"
+if grep -q "local.etherealengine.org" /etc/hosts; then
+    if grep -q "127.0.0.1 local.etherealengine.org" /etc/hosts; then
+        echo "*.etherealengine.org entries exists"
     else
-        echo "*.etherealengine.com entries outdated"
-        grep -v 'local.etherealengine.com' /etc/hosts >/tmp/hosts.tmp
+        echo "*.etherealengine.org entries outdated"
+        grep -v 'local.etherealengine.org' /etc/hosts >/tmp/hosts.tmp
         echo "$PASSWORD" | sudo -S cp /tmp/hosts.tmp /etc/hosts
         ADD_DOMAIN=true
     fi
@@ -228,8 +228,8 @@ else
 fi
 
 if $ADD_DOMAIN; then
-    echo "$PASSWORD" | sudo -S -- sh -c "echo '127.0.0.1 local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com' >>/etc/hosts"
-    echo "*.etherealengine.com entries added"
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '127.0.0.1 local.etherealengine.org api-local.etherealengine.org instanceserver-local.etherealengine.org 00000.instanceserver-local.etherealengine.org 00001.instanceserver-local.etherealengine.org 00002.instanceserver-local.etherealengine.org 00003.instanceserver-local.etherealengine.org' >>/etc/hosts"
+    echo "*.etherealengine.org entries added"
 fi
 
 #==================

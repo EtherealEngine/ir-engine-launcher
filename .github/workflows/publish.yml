@@ -72,7 +72,7 @@ jobs:
           npm run build
           npm exec electron-builder -- --publish always --linux
         # npm exec electron-builder -- --publish always --linux deb AppImage
-        # npm exec electron-builder -- --publish always --linux rpm -c.productName=XREngineControlCenter
+        # npm exec electron-builder -- --publish always --linux rpm -c.productName=EtherealEngineControlCenter
 
   # publish_mac:
   #   runs-on: macos-latest

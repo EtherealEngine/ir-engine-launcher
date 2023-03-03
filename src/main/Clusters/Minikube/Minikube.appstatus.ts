@@ -20,7 +20,7 @@ export const MinikubeAppsStatus: AppModel[] = [
   getAppModel('git', 'Git', 'git --version;'),
   getAppModel('docker', 'Docker', 'docker --version;'),
   getAppModel('dockercompose', 'Docker Compose', 'docker-compose --version;'),
-  getAppModel('mysql', 'MySql', 'docker top xrengine_minikube_db;'),
+  getAppModel('mysql', 'MySql', 'docker top etherealengine_minikube_db;'),
   getAppModel('virtualbox', 'VirtualBox', 'vboxmanage --version;'),
   getAppModel('kubectl', 'kubectl', 'kubectl version --client --output=yaml;'),
   getAppModel('helm', 'Helm', 'helm version;'),
@@ -54,16 +54,16 @@ export const MinikubeAppsStatus: AppModel[] = [
     minikubeDependantScript(
       `
       MINIKUBE_IP=$(minikube ip)
-      if grep -q "local.etherealengine.com" /etc/hosts; then
+      if grep -q "local.etherealengine.org" /etc/hosts; then
           if grep -q "$MINIKUBE_IP" /etc/hosts; then
-              echo "*.etherealengine.com entries exists";
+              echo "*.etherealengine.org entries exists";
               exit 0;
           else
-              echo "*.etherealengine.com entries outdated" >&2;
+              echo "*.etherealengine.org entries outdated" >&2;
               exit 1;
           fi
       else
-        echo "*.etherealengine.com entries does not exist" >&2;
+        echo "*.etherealengine.org entries does not exist" >&2;
         exit 1;
       fi
     `

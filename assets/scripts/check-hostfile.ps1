@@ -74,20 +74,20 @@ try {
             }
         }
     
-        if ($hostFileContent -like "*local.etherealengine.com*") {
-            if ($hostFileContent -like "*$wslIp local.etherealengine.com*") {
-                Write-Host "*.etherealengine.com host entry exists";
+        if ($hostFileContent -like "*local.etherealengine.org*") {
+            if ($hostFileContent -like "*$wslIp local.etherealengine.org*") {
+                Write-Host "*.etherealengine.org host entry exists";
             }
             else {
-                Write-Host "*.etherealengine.com host entry outdated";
+                Write-Host "*.etherealengine.org host entry outdated";
     
                 $EXITCODE = 1
                 if ($IS_READONLY -eq $false) {
                     #Ref: https://shellgeek.com/read-file-line-by-line-in-powershell/
                     #Ref: https://stackoverflow.com/a/21970035
                     $updatedContent = [System.IO.File]::ReadAllLines($hostFilePath);
-                    $linenumber = $updatedContent | select-string "local.etherealengine.com";
-                    $updatedContent[$linenumber.LineNumber - 1] = "$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com";
+                    $linenumber = $updatedContent | select-string "local.etherealengine.org";
+                    $updatedContent[$linenumber.LineNumber - 1] = "$wslIp local.etherealengine.org api-local.etherealengine.org instanceserver-local.etherealengine.org 00000.instanceserver-local.etherealengine.org 00001.instanceserver-local.etherealengine.org 00002.instanceserver-local.etherealengine.org 00003.instanceserver-local.etherealengine.org";
 
                     # Added this to avoid file in user error.
                     $fileLocked = Test-FileLock -Path $hostFilePath
@@ -104,11 +104,11 @@ try {
             }
         }
         else {
-            Write-Host "*.etherealengine.com host entry needs to be added";
+            Write-Host "*.etherealengine.org host entry needs to be added";
     
             $EXITCODE = 1
             if ($IS_READONLY -eq $false) {
-                Add-Content -Path $hostFilePath -value "`n$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com";
+                Add-Content -Path $hostFilePath -value "`n$wslIp local.etherealengine.org api-local.etherealengine.org instanceserver-local.etherealengine.org 00000.instanceserver-local.etherealengine.org 00001.instanceserver-local.etherealengine.org 00002.instanceserver-local.etherealengine.org 00003.instanceserver-local.etherealengine.org";
             }
         }
         
@@ -153,11 +153,11 @@ try {
         }
     }
     else {
-        Write-Host "*.etherealengine.com & microk8s.registry host entries needs to be created";
+        Write-Host "*.etherealengine.org & microk8s.registry host entries needs to be created";
         
         $EXITCODE = 1
         if ($IS_READONLY -eq $false) {
-            Set-Content $hostFilePath "`n$wslIp local.etherealengine.com api-local.etherealengine.com instanceserver-local.etherealengine.com 00000.instanceserver-local.etherealengine.com 00001.instanceserver-local.etherealengine.com 00002.instanceserver-local.etherealengine.com 00003.instanceserver-local.etherealengine.com`n$wslIp microk8s.registry";
+            Set-Content $hostFilePath "`n$wslIp local.etherealengine.org api-local.etherealengine.org instanceserver-local.etherealengine.org 00000.instanceserver-local.etherealengine.org 00001.instanceserver-local.etherealengine.org 00002.instanceserver-local.etherealengine.org 00003.instanceserver-local.etherealengine.org`n$wslIp microk8s.registry";
         }
     }
     

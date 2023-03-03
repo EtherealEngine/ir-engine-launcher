@@ -53,7 +53,7 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     getAppModel('git', 'Git', 'git --version;'),
     getAppModel('docker', 'Docker', 'docker --version;'),
     getAppModel('dockercompose', 'Docker Compose', 'docker-compose --version;'),
-    getAppModel('mysql', 'MySql', 'docker top xrengine_minikube_db;'),
+    getAppModel('mysql', 'MySql', 'docker top etherealengine_minikube_db;'),
     getAppModel('kubectl', 'kubectl', 'kubectl version --client --output=yaml;'),
     getAppModel('helm', 'Helm', 'helm version;'),
     getAppModel(
@@ -106,14 +106,14 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
         if ($wslIp -like "* *") {
           $wslIp = $wslIp.split(" ")[0]
   
-          if ($content -like "*local.etherealengine.com*") {
+          if ($content -like "*local.etherealengine.org*") {
             if ($content -like "*$wslIp*") {
-                Write-Host "*.etherealengine.com entries exists"
+                Write-Host "*.etherealengine.org entries exists"
             } else {
-                throw "*.etherealengine.com entries outdated"
+                throw "*.etherealengine.org entries outdated"
             }
           } else {
-            throw "*.etherealengine.com entries does not exist"
+            throw "*.etherealengine.org entries does not exist"
           }
   
           if ($content -like "*microk8s.registry*") {
@@ -131,16 +131,16 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
         `
         : microk8sDependantScript(
             `
-        if grep -q 'local.etherealengine.com' /etc/hosts; then
-            if grep -q '127.0.0.1 local.etherealengine.com' /etc/hosts; then
-                echo '*.etherealengine.com entries exists'
+        if grep -q 'local.etherealengine.org' /etc/hosts; then
+            if grep -q '127.0.0.1 local.etherealengine.org' /etc/hosts; then
+                echo '*.etherealengine.org entries exists'
                 exit 0;
             else
-              echo '*.etherealengine.com entries outdated' >&2;
+              echo '*.etherealengine.org entries outdated' >&2;
               exit 1;
             fi
         else
-          echo '*.etherealengine.com entries does not exist' >&2;
+          echo '*.etherealengine.org entries does not exist' >&2;
           exit 1;
         fi
       `,

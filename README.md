@@ -8,17 +8,17 @@ We know it's been complicated to build with #EtherealEngine and we've made this 
 
 We would love to see your creations and invite you all to come build with us. We've got a long backlog and need your help to build the Open Metaverse. Come build with us!
 
-### [DOWNLOAD HERE](https://github.com/XRFoundation/XREngine-Control-Center/releases)
+### [DOWNLOAD HERE](https://github.com/etherealengine/etherealengine-control-center/releases)
 
 https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-8153-cd2c9c2771d5.mp4
 
-### [DOWNLOAD HERE](https://github.com/XRFoundation/XREngine-Control-Center/releases)
+### [DOWNLOAD HERE](https://github.com/etherealengine/etherealengine-control-center/releases)
 
 ### [All Control Center Video Tutorials](./TUTORIALS.md)
 
 ## Install Released
 
-1. [Download latest version of Ethereal Engine control center app from here](https://github.com/XRFoundation/XREngine-Control-Center/releases).
+1. [Download latest version of Ethereal Engine control center app from here](https://github.com/etherealengine/etherealengine-control-center/releases).
 2. For AppImage: Once downloaded, right click and go to **Properties**. In **Permissions** tab check 'Allow executing file as program'.
 3. Double click on AppImage to launch the app.
 
@@ -31,6 +31,9 @@ https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-
 Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html)
 
 ```bash
+git clone https://github.com/etherealengine/etherealengine-control-center.git ethereal-control-center
+cd ethereal-control-center
+npm install
 sudo apt-get install fuse libfuse2 -y
 ```
 
@@ -52,8 +55,8 @@ If you face an issue please report it to [Issues](https://github.com/canonical/m
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/xrfoundation/xrengine-control-center.git ethereal-engine-control-center
-cd ethereal-engine-control-center
+git clone https://github.com/etherealengine/etherealengine-control-center.git etherealengine-control-center
+cd etherealengine-control-center
 npm install
 ```
 
@@ -94,6 +97,6 @@ Electron based Ethereal Engine Server Cluster Creator app
 - Multiple electron apps with same k8s control plane
 - Benchmark tool - minimum specs of 4 CPU cores and 16-24GB of ram.
 
-We [Ethereal Engine](https://github.com/xrfoundation) believe that the Metaverse, Web AR, VR. XR should be easy.
+We [Ethereal Engine](https://github.com/etherealengine) believe that the Metaverse, Web AR, VR. XR should be easy.
 
 ### [Sponsorship](https://opencollective.com/etherealengine) [![Open Collective](https://opencollective.com/etherealengine/tiers/badge.svg)](https://opencollective.com/etherealengine)
