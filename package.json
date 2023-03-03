@@ -1,5 +1,5 @@
 {
-  "name": "ethereal-engine-control-center",
+  "name": "etherealengine-control-center",
   "description": "A desktop app for managing Ethereal Engine cluster.",
   "homepage": "etherealengine.org",
   "keywords": [
@@ -23,10 +23,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/etherealengine/ethereal-engine-control-center.git"
+    "url": "git+https://github.com/etherealengine/etherealengine-control-center.git"
   },
   "bugs": {
-    "url": "https://github.com/etherealengine/ethereal-engine-control-center/issues"
+    "url": "https://github.com/etherealengine/etherealengine-control-center/issues"
   },
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
@@ -110,7 +110,7 @@
     "publish": {
       "provider": "github",
       "owner": "etherealengine",
-      "repo": "ethereal-engine-control-center"
+      "repo": "etherealengine-control-center"
     }
   },
   "jest": {
