@@ -29,9 +29,9 @@ Steps to reproduce the behavior:
 <!--
 This log file can be found at following path:
 
-- on Linux: `~/.config/etherealengine-control-center/logs/main.log`
-- on macOS: `~/Library/Logs/etherealengine-control-center/main.log`
-- on Windows: `%USERPROFILE%\AppData\Roaming\etherealengine-control-center\logs\main.log`
+- on Linux: `~/.config/ethereal-engine-control-center/logs/main.log`
+- on macOS: `~/Library/Logs/ethereal-engine-control-center/main.log`
+- on Windows: `%USERPROFILE%\AppData\Roaming\ethereal-engine-control-center\logs\main.log`
  -->
 
 #### UI Log File

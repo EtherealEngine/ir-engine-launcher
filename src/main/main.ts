@@ -123,7 +123,7 @@ const createWindow = async () => {
   autoUpdater.setFeedURL({
     provider: 'github',
     owner: 'etherealengine',
-    repo: 'etherealengine-control-center'
+    repo: 'ethereal-engine-control-center'
   })
 
   log.transports.file.level = 'info'

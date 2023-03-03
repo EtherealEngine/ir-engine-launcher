@@ -1,5 +1,5 @@
 {
-  "name": "etherealengine-control-center",
+  "name": "ethereal-engine-control-center",
   "version": "0.1.3",
   "description": "A desktop app for managing Ethereal Engine cluster.",
   "main": "./dist/main/main.js",

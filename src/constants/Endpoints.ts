@@ -15,11 +15,11 @@ const Endpoints = {
     LAUNCH_PAGE: 'https://local.etherealengine.org/location/apartment',
     ENGINE_ENV_DEFAULT: 'https://raw.githubusercontent.com/etherealengine/etherealengine/dev/.env.local.default',
     MINIKUBE_LINUX_SCRIPT:
-      'https://raw.githubusercontent.com/etherealengine/EtherealEngine-Control-Center/master/assets/scripts/configure-minikube-linux.sh',
+      'https://raw.githubusercontent.com/etherealengine/ethereal-engine-control-center/master/assets/scripts/configure-minikube-linux.sh',
     MICROK8S_LINUX_SCRIPT:
-      'https://raw.githubusercontent.com/etherealengine/EtherealEngine-Control-Center/master/assets/scripts/configure-microk8s-linux.sh',
+      'https://raw.githubusercontent.com/etherealengine/ethereal-engine-control-center/master/assets/scripts/configure-microk8s-linux.sh',
     MICROK8S_WINDOWS_SCRIPT:
-      'https://raw.githubusercontent.com/etherealengine/EtherealEngine-Control-Center/master/assets/scripts/configure-microk8s-windows.ps1',
+      'https://raw.githubusercontent.com/etherealengine/ethereal-engine-control-center/master/assets/scripts/configure-microk8s-windows.ps1',
     MINIKUBE_VALUES_TEMPLATE:
       'https://raw.githubusercontent.com/etherealengine/etherealengine/dev/packages/ops/configs/local.minikube.template.values.yaml',
     MICROK8S_VALUES_TEMPLATE:
