@@ -106,10 +106,7 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
             )
           }}
         />
-        <InfoTooltip
-          ml={1}
-          message="Folder of Ethereal Engine OPS source code."
-        />
+        <InfoTooltip ml={1} message="Folder of Ethereal Engine OPS source code." />
       </Box>
       <FormControlLabel
         labelPlacement="start"
