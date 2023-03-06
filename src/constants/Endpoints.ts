@@ -8,6 +8,7 @@ const Endpoints = {
   ],
   MYSQL_PORT: 3304,
   DEFAULT_ENGINE_FOLDER: 'etherealengine',
+  DEFAULT_OPS_FOLDER: 'etherealengine-ops',
   Urls: {
     HOST: 'https://etherealengine.org',
     ADMIN_PORTAL: 'https://local.etherealengine.org/admin',
@@ -21,24 +22,24 @@ const Endpoints = {
     MICROK8S_WINDOWS_SCRIPT:
       'https://raw.githubusercontent.com/etherealengine/etherealengine-control-center/master/assets/scripts/configure-microk8s-windows.ps1',
     MINIKUBE_VALUES_TEMPLATE:
-      'https://raw.githubusercontent.com/etherealengine/etherealengine/dev/packages/ops/configs/local.minikube.template.values.yaml',
+      'https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.minikube.template.values.yaml',
     MICROK8S_VALUES_TEMPLATE:
-      'https://raw.githubusercontent.com/etherealengine/etherealengine/dev/packages/ops/configs/local.microk8s.template.values.yaml',
+      'https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml',
     RIPPLED_CLI_DOCS: 'https://xrpl.org/commandline-usage.html',
-    IPFS_VALUES_TEMPLATE: 'https://raw.githubusercontent.com/etherealengine/etherealengine/dev/packages/ops/ipfs/values.yaml'
+    IPFS_VALUES_TEMPLATE: 'https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/ipfs/values.yaml'
   },
   Paths: {
     ENGINE_ENV: '.env.local',
     ENGINE_ENV_DEFAULT: '.env.local.default',
     ENGINE_VALUES_FILE_NAME: 'engine.values.yaml',
-    MINIKUBE_VALUES_TEMPLATE: 'packages/ops/configs/local.minikube.template.values.yaml',
-    MICROK8S_VALUES_TEMPLATE: 'packages/ops/configs/local.microk8s.template.values.yaml',
+    MINIKUBE_VALUES_TEMPLATE: 'configs/local.minikube.template.values.yaml',
+    MICROK8S_VALUES_TEMPLATE: 'configs/local.microk8s.template.values.yaml',
     IPFS_VALUES_FILE_NAME: 'ipfs.values.yaml',
-    IPFS_VALUES_TEMPLATE: 'packages/ops/ipfs/values.yaml',
-    VALIDATOR_FILE: 'packages/ops/rippled/config/validators.txt',
-    VALIDATOR_TEMPLATE: 'packages/ops/rippled/config/validators.template.txt',
-    RIPPLED_FILE: 'packages/ops/rippled/config/rippled.cfg',
-    RIPPLED_TEMPLATE: 'packages/ops/rippled/config/rippled.template.cfg',
+    IPFS_VALUES_TEMPLATE: 'ipfs/values.yaml',
+    VALIDATOR_FILE: 'rippled/config/validators.txt',
+    VALIDATOR_TEMPLATE: 'rippled/config/validators.template.txt',
+    RIPPLED_FILE: 'rippled/config/rippled.cfg',
+    RIPPLED_TEMPLATE: 'rippled/config/rippled.template.cfg',
     WSL_PREFIX: '\\\\wsl$\\Ubuntu',
     FILE_SERVER: 'packages/server/upload'
   },

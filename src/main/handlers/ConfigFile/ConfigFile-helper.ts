@@ -3,7 +3,7 @@ import path from 'path'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
-import { ensureWSLToWindowsPath, getEngineDefaultPath } from '../../managers/PathManager'
+import { ensureWSLToWindowsPath, getEngineDefaultPath, getOpsDefaultPath } from '../../managers/PathManager'
 import { getValue } from '../../managers/StoreManager'
 import { findRequiredValues, getYamlDoc } from '../../managers/YamlManager'
 
@@ -21,6 +21,9 @@ export const getClusters = async () => {
 export const processConfigs = async (clusterConfigs: Record<string, string> = {}) => {
   if (!clusterConfigs[Storage.ENGINE_PATH]) {
     clusterConfigs[Storage.ENGINE_PATH] = await getEngineDefaultPath()
+  }
+  if (!clusterConfigs[Storage.OPS_PATH]) {
+    clusterConfigs[Storage.OPS_PATH] = await getOpsDefaultPath()
   }
   if (!clusterConfigs[Storage.ENABLE_RIPPLE_STACK]) {
     clusterConfigs[Storage.ENABLE_RIPPLE_STACK] = 'false'
@@ -72,8 +75,8 @@ export const processVariablesFile = async (
 ) => {
   const vars: Record<string, string> = {}
 
-  const enginePath = ensureWSLToWindowsPath(clusterConfigs[Storage.ENGINE_PATH])
-  const templateFullPath = path.join(enginePath, templatePath)
+  const opsPath = ensureWSLToWindowsPath(clusterConfigs[Storage.OPS_PATH])
+  const templateFullPath = path.join(opsPath, templatePath)
   const yamlDoc = await getYamlDoc(templateFullPath, templateUrl)
 
   const valuesKey = [] as string[]

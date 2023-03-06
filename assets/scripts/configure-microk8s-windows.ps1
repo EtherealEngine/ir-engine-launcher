@@ -51,6 +51,9 @@ for ( $i = 0; $i -lt $args.count; $i += 2 ) {
     elseif ($args[$i] -eq "-i") {
         $CLUSTER_ID = $args[$i + 1]
     }
+    elseif ($args[$i] -eq "-o") {
+        $OPS_FOLDER = $args[$i + 1]
+    }
     elseif ($args[$i] -eq "-p") {
         $PASSWORD = $args[$i + 1]
     }
@@ -68,6 +71,7 @@ if ([string]::IsNullOrEmpty($ASSETS_FOLDER) -or
     [string]::IsNullOrEmpty($FORCE_DB_REFRESH) -or 
     [string]::IsNullOrEmpty($ENGINE_FOLDER) -or 
     [string]::IsNullOrEmpty($CLUSTER_ID) -or 
+    [string]::IsNullOrEmpty($OPS_FOLDER) -or 
     [string]::IsNullOrEmpty($PASSWORD) -or 
     [string]::IsNullOrEmpty($ENABLE_RIPPLE_STACK)) {
     throw "Missing arguments"
@@ -298,7 +302,7 @@ checkExitCode;
 # Get Engine
 #=============
 
-wsl bash "$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER";
+wsl bash "$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER" "$OPS_FOLDER";
 
 checkExitCode;
 
@@ -322,7 +326,7 @@ checkExitCode;
 # Verify agones & redis
 #======================
 
-wsl bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$ENGINE_FOLDER";
+wsl bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$OPS_FOLDER";
 
 checkExitCode;
 
@@ -330,7 +334,7 @@ checkExitCode;
 # Verify ripple stack
 #====================
 
-wsl bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID"
+wsl bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$OPS_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID";
 
 checkExitCode;
 
@@ -338,7 +342,7 @@ checkExitCode;
 # Verify Ethereal Engine
 #=======================
 
-wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows"
+wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows" "$OPS_FOLDER";
 
 checkExitCode;
 

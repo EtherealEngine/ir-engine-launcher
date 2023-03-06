@@ -15,13 +15,14 @@ checkExitCode() {
 # Parameters
 #===========
 
-while getopts a:c:d:f:i:p:r: flag; do
+while getopts a:c:d:f:i:o:p:r: flag; do
     case "${flag}" in
     a) ASSETS_FOLDER=${OPTARG} ;;
     c) CONFIGS_FOLDER=${OPTARG} ;;
     d) FORCE_DB_REFRESH=${OPTARG} ;;
     f) ENGINE_FOLDER=${OPTARG} ;;
     i) CLUSTER_ID=${OPTARG} ;;
+    o) OPS_FOLDER=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
     r) ENABLE_RIPPLE_STACK=${OPTARG} ;;
     *)
@@ -31,7 +32,7 @@ while getopts a:c:d:f:i:p:r: flag; do
     esac
 done
 
-if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENGINE_FOLDER || -z $CLUSTER_ID || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
+if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENGINE_FOLDER || -z $CLUSTER_ID || -z $OPS_FOLDER || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
     echo "Missing arguments"
     exit 1
 fi
@@ -137,7 +138,7 @@ checkExitCode
 # Get Engine
 #=============
 
-bash "$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER"
+bash "$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER" "$OPS_FOLDER"
 
 checkExitCode
 
@@ -244,7 +245,7 @@ checkExitCode
 # Verify agones & redis
 #======================
 
-bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$ENGINE_FOLDER"
+bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$OPS_FOLDER"
 
 checkExitCode
 
@@ -252,7 +253,7 @@ checkExitCode
 # Verify ripple stack
 #====================
 
-bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$ENGINE_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID"
+bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$OPS_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID"
 
 checkExitCode
 
@@ -260,7 +261,7 @@ checkExitCode
 # Verify Ethereal Engine
 #=======================
 
-bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8s"
+bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8s" "$OPS_FOLDER"
 
 checkExitCode
 

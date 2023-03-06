@@ -7,6 +7,7 @@ set -e
 #===========
 
 ENGINE_FOLDER=$1
+OPS_FOLDER=$2
 
 #=============
 # Get Engine
@@ -15,6 +16,13 @@ ENGINE_FOLDER=$1
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+if [[ -d $OPS_FOLDER ]]; then
+    echo "ethereal engine ops repo exists at $OPS_FOLDER"
+else
+    echo "cloning ethereal engine ops in $OPS_FOLDER"
+    git clone https://github.com/etherealengine/ethereal-engine-ops "$OPS_FOLDER"
+fi
 
 if [[ -d $ENGINE_FOLDER ]] && [[ -f "$ENGINE_FOLDER/package.json" ]]; then
     echo "ethereal engine repo exists at $ENGINE_FOLDER"

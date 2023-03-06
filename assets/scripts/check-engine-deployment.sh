@@ -11,6 +11,7 @@ FORCE_DB_REFRESH=$2
 CONFIGS_FOLDER=$3
 CLUSTER_ID=$4
 CLUSTER_TYPE=$5
+OPS_FOLDER=$6
 
 #=======================
 # Verify Ethereal Engine
@@ -95,7 +96,7 @@ echo "Force DB refresh is $FORCE_DB_REFRESH"
 if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Updating Ethereal Engine deployment to configure database"
 
-    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-true.values.yaml" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-true.values.yaml" local etherealengine/etherealengine
 
     # Added this wait to ensure previous pod is deleted.
     sleep 60
@@ -118,11 +119,11 @@ if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRES
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
 
-    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-false.values.yaml" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Installing Ethereal Engine deployment with populating database"
 
-    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "./packages/ops/configs/db-refresh-true.values.yaml" local etherealengine/etherealengine
+    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "$OPS_FOLDER/configs/db-refresh-true.values.yaml" local etherealengine/etherealengine
 
     apiCount=$(kubectl get deploy local-etherealengine-api -o jsonpath='{.status.availableReplicas}')
     if [ -z "$apiCount" ]; then
@@ -141,7 +142,7 @@ elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REF
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
 
-    helm upgrade --reuse-values -f "./packages/ops/configs/db-refresh-false.values.yaml" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
     echo "Installing Ethereal Engine deployment without populating database"
 

@@ -17,6 +17,13 @@ export const getEngineDefaultPath = async () => {
   return defaultPath
 }
 
+export const getOpsDefaultPath = async () => {
+  let homePath = await getHomePath()
+
+  const defaultPath = [homePath, Endpoints.DEFAULT_OPS_FOLDER].join('/')
+  return defaultPath
+}
+
 export const getHomePath = async () => {
   let homePath = app.getPath('home')
 
