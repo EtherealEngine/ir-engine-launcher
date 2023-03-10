@@ -6,7 +6,19 @@ const type = os.type()
 
 const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
   // Escape special characters.
-  if (type === 'Windows_NT') {
+  if (type === 'Darwin') {
+    // https://stackoverflow.com/a/44758924/2077741
+    script = `
+      mk8sStatus=$(microk8s status 2>/dev/null)
+      if grep -q 'microk8s is running' <<< "$mk8sStatus"; then
+        ${script}
+        exit 0;
+      else
+        echo 'MicroK8s not configured' >&2;
+        exit 1;
+      fi
+  `
+  } else if (type === 'Windows_NT') {
     script = `
       if ${microk8sPrefix}microk8s status | grep -q 'microk8s is not running'; then
         echo 'MicroK8s not configured' >&2;
