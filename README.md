@@ -30,9 +30,9 @@ Then, double click on AppImage to launch the app.
 
 ### App not launching in Ubuntu 22.04
 
-Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html)
+Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html) by following this process:
 
-CLone this repository:
+Clone this repository:
 ```bash
 git clone https://github.com/etherealengine/etherealengine-control-center.git ethereal-control-center
 ```
@@ -65,11 +65,16 @@ If you face an issue please report it to [Issues](https://github.com/canonical/m
 
 ## Install Development Release
 
-Clone the repo and install dependencies:
-
+Clone this repository:
 ```bash
-git clone https://github.com/etherealengine/etherealengine-control-center.git etherealengine-control-center
-cd etherealengine-control-center
+git clone https://github.com/etherealengine/etherealengine-control-center.git ethereal-control-center
+```
+Go inside the folder:
+```bash
+cd ethereal-control-center
+```
+Install the dependencies:
+```bash
 npm install
 ```
 
