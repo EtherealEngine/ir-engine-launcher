@@ -116,7 +116,7 @@ class Utilities {
 
       if (
         (prerequisite.id === 'wsl' && stdOutput) ||
-        (prerequisite.id === 'wslUbuntu' && stdOutput.includes('Default Distribution: Ubuntu')) ||
+        (prerequisite.id === 'wslUbuntu' && stdOutput.includes(': Ubuntu')) ||
         ((prerequisite.id === 'dockerDesktop' || prerequisite.id === 'dockerDesktopUbuntu') &&
           stdOutput.includes('Server: Docker Desktop'))
       ) {
