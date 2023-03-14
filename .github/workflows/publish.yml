@@ -21,7 +21,7 @@ jobs:
   publish_windows:
     runs-on: windows-latest
 
-    needs: bump_version
+    # needs: bump_version
 
     steps:
       - name: Checkout git repo
@@ -48,7 +48,7 @@ jobs:
   publish_linux:
     runs-on: ubuntu-latest
 
-    needs: bump_version
+    # needs: bump_version
 
     steps:
       - name: Checkout git repo
