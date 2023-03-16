@@ -85,7 +85,7 @@ if ([string]::IsNullOrEmpty($ASSETS_FOLDER) -or
 $wslStatus = cleanseString(wsl --status);
 Write-Host "WSL Status: `n$wslStatus";
 
-if ([string]::IsNullOrEmpty($wslStatus) -or $wslStatus -notlike '*Default Distribution: Ubuntu*') {
+if ([string]::IsNullOrEmpty($wslStatus) -or $wslStatus -notlike '*: Ubuntu*') {
     throw "Make sure WSL is installed and Ubuntu is selected as default distribution.`nhttps://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl";
     exit 1;
 }

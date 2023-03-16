@@ -59,7 +59,7 @@ class Shell {
       throw 'Unable to get wsl status'
     }
 
-    if (wslResponseOutput.includes('Default Distribution: Ubuntu')) {
+    if (wslResponseOutput.includes(': Ubuntu')) {
       log.info(`Executing script ${loginScript}`)
 
       const response = await execScriptFile(loginScript, [password])

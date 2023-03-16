@@ -2,7 +2,8 @@
 
 Want to build the spatial web on your website? Looking for a place to start? Run a web metaverse cluster yourself on your own computer.
 
-The Ethereal Engine Control Center is a self-contained Metaverse world in a box. Take what you need or launch the full stack.  Ethereal Engine Control Center is a desktop app to manage a metaverse cluster.
+**The Ethereal Engine Control Center is a self-contained Metaverse world in a box.** 
+Take what you need or launch the full stack.  Ethereal Engine Control Center is a desktop app to manage a metaverse cluster.
 
 We know it's been complicated to build with #EtherealEngine and we've made this tool to give the community easy access to the engine for development and creation. The full Kubernetes cluster can run on Windows and any Debian Linux distro with at least 16 GB of ram.
 
@@ -18,9 +19,10 @@ https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-
 
 ## Install Released
 
-1. [Download latest version of Ethereal Engine control center app from here](https://github.com/etherealengine/etherealengine-control-center/releases).
-2. For AppImage: Once downloaded, right click and go to **Properties**. In **Permissions** tab check 'Allow executing file as program'.
-3. Double click on AppImage to launch the app.
+[Download latest version of Ethereal Engine control center app from here](https://github.com/etherealengine/etherealengine-control-center/releases).
+1. (Windows) Directly download the .exe file.
+2. (Linux) For AppImage: Once downloaded, right click and go to **Properties**. In **Permissions** tab check 'Allow executing file as program'.
+Then, double click on AppImage to launch the app.
 
 > Note: Currently the app is tested on Windows 11 and Ubuntu 20.04 & 22.04.
 
@@ -28,14 +30,25 @@ https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-
 
 ### App not launching in Ubuntu 22.04
 
-Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html)
+Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html) by following this process:
 
+Clone this repository:
 ```bash
 git clone https://github.com/etherealengine/etherealengine-control-center.git ethereal-control-center
+```
+Go inside the folder:
+```bash
 cd ethereal-control-center
+```
+Install the dependencies:
+```bash
 npm install
+```
+Install Fuse:
+```bash
 sudo apt-get install fuse libfuse2 -y
 ```
+
 
 ### Reporting an Issue
 
@@ -52,11 +65,16 @@ If you face an issue please report it to [Issues](https://github.com/canonical/m
 
 ## Install Development Release
 
-Clone the repo and install dependencies:
-
+Clone this repository:
 ```bash
-git clone https://github.com/etherealengine/etherealengine-control-center.git etherealengine-control-center
-cd etherealengine-control-center
+git clone https://github.com/etherealengine/etherealengine-control-center.git ethereal-control-center
+```
+Go inside the folder:
+```bash
+cd ethereal-control-center
+```
+Install the dependencies:
+```bash
 npm install
 ```
 
