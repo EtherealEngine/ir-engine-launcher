@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 import { ClusterModel } from 'models/Cluster'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import { DeploymentAppModel } from '../../../models/AppStatus'
 import { IBaseHandler } from '../IBaseHandler'
 import Cluster from './Cluster.class'

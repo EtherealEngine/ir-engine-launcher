@@ -2,17 +2,17 @@
   "name": "etherealengine-control-center",
   "version": "0.1.5",
   "description": "A desktop app for managing Ethereal Engine cluster.",
-  "main": "./dist/main/main.js",
+  "license": "MIT",
   "author": {
     "name": "Ethereal Engine",
     "email": "hello@etherealengine.org",
     "url": "https://etherealengine.org"
   },
+  "main": "./dist/main/main.js",
   "scripts": {
-    "electron-rebuild": "node -r ts-node/register ../../.electron/scripts/electron-rebuild.js",
+    "rebuild": "node -r ts-node/register ../../.electron/scripts/electron-rebuild.js",
     "link-modules": "node -r ts-node/register ../../.electron/scripts/link-modules.ts",
-    "postinstall": "npm run electron-rebuild && npm run link-modules"
+    "postinstall": "npm run rebuild && npm run link-modules"
   },
-  "dependencies": {},
-  "license": "MIT"
+  "dependencies": {}
 }

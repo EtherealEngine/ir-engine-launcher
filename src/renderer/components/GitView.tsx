@@ -1,4 +1,4 @@
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import { cloneCluster } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'

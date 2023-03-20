@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import { ClusterType } from '../../../models/Cluster'
 import { ConfigFileModel } from '../../../models/ConfigFile'
 import { IBaseHandler } from '../IBaseHandler'

@@ -1,4 +1,4 @@
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 
 import App from './App'
 import { ConfigFileService } from './services/ConfigFileService'
@@ -8,29 +8,33 @@ import { SettingsService } from './services/SettingsService'
 import { UpdatesService } from './services/UpdatesService'
 import SplashScreen from './SplashScreen'
 
+const container = document.getElementById('root')!
+
+const root = createRoot(container)
+
 const searchParams = new URLSearchParams(window.location.search)
 const isSplash = searchParams.get('splash')
 
 if (isSplash) {
   UpdatesService.listen()
 
-  render(<SplashScreen />, document.getElementById('root'))
+  root.render(<SplashScreen />)
 } else {
   LogService.listen()
   DeploymentService.listen()
   ConfigFileService.init()
   SettingsService.init()
 
-  render(<App />, document.getElementById('root'))
+  root.render(<App />)
 }
 
-export interface IElectronAPI {
-  invoke: (channel: string, ...args: any[]) => Promise<any>
-  on: (channel: string, func: (...args: any[]) => void) => () => void
-}
+// export interface IElectronAPI {
+//   invoke: (channel: string, ...args: any[]) => Promise<any>
+//   on: (channel: string, func: (...args: any[]) => void) => () => void
+// }
 
-declare global {
-  interface Window {
-    electronAPI: IElectronAPI
-  }
-}
+// declare global {
+//   interface Window {
+//     electronAPI: IElectronAPI
+//   }
+// }

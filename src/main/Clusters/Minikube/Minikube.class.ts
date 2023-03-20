@@ -2,7 +2,7 @@ import { BrowserWindow } from 'electron'
 import log from 'electron-log'
 import path from 'path'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
 import { DeploymentAppModel } from '../../../models/AppStatus'

@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import log from 'electron-log'
 import { autoUpdater, ProgressInfo } from 'electron-updater'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 
 class Updates {
   static checkUpdate = async () => {

@@ -1,5 +1,5 @@
-import { createState, useState } from '@speigg/hookstate'
-import { Channels } from 'constants/Channels'
+import { hookstate, useHookstate } from '@hookstate/core'
+import Channels from 'constants/Channels'
 import { cloneClusterArray, ClusterModel, ClusterType } from 'models/Cluster'
 import { CONFIG_VERSION, ConfigFileModel } from 'models/ConfigFile'
 import { openPathAction } from 'renderer/common/NotistackActions'
@@ -10,7 +10,7 @@ import { LogService } from './LogService'
 import { accessSettingsState } from './SettingsService'
 
 //State
-const state = createState({
+const state = hookstate({
   selectedClusterId: '',
   selectedCluster: undefined as ClusterModel | undefined,
   clusters: [] as ClusterModel[],
@@ -20,37 +20,35 @@ const state = createState({
 })
 
 store.receptors.push((action: ConfigFileActionType): void => {
-  state.batch((s) => {
-    switch (action.type) {
-      case 'SET_SELECTED_CLUSTER_ID': {
-        const selectedCluster = s.clusters.value.find((item) => item.id === action.payload)
+  switch (action.type) {
+    case 'SET_SELECTED_CLUSTER_ID': {
+      const selectedCluster = state.clusters.value.find((item) => item.id === action.payload)
 
-        return s.merge({
-          selectedClusterId: action.payload,
-          selectedCluster
-        })
-      }
-
-      case 'SET_CONFIG':
-        return s.merge({
-          version: action.payload.version,
-          clusters: action.payload.clusters,
-          loading: false,
-          error: ''
-        })
-
-      case 'SET_ERROR':
-        return s.merge({
-          loading: false,
-          error: action.payload
-        })
+      return state.merge({
+        selectedClusterId: action.payload,
+        selectedCluster
+      })
     }
-  }, action.type)
+
+    case 'SET_CONFIG':
+      return state.merge({
+        version: action.payload.version,
+        clusters: action.payload.clusters,
+        loading: false,
+        error: ''
+      })
+
+    case 'SET_ERROR':
+      return state.merge({
+        loading: false,
+        error: action.payload
+      })
+  }
 })
 
 export const accessConfigFileState = () => state
 
-export const useConfigFileState = () => useState(state) as any as typeof state
+export const useConfigFileState = () => useHookstate(state) as any as typeof state
 
 //Service
 export const ConfigFileService = {

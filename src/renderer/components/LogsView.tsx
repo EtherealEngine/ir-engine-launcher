@@ -1,7 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { LogService, useLogState } from 'renderer/services/LogService'
-import { useHookedEffect } from 'renderer/services/useHookedEffect'
 
 import DownloadIcon from '@mui/icons-material/Download'
 import PlaylistRemoveOutlinedIcon from '@mui/icons-material/PlaylistRemoveOutlined'
@@ -23,7 +22,7 @@ const LogsView = () => {
   }
 
   // Scroll to bottom of logs
-  useHookedEffect(() => {
+  useEffect(() => {
     scrollLogsToBottom()
   }, [logState, showLogs])
 

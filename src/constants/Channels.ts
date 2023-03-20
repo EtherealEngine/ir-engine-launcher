@@ -58,4 +58,4 @@ const Channels = {
   }
 }
 
-module.exports.Channels = Channels
+export default Channels

@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import path from 'path'
 import { kill } from 'ps-node'
 
-import { Channels } from '../../constants/Channels'
+import Channels from '../../constants/Channels'
 import Storage from '../../constants/Storage'
 import { ClusterModel } from '../../models/Cluster'
 import { LogModel } from '../../models/Log'

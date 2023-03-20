@@ -1,4 +1,4 @@
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
 import { ClusterType } from 'models/Cluster'

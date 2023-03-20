@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import { createMainWindow } from '../../main'
 import { IBaseHandler } from '../IBaseHandler'
 import Updates from './Updates.class'

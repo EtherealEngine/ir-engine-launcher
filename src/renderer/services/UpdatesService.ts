@@ -1,5 +1,5 @@
-import { createState, useState } from '@speigg/hookstate'
-import { Channels } from 'constants/Channels'
+import { hookstate, useHookstate } from '@hookstate/core'
+import Channels from 'constants/Channels'
 import { ProgressInfo } from 'electron-updater'
 
 import { store, useDispatch } from '../store'
@@ -13,7 +13,7 @@ export enum UpdateStatus {
 }
 
 //State
-const state = createState({
+const state = hookstate({
   status: UpdateStatus.Downloading,
   checking: 'Checking for updates...',
   error: '',
@@ -22,41 +22,39 @@ const state = createState({
 })
 
 store.receptors.push((action: UpdatesActionType): void => {
-  state.batch((s) => {
-    switch (action.type) {
-      case 'SET_UPDATE_STATUS':
-        return s.merge({
-          status: action.status
-        })
-      case 'SET_UPDATE_PROGRESS':
-        return s.merge({
-          status: UpdateStatus.Downloading,
-          progress: action.progress
-        })
-      case 'SET_UPDATE_CHECKING':
-        return s.merge({
-          status: UpdateStatus.Checking,
-          checking: action.checking,
-          progress: undefined
-        })
-      case 'SET_UPDATE_ERROR':
-        return s.merge({
-          status: UpdateStatus.Error,
-          error: action.error
-        })
-      case 'SET_UPDATE_VERSION':
-        return s.merge({
-          status: UpdateStatus.Prompt,
-          error: '',
-          newVersion: action.newVersion
-        })
-    }
-  }, action.type)
+  switch (action.type) {
+    case 'SET_UPDATE_STATUS':
+      return state.merge({
+        status: action.status
+      })
+    case 'SET_UPDATE_PROGRESS':
+      return state.merge({
+        status: UpdateStatus.Downloading,
+        progress: action.progress
+      })
+    case 'SET_UPDATE_CHECKING':
+      return state.merge({
+        status: UpdateStatus.Checking,
+        checking: action.checking,
+        progress: undefined
+      })
+    case 'SET_UPDATE_ERROR':
+      return state.merge({
+        status: UpdateStatus.Error,
+        error: action.error
+      })
+    case 'SET_UPDATE_VERSION':
+      return state.merge({
+        status: UpdateStatus.Prompt,
+        error: '',
+        newVersion: action.newVersion
+      })
+  }
 })
 
 export const accessUpdatesState = () => state
 
-export const useUpdatesState = () => useState(state) as any as typeof state
+export const useUpdatesState = () => useHookstate(state) as any as typeof state
 
 //Service
 export const UpdatesService = {

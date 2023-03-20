@@ -1,4 +1,4 @@
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import Commands from 'main/Clusters/Minikube/Minikube.commands'
 import { AppStatus } from 'models/AppStatus'
 import { cloneCluster } from 'models/Cluster'
