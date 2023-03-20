@@ -17,8 +17,7 @@ jobs:
       - name: Install Node.js and NPM
         uses: actions/setup-node@v3
         with:
-          node-version: 16
-          cache: npm
+          node-version: 16.x
 
       - name: npm install
         run: |
