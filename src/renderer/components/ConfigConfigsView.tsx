@@ -1,4 +1,4 @@
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
 import { OSType } from 'models/AppSysInfo'

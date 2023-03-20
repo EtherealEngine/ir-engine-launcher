@@ -4,7 +4,7 @@ import { promises as fs } from 'fs'
 import { existsSync } from 'fs'
 import path from 'path'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
 import { ClusterType } from '../../../models/Cluster'
 import { ConfigFileModel } from '../../../models/ConfigFile'

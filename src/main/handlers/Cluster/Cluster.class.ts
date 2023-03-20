@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron'
 import { DeploymentAppModel } from 'models/AppStatus'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import MicroK8s from '../../Clusters/MicroK8s/MicroK8s.class'

@@ -25,13 +25,13 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Install Node and NPM
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: 'npm'
+          cache: npm
 
       - name: Install dependencies
         run: |
@@ -52,10 +52,10 @@ jobs:
 
     steps:
       - name: Checkout git repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Install Node and NPM
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: 'npm'
@@ -81,10 +81,10 @@ jobs:
 
   #   steps:
   #     - name: Checkout git repo
-  #       uses: actions/checkout@v1
+  #       uses: actions/checkout@v3
 
   #     - name: Install Node and NPM
-  #       uses: actions/setup-node@v1
+  #       uses: actions/setup-node@v3
   #       with:
   #         node-version: 16
   #         cache: 'npm'

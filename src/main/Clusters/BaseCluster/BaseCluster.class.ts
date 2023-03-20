@@ -4,7 +4,7 @@ import log from 'electron-log'
 import os from 'os'
 import PeerId from 'peer-id'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import ConfigEnvMap from '../../../constants/ConfigEnvMap'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'

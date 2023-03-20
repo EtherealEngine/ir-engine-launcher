@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron'
 import { CheckRepoActions, GitResponseError, simpleGit, SimpleGit } from 'simple-git'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import Storage from '../../../constants/Storage'
 import { ClusterModel } from '../../../models/Cluster'
 import { GitStatus } from '../../../models/GitStatus'

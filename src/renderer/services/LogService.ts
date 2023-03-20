@@ -1,5 +1,5 @@
-import { createState, none, useState } from '@speigg/hookstate'
-import { Channels } from 'constants/Channels'
+import { hookstate, none, useHookstate } from '@hookstate/core'
+import Channels from 'constants/Channels'
 import { LogModel } from 'models/Log'
 import { openPathAction } from 'renderer/common/NotistackActions'
 
@@ -13,59 +13,57 @@ type LogState = {
 }
 
 //State
-const state = createState<LogState[]>([])
+const state = hookstate<LogState[]>([])
 
 store.receptors.push((action: LogActionType): void => {
-  state.batch((s) => {
-    switch (action.type) {
-      case 'SET_IS_SAVING': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].isSaving.set(action.isSaving)
-        }
-        break
+  switch (action.type) {
+    case 'SET_IS_SAVING': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].isSaving.set(action.isSaving)
       }
-      case 'SET_LOGS': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index === -1) {
-          s.merge([
-            {
-              clusterId: action.clusterId,
-              isSaving: false,
-              logs: []
-            } as LogState
-          ])
-        }
-        break
-      }
-      case 'REMOVE_LOGS': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].set(none)
-        }
-        break
-      }
-      case 'LOG_RECEIVED': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].logs.merge([action.log])
-        }
-        break
-      }
-      case 'LOG_CLEAR': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].logs.set([])
-        }
-        break
-      }
+      break
     }
-  }, action.type)
+    case 'SET_LOGS': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index === -1) {
+        state.merge([
+          {
+            clusterId: action.clusterId,
+            isSaving: false,
+            logs: []
+          } as LogState
+        ])
+      }
+      break
+    }
+    case 'REMOVE_LOGS': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].set(none)
+      }
+      break
+    }
+    case 'LOG_RECEIVED': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].logs.merge([action.log])
+      }
+      break
+    }
+    case 'LOG_CLEAR': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].logs.set([])
+      }
+      break
+    }
+  }
 })
 
 export const accessLogState = () => state
 
-export const useLogState = () => useState(state) as any as typeof state
+export const useLogState = () => useHookstate(state) as any as typeof state
 
 //Service
 export const LogService = {

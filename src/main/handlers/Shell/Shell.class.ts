@@ -3,7 +3,7 @@ import log from 'electron-log'
 import os from 'os'
 import path from 'path'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { scriptsPath } from '../../managers/PathManager'

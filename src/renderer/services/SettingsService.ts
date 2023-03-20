@@ -1,5 +1,5 @@
-import { createState, useState } from '@speigg/hookstate'
-import { Channels } from 'constants/Channels'
+import { hookstate, useHookstate } from '@hookstate/core'
+import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { AppModel } from 'models/AppStatus'
@@ -9,7 +9,7 @@ import { SnackbarProvider } from 'notistack'
 import { store, useDispatch } from '../store'
 
 //State
-const state = createState({
+const state = hookstate({
   appSysInfo: {
     osType: OSType.Undefined,
     appVersion: ''
@@ -21,35 +21,33 @@ const state = createState({
 })
 
 store.receptors.push((action: SettingsActionType): void => {
-  state.batch((s) => {
-    switch (action.type) {
-      case 'SET_APP_SYS_INFO':
-        return s.merge({
-          appSysInfo: action.payload
-        })
-      case 'SET_SUDO_PASSWORD':
-        return s.merge({
-          sudoPassword: action.payload
-        })
-      case 'SET_AUTHENTICATION_DIALOG':
-        return s.merge({
-          showAuthenticationDialog: action.payload
-        })
-      case 'SET_CREATE_CLUSTER_DIALOG':
-        return s.merge({
-          showCreateClusterDialog: action.payload
-        })
-      case 'SET_NOTISTACK':
-        return s.merge({
-          notistack: action.payload
-        })
-    }
-  }, action.type)
+  switch (action.type) {
+    case 'SET_APP_SYS_INFO':
+      return state.merge({
+        appSysInfo: action.payload
+      })
+    case 'SET_SUDO_PASSWORD':
+      return state.merge({
+        sudoPassword: action.payload
+      })
+    case 'SET_AUTHENTICATION_DIALOG':
+      return state.merge({
+        showAuthenticationDialog: action.payload
+      })
+    case 'SET_CREATE_CLUSTER_DIALOG':
+      return state.merge({
+        showCreateClusterDialog: action.payload
+      })
+    case 'SET_NOTISTACK':
+      return state.merge({
+        notistack: action.payload
+      })
+  }
 })
 
 export const accessSettingsState = () => state
 
-export const useSettingsState = () => useState(state) as any as typeof state
+export const useSettingsState = () => useHookstate(state) as any as typeof state
 
 //Service
 export const SettingsService = {

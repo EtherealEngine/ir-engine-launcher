@@ -1,7 +1,7 @@
 import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron'
 
 // import log from 'electron-log'
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import { ClusterModel } from '../../../models/Cluster'
 import { IBaseHandler } from '../IBaseHandler'
 import Git from './Git.class'

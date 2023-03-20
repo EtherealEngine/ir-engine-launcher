@@ -1,4 +1,4 @@
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import { SnackbarKey, useSnackbar } from 'notistack'
 import { Fragment } from 'react'
 

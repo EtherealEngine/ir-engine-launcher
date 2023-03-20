@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron'
 import log from 'electron-log'
 import { autoUpdater, ProgressInfo } from 'electron-updater'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 
 class Updates {
   static checkUpdate = async () => {
@@ -11,7 +11,9 @@ class Updates {
 
     if (process.env.NODE_ENV !== 'development') {
       const result = await autoUpdater.checkForUpdates()
-      latestVersion = result.updateInfo.version
+      if (result) {
+        latestVersion = result.updateInfo.version
+      }
     }
 
     const response = { currentVersion, latestVersion }

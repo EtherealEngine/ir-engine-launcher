@@ -1,5 +1,5 @@
 import { decryptPassword } from 'common/UtilitiesManager'
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
