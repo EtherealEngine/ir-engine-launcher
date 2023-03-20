@@ -5,7 +5,7 @@ const Channels = {
     ConfigureIPFSDashboardResponse: 'ConfigureIPFSDashboardResponse',
     CheckSudoPassword: 'CheckSudoPassword',
     ExecuteRippledCommand: 'ExecuteRippledCommand',
-    ExecuteCommand: 'ExecuteCommand',
+    ExecuteCommand: 'ExecuteCommand'
   },
   Utilities: {
     CopyClipboard: 'CopyClipboard',
@@ -21,8 +21,8 @@ const Channels = {
   Git: {
     GetCurrentConfigs: 'GetCurrentConfigs',
     ChangeBranch: 'ChangeBranch',
-    PullBranch: "PullBranch",
-    PushBranch: "PushBranch"
+    PullBranch: 'PullBranch',
+    PushBranch: 'PushBranch'
   },
   Engine: {
     EnsureAdminAccess: 'EnsureAdminAccess',
@@ -45,14 +45,14 @@ const Channels = {
     DownloadUpdate: 'DownloadUpdate',
     DownloadProgress: 'DownloadProgress',
     LaunchApp: 'LaunchApp',
-    QuitAndUpdate: 'QuitAndUpdate',
+    QuitAndUpdate: 'QuitAndUpdate'
   },
   ConfigFile: {
     LoadConfig: 'LoadConfig',
     SaveConfig: 'SaveConfig',
-    ExportConfig: "ExportConfig",
-    ImportConfig: "ImportConfig",
-    RemoveFiles: "RemoveFiles",
+    ExportConfig: 'ExportConfig',
+    ImportConfig: 'ImportConfig',
+    RemoveFiles: 'RemoveFiles',
     GetDefaultConfigs: 'GetDefaultConfigs',
     GetDefaultVariables: 'GetDefaultVariables'
   }

@@ -114,7 +114,9 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       devTools: false,
-      preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.electron/dll/preload.js')
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.electron/dll/preload.js')
     }
   })
 
@@ -172,7 +174,9 @@ export const createMainWindow = async () => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      preload: app.isPackaged ? path.join(__dirname, 'preload.js') : path.join(__dirname, '../../.electron/dll/preload.js'),
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.electron/dll/preload.js'),
       webviewTag: true
     }
   })
