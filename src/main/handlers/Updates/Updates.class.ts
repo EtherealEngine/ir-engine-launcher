@@ -11,7 +11,9 @@ class Updates {
 
     if (process.env.NODE_ENV !== 'development') {
       const result = await autoUpdater.checkForUpdates()
-      latestVersion = result.updateInfo.version
+      if (result) {
+        latestVersion = result.updateInfo.version
+      }
     }
 
     const response = { currentVersion, latestVersion }

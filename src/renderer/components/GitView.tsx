@@ -59,7 +59,7 @@ const GitView = () => {
           throw 'Failed to checkout branch.'
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       enqueueSnackbar(err, {
         variant: 'error'
       })
@@ -78,7 +78,7 @@ const GitView = () => {
       } else {
         throw 'Failed to pull branch.'
       }
-    } catch (err) {
+    } catch (err: any) {
       enqueueSnackbar(err, {
         variant: 'error'
       })
@@ -97,7 +97,7 @@ const GitView = () => {
       } else {
         throw 'Failed to push branch.'
       }
-    } catch (err) {
+    } catch (err: any) {
       enqueueSnackbar(err, {
         variant: 'error'
       })
