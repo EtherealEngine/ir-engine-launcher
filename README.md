@@ -30,9 +30,8 @@ Then, double click on AppImage to launch the app.
 
 ### App not launching in Ubuntu 22.04
 
-Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html)
+Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html):
 
-Install Fuse:
 ```bash
 sudo apt-get install fuse libfuse2 -y
 ```
