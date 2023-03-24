@@ -30,25 +30,12 @@ Then, double click on AppImage to launch the app.
 
 ### App not launching in Ubuntu 22.04
 
-Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html) by following this process:
+Install [Fuse](https://docs.appimage.org/user-guide/troubleshooting/fuse.html)
 
-Clone this repository:
-```bash
-git clone https://github.com/etherealengine/etherealengine-control-center.git ethereal-control-center
-```
-Go inside the folder:
-```bash
-cd ethereal-control-center
-```
-Install the dependencies:
-```bash
-npm install
-```
 Install Fuse:
 ```bash
 sudo apt-get install fuse libfuse2 -y
 ```
-
 
 ### Reporting an Issue
 
