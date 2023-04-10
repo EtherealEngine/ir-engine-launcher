@@ -1,6 +1,7 @@
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
+import ConfigMicroK8sView from 'renderer/components/ConfigMicroK8sView'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
 import { useSettingsState } from 'renderer/services/SettingsService'
@@ -109,6 +110,7 @@ const SettingsDialog = ({ onClose }: Props) => {
               <Tab label="Configs" value="configs" />
               <Tab label="Variables" value="variables" />
               {selectedCluster.type === ClusterType.Minikube && <Tab label="Minikube" value="minikube" />}
+              {selectedCluster.type === ClusterType.MicroK8s && <Tab label="MicroK8s" value="microK8s" />}
               <Tab label="Backup" value="backup" />
               <Tab label="About" value="about" />
             </Tabs>
@@ -130,6 +132,11 @@ const SettingsDialog = ({ onClose }: Props) => {
               {selectedCluster.type === ClusterType.Minikube && (
                 <TabPanel value="minikube">
                   <ConfigMinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
+                </TabPanel>
+              )}
+              {selectedCluster.type === ClusterType.MicroK8s && (
+                <TabPanel value="microK8s">
+                  <ConfigMicroK8sView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
                 </TabPanel>
               )}
               <TabPanel value="backup">

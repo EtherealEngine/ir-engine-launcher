@@ -81,7 +81,7 @@ class Shell {
   static executeCommand = async (window: BrowserWindow, cluster: ClusterModel, command: string) => {
     const category = 'execute command'
     try {
-      const output = await new Promise((resolve) => {
+      const output = await new Promise((resolve, reject) => {
         execStream(
           command,
           (data: any) => {
@@ -99,6 +99,9 @@ class Shell {
               category,
               message: stringData
             } as LogModel)
+            
+            if (stringData.toLowerCase().includes("error") || stringData.toLowerCase().includes("is not installed"))
+              reject(stringData)
           }
         )
       })
