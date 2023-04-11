@@ -99,8 +99,8 @@ class Shell {
               category,
               message: stringData
             } as LogModel)
-            
-            if (stringData.toLowerCase().includes("error") || stringData.toLowerCase().includes("is not installed"))
+
+            if (stringData.toLowerCase().includes('error') || stringData.toLowerCase().includes('is not installed'))
               reject(stringData)
           }
         )
