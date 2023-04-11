@@ -62,6 +62,14 @@ jobs:
         run: |
           npm install
 
+      - name: Pre Checks
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm run lint
+          npm exec tsc
+          npm test
+
       - name: Publish release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -85,7 +93,7 @@ jobs:
   #       uses: actions/setup-node@v3
   #       with:
   #         node-version: 16.x
-          
+
   #     - name: Install dependencies
   #       run: |
   #         npm install
