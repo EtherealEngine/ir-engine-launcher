@@ -77,14 +77,14 @@ This issue is mainly due to Docker Desktop being installed in default location. 
 
 1. Uninstall existing installation of Docker Desktop in Windows.
 2. Download latest version of [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/).
-3. Open Command Prompt.
+3. Open Command Prompt (cmd).
 4. Change current working directory to downloaded Docker Desktop folder. i.e.
 
 ```bash
 cd "C:\Users\%USERNAME%\Downloads"
 ```
 
-5. Run following command to install Docker Desktop in folder other than default one.
+5. Run following command to install Docker Desktop in a folder other than default one.
 
 ```bash
 "Docker Desktop Installer.exe" install --accept-license --installation-dir=C:\Docker
