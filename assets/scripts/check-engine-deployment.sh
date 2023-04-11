@@ -89,6 +89,8 @@ else
     echo "Ethereal Engine is not installed"
 fi
 
+export MYSQL_HOST=localhost
+export MYSQL_PORT=3304
 npm run prepare-database
 
 echo "Force DB refresh is $FORCE_DB_REFRESH"
