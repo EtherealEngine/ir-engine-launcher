@@ -176,7 +176,16 @@ if ($wslRestart -or $dockerRestart) {
 
     Start-Sleep -Seconds 10;
     
-    Start-Process "$env:PROGRAMFILES\Docker\Docker\Docker Desktop.exe"
+    $dockerPaths = $env:path -split ";" -match "docker"
+    $dockerPath = $dockerPaths[0] -replace "\\resources\\bin", ""
+
+    if ([string]::IsNullOrEmpty($dockerPath)) {
+        $dockerPath = "$env:PROGRAMFILES\Docker\Docker"
+    }
+
+    Write-Host "Docker Path is $dockerPath"
+
+    Start-Process "$dockerPath\Docker Desktop.exe"
 
     Start-Sleep -Seconds 10;
 
