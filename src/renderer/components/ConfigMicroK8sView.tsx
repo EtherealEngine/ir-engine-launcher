@@ -1,5 +1,6 @@
 import { decryptPassword, delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import Commands from 'main/Clusters/MicroK8s/MicroK8s.commands'
 import { OSType } from 'models/AppSysInfo'
 import { cloneCluster } from 'models/Cluster'
@@ -22,6 +23,7 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const [showAlert, setAlert] = useState(false)
   const [processingMicroK8sPrune, setProcessingMicroK8sPrune] = useState(false)
+  const [isOpeningRegistry, setOpeningRegistry] = useState(false)
 
   const configFileState = useConfigFileState()
   const { selectedCluster } = configFileState.value
@@ -30,7 +32,7 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
     return <></>
   }
 
-  const microK8sPrune = async () => {
+  const onPruneMicroK8s = async () => {
     try {
       setAlert(false)
       setProcessingMicroK8sPrune(true)
@@ -63,6 +65,20 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
     setProcessingMicroK8sPrune(false)
   }
 
+  const onOpenMicroK8sRegistry = async () => {
+    setOpeningRegistry(true)
+    const appSysInfo = accessSettingsState().value.appSysInfo
+
+    let url = Endpoints.Urls.MICROK8S_REGISTRY_CATALOG
+    if (appSysInfo.osType === OSType.Windows) {
+      url = Endpoints.Urls.MICROK8S_WINDOWS_REGISTRY_CATALOG
+    }
+
+    await window.electronAPI.invoke(Channels.Utilities.OpenExternal, url)
+
+    setOpeningRegistry(false)
+  }
+
   return (
     <Box sx={sx}>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
@@ -93,13 +109,54 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
         </LoadingButton>
       </Box>
 
+      <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
+        <FormControlLabel
+          labelPlacement="start"
+          label={
+            <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
+              <Typography variant="body2">LOCAL REGISTRY</Typography>
+              <InfoTooltip
+                message={
+                  <>
+                    This open microK8s local registry in local browser.
+                    <br />
+                    <br />
+                    To find more on local registry visit{' '}
+                    <a target="_blank" href="https://docs.docker.com/registry/spec/api/#detail">
+                      docker docs
+                    </a>
+                    .
+                  </>
+                }
+              />
+            </Box>
+          }
+          control={<></>}
+          sx={{ marginTop: 2, marginLeft: 0 }}
+        />
+        <LoadingButton
+          variant="outlined"
+          sx={{ marginLeft: 4, width: isOpeningRegistry ? 130 : 'auto' }}
+          loading={isOpeningRegistry}
+          loadingIndicator={
+            <Box sx={{ display: 'flex', color: '#ffffffab' }}>
+              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              Opening
+            </Box>
+          }
+          onClick={onOpenMicroK8sRegistry}
+        >
+          Open
+        </LoadingButton>
+      </Box>
+
       {showAlert && (
         <AlertDialog
           title="Confirmation"
           message="Are you sure you want to proceed? This will remove microK8s from your machine."
           okButtonText="Proceed"
           onClose={() => setAlert(false)}
-          onOk={microK8sPrune}
+          onOk={onPruneMicroK8s}
         />
       )}
     </Box>
