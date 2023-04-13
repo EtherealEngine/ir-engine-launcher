@@ -34,7 +34,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
 
     for (const status of initialStatuses) {
       // Display prerequisite with checked status
-      const checkedStatus = await SettingsService.CheckPrerequisite(status)
+      const checkedStatus = await SettingsService.checkPrerequisite(status)
 
       // Add description for corrective actions to be displayed in dialog
       if (checkedStatus.status !== AppStatus.Configured) {
@@ -44,11 +44,14 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
       const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
       checkedStatuses[currentIndex] = checkedStatus
 
-      setStatuses(checkedStatuses)
+      setStatuses((prevState) => {
+        const newState = [...prevState]
+        newState[currentIndex] = checkedStatus
+        return newState
+      })
     }
 
-    const allConfigured =
-      checkedStatuses.length > 0 && checkedStatuses.every((item) => item.status === AppStatus.Configured)
+    const allConfigured = statuses.length > 0 && statuses.every((item) => item.status === AppStatus.Configured)
 
     // Callback to enabled next button in dialog
     onChange(allConfigured)
