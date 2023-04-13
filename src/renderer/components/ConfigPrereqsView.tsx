@@ -51,7 +51,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
       })
     }
 
-    const allConfigured = statuses.length > 0 && statuses.every((item) => item.status === AppStatus.Configured)
+    const allConfigured = checkedStatuses.length > 0 && checkedStatuses.every((item) => item.status === AppStatus.Configured)
 
     // Callback to enabled next button in dialog
     onChange(allConfigured)
