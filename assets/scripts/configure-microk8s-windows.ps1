@@ -209,9 +209,11 @@ if ($LastExitCode -eq 1) {
 
     if ($hostfileProcess.ExitCode -eq 0) {
         Write-Host "Hostfile already up to date";
-    } elseif ($hostfileProcess.ExitCode -eq 1) {
+    }
+    elseif ($hostfileProcess.ExitCode -eq 1) {
         Write-Host "Hostfile updated";
-    } else {
+    }
+    else {
         Write-Host "Hostfile update exited with:";
         Write-Host $hostfileProcess.ExitCode;
         Write-host "Failed in check-hostfile"
@@ -347,11 +349,21 @@ wsl bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$OPS_FOLDER" 
 
 checkExitCode;
 
+#=====================
+# Get Docker Image Tag
+#=====================
+
+wsl bash -c "echo '$PASSWORD' | sudo -S apt install jq -y";
+
+$TAG = wsl bash -c "echo `$(jq -r .version `"$ENGINE_FOLDER/packages/server-core/package.json`")_`$(cd `"$ENGINE_FOLDER`" && git rev-parse HEAD)__`$(date +`"%d-%m-%yT%H-%M-%S`")";
+
+Write-Host "Tag is $TAG";
+
 #=======================
 # Verify Ethereal Engine
 #=======================
 
-wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows" "$OPS_FOLDER";
+wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows" "$OPS_FOLDER" "$TAG";
 
 checkExitCode;
 

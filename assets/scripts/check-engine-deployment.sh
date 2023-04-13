@@ -12,6 +12,7 @@ CONFIGS_FOLDER=$3
 CLUSTER_ID=$4
 CLUSTER_TYPE=$5
 OPS_FOLDER=$6
+TAG=$7
 
 #=======================
 # Verify Ethereal Engine
@@ -53,7 +54,7 @@ export DOCKER_BUILDKIT=0
 export COMPOSE_DOCKER_CLI_BUILD=0
 
 if [[ $CLUSTER_TYPE == 'microk8s' ]]; then
-    bash ./scripts/build_microk8s.sh
+    bash ./scripts/build_microk8s.sh "$TAG" true
 elif [[ $CLUSTER_TYPE == 'microk8sWindows' ]]; then
     export REGISTRY_HOST=microk8s.registry
     export MYSQL_HOST=kubernetes.docker.internal
@@ -63,7 +64,7 @@ elif [[ $CLUSTER_TYPE == 'microk8sWindows' ]]; then
     while [ "$retry" -le 6 ]; do
         echo "Trying: $retry"
 
-        bash ./scripts/build_microk8s.sh
+        bash ./scripts/build_microk8s.sh "$TAG" true
 
         exit_status=$?
         if [ $exit_status -eq 0 ]; then
@@ -98,7 +99,7 @@ echo "Force DB refresh is $FORCE_DB_REFRESH"
 if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Updating Ethereal Engine deployment to configure database"
 
-    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-true.values.yaml" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-true.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 
     # Added this wait to ensure previous pod is deleted.
     sleep 60
@@ -121,11 +122,15 @@ if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRES
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
 
-    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
+elif [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == true ]]; then
+    echo "Updating Ethereal Engine deployment without populating database"
+
+    helm upgrade --reuse-values --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Installing Ethereal Engine deployment with populating database"
 
-    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "$OPS_FOLDER/configs/db-refresh-true.values.yaml" local etherealengine/etherealengine
+    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "$OPS_FOLDER/configs/db-refresh-true.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 
     apiCount=$(kubectl get deploy local-etherealengine-api -o jsonpath='{.status.availableReplicas}')
     if [ -z "$apiCount" ]; then
@@ -144,11 +149,11 @@ elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REF
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
 
-    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
     echo "Installing Ethereal Engine deployment without populating database"
 
-    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" local etherealengine/etherealengine
+    helm install -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 fi
 
 export RELEASE_NAME=local

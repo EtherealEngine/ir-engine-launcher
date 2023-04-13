@@ -257,11 +257,23 @@ bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$OPS_FOLDER" "$CO
 
 checkExitCode
 
+#=====================
+# Get Docker Image Tag
+#=====================
+
+echo "$PASSWORD" | sudo -S apt install jq -y
+
+TAG="$(jq -r .version "$ENGINE_FOLDER/packages/server-core/package.json")_$(cd "$ENGINE_FOLDER" && git rev-parse HEAD)__$(date +"%d-%m-%yT%H-%M-%S")"
+
+echo "Tag is $TAG"
+
+checkExitCode
+
 #=======================
 # Verify Ethereal Engine
 #=======================
 
-bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8s" "$OPS_FOLDER"
+bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8s" "$OPS_FOLDER" "$TAG"
 
 checkExitCode
 
