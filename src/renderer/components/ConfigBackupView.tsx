@@ -50,7 +50,12 @@ const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
           disabled={loading}
           variant="contained"
           startIcon={<FileDownloadIcon />}
-          sx={{ marginLeft: 4, width: 'auto', background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
+          sx={{
+            marginLeft: 4,
+            width: 'auto',
+            background: 'linear-gradient(90deg, var(--buttonGradientStart), var(--buttonGradientEnd))',
+            ':hover': { opacity: 0.8 }
+          }}
           onClick={handleExport}
         >
           Export
@@ -73,7 +78,12 @@ const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
           disabled={loading}
           variant="contained"
           startIcon={<FileUploadIcon />}
-          sx={{ marginLeft: 4, width: 'auto', background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
+          sx={{
+            marginLeft: 4,
+            width: 'auto',
+            background: 'linear-gradient(90deg, var(--buttonGradientStart), var(--buttonGradientEnd))',
+            ':hover': { opacity: 0.8 }
+          }}
           onClick={() => setImportAlert(true)}
         >
           Import

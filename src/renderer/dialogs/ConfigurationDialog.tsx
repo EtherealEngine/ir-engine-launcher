@@ -248,7 +248,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
               these changes you can checkout the script{' '}
             </span>
             <a
-              style={{ color: 'white' }}
+              style={{ color: 'var(--textColor)' }}
               target="_blank"
               href={
                 selectedCluster?.type === ClusterType.Minikube

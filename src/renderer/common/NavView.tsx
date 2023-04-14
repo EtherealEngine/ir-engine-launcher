@@ -1,11 +1,13 @@
 import Routes from 'constants/Routes'
 import Storage from 'constants/Storage'
+import { ThemeMode } from 'models/ThemeMode'
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ColorModeContext } from 'renderer/App'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 
 import { AccountCircleOutlined } from '@mui/icons-material'
+import ColorLensIcon from '@mui/icons-material/ColorLens';
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import HomeIcon from '@mui/icons-material/Home'
@@ -35,6 +37,10 @@ type MenuModel = {
 const NavView = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null)
   const [anchorElUser, setAnchorElUser] = React.useState(null)
+
+  const defaultMode = 'vaporwave' as ThemeMode
+  const storedMode = localStorage.getItem(Storage.COLOR_MODE) as ThemeMode | undefined
+  const [mode, setMode] = React.useState(storedMode ? storedMode : defaultMode)
 
   const { selectedCluster } = useConfigFileState().value
 
@@ -91,7 +97,7 @@ const NavView = () => {
 
   return (
     <AppBar position="static" sx={{ height: '70px', backgroundColor: theme.palette.primary.main }}>
-      <Box sx={{ height: '70px', backgroundColor: 'var(--dock)' }}>
+      <Box sx={{ height: '70px', backgroundColor: 'var(--navbarBackground)' }}>
         <Toolbar>
           <Box sx={{ display: { xs: 'none', md: 'flex' }, mr: 6, alignItems: 'center', flexDirection: 'row' }}>
             <Box sx={{ height: 45, mr: 0.7 }} component="img" src={logo} />
@@ -158,7 +164,7 @@ const NavView = () => {
                   navigate(page.path)
                   handleCloseNavMenu()
                 }}
-                sx={{ my: 2, color: page.path === pathname ? 'white' : 'gray', display: 'block' }}
+                sx={{ my: 2, opacity: page.path === pathname ? 1 : 0.5, display: 'block' }}
               >
                 {page.title}
               </Button>
@@ -167,21 +173,26 @@ const NavView = () => {
 
           <Box sx={{ flexGrow: 0 }}>
             <IconButton
+              title="Toggle Theme"
               sx={{ mr: 2 }}
               onClick={() => {
+                const newMode = mode === 'vaporwave' ? 'light' : mode === 'light' ? 'dark' : ('vaporwave' as ThemeMode)
+                setMode(newMode)
                 colorMode.toggleColorMode()
               }}
               color="inherit"
             >
-              {theme.palette.mode === 'dark' ? (
+              {mode === 'vaporwave' ? (
                 <Brightness7Icon fontSize="small" />
-              ) : (
+              ) : mode === 'light' ? (
                 <Brightness4Icon fontSize="small" />
+              ) : (
+                <ColorLensIcon fontSize="small" />
               )}
             </IconButton>
             <Tooltip title="Profile">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <AccountCircleOutlined sx={{ color: 'white' }} fontSize="large" />
+                <AccountCircleOutlined fontSize="large" />
               </IconButton>
             </Tooltip>
             <Menu

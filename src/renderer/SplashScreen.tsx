@@ -1,34 +1,47 @@
+import { defaultThemeSettings } from 'constants/DefaultThemeSettings'
+import Storage from 'constants/Storage'
+import { ThemeMode } from 'models/ThemeMode'
 import * as React from 'react'
 
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import { Box, Button, CircularProgress, LinearProgress, PaletteMode, Typography } from '@mui/material'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { Box, Button, CircularProgress, LinearProgress, Typography } from '@mui/material'
+import { ThemeProvider } from '@mui/material/styles'
 
 import logo from '../../assets/icon.svg'
 import './App.css'
 import PageRoot from './common/PageRoot'
-import MUITheme from './MUITheme'
 import { UpdatesService, UpdateStatus, useUpdatesState } from './services/UpdatesService'
+import theme from './theme'
 
 const SplashScreen = () => {
   const updatesState = useUpdatesState()
   const { status, checking, newVersion, error, progress } = updatesState.value
 
-  const mode = 'dark' as PaletteMode
-  const theme = React.useMemo(() => createTheme(MUITheme(mode) as any), [mode])
+  const defaultMode = 'vaporwave' as ThemeMode
+  const storedMode = localStorage.getItem(Storage.COLOR_MODE) as ThemeMode | undefined
+  const mode = storedMode ? storedMode : (defaultMode as ThemeMode)
 
   React.useEffect(() => {
     const html = document.querySelector('html')
     if (html) {
-      html.dataset.theme = mode || 'dark'
+      html.dataset.theme = mode
+      updateTheme(mode)
     }
   }, [])
 
   React.useEffect(() => {
     UpdatesService.checkForUpdates()
   }, [])
+
+  const updateTheme = (mode: ThemeMode) => {
+    const theme = defaultThemeSettings[mode] as any
+    if (theme)
+      for (const variable of Object.keys(theme)) {
+        ;(document.querySelector(`[data-theme=${mode}]`) as any)?.style.setProperty('--' + variable, theme[variable])
+      }
+  }
 
   let content = (
     <>
@@ -41,7 +54,7 @@ const SplashScreen = () => {
     content = (
       <>
         <Box sx={{ display: 'flex', mb: 2 }}>
-          <CancelOutlinedIcon sx={{ marginRight: 1, color: 'red' }} />
+          <CancelOutlinedIcon sx={{ marginRight: 1, fill: 'red' }} />
           <Typography>{error}</Typography>
         </Box>
         <Button variant="outlined" onClick={() => UpdatesService.launchApp()}>
@@ -53,7 +66,7 @@ const SplashScreen = () => {
     content = (
       <>
         <Box sx={{ display: 'flex', mb: 2 }}>
-          <InfoOutlinedIcon sx={{ marginRight: 1, color: 'white' }} />
+          <InfoOutlinedIcon sx={{ marginRight: 1, fill: 'white' }} />
           <Typography>New version found: {newVersion}</Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -76,12 +89,12 @@ const SplashScreen = () => {
         )}
         {progress && (
           <>
-            <Typography variant="body2" sx={{ mt: 1, color: '#ffffffab' }}>
+            <Typography variant="body2" sx={{ mt: 1, opacity: 0.7 }}>
               {`${Math.round(progress.percent)}% (${humanFileSize(progress.transferred)} of ${humanFileSize(
                 progress.total
               )})`}
             </Typography>
-            <Typography variant="body2" sx={{ color: '#ffffffab' }}>
+            <Typography variant="body2" sx={{ opacity: 0.7 }}>
               {`${humanFileSize(progress.bytesPerSecond)}/sec`}
             </Typography>
           </>
@@ -92,7 +105,7 @@ const SplashScreen = () => {
     content = (
       <>
         <Box sx={{ display: 'flex', mb: 2 }}>
-          <CheckCircleOutlineIcon sx={{ marginRight: 1, color: 'limegreen' }} />
+          <CheckCircleOutlineIcon sx={{ marginRight: 1, fill: 'limegreen' }} />
           <Typography>Update successfully downloaded.</Typography>
         </Box>
         <Button variant="outlined" onClick={() => UpdatesService.updateApp()}>
@@ -112,7 +125,7 @@ const SplashScreen = () => {
             justifyContent: 'center',
             alignItems: 'center',
             width: '100%',
-            backgroundColor: 'var(--dock)'
+            backgroundColor: 'var(--navbarBackground)'
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mb: 6 }}>

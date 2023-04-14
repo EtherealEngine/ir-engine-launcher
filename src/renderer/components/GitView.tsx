@@ -117,7 +117,7 @@ const GitView = () => {
   if (currentDeployment.gitStatus.loading === false && currentDeployment.gitStatus.data === undefined)
     return (
       <>
-        <RemoveCircleOutlineRoundedIcon sx={{ color: 'orange' }} />
+        <RemoveCircleOutlineRoundedIcon sx={{ fill: 'orange' }} />
         <Typography>Git status unavailable</Typography>
       </>
     )

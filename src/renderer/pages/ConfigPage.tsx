@@ -113,11 +113,15 @@ const ConfigPage = () => {
 
           <LoadingButton
             variant="contained"
-            sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 }, width: 150 }}
+            sx={{
+              background: 'linear-gradient(90deg, var(--buttonGradientStart), var(--buttonGradientEnd))',
+              ':hover': { opacity: 0.8 },
+              width: 150
+            }}
             startIcon={<PowerSettingsNewOutlinedIcon />}
             loading={currentDeployment?.isConfiguring}
             loadingIndicator={
-              <Box sx={{ display: 'flex', color: '#ffffffab' }}>
+              <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
                 <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
                 Configuring
               </Box>
@@ -134,7 +138,7 @@ const ConfigPage = () => {
             sx={{ width: isLaunching ? 140 : 'auto' }}
             loading={isLaunching}
             loadingIndicator={
-              <Box sx={{ display: 'flex', color: '#ffffffab' }}>
+              <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
                 <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
                 Launching
               </Box>

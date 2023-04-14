@@ -26,7 +26,8 @@ const Endpoints = {
     MICROK8S_VALUES_TEMPLATE:
       'https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml',
     RIPPLED_CLI_DOCS: 'https://xrpl.org/commandline-usage.html',
-    IPFS_VALUES_TEMPLATE: 'https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/ipfs/values.yaml',
+    IPFS_VALUES_TEMPLATE:
+      'https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/ipfs/values.yaml',
     MICROK8S_REGISTRY_CATALOG: 'http://localhost:32000/v2/_catalog',
     MICROK8S_WINDOWS_REGISTRY_CATALOG: 'http://microk8s.registry:32000/v2/_catalog'
   },

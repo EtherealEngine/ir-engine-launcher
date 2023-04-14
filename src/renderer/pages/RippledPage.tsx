@@ -136,7 +136,7 @@ const RippledPage = () => {
             <pre key={`output-${index}`}>{output}</pre>
           ))}
           {outputs.length === 0 && (
-            <Typography sx={{ textAlign: 'center', mt: 5, color: 'gray' }}>
+            <Typography sx={{ textAlign: 'center', mt: 5, color: 'var(--textColor)', opacity: 0.5 }}>
               Please run a rippled command to see output here.
             </Typography>
           )}

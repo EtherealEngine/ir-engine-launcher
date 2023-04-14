@@ -31,7 +31,7 @@ export const defaultAction = (key: SnackbarKey, content?: React.ReactNode) => {
     <Fragment>
       {content}
       <IconButton onClick={() => closeSnackbar(key)}>
-        <CloseIcon />
+        <CloseIcon sx={{ fill: 'white' }} />
       </IconButton>
     </Fragment>
   )

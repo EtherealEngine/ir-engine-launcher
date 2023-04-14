@@ -16,13 +16,13 @@ const ConfigSummaryView = ({ name, type, localConfigs, localVars, localFlags, sx
   return (
     <Box sx={sx}>
       <Typography sx={{ display: 'flex', fontWeight: 'bold' }}>
-        Authentication: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
+        Authentication: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
       </Typography>
 
       {name && type && (
         <>
           <Typography sx={{ display: 'flex', fontWeight: 'bold', marginTop: 2, marginBottom: 0.5 }}>
-            Cluster: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
+            Cluster: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
           </Typography>
           <Typography variant="body2">
             <span style={{ opacity: 0.5 }}>Cluster Name:</span> {name}
@@ -33,7 +33,7 @@ const ConfigSummaryView = ({ name, type, localConfigs, localVars, localFlags, sx
         </>
       )}
       <Typography sx={{ display: 'flex', fontWeight: 'bold', marginTop: 2, marginBottom: 0.5 }}>
-        Configs: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
+        Configs: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
       </Typography>
       {Object.keys(localConfigs).map((key) => (
         <Typography key={key} variant="body2">
@@ -47,7 +47,7 @@ const ConfigSummaryView = ({ name, type, localConfigs, localVars, localFlags, sx
       ))}
 
       <Typography sx={{ display: 'flex', fontWeight: 'bold', marginTop: 2, marginBottom: 0.5 }}>
-        Variables: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, color: 'limegreen' }} />
+        Variables: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
       </Typography>
       {Object.keys(localVars).map((key) => (
         <Typography key={key} variant="body2">

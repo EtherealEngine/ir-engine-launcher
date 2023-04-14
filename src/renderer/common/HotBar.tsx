@@ -39,7 +39,7 @@ const HotBar = () => {
     <Box sx={{ backgroundColor: theme.palette.primary.main }}>
       <Box
         sx={{
-          backgroundColor: 'var(--dock)',
+          backgroundColor: 'var(--navbarBackground)',
           width: '100px',
           height: 'calc(100vh - 70px)',
           display: 'flex',
@@ -69,8 +69,8 @@ const HotBar = () => {
                   sx={{
                     width: '100%',
                     height: '100%',
-                    background: selectedClusterId === cluster.id ? 'var(--purpleDarkest)' : undefined,
-                    color: 'var(--text)',
+                    background: selectedClusterId === cluster.id ? 'var(--sidebarSelectedBackground)' : undefined,
+                    color: 'var(--textColor)',
                     flexDirection: 'column',
                     display: 'flex',
                     padding: 1,
