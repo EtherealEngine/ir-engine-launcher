@@ -13,6 +13,7 @@ import { exec } from '../../managers/ShellManager'
 class Engine {
   static ensureAdminAccess = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
     try {
+      await delay(1500)
       let adminWindow: BrowserWindow | null = new BrowserWindow({
         width: 1000,
         height: 800,

@@ -16,7 +16,6 @@ const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
         exit 0;
       fi
     `
-    script = script.replaceAll('$', '`$')
   } else {
     // https://stackoverflow.com/a/44758924/2077741
     script = `

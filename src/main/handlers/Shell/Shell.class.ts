@@ -154,7 +154,7 @@ class Shell {
   static executeRippledCommand = async (window: BrowserWindow, cluster: ClusterModel, command: string) => {
     const category = 'rippled cli'
     try {
-      command = `podname=$(kubectl get pods -l app.kubernetes.io/instance=local-rippled --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl exec -i $podname -- bash -c '${command}';`
+      command = `kubectl exec -i $(kubectl get pods -l app.kubernetes.io/instance=local-rippled --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}') -- bash -c '${command}';`
       const response = await exec(command)
       const { stdout, stderr } = response
 

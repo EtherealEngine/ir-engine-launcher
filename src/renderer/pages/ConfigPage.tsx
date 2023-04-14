@@ -118,7 +118,7 @@ const ConfigPage = () => {
               ':hover': { opacity: 0.8 },
               width: 150
             }}
-            startIcon={<PowerSettingsNewOutlinedIcon />}
+            startIcon={currentDeployment?.isConfiguring ? undefined : <PowerSettingsNewOutlinedIcon />}
             loading={currentDeployment?.isConfiguring}
             loadingIndicator={
               <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>

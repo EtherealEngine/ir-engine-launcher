@@ -39,7 +39,7 @@ const HotBar = () => {
     <Box sx={{ backgroundColor: theme.palette.primary.main }}>
       <Box
         sx={{
-          backgroundColor: 'var(--navbarBackground)',
+          backgroundColor: 'var(--sidebarBackground)',
           width: '100px',
           height: 'calc(100vh - 70px)',
           display: 'flex',
