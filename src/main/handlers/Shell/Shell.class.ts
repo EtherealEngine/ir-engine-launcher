@@ -9,12 +9,12 @@ import { LogModel } from '../../../models/Log'
 import { scriptsPath } from '../../managers/PathManager'
 import { cleanseString, exec, execScriptFile, execStream } from '../../managers/ShellManager'
 
+const type = os.type()
 class Shell {
   static checkSudoPassword = async (password: string = '') => {
     try {
       const loginScript = path.join(scriptsPath(), 'check-login.sh')
 
-      const type = os.type()
       if (type === 'Windows_NT') {
         await Shell._checkSudoPasswordWindows(password, loginScript)
       } else {
@@ -137,11 +137,15 @@ class Shell {
         window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: stringData } as LogModel)
         window.webContents.send(Channels.Shell.ConfigureIPFSDashboardError, cluster.id, data)
       }
-      await execStream(
-        `podname=$(kubectl get pods -l app.kubernetes.io/instance=local-ipfs --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}'); kubectl port-forward $podname :9095;`,
-        onStdout,
-        onStderr
-      )
+
+      let command = `kubectl port-forward $(kubectl get pods -l app.kubernetes.io/instance=local-ipfs --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}') :9095;`
+
+      if (type === 'Windows_NT') {
+        command = command.replaceAll('$', '`$')
+        command = `wsl bash -c "${command}"`
+      }
+      
+      await execStream(command, onStdout, onStderr)
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
         category,
