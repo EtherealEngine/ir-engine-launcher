@@ -22,12 +22,12 @@ const theme = createTheme({
         root: {
           color: 'var(--textColor)',
           opacity: 0.5,
-          
+
           '&.Mui-selected': {
             color: 'var(--textColor)',
             opacity: 1
           }
-        },
+        }
       }
     },
     MuiStepLabel: {
@@ -62,59 +62,59 @@ const theme = createTheme({
         root: {
           color: 'var(--textColor)'
         }
-    //     h1: {
-    //       fontSize: 24,
-    //       margin: '15px 0px',
-    //       display: 'flex',
-    //       alignItems: 'center'
-    //     },
-    //     h2: {
-    //       fontSize: 16,
-    //       fontWeight: 'bold',
-    //       margin: '5px 0px',
-    //       cursor: 'pointer',
-    //       display: 'flex',
-    //       alignItems: 'center',
-    //       '&.MuiTypography-colorSecondary': {
-    //         color: '#FFD600'
-    //       }
-    //     },
-    //     h3: {
-    //       fontSize: 14,
-    //       margin: '5px 0px',
-    //       fontWeight: 'bold',
-    //       cursor: 'pointer',
-    //       display: 'flex',
-    //       alignItems: 'center',
-    //       '&.MuiTypography-colorSecondary': {
-    //         color: '#FFD600'
-    //       }
-    //     },
-    //     h4: {
-    //       fontSize: 14,
-    //       margin: '5px 0px',
-    //       cursor: 'pointer',
-    //       display: 'flex',
-    //       alignItems: 'center',
-    //       '&.MuiTypography-colorSecondary': {
-    //         color: '#FFD600'
-    //       }
-    //     },
-    //     alignRight: {
-    //       textAlign: 'right',
-    //       justifyContent: 'flex-end',
-    //       alignItems: 'right'
-    //     },
-    //     alignLeft: {
-    //       textAlign: 'left',
-    //       justifyContent: 'flex-start',
-    //       alignItems: 'left'
-    //     },
-    //     alignCenter: {
-    //       textAlign: 'center',
-    //       justifyContent: 'center',
-    //       alignItems: 'center'
-    //     }
+        //     h1: {
+        //       fontSize: 24,
+        //       margin: '15px 0px',
+        //       display: 'flex',
+        //       alignItems: 'center'
+        //     },
+        //     h2: {
+        //       fontSize: 16,
+        //       fontWeight: 'bold',
+        //       margin: '5px 0px',
+        //       cursor: 'pointer',
+        //       display: 'flex',
+        //       alignItems: 'center',
+        //       '&.MuiTypography-colorSecondary': {
+        //         color: '#FFD600'
+        //       }
+        //     },
+        //     h3: {
+        //       fontSize: 14,
+        //       margin: '5px 0px',
+        //       fontWeight: 'bold',
+        //       cursor: 'pointer',
+        //       display: 'flex',
+        //       alignItems: 'center',
+        //       '&.MuiTypography-colorSecondary': {
+        //         color: '#FFD600'
+        //       }
+        //     },
+        //     h4: {
+        //       fontSize: 14,
+        //       margin: '5px 0px',
+        //       cursor: 'pointer',
+        //       display: 'flex',
+        //       alignItems: 'center',
+        //       '&.MuiTypography-colorSecondary': {
+        //         color: '#FFD600'
+        //       }
+        //     },
+        //     alignRight: {
+        //       textAlign: 'right',
+        //       justifyContent: 'flex-end',
+        //       alignItems: 'right'
+        //     },
+        //     alignLeft: {
+        //       textAlign: 'left',
+        //       justifyContent: 'flex-start',
+        //       alignItems: 'left'
+        //     },
+        //     alignCenter: {
+        //       textAlign: 'center',
+        //       justifyContent: 'center',
+        //       alignItems: 'center'
+        //     }
       }
     },
     MuiDialog: {

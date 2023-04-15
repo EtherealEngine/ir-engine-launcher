@@ -15,11 +15,19 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  SxProps,
+  Theme,
   Tooltip,
   Typography
 } from '@mui/material'
 
-const GitView = () => {
+interface Props {
+  name: string
+  repoType: string
+  sx?: SxProps<Theme>
+}
+
+const GitView = ({ name, repoType, sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const configFileState = useConfigFileState()
   const { selectedCluster, selectedClusterId } = configFileState.value
@@ -32,13 +40,14 @@ const GitView = () => {
   }
 
   let branches: string[] = []
-  if (currentDeployment.gitStatus.data) {
+  if (currentDeployment.gitStatus[repoType].data) {
     const allowedBranches = ['dev', '/dev', 'master', '/master']
-    branches = currentDeployment.gitStatus.data.branches.filter((item) =>
-      allowedBranches.some((allowed) => item.endsWith(allowed))
-    )
+    branches =
+      currentDeployment.gitStatus[repoType].data?.branches.filter((item) =>
+        allowedBranches.some((allowed) => item.endsWith(allowed))
+      ) || []
 
-    const current = currentDeployment.gitStatus.data.current
+    const current = currentDeployment.gitStatus[repoType].data?.current
     if (current && branches.includes(current) === false) {
       branches = [current, ...branches]
     }
@@ -52,9 +61,14 @@ const GitView = () => {
         // Here we are cloning cluster object so that when selected Cluster is changed,
         // The context cluster does not change.
         const clonedCluster = cloneCluster(selectedCluster)
-        const success = await window.electronAPI.invoke(Channels.Git.ChangeBranch, clonedCluster, value)
+        const success = await window.electronAPI.invoke(
+          Channels.Git.ChangeBranch,
+          clonedCluster,
+          selectedCluster.configs[repoType],
+          value
+        )
         if (success) {
-          await DeploymentService.fetchGitStatus(clonedCluster)
+          await DeploymentService.fetchGitStatus(clonedCluster, repoType)
         } else {
           throw 'Failed to checkout branch.'
         }
@@ -72,9 +86,13 @@ const GitView = () => {
       // Here we are cloning cluster object so that when selected Cluster is changed,
       // The context cluster does not change.
       const clonedCluster = cloneCluster(selectedCluster)
-      const success = await window.electronAPI.invoke(Channels.Git.PullBranch, clonedCluster)
+      const success = await window.electronAPI.invoke(
+        Channels.Git.PullBranch,
+        clonedCluster,
+        selectedCluster.configs[repoType]
+      )
       if (success) {
-        await DeploymentService.fetchGitStatus(clonedCluster)
+        await DeploymentService.fetchGitStatus(clonedCluster, repoType)
       } else {
         throw 'Failed to pull branch.'
       }
@@ -91,9 +109,13 @@ const GitView = () => {
       // Here we are cloning cluster object so that when selected Cluster is changed,
       // The context cluster does not change.
       const clonedCluster = cloneCluster(selectedCluster)
-      const success = await window.electronAPI.invoke(Channels.Git.PushBranch, clonedCluster)
+      const success = await window.electronAPI.invoke(
+        Channels.Git.PushBranch,
+        clonedCluster,
+        selectedCluster.configs[repoType]
+      )
       if (success) {
-        await DeploymentService.fetchGitStatus(clonedCluster)
+        await DeploymentService.fetchGitStatus(clonedCluster, repoType)
       } else {
         throw 'Failed to push branch.'
       }
@@ -105,7 +127,7 @@ const GitView = () => {
     }
   }
 
-  if (currentDeployment.gitStatus.loading) {
+  if (currentDeployment.gitStatus[repoType].loading) {
     return (
       <>
         <CircularProgress size={25} />
@@ -114,7 +136,10 @@ const GitView = () => {
     )
   }
 
-  if (currentDeployment.gitStatus.loading === false && currentDeployment.gitStatus.data === undefined)
+  if (
+    currentDeployment.gitStatus[repoType].loading === false &&
+    currentDeployment.gitStatus[repoType].data === undefined
+  )
     return (
       <>
         <RemoveCircleOutlineRoundedIcon sx={{ fill: 'orange' }} />
@@ -124,14 +149,14 @@ const GitView = () => {
 
   return (
     <>
-      <Typography>Git: </Typography>
+      <Typography sx={sx}>{name}: </Typography>
 
       <FormControl margin="dense" size="small">
         <InputLabel id="branch-label">Branch</InputLabel>
         <Select
           labelId="branch-label"
           label="Branch"
-          value={currentDeployment.gitStatus.data?.current}
+          value={currentDeployment.gitStatus[repoType].data?.current}
           onChange={handleBranchChange}
         >
           {branches.map((branch) => (
@@ -145,12 +170,14 @@ const GitView = () => {
       <Tooltip arrow title="Pull/Behind">
         <span>
           <Button
-            disabled={!currentDeployment.gitStatus.data || currentDeployment.gitStatus.data?.behind === 0}
+            disabled={
+              !currentDeployment.gitStatus[repoType].data || currentDeployment.gitStatus[repoType].data?.behind === 0
+            }
             sx={{ minWidth: 'auto' }}
             onClick={handlePull}
           >
             <DownloadIcon />
-            {currentDeployment.gitStatus.data?.behind}
+            {currentDeployment.gitStatus[repoType].data?.behind}
           </Button>
         </span>
       </Tooltip>
@@ -168,12 +195,14 @@ const GitView = () => {
       >
         <span>
           <Button
-            disabled={!currentDeployment.gitStatus.data || currentDeployment.gitStatus.data?.ahead === 0}
+            disabled={
+              !currentDeployment.gitStatus[repoType].data || currentDeployment.gitStatus[repoType].data?.ahead === 0
+            }
             sx={{ minWidth: 'auto' }}
             onClick={handlePush}
           >
             <UploadIcon />
-            {currentDeployment.gitStatus.data?.ahead}
+            {currentDeployment.gitStatus[repoType].data?.ahead}
           </Button>
         </span>
       </Tooltip>

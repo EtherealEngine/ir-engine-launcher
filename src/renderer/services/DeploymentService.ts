@@ -1,6 +1,7 @@
 import { hookstate, none, useHookstate } from '@hookstate/core'
 import { decryptPassword, delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
+import Storage from 'constants/Storage'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'
 import { OSType } from 'models/AppSysInfo'
 import { cloneCluster, ClusterModel } from 'models/Cluster'
@@ -15,7 +16,7 @@ type DeploymentState = {
   isConfiguring: boolean
   isFirstFetched: boolean
   isFetchingStatuses: boolean
-  gitStatus: FetchableItem<GitStatus | undefined>
+  gitStatus: Record<string, FetchableItem<GitStatus | undefined>>
   ipfs: FetchableItem<string>
   adminPanel: FetchableItem<boolean>
   k8dashboard: FetchableItem<string>
@@ -66,9 +67,16 @@ store.receptors.push((action: DeploymentActionType): void => {
             isFirstFetched: false,
             isFetchingStatuses: false,
             gitStatus: {
-              loading: false,
-              data: undefined,
-              error: ''
+              [Storage.ENGINE_PATH]: {
+                loading: false,
+                data: undefined,
+                error: ''
+              },
+              [Storage.OPS_PATH]: {
+                loading: false,
+                data: undefined,
+                error: ''
+              }
             },
             ipfs: {
               loading: false,
@@ -103,7 +111,7 @@ store.receptors.push((action: DeploymentActionType): void => {
     case 'SET_GIT_STATUS': {
       const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
       if (index !== -1) {
-        state[index].gitStatus.set(action.payload)
+        state[index].gitStatus[action.repoType].set(action.payload)
       }
       break
     }
@@ -206,7 +214,7 @@ export const DeploymentService = {
         password = decryptPassword(sudoPassword)
       }
 
-      DeploymentService.fetchGitStatus(clonedCluster)
+      DeploymentService.fetchGitStatuses(clonedCluster)
 
       const deploymentApps = await DeploymentService.getDeploymentStatus(clonedCluster, password)
       if (deploymentApps) {
@@ -238,20 +246,30 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     dispatch(DeploymentAction.setK8Dashboard(clusterId))
   },
-  fetchGitStatus: async (cluster: ClusterModel) => {
+  fetchGitStatus: async (cluster: ClusterModel, repoType: string) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
     const dispatch = useDispatch()
 
     try {
-      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, undefined, true))
-      const gitStatus = await window.electronAPI.invoke(Channels.Git.GetCurrentConfigs, clonedCluster)
-      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, gitStatus, false))
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, repoType, undefined, true))
+      const gitStatus: GitStatus = await window.electronAPI.invoke(
+        Channels.Git.GetCurrentConfigs,
+        clonedCluster,
+        clonedCluster.configs[repoType]
+      )
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, repoType, gitStatus, false))
     } catch (error) {
       console.error(error)
-      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, undefined, false))
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, repoType, undefined, false))
     }
+  },
+  fetchGitStatuses: async (cluster: ClusterModel) => {
+    await Promise.all([
+      DeploymentService.fetchGitStatus(cluster, Storage.ENGINE_PATH),
+      DeploymentService.fetchGitStatus(cluster, Storage.OPS_PATH)
+    ])
   },
   fetchIpfsDashboard: async (cluster: ClusterModel) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
@@ -372,10 +390,11 @@ export const DeploymentAction = {
       deploymentApps
     }
   },
-  setGitStatus: (clusterId: string, data: GitStatus | undefined, loading = false, error = '') => {
+  setGitStatus: (clusterId: string, repoType: string, data: GitStatus | undefined, loading = false, error = '') => {
     return {
       type: 'SET_GIT_STATUS' as const,
       clusterId,
+      repoType,
       payload: { loading, data, error } as FetchableItem<GitStatus | undefined>
     }
   },

@@ -34,7 +34,7 @@ const RippledPage = () => {
   if (!selectedCluster) {
     return <></>
   }
-  
+
   const onCommandChange = (value: string) => {
     setCommand(value)
   }

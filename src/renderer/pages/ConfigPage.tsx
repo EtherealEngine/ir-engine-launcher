@@ -1,5 +1,6 @@
 import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
+import Storage from 'constants/Storage'
 import { AppStatus } from 'models/AppStatus'
 import { ClusterType } from 'models/Cluster'
 import { useState } from 'react'
@@ -87,11 +88,13 @@ const ConfigPage = () => {
                   : logoEngine
               }
             />
-            <Typography variant="h5" sx={{ mr: 3 }}>
+            <Typography variant="h5" sx={{ mr: 5 }}>
               {selectedCluster.name}
             </Typography>
 
-            <GitView />
+            <GitView name="Engine" repoType={Storage.ENGINE_PATH} />
+
+            <GitView sx={{ ml: 5 }} name="Ops" repoType={Storage.OPS_PATH} />
           </Box>
 
           <IconButton

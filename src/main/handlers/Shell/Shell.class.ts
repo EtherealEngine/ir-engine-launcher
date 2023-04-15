@@ -145,7 +145,7 @@ class Shell {
         command = command.replaceAll('$', '`$')
         command = `wsl bash -c "${command}"`
       }
-      
+
       await execStream(command, onStdout, onStderr)
     } catch (err) {
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

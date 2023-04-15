@@ -2,23 +2,22 @@ import { BrowserWindow } from 'electron'
 import { CheckRepoActions, GitResponseError, simpleGit, SimpleGit } from 'simple-git'
 
 import Channels from '../../../constants/Channels'
-import Storage from '../../../constants/Storage'
 import { ClusterModel } from '../../../models/Cluster'
 import { GitStatus } from '../../../models/GitStatus'
 import { LogModel } from '../../../models/Log'
 import { ensureWSLToWindowsPath } from '../../managers/PathManager'
 
 class Git {
-  private static _getGit = (cluster: ClusterModel) => {
-    let enginePath = ensureWSLToWindowsPath(cluster.configs[Storage.ENGINE_PATH])
+  private static _getGit = (repoPath: string) => {
+    let enginePath = ensureWSLToWindowsPath(repoPath)
 
     const git: SimpleGit = simpleGit(enginePath)
     return git
   }
 
-  static getCurrentConfigs = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
+  static getCurrentConfigs = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
-      const git = Git._getGit(cluster)
+      const git = Git._getGit(repoPath)
 
       const isRepo = await git.checkIsRepo(CheckRepoActions.IS_REPO_ROOT)
 
@@ -46,9 +45,14 @@ class Git {
     }
   }
 
-  static changeBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, branch: string) => {
+  static changeBranch = async (
+    parentWindow: BrowserWindow,
+    cluster: ClusterModel,
+    repoPath: string,
+    branch: string
+  ) => {
     try {
-      const git = Git._getGit(cluster)
+      const git = Git._getGit(repoPath)
 
       if (branch.startsWith('remotes/')) {
         let localBranch = branch.split('/').pop()
@@ -78,9 +82,9 @@ class Git {
     }
   }
 
-  static pullBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
+  static pullBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
-      const git = Git._getGit(cluster)
+      const git = Git._getGit(repoPath)
 
       await git.pull()
 
@@ -94,9 +98,9 @@ class Git {
     }
   }
 
-  static pushBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
+  static pushBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
-      const git = Git._getGit(cluster)
+      const git = Git._getGit(repoPath)
 
       await git.push()
 
