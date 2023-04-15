@@ -128,6 +128,7 @@ class Shell {
         if (stringData.toString().startsWith('Forwarding from 127.0.0.1')) {
           let url = stringData.toString().replace('Forwarding from ', '')
           url = url.split(' ')[0]
+          url = url.replace('127.0.0.1', 'localhost')
           url = `http://${url}/webui`
           window.webContents.send(Channels.Shell.ConfigureIPFSDashboardResponse, cluster.id, url)
         }

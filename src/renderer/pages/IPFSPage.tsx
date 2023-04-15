@@ -68,7 +68,7 @@ const IPFSPage = () => {
   return (
     <PageRoot full>
       <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        <iframe height="100%" style={{ border: 0 }} src={currentDeployment?.ipfs.data}></iframe>
+        <webview style={{ border: 0, height: '100%' }} src={currentDeployment?.ipfs.data}></webview>
       </Box>
     </PageRoot>
   )
