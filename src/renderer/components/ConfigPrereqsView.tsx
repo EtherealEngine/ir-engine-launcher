@@ -34,7 +34,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
 
     for (const status of initialStatuses) {
       // Display prerequisite with checked status
-      const checkedStatus = await SettingsService.CheckPrerequisite(status)
+      const checkedStatus = await SettingsService.checkPrerequisite(status)
 
       // Add description for corrective actions to be displayed in dialog
       if (checkedStatus.status !== AppStatus.Configured) {
@@ -44,7 +44,11 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
       const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
       checkedStatuses[currentIndex] = checkedStatus
 
-      setStatuses(checkedStatuses)
+      setStatuses((prevState) => {
+        const newState = [...prevState]
+        newState[currentIndex] = checkedStatus
+        return newState
+      })
     }
 
     const allConfigured =
@@ -61,7 +65,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
           <span style={{ fontSize: 14, opacity: 0.6 }}>
             Make sure WSL is installed and Ubuntu is selected as default distribution.{' '}
           </span>
-          <a style={{ color: 'white' }} target="_blank" href={Endpoints.Docs.INSTALL_WSL}>
+          <a style={{ color: 'var(--textColor)' }} target="_blank" href={Endpoints.Docs.INSTALL_WSL}>
             Install WSL
           </a>
           .
@@ -73,7 +77,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
           <span style={{ fontSize: 14, opacity: 0.6 }}>
             Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.{' '}
           </span>
-          <a style={{ color: 'white' }} target="_blank" href={Endpoints.Docs.INSTALL_DOCKER}>
+          <a style={{ color: 'var(--textColor)' }} target="_blank" href={Endpoints.Docs.INSTALL_DOCKER}>
             Install Docker Desktop
           </a>
           .

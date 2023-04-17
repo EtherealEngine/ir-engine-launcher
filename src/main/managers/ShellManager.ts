@@ -37,6 +37,8 @@ export const exec = (command: string, isLinuxCommand: boolean = true): Promise<S
         command = `source ~/.nvm/nvm.sh [ -x '$(command -v nvm)' ] && ${command}`
       }
 
+      command = command.replaceAll('$', '`$')
+
       command = `wsl bash -c "${command}"`
     }
   }

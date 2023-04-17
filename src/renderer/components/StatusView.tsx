@@ -37,7 +37,7 @@ const StatusView = ({ statuses, title }: Props) => {
           )}
           {!checking && allConfigured && (
             <Fragment>
-              <CheckCircleOutlineIcon sx={{ marginLeft: 2, marginRight: 1, color: 'limegreen' }} />
+              <CheckCircleOutlineIcon sx={{ marginLeft: 2, marginRight: 1, fill: 'limegreen' }} />
               <Typography variant="h6" sx={{ fontWeight: 'light' }}>
                 {' '}
                 All Configured
@@ -46,7 +46,7 @@ const StatusView = ({ statuses, title }: Props) => {
           )}
           {!checking && allNotConfigured && (
             <Fragment>
-              <CancelOutlinedIcon sx={{ marginLeft: 2, marginRight: 1, color: 'red' }} />
+              <CancelOutlinedIcon sx={{ marginLeft: 2, marginRight: 1, fill: 'red' }} />
               <Typography variant="h6" sx={{ fontWeight: 'light' }}>
                 {' '}
                 Nothing Configured
@@ -55,7 +55,7 @@ const StatusView = ({ statuses, title }: Props) => {
           )}
           {!checking && !allConfigured && !allNotConfigured && (
             <Fragment>
-              <RemoveCircleOutlineRoundedIcon sx={{ marginLeft: 2, marginRight: 1, color: 'orange' }} />
+              <RemoveCircleOutlineRoundedIcon sx={{ marginLeft: 2, marginRight: 1, fill: 'orange' }} />
               <Typography variant="h6" sx={{ fontWeight: 'light' }}>
                 {' '}
                 Pending Configuration
@@ -97,8 +97,8 @@ export const StatusViewItem = ({ status, titleVariant }: StatusViewItemProps) =>
       sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginBottom: 2 }}
     >
       {status.status === AppStatus.Checking && <CircularProgress size={20} />}
-      {status.status === AppStatus.Configured && <CheckCircleOutlineIcon sx={{ color: 'limegreen' }} />}
-      {status.status === AppStatus.NotConfigured && <CancelOutlinedIcon sx={{ color: 'red' }} />}
+      {status.status === AppStatus.Configured && <CheckCircleOutlineIcon sx={{ fill: 'limegreen' }} />}
+      {status.status === AppStatus.NotConfigured && <CancelOutlinedIcon sx={{ fill: 'red' }} />}
       {status.status === AppStatus.Pending && <RemoveCircleOutlineRoundedIcon />}
 
       <Box marginLeft={1}>

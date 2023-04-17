@@ -27,8 +27,6 @@ const PageRoot = ({ full, noNav, children, className }: PropsWithChildren<Props>
       sx={{
         display: 'flex',
         height: `calc(100vh - ${navHeight})`,
-        bgcolor: 'var(--purpleDarkest)',
-        color: 'var(--text)',
         p: padding
       }}
     >

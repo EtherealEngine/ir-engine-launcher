@@ -4,7 +4,7 @@ import log from 'electron-log'
 import os from 'os'
 import PeerId from 'peer-id'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import ConfigEnvMap from '../../../constants/ConfigEnvMap'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
@@ -257,8 +257,6 @@ class BaseCluster {
   }
 
   private static _ensureIPFSVariables = async (cluster: ClusterModel) => {
-    const vars: Record<string, string> = {}
-
     const varsData = await processVariablesFile(
       cluster.configs,
       cluster.variables,
@@ -271,7 +269,7 @@ class BaseCluster {
 
       // Data already exists
       if (existingValue) {
-        vars[key] = existingValue
+        cluster.variables[key] = existingValue
       } else if (key === Storage.IPFS_CLUSTER_SECRET) {
         const response = await exec(Commands.IPFS_SECRET)
         const { stdout, stderr } = response
@@ -281,15 +279,15 @@ class BaseCluster {
         }
 
         if (stdout) {
-          vars[key] = stdout.toString()
+          cluster.variables[key] = stdout.toString()
         }
       } else if (key === Storage.IPFS_BOOTSTRAP_PEER_ID) {
         const peerIdObj = await PeerId.create({ bits: 2048, keyType: 'Ed25519' })
         const peerId = peerIdObj.toJSON()
 
         if (peerId.privKey) {
-          vars[key] = peerId.id
-          vars[Storage.IPFS_BOOTSTRAP_PEER_PRIVATE_KEY] = peerId.privKey
+          cluster.variables[key] = peerId.id
+          cluster.variables[Storage.IPFS_BOOTSTRAP_PEER_PRIVATE_KEY] = peerId.privKey
         }
       }
     }

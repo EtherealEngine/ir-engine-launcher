@@ -1,5 +1,5 @@
 import { decryptPassword } from 'common/UtilitiesManager'
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
 import { OSType } from 'models/AppSysInfo'
@@ -248,7 +248,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
               these changes you can checkout the script{' '}
             </span>
             <a
-              style={{ color: 'white' }}
+              style={{ color: 'var(--textColor)' }}
               target="_blank"
               href={
                 selectedCluster?.type === ClusterType.Minikube

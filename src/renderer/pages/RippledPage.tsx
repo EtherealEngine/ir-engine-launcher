@@ -1,6 +1,7 @@
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import { AppStatus } from 'models/AppStatus'
+import { cloneCluster } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useEffect, useRef, useState } from 'react'
 import InfoTooltip from 'renderer/common/InfoTooltip'
@@ -30,6 +31,10 @@ const RippledPage = () => {
   const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
   const rippledStatus = currentDeployment?.appStatus.find((app) => app.id === 'rippled')
 
+  if (!selectedCluster) {
+    return <></>
+  }
+
   const onCommandChange = (value: string) => {
     setCommand(value)
   }
@@ -50,7 +55,8 @@ const RippledPage = () => {
           return
         }
 
-        const output = await window.electronAPI.invoke(Channels.Shell.ExecuteRippledCommand, command)
+        const clonedCluster = cloneCluster(selectedCluster)
+        const output = await window.electronAPI.invoke(Channels.Shell.ExecuteRippledCommand, clonedCluster, command)
 
         const newHistory = [...history, command]
         setOutputs([...outputs, `> ${command}`, output])
@@ -136,7 +142,7 @@ const RippledPage = () => {
             <pre key={`output-${index}`}>{output}</pre>
           ))}
           {outputs.length === 0 && (
-            <Typography sx={{ textAlign: 'center', mt: 5, color: 'gray' }}>
+            <Typography sx={{ textAlign: 'center', mt: 5, color: 'var(--textColor)', opacity: 0.5 }}>
               Please run a rippled command to see output here.
             </Typography>
           )}

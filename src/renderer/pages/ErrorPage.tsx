@@ -36,7 +36,7 @@ const ErrorPage = ({ error, detail, retryText, isInPage, variant, bodyVariant, o
         alignItems: 'center'
       }}
     >
-      <CancelOutlinedIcon sx={{ fontSize: 40, marginBottom: 1, color: 'red' }} />
+      <CancelOutlinedIcon sx={{ fontSize: 40, marginBottom: 1, fill: 'red' }} />
       <Typography variant={variant} sx={{ marginBottom: 1 }}>
         {error}
       </Typography>
@@ -50,7 +50,11 @@ const ErrorPage = ({ error, detail, retryText, isInPage, variant, bodyVariant, o
           color="primary"
           variant="contained"
           startIcon={<CachedOutlinedIcon />}
-          sx={{ marginTop: 1, background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
+          sx={{
+            marginTop: 1,
+            background: 'linear-gradient(90deg, var(--buttonGradientStart), var(--buttonGradientEnd))',
+            ':hover': { opacity: 0.8 }
+          }}
           onClick={onRetry}
         >
           {retryText ? retryText : 'Retry'}

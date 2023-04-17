@@ -4,7 +4,7 @@ import { promises as fs } from 'fs'
 import os from 'os'
 import path from 'path'
 
-import { Channels } from '../../../constants/Channels'
+import Channels from '../../../constants/Channels'
 import { AppModel, AppStatus } from '../../../models/AppStatus'
 import { AppSysInfo, OSType } from '../../../models/AppSysInfo'
 import { LogModel } from '../../../models/Log'
@@ -116,7 +116,7 @@ class Utilities {
 
       if (
         (prerequisite.id === 'wsl' && stdOutput) ||
-        (prerequisite.id === 'wslUbuntu' && stdOutput.includes('Default Distribution: Ubuntu')) ||
+        (prerequisite.id === 'wslUbuntu' && stdOutput.includes(': Ubuntu')) ||
         ((prerequisite.id === 'dockerDesktop' || prerequisite.id === 'dockerDesktopUbuntu') &&
           stdOutput.includes('Server: Docker Desktop'))
       ) {

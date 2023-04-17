@@ -31,7 +31,10 @@ const WelcomePage = () => {
         color="primary"
         variant="contained"
         startIcon={<AddIcon />}
-        sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 } }}
+        sx={{
+          background: 'linear-gradient(90deg, var(--buttonGradientStart), var(--buttonGradientEnd))',
+          ':hover': { opacity: 0.8 }
+        }}
         onClick={() => SettingsService.setCreateClusterDialog(true)}
       >
         Create

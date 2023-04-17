@@ -21,7 +21,7 @@ export const cloneCluster = (cluster: ClusterModel) => {
   return clonedCluster
 }
 
-export const cloneClusterArray = (clusters: ClusterModel[]) => {
+export const cloneClusterArray = (clusters: Array<ClusterModel>) => {
   const myClonedClusters: ClusterModel[] = []
 
   for (const cluster of clusters) {

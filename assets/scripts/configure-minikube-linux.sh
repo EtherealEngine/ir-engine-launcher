@@ -291,7 +291,7 @@ checkExitCode
 # Verify Ethereal Engine
 #=======================
 
-bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "minikube" "$OPS_FOLDER"
+bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "minikube" "$OPS_FOLDER" "latest"
 
 checkExitCode
 

@@ -85,7 +85,7 @@ if ([string]::IsNullOrEmpty($ASSETS_FOLDER) -or
 $wslStatus = cleanseString(wsl --status);
 Write-Host "WSL Status: `n$wslStatus";
 
-if ([string]::IsNullOrEmpty($wslStatus) -or $wslStatus -notlike '*Default Distribution: Ubuntu*') {
+if ([string]::IsNullOrEmpty($wslStatus) -or $wslStatus -notlike '*: Ubuntu*') {
     throw "Make sure WSL is installed and Ubuntu is selected as default distribution.`nhttps://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl";
     exit 1;
 }
@@ -176,7 +176,16 @@ if ($wslRestart -or $dockerRestart) {
 
     Start-Sleep -Seconds 10;
     
-    Start-Process "$env:PROGRAMFILES\Docker\Docker\Docker Desktop.exe"
+    $dockerPaths = $env:path -split ";" -match "docker"
+    $dockerPath = $dockerPaths[0] -replace "\\resources\\bin", ""
+
+    if ([string]::IsNullOrEmpty($dockerPath)) {
+        $dockerPath = "$env:PROGRAMFILES\Docker\Docker"
+    }
+
+    Write-Host "Docker Path is $dockerPath"
+
+    Start-Process "$dockerPath\Docker Desktop.exe"
 
     Start-Sleep -Seconds 10;
 
@@ -200,9 +209,11 @@ if ($LastExitCode -eq 1) {
 
     if ($hostfileProcess.ExitCode -eq 0) {
         Write-Host "Hostfile already up to date";
-    } elseif ($hostfileProcess.ExitCode -eq 1) {
+    }
+    elseif ($hostfileProcess.ExitCode -eq 1) {
         Write-Host "Hostfile updated";
-    } else {
+    }
+    else {
         Write-Host "Hostfile update exited with:";
         Write-Host $hostfileProcess.ExitCode;
         Write-host "Failed in check-hostfile"
@@ -338,11 +349,21 @@ wsl bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$OPS_FOLDER" 
 
 checkExitCode;
 
+#=====================
+# Get Docker Image Tag
+#=====================
+
+wsl bash -c "echo '$PASSWORD' | sudo -S apt install jq -y";
+
+$TAG = wsl bash -c "echo `$(jq -r .version `"$ENGINE_FOLDER/packages/server-core/package.json`")_`$(cd `"$ENGINE_FOLDER`" && git rev-parse HEAD)__`$(date +`"%d-%m-%yT%H-%M-%S`")";
+
+Write-Host "Tag is $TAG";
+
 #=======================
 # Verify Ethereal Engine
 #=======================
 
-wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows" "$OPS_FOLDER";
+wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows" "$OPS_FOLDER" "$TAG";
 
 checkExitCode;
 

@@ -1,4 +1,4 @@
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import { SnackbarKey, useSnackbar } from 'notistack'
 import { Fragment } from 'react'
 
@@ -31,7 +31,7 @@ export const defaultAction = (key: SnackbarKey, content?: React.ReactNode) => {
     <Fragment>
       {content}
       <IconButton onClick={() => closeSnackbar(key)}>
-        <CloseIcon />
+        <CloseIcon sx={{ fill: 'white' }} />
       </IconButton>
     </Fragment>
   )

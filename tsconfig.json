@@ -1,13 +1,9 @@
 {
   "compilerOptions": {
+    "incremental": true,
     "target": "es2021",
     "module": "commonjs",
-    "lib": [
-      "dom",
-      "esnext"
-    ],
-    "declaration": true,
-    "declarationMap": true,
+    "lib": ["dom", "es2021"],
     "jsx": "react-jsx",
     "strict": true,
     "pretty": true,
@@ -22,7 +18,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "outDir": "release/app/dist"
+    "outDir": ".electron/dll"
   },
   "exclude": [
     "test",

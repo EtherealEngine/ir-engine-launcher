@@ -1,5 +1,6 @@
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
+import Storage from 'constants/Storage'
 import { AppStatus } from 'models/AppStatus'
 import { ClusterType } from 'models/Cluster'
 import { useState } from 'react'
@@ -87,11 +88,13 @@ const ConfigPage = () => {
                   : logoEngine
               }
             />
-            <Typography variant="h5" sx={{ mr: 3 }}>
+            <Typography variant="h5" sx={{ mr: 5 }}>
               {selectedCluster.name}
             </Typography>
 
-            <GitView />
+            <GitView name="Engine" repoType={Storage.ENGINE_PATH} />
+
+            <GitView sx={{ ml: 5 }} name="Ops" repoType={Storage.OPS_PATH} />
           </Box>
 
           <IconButton
@@ -113,11 +116,15 @@ const ConfigPage = () => {
 
           <LoadingButton
             variant="contained"
-            sx={{ background: 'var(--purplePinkGradient)', ':hover': { opacity: 0.8 }, width: 150 }}
-            startIcon={<PowerSettingsNewOutlinedIcon />}
+            sx={{
+              background: 'linear-gradient(90deg, var(--buttonGradientStart), var(--buttonGradientEnd))',
+              ':hover': { opacity: 0.8 },
+              width: 150
+            }}
+            startIcon={currentDeployment?.isConfiguring ? undefined : <PowerSettingsNewOutlinedIcon />}
             loading={currentDeployment?.isConfiguring}
             loadingIndicator={
-              <Box sx={{ display: 'flex', color: '#ffffffab' }}>
+              <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
                 <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
                 Configuring
               </Box>
@@ -134,7 +141,7 @@ const ConfigPage = () => {
             sx={{ width: isLaunching ? 140 : 'auto' }}
             loading={isLaunching}
             loadingIndicator={
-              <Box sx={{ display: 'flex', color: '#ffffffab' }}>
+              <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
                 <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
                 Launching
               </Box>

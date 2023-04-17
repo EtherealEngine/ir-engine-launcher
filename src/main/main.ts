@@ -69,9 +69,9 @@ if (process.env.NODE_ENV === 'production') {
   sourceMapSupport.install()
 }
 
-const isDevelopment = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
+const isDebug = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
 
-if (isDevelopment) {
+if (isDebug) {
   require('electron-debug')()
 }
 
@@ -94,7 +94,7 @@ const createWindow = async () => {
     splashWindow = null
   }
 
-  if (isDevelopment) {
+  if (isDebug) {
     await installExtensions()
   }
 
@@ -114,7 +114,9 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       devTools: false,
-      preload: path.join(__dirname, 'preload.js')
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.electron/dll/preload.js')
     }
   })
 
@@ -154,7 +156,7 @@ const createWindow = async () => {
 }
 
 export const createMainWindow = async () => {
-  if (isDevelopment) {
+  if (isDebug) {
     await installExtensions()
   }
 
@@ -172,7 +174,9 @@ export const createMainWindow = async () => {
     height: 728,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: app.isPackaged
+        ? path.join(__dirname, 'preload.js')
+        : path.join(__dirname, '../../.electron/dll/preload.js'),
       webviewTag: true
     }
   })

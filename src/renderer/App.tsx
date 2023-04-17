@@ -1,19 +1,19 @@
+import { defaultThemeSettings } from 'constants/DefaultThemeSettings'
 import Routes from 'constants/Routes'
 import Storage from 'constants/Storage'
+import { ThemeMode } from 'models/ThemeMode'
 import { SnackbarProvider } from 'notistack'
 import * as React from 'react'
 import { HashRouter, Navigate, Route, Routes as RouterRoutes } from 'react-router-dom'
 
-import { Box, PaletteMode } from '@mui/material'
-import { createTheme, ThemeProvider } from '@mui/material/styles'
-import useMediaQuery from '@mui/material/useMediaQuery'
+import { Box } from '@mui/material'
+import { ThemeProvider } from '@mui/material/styles'
 
 import './App.css'
 import HotBar from './common/HotBar'
 import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import AuthenticationDialog from './dialogs/AuthenticationDialog'
-import MUITheme from './MUITheme'
 import AdminPage from './pages/AdminPage'
 import ConfigPage from './pages/ConfigPage'
 import IPFSPage from './pages/IPFSPage'
@@ -22,6 +22,7 @@ import RippledPage from './pages/RippledPage'
 import WelcomePage from './pages/WelcomePage'
 import { useConfigFileState } from './services/ConfigFileService'
 import { SettingsService, useSettingsState } from './services/SettingsService'
+import theme from './theme'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
@@ -33,19 +34,20 @@ const App = () => {
   const settingsState = useSettingsState()
   const { showAuthenticationDialog } = settingsState.value
 
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
-  const defaultMode = (prefersDarkMode ? 'dark' : 'light') as PaletteMode
-  const storedMode = localStorage.getItem(Storage.COLOR_MODE) as PaletteMode | undefined
+  const defaultMode = 'vaporwave' as ThemeMode
+  const storedMode = localStorage.getItem(Storage.COLOR_MODE) as ThemeMode | undefined
   const [mode, setMode] = React.useState(storedMode ? storedMode : defaultMode)
-  const theme = React.useMemo(() => createTheme(MUITheme(mode) as any), [mode])
+
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
         setMode((prevMode) => {
-          const newMode = prevMode === 'light' ? 'dark' : 'light'
+          const newMode =
+            prevMode === 'vaporwave' ? 'light' : prevMode === 'light' ? 'dark' : ('vaporwave' as ThemeMode)
           const html = document.querySelector('html')
           if (html) {
             html.dataset.theme = newMode
+            updateTheme(newMode)
           }
           localStorage.setItem(Storage.COLOR_MODE, newMode)
           return newMode
@@ -64,9 +66,18 @@ const App = () => {
   React.useEffect(() => {
     const html = document.querySelector('html')
     if (html) {
-      html.dataset.theme = mode || 'dark'
+      html.dataset.theme = mode
+      updateTheme(mode)
     }
   }, [])
+
+  const updateTheme = (mode: ThemeMode) => {
+    const theme = defaultThemeSettings[mode] as any
+    if (theme)
+      for (const variable of Object.keys(theme)) {
+        ;(document.querySelector(`[data-theme=${mode}]`) as any)?.style.setProperty('--' + variable, theme[variable])
+      }
+  }
 
   return (
     <ColorModeContext.Provider value={colorMode}>

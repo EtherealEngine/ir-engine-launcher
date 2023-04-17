@@ -1,6 +1,7 @@
-import { createState, none, useState } from '@speigg/hookstate'
+import { hookstate, none, useHookstate } from '@hookstate/core'
 import { decryptPassword, delay } from 'common/UtilitiesManager'
-import { Channels } from 'constants/Channels'
+import Channels from 'constants/Channels'
+import Storage from 'constants/Storage'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'
 import { OSType } from 'models/AppSysInfo'
 import { cloneCluster, ClusterModel } from 'models/Cluster'
@@ -15,7 +16,7 @@ type DeploymentState = {
   isConfiguring: boolean
   isFirstFetched: boolean
   isFetchingStatuses: boolean
-  gitStatus: FetchableItem<GitStatus | undefined>
+  gitStatus: Record<string, FetchableItem<GitStatus | undefined>>
   ipfs: FetchableItem<string>
   adminPanel: FetchableItem<boolean>
   k8dashboard: FetchableItem<string>
@@ -25,141 +26,146 @@ type DeploymentState = {
 }
 
 //State
-const state = createState<DeploymentState[]>([])
+const state = hookstate<DeploymentState[]>([])
 
 store.receptors.push((action: DeploymentActionType): void => {
-  state.batch((s) => {
-    switch (action.type) {
-      case 'SET_CONFIGURING': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].isConfiguring.set(action.isConfiguring)
-        }
-        break
+  switch (action.type) {
+    case 'SET_CONFIGURING': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].isConfiguring.set(action.isConfiguring)
       }
-      case 'SET_FETCHING_STATUSES': {
-        try {
-          const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-          if (index !== -1) {
-            s[index].isFetchingStatuses.set(action.isFetchingStatuses)
+      break
+    }
+    case 'SET_FETCHING_STATUSES': {
+      try {
+        const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+        if (index !== -1) {
+          state[index].isFetchingStatuses.set(action.isFetchingStatuses)
 
-            if (action.isFetchingStatuses === false) {
-              s[index].isFirstFetched.set(true)
-            }
+          if (action.isFetchingStatuses === false) {
+            state[index].isFirstFetched.set(true)
           }
-        } catch (err) {
-          console.log(err)
         }
-        break
+      } catch (err) {
+        console.log(err)
       }
-      case 'SET_DEPLOYMENT_APPS': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].isFetchingStatuses.set(true)
-          s[index].systemStatus.set([...action.deploymentApps.systemStatus])
-          s[index].appStatus.set([...action.deploymentApps.appStatus])
-          s[index].engineStatus.set([...action.deploymentApps.engineStatus])
-        } else {
-          s.merge([
-            {
-              clusterId: action.clusterId,
-              isConfiguring: false,
-              isFirstFetched: false,
-              isFetchingStatuses: false,
-              gitStatus: {
+      break
+    }
+    case 'SET_DEPLOYMENT_APPS': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].isFetchingStatuses.set(true)
+        state[index].systemStatus.set([...action.deploymentApps.systemStatus])
+        state[index].appStatus.set([...action.deploymentApps.appStatus])
+        state[index].engineStatus.set([...action.deploymentApps.engineStatus])
+      } else {
+        state.merge([
+          {
+            clusterId: action.clusterId,
+            isConfiguring: false,
+            isFirstFetched: false,
+            isFetchingStatuses: false,
+            gitStatus: {
+              [Storage.ENGINE_PATH]: {
                 loading: false,
                 data: undefined,
                 error: ''
               },
-              ipfs: {
+              [Storage.OPS_PATH]: {
                 loading: false,
-                data: '',
+                data: undefined,
                 error: ''
-              },
-              adminPanel: {
-                loading: false,
-                data: false,
-                error: ''
-              },
-              k8dashboard: {
-                loading: false,
-                data: '',
-                error: ''
-              },
-              systemStatus: [...action.deploymentApps.systemStatus],
-              appStatus: [...action.deploymentApps.appStatus],
-              engineStatus: [...action.deploymentApps.engineStatus]
-            } as DeploymentState
-          ])
-        }
-        break
+              }
+            },
+            ipfs: {
+              loading: false,
+              data: '',
+              error: ''
+            },
+            adminPanel: {
+              loading: false,
+              data: false,
+              error: ''
+            },
+            k8dashboard: {
+              loading: false,
+              data: '',
+              error: ''
+            },
+            systemStatus: [...action.deploymentApps.systemStatus],
+            appStatus: [...action.deploymentApps.appStatus],
+            engineStatus: [...action.deploymentApps.engineStatus]
+          } as DeploymentState
+        ])
       }
-      case 'REMOVE_DEPLOYMENT': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].set(none)
-        }
-        break
-      }
-      case 'SET_GIT_STATUS': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].gitStatus.set(action.payload)
-        }
-        break
-      }
-      case 'SET_K8_DASHBOARD': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].k8dashboard.set(action.payload)
-        }
-        break
-      }
-      case 'SET_IPFS_DASHBOARD': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].ipfs.set(action.payload)
-        }
-        break
-      }
-      case 'SET_ADMIN_PANEL': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          s[index].adminPanel.set(action.payload)
-        }
-        break
-      }
-      case 'SYSTEM_STATUS_RECEIVED': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          const statusIndex = s[index].systemStatus.findIndex((app) => app.id.value === action.systemStatus.id)
-          s[index].systemStatus.merge({ [statusIndex]: action.systemStatus })
-        }
-        break
-      }
-      case 'APP_STATUS_RECEIVED': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          const statusIndex = s[index].appStatus.findIndex((app) => app.id.value === action.appStatus.id)
-          s[index].appStatus.merge({ [statusIndex]: action.appStatus })
-        }
-        break
-      }
-      case 'ENGINE_STATUS_RECEIVED': {
-        const index = s.findIndex((item) => item.clusterId.value === action.clusterId)
-        if (index !== -1) {
-          const statusIndex = s[index].engineStatus.findIndex((app) => app.id.value === action.engineStatus.id)
-          s[index].engineStatus.merge({ [statusIndex]: action.engineStatus })
-        }
-        break
-      }
+      break
     }
-  }, action.type)
+    case 'REMOVE_DEPLOYMENT': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].set(none)
+      }
+      break
+    }
+    case 'SET_GIT_STATUS': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].gitStatus[action.repoType].set(action.payload)
+      }
+      break
+    }
+    case 'SET_K8_DASHBOARD': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].k8dashboard.set(action.payload)
+      }
+      break
+    }
+    case 'SET_IPFS_DASHBOARD': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].ipfs.set(action.payload)
+      }
+      break
+    }
+    case 'SET_ADMIN_PANEL': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].adminPanel.set(action.payload)
+      }
+      break
+    }
+    case 'SYSTEM_STATUS_RECEIVED': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        const statusIndex = state[index].systemStatus.findIndex((app) => app.id.value === action.systemStatus.id)
+        state[index].systemStatus.merge({ [statusIndex]: action.systemStatus })
+      }
+      break
+    }
+    case 'APP_STATUS_RECEIVED': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        const statusIndex = state[index].appStatus.findIndex((app) => app.id.value === action.appStatus.id)
+        state[index].appStatus.merge({ [statusIndex]: action.appStatus })
+      }
+      break
+    }
+    case 'ENGINE_STATUS_RECEIVED': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        const statusIndex = state[index].engineStatus.findIndex((app) => app.id.value === action.engineStatus.id)
+        state[index].engineStatus.merge({ [statusIndex]: action.engineStatus })
+      }
+      break
+    }
+  }
 })
 
 export const accessDeploymentState = () => state
 
-export const useDeploymentState = () => useState(state) as any as typeof state
+export const useDeploymentState = () => useHookstate(state) as any as typeof state
 
 //Service
 export const DeploymentService = {
@@ -208,7 +214,7 @@ export const DeploymentService = {
         password = decryptPassword(sudoPassword)
       }
 
-      DeploymentService.fetchGitStatus(clonedCluster)
+      DeploymentService.fetchGitStatuses(clonedCluster)
 
       const deploymentApps = await DeploymentService.getDeploymentStatus(clonedCluster, password)
       if (deploymentApps) {
@@ -240,20 +246,30 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     dispatch(DeploymentAction.setK8Dashboard(clusterId))
   },
-  fetchGitStatus: async (cluster: ClusterModel) => {
+  fetchGitStatus: async (cluster: ClusterModel, repoType: string) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
     const dispatch = useDispatch()
 
     try {
-      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, undefined, true))
-      const gitStatus = await window.electronAPI.invoke(Channels.Git.GetCurrentConfigs, clonedCluster)
-      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, gitStatus, false))
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, repoType, undefined, true))
+      const gitStatus: GitStatus = await window.electronAPI.invoke(
+        Channels.Git.GetCurrentConfigs,
+        clonedCluster,
+        clonedCluster.configs[repoType]
+      )
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, repoType, gitStatus, false))
     } catch (error) {
       console.error(error)
-      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, undefined, false))
+      dispatch(DeploymentAction.setGitStatus(clonedCluster.id, repoType, undefined, false))
     }
+  },
+  fetchGitStatuses: async (cluster: ClusterModel) => {
+    await Promise.all([
+      DeploymentService.fetchGitStatus(cluster, Storage.ENGINE_PATH),
+      DeploymentService.fetchGitStatus(cluster, Storage.OPS_PATH)
+    ])
   },
   fetchIpfsDashboard: async (cluster: ClusterModel) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
@@ -374,10 +390,11 @@ export const DeploymentAction = {
       deploymentApps
     }
   },
-  setGitStatus: (clusterId: string, data: GitStatus | undefined, loading = false, error = '') => {
+  setGitStatus: (clusterId: string, repoType: string, data: GitStatus | undefined, loading = false, error = '') => {
     return {
       type: 'SET_GIT_STATUS' as const,
       clusterId,
+      repoType,
       payload: { loading, data, error } as FetchableItem<GitStatus | undefined>
     }
   },
