@@ -12,6 +12,11 @@ const Requirements: SysRequirement[] = [
     minMemory: 3900
   },
   {
+    os: 'Darwin',
+    minCPU: 4,
+    minMemory: 3900
+  },
+  {
     os: 'Windows_NT',
     minCPU: 4,
     minMemory: 3900
