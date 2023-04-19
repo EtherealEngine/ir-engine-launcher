@@ -82,8 +82,8 @@ if $INSTALL_NODE; then
     else
         echo "nvm is not installed"
 
-        echo "$PASSWORD" | apt update -y
-        echo "$PASSWORD" | apt install curl -y
+        echo "$PASSWORD" | sudo -S apt update -y
+        echo "$PASSWORD" | sudo -S apt install curl -y
         curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
         source ~/.profile
 
@@ -148,6 +148,12 @@ checkExitCode
 
 bash "$SCRIPTS_FOLDER/check-docker.sh" "$PASSWORD"
 
+open -a Docker
+while [[ -z "$(! docker ps 2> /dev/null)" ]];
+    do printf "Waiting for docker to start...";
+    sleep 5
+done
+
 checkExitCode
 
 #======================
@@ -190,13 +196,26 @@ if [[ -f "/etc/docker/daemon.json" ]]; then
     echo "daemon.json file exists at /etc/docker/daemon.json"
 else
     if [[ ! -d "/etc/docker" ]]; then
-        echo "$PASSWORD" | mkdir "/etc/docker"
+        echo "$PASSWORD" | sudo -S mkdir "/etc/docker"
     fi
 
-    echo "$PASSWORD" | -- sh -c "echo '{\"insecure-registries\" : [\"127.0.0.1:32000\"]}' >>/etc/docker/daemon.json"
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '{\"insecure-registries\" : [\"127.0.0.1:32000\"]}' >>/etc/docker/daemon.json"
     echo "daemon.json file created at /etc/docker/daemon.json"
 
-    echo "$PASSWORD" | systemctl restart docker
+    # close docker desktop
+    killall Docker
+    # https://stackoverflow.com/questions/16931244/checking-if-output-of-a-command-contains-a-certain-string-in-a-shell-script/57102498#57102498
+    while [[ ! "$(docker ps 2>&1)" =~ "Is the docker daemon running?" ]];
+        do printf "Waiting for docker to stop...";
+        sleep 5
+    done
+    echo "Stopped docker"
+    open -a Docker
+    while [[ -z "$(! docker ps 2> /dev/null)" ]];
+        do printf "Waiting for docker to start...";
+        sleep 5
+    done
+    echo "Restarted docker"
 fi
 
 #================
@@ -221,7 +240,7 @@ if grep "local.etherealengine.org" /etc/hosts; then
     else
         echo "*.etherealengine.org entries outdated"
         grep -v 'local.etherealengine.org' /etc/hosts >/tmp/hosts.tmp
-        echo "$PASSWORD" | cp /tmp/hosts.tmp /etc/hosts
+        echo "$PASSWORD" | sudo -S cp /tmp/hosts.tmp /etc/hosts
         ADD_DOMAIN=true
     fi
 else
@@ -229,7 +248,7 @@ else
 fi
 
 if $ADD_DOMAIN; then
-    echo "$PASSWORD" | -- sh -c "echo '127.0.0.1 local.etherealengine.org api-local.etherealengine.org instanceserver-local.etherealengine.org 00000.instanceserver-local.etherealengine.org 00001.instanceserver-local.etherealengine.org 00002.instanceserver-local.etherealengine.org 00003.instanceserver-local.etherealengine.org' >>/etc/hosts"
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '127.0.0.1 local.etherealengine.org api-local.etherealengine.org instanceserver-local.etherealengine.org 00000.instanceserver-local.etherealengine.org 00001.instanceserver-local.etherealengine.org 00002.instanceserver-local.etherealengine.org 00003.instanceserver-local.etherealengine.org' >>/etc/hosts"
     echo "*.etherealengine.org entries added"
 fi
 
@@ -261,7 +280,7 @@ checkExitCode
 # Get Docker Image Tag
 #=====================
 
-echo "$PASSWORD" | apt install jq -y
+echo "$PASSWORD" | sudo -S apt install jq -y
 
 TAG="$(jq -r .version "$ENGINE_FOLDER/packages/server-core/package.json")_$(cd "$ENGINE_FOLDER" && git rev-parse HEAD)__$(date +"%d-%m-%yT%H-%M-%S")"
 
