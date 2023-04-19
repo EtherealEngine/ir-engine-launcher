@@ -19,7 +19,11 @@ if echo "$PASSWORD" | microk8s version >/dev/null; then
 else
     echo "microk8s is not installed"
 
-    echo "$PASSWORD" | sudo snap install microk8s --classic --channel=1.26/stable
+    # multipass is needed to package microk8s locally
+    brew install --cask multipass
+
+    brew install ubuntu/microk8s/microk8s
+    microk8s install --channel=1.26
 
     CONFIGURE_MICROK8S=true
 
@@ -42,8 +46,8 @@ else
     fi
 
     # Ensure the certificate is accessible. Ref: https://askubuntu.com/a/720000/1558816
-    echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/certs/
-    echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/certs/ca.crt
+    echo "$PASSWORD" | sudo -S chmod a+rwx /opt/homebrew/bin/microk8s/current/certs/
+    echo "$PASSWORD" | sudo -S chmod a+rwx /opt/homebrew/bin/microk8s/current/certs/ca.crt
 
     # Ref: https://discuss.kubernetes.io/t/use-kubectl-with-microk8s/5313/6
     echo kubectl config set clusters.microk8s.certificate-authority-data --server=https://127.0.0.1:16443/
@@ -57,22 +61,22 @@ else
     if [[ "$HOSTNAME" =~ [[:upper:]] || "$HOSTNAME" =~ _ ]]; then
         echo "Hostname is invalid. Uppercase or underscore character found"
 
-        echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current
-        echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/args
-        echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/args/kubelet
+        echo "$PASSWORD" | sudo -S chmod a+rwx /opt/homebrew/bin/microk8s/current
+        echo "$PASSWORD" | sudo -S chmod a+rwx /opt/homebrew/bin/microk8s/current/args
+        echo "$PASSWORD" | sudo -S chmod a+rwx /opt/homebrew/bin/microk8s/current/args/kubelet
 
-        echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/credentials
-        echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/credentials/known_tokens.csv
+        echo "$PASSWORD" | sudo -S chmod a+rwx /opt/homebrew/bin/microk8s/current/credentials
+        echo "$PASSWORD" | sudo -S chmod a+rwx /opt/homebrew/bin/microk8s/current/credentials/known_tokens.csv
 
         # Ref: 'Node is not ready when RBAC is enabled' section of https://microk8s.io/docs/troubleshooting#heading--common-issues
         UPDATE_KUBELET=false
-        if grep "hostname-override" /var/snap/microk8s/current/args/kubelet; then
-            if grep "hostname-override=microk8s-node" /var/snap/microk8s/current/args/kubelet; then
+        if grep "hostname-override" /opt/homebrew/bin/microk8s/current/args/kubelet; then
+            if grep "hostname-override=microk8s-node" /opt/homebrew/bin/microk8s/current/args/kubelet; then
                 echo "kubelet hostname-override entry exists"
             else
                 echo "kubelet hostname-override entry outdated"
-                grep -v 'hostname-override' /var/snap/microk8s/current/args/kubelet >/tmp/kubelet.tmp
-                echo "$PASSWORD" | sudo -S cp /tmp/kubelet.tmp /var/snap/microk8s/current/args/kubelet
+                grep -v 'hostname-override' /opt/homebrew/bin/microk8s/current/args/kubelet >/tmp/kubelet.tmp
+                echo "$PASSWORD" | sudo -S cp /tmp/kubelet.tmp /opt/homebrew/bin/microk8s/current/args/kubelet
                 UPDATE_KUBELET=true
             fi
         else
@@ -80,14 +84,14 @@ else
         fi
 
         if $UPDATE_KUBELET; then
-            echo "$PASSWORD" | sudo -S -- sh -c "echo '--hostname-override=microk8s-node' >>/var/snap/microk8s/current/args/kubelet"
+            echo "$PASSWORD" | sudo -S -- sh -c "echo '--hostname-override=microk8s-node' >>/opt/homebrew/bin/microk8s/current/args/kubelet"
             echo "kubelet hostname-override entry added"
         fi
 
         # Update hostname in known_tokens.csv
         #Ref: https://github.com/canonical/microk8s/issues/3755#issuecomment-1429298118
         #Ref: https://www.cyberciti.biz/faq/how-to-use-sed-to-find-and-replace-text-in-files-in-linux-unix-shell/
-        echo "$PASSWORD" | sudo -S sed -i "s/$HOSTNAME/microk8s-node/g" "/var/snap/microk8s/current/credentials/known_tokens.csv"
+        echo "$PASSWORD" | sudo -S sed -i "s/$HOSTNAME/microk8s-node/g" "/opt/homebrew/bin/microk8s/current/credentials/known_tokens.csv"
         echo "known_tokens.csv updated"
 
         #Restart microk8s
