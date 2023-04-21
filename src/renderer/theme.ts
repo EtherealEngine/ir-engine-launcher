@@ -224,6 +224,13 @@ const theme = createTheme({
     //     }
     //   }
     // },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: 'var(--dropdownMenuBackground)'
+        }
+      }
+    },
     MuiMenuItem: {
       styleOverrides: {
         root: {
