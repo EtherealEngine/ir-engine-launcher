@@ -14,7 +14,7 @@ ASSETS_FOLDER=$2
 #================
 
 CONFIGURE_MICROK8S=false
-if [[ "$("microk8s version >/dev/null")" ]]; then
+if echo "$PASSWORD" | sudo -S microk8s version >/dev/null; then
     echo "microk8s is installed"
 else
     echo "microk8s is not installed"
@@ -44,12 +44,30 @@ else
         kubectl config delete-user microk8s-admin
     fi
 
-    # Ref: https://discuss.kubernetes.io/t/use-kubectl-with-microk8s/5313/6
-    # kubectl config set clusters.microk8s.certificate-authority-data --server=https://127.0.0.1:16443/
-    # kubectl config set-credentials microk8s-admin --token="$(echo "$PASSWORD" | microk8s kubectl config view --raw -o 'jsonpath={.users[0].user.token}')"
-    kubectl config set-context microk8s --cluster=microk8s --namespace=default --user=microk8s-admin
+    # export kubectl config to new config file
+    if [[ ! -d ~/.kube ]]; then
+        mkdir ~/.kube
+    fi
+    microk8s config > ~/.kube/config-microk8s
+
+    # add to ~/.bashrc
+
+    # check if .bashrc exists
+    if [[ ! -f ~/.bashrc ]]; then
+        touch ~/.bashrc
+    fi
+
+    # append to .bashrc
+    if [[ ! grep -F config-microk8s ~/.bashrc ]]
+        echo >> export KUBECONFIG=$KUBECONFIG:
+    fi
+    # add to export
+    export 
 fi
 
+kubectl config set-cluster microk8s --server=https://192.168.64.2:16443/
+kubectl config set-credentials microk8s-admin --token="$(microk8s kubectl config view --raw -o 'jsonpath={.users[0].user.token}')"
+kubectl config set-context microk8s --cluster=microk8s --namespace=default --user=microk8s-admin
 kubectl config use-context microk8s
 
 MICROK8S_VERSION=$(microk8s version)
@@ -63,8 +81,12 @@ if microk8s status | grep 'microk8s is not running'; then
 fi
 
 if $CONFIGURE_MICROK8S; then
+    echo "Microk8s not running, starting..."
+
     # Start microk8s
     microk8s start
+
+    echo "Microk8s started"
 
     # Enable Addons
     microk8s enable dashboard
@@ -78,6 +100,13 @@ if $CONFIGURE_MICROK8S; then
     microk8s enable rbac
     microk8s enable hostpath-storage
     microk8s enable helm3
+
+    echo "Microk8s config enabled"
+
+    # Update kube config with microk8s specific config
+    microk8s kubectl config view --raw > ~/.kube/config
+    chmod +x ~/.kube/config
+    # TODO add $KUBECONFIG to path
 
     sleep 30
 
@@ -94,7 +123,7 @@ if $CONFIGURE_MICROK8S; then
     fi
 
     # Update kubernetes dashboard to allow skip login and update user role to have access to metrics.
-    kubectl patch deployment kubernetes-dashboard -n kube-system --type 'json' -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
-    kubectl delete clusterrolebinding kubernetes-dashboard -n kube-system
-    kubectl apply -f "$ASSETS_FOLDER/files/microk8s-dashboard.yaml"
+    # kubectl patch deployment kubernetes-dashboard -n kube-system --type 'json' -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
+    # kubectl delete clusterrolebinding kubernetes-dashboard -n kube-system
+    # kubectl apply -f "$ASSETS_FOLDER/files/microk8s-dashboard.yaml"
 fi
