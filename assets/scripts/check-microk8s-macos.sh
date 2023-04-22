@@ -8,13 +8,18 @@ set -e
 
 PASSWORD=$1
 ASSETS_FOLDER=$2
+USER_NAME=$3
+CLUSTER_NAME=$4
+CONTEXT_NAME=$5
+NAMESPACE=$6
+CLUSTER_URL=$7
 
 #================
 # Verify MicroK8s
 #================
 
 CONFIGURE_MICROK8S=false
-if [[ "$("microk8s version >/dev/null")" ]]; then
+if [[ "$("microk8s version")" ]]; then
     echo "microk8s is installed"
 else
     echo "microk8s is not installed"
@@ -29,28 +34,33 @@ else
 
     CONFIGURE_MICROK8S=true
 
-    # Remove previous context from config
-    if kubectl config view -o jsonpath='{.contexts}' | grep 'microk8s'; then
-        kubectl config delete-context microk8s
-    fi
+    # # Remove previous context from config
+    # if kubectl config view -o jsonpath='{.contexts}' | grep '$CONTEXT_NAME'; then
+    #     kubectl config delete-context $CONTEXT_NAME
+    # fi
 
-    # Remove previous cluster from config
-    if kubectl config view -o jsonpath='{.clusters}' | grep 'microk8s-cluster'; then
-        kubectl config delete-cluster microk8s-cluster
-    fi
+    # # Remove previous cluster from config
+    # if kubectl config view -o jsonpath='{.clusters}' | grep '$CLUSTER_NAME'; then
+    #     kubectl config delete-cluster $CLUSTER_NAME
+    # fi
 
-    # Remove previous user from config
-    if kubectl config view -o jsonpath='{.users}' | grep 'microk8s-admin'; then
-        kubectl config delete-user microk8s-admin
-    fi
+    # # Remove previous user from config
+    # if kubectl config view -o jsonpath='{.users}' | grep '$USER_NAME'; then
+    #     kubectl config delete-user $USER_NAME
+    # fi
+
+    # echo "$PASSWORD" | sudo -S chmod a+rwx /etc/ssl/certs/
+    # if [ -e /etc/ssl/certs/ca.crt ]; then
+    #     echo "$PASSWORD" | sudo -S chmod a+rwx /etc/ssl/certs/ca.crt
+    # fi
 
     # Ref: https://discuss.kubernetes.io/t/use-kubectl-with-microk8s/5313/6
-    # kubectl config set clusters.microk8s.certificate-authority-data --server=https://127.0.0.1:16443/
-    # kubectl config set-credentials microk8s-admin --token="$(echo "$PASSWORD" | microk8s kubectl config view --raw -o 'jsonpath={.users[0].user.token}')"
-    kubectl config set-context microk8s --cluster=microk8s --namespace=default --user=microk8s-admin
+    # kubectl config set-cluster $CLUSTER_NAME --server=https://kubernetes.docker.internal:6443/ --certificate-authority-data="$(echo "$PASSWORD" | sudo -S microk8s kubectl config view --raw -o 'jsonpath={.clusters[0].cluster.certificate-authority-data}')"
+    # kubectl config set-credentials $USER_NAME --token="$(echo "$PASSWORD" | sudo -S microk8s kubectl config view --raw -o 'jsonpath={.users[0].user.token}')"
+    # kubectl config set-context $CONTEXT_NAME --cluster=$CLUSTER_NAME --namespace=default --user=$USER_NAME
 fi
 
-kubectl config use-context microk8s
+# kubectl config use-context $CONTEXT_NAME
 
 MICROK8S_VERSION=$(microk8s version)
 echo "microk8s version is $MICROK8S_VERSION"
@@ -94,7 +104,7 @@ if $CONFIGURE_MICROK8S; then
     fi
 
     # Update kubernetes dashboard to allow skip login and update user role to have access to metrics.
-    kubectl patch deployment kubernetes-dashboard -n kube-system --type 'json' -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
-    kubectl delete clusterrolebinding kubernetes-dashboard -n kube-system
-    kubectl apply -f "$ASSETS_FOLDER/files/microk8s-dashboard.yaml"
+    # kubectl patch deployment kubernetes-dashboard -n "$NAMESPACE" --type 'json' -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/-", "value": "--enable-skip-login"}]'
+    # kubectl delete clusterrolebinding kubernetes-dashboard -n "$NAMESPACE"
+    # kubectl apply -f "$ASSETS_FOLDER/files/microk8s-dashboard.yaml"
 fi

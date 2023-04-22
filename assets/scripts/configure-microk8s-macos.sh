@@ -15,7 +15,7 @@ checkExitCode() {
 # Parameters
 #===========
 
-while getopts a:c:d:f:i:o:p:r: flag; do
+while getopts a:c:d:f:i:o:p:r:u:n:x: flag; do
     case "${flag}" in
     a) ASSETS_FOLDER=${OPTARG} ;;
     c) CONFIGS_FOLDER=${OPTARG} ;;
@@ -25,6 +25,11 @@ while getopts a:c:d:f:i:o:p:r: flag; do
     o) OPS_FOLDER=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
     r) ENABLE_RIPPLE_STACK=${OPTARG} ;;
+    u) USER_NAME=${OPTARG} ;;
+    n) CLUSTER_NAME=${OPTARG} ;;
+    x) CONTEXT_NAME=${OPTARG} ;;
+    s) NAMESPACE=${OPTARG} ;;
+    l) CLUSTER_URL=${OPTARG} ;;
     *)
         echo "Invalid argument passed" >&2
         exit 1
@@ -222,7 +227,7 @@ fi
 # Verify MicroK8s
 #================
 
-bash "$SCRIPTS_FOLDER/check-microk8s-macos.sh" "$PASSWORD" "$ASSETS_FOLDER"
+bash "$SCRIPTS_FOLDER/check-microk8s-macos.sh" "$PASSWORD" "$ASSETS_FOLDER" "$USER_NAME" "$CLUSTER_NAME" "$CONTEXT_NAME" "$NAMESPACE" "$CLUSTER_URL"
 
 checkExitCode
 

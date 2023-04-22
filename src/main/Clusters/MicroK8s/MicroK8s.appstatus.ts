@@ -9,13 +9,13 @@ const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
   if (type === 'Darwin') {
     // https://stackoverflow.com/a/44758924/2077741
     script = `
-      if microk8s status | grep 'microk8s is running'; then
-        ${script}
-        exit 0;
-      else
+    if  microk8s status | grep 'microk8s is not running'; then
         echo 'MicroK8s not configured';
         exit 1;
-      fi
+      else
+        ${script}
+        exit 0; 
+    fi
   `
   } else if (type === 'Windows_NT') {
     script = `

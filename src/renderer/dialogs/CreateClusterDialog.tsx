@@ -61,6 +61,16 @@ interface Props {
   onClose: () => void
 }
 
+interface PresetProps {
+  id: string,
+  name: string,
+  user: string,
+  context: string,
+  type: ClusterType,
+  namespace: string,
+  url: string,
+}
+
 const CreateClusterDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
   const settingsState = useSettingsState()
@@ -76,8 +86,38 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     const decrypted = decryptPassword(sudoPassword)
     return decrypted
   })
-  const [name, setName] = useState('')
-  const [type, setType] = useState<ClusterType>(ClusterType.MicroK8s)
+
+  const presets = [
+    {
+      id: 'default',
+      name: 'Default',
+      user: 'microk8s-admin',
+      context: 'microk8s',
+      type: ClusterType.MicroK8s,
+      namespace: 'kube-system',
+      url: 'https://127.0.0.1:16443',
+    },
+    {
+      id: 'docker-desktop',
+      name: 'Docker Desktop',
+      user: 'docker-desktop',
+      context: 'docker-desktop',
+      type: ClusterType.MicroK8s,
+      namespace: 'default',
+      url: 'https://kubernetes.docker.internal:6443',
+    },
+   ] as PresetProps[]
+
+  const [name, setName] = useState('New Cluster')
+  const [preset, setPreset] = useState(0)
+
+  const [id, setId] = useState(presets[0].id)
+  const [type, setType] = useState<ClusterType>(presets[0].type)
+  const [user, setUser] = useState(presets[0].user)
+  const [context, setContext] = useState(presets[0].context)
+  const [namespace, setNamespace] = useState(presets[0].namespace)
+  const [url, setUrl] = useState(presets[0].url)
+  
   const [prereqsPassed, setPrereqsPassed] = useState(false)
   const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
   const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
@@ -210,14 +250,45 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       content: (
         <Box sx={{ marginLeft: 2, marginRight: 2 }}>
           <ConfigClusterView
+            id={id}
+            onIdChange={(id) => {
+              setId(id)
+              setError('')
+            }}
             name={name}
-            type={type}
             onNameChange={(name) => {
               setName(name)
               setError('')
             }}
+            type={type}
             onTypeChange={(type) => {
               setType(type)
+              setError('')
+            }}
+            user={user}
+            onUserChange={(user) => {
+              setUser(user)
+              setError('')
+            }}
+            context={context}
+            onContextChange={(context) => {
+              setContext(context)
+              setError('')
+            }}
+            namespace={namespace}
+            onNamespaceChange={(namespace) => {
+              setNamespace(namespace)
+              setError('')
+            }}
+            url={url}
+            onUrlChange={(url) => {
+              setUrl(url)
+              setError('')
+            }}
+            preset={preset}
+            presets={presets}
+            onPresetChange={(preset) => {
+              setPreset(preset)
               setError('')
             }}
           />
@@ -269,6 +340,14 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   ]
 
   useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
+
+  useEffect(() => {
+    const newPreset = presets[preset];
+    setId(newPreset.id)
+    setType(newPreset.type)
+    setUser(newPreset.user)
+    setContext(newPreset.context)
+  }, [preset, presets])
 
   return (
     <Dialog open fullWidth maxWidth="sm">

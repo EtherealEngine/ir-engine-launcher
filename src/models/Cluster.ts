@@ -1,7 +1,7 @@
 export type ClusterModel = {
   id: string
   name: string
-  type: ClusterType
+  type: ClusterType,
   configs: Record<string, string>
   variables: Record<string, string>
 }
