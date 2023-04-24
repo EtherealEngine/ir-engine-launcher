@@ -15,6 +15,10 @@ https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-
 
 ### [DOWNLOAD HERE](https://github.com/etherealengine/etherealengine-control-center/releases)
 
+## Getting Started
+
+You can find complete getting started guide [here](https://etherealengine.github.io/etherealengine-docs/docs/tutorials/ethereal_control_center/getting_started).
+
 ### [All Control Center Video Tutorials](./TUTORIALS.md)
 
 ## Install Released
