@@ -150,12 +150,14 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         variables: { ...localVars }
       }
 
+      DeploymentService.setConfiguring(createCluster.id, true)
+
+      onClose()
+
       const inserted = await ConfigFileService.insertOrUpdateConfig(createCluster)
       if (!inserted) {
         return
       }
-
-      onClose()
 
       ConfigFileService.setSelectedClusterId(createCluster.id)
 

@@ -325,6 +325,10 @@ export const DeploymentService = {
     }
     dispatch(DeploymentAction.setConfiguring(clonedCluster.id, false))
   },
+  setConfiguring: (clusterId: string, isConfiguring: boolean) => {
+    const dispatch = useDispatch()
+    dispatch(DeploymentAction.setConfiguring(clusterId, isConfiguring))
+  },
   listen: async () => {
     const dispatch = useDispatch()
     try {
