@@ -113,6 +113,10 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         variables: { ...localVars }
       }
 
+      DeploymentService.setConfiguring(updatedCluster.id, true)
+
+      onClose()
+
       if (Object.keys(tempConfigs).length > 0 || Object.keys(tempVars).length > 0) {
         const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
         if (!saved) {
@@ -123,7 +127,6 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       }
 
       DeploymentService.processConfigurations(updatedCluster, password, localFlags)
-      onClose()
 
       return
     }

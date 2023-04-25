@@ -1,3 +1,4 @@
+import Endpoints from 'constants/Endpoints'
 import Routes from 'constants/Routes'
 import Storage from 'constants/Storage'
 import { ThemeMode } from 'models/ThemeMode'
@@ -12,6 +13,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7'
 import ColorLensIcon from '@mui/icons-material/ColorLens'
 import HomeIcon from '@mui/icons-material/Home'
 import MenuIcon from '@mui/icons-material/Menu'
+import SupportAgentIcon from '@mui/icons-material/SupportAgent'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -29,6 +31,17 @@ const settings: string[] = [
   /*'Profile', 'Logout'*/
 ]
 
+const support = [
+  {
+    name: 'Discord',
+    url: Endpoints.Urls.SUPPORT_DISCORD
+  },
+  {
+    name: 'Github',
+    url: Endpoints.Urls.SUPPORT_GITHUB
+  }
+]
+
 type MenuModel = {
   title: string
   path: string
@@ -37,6 +50,7 @@ type MenuModel = {
 const NavView = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null)
   const [anchorElUser, setAnchorElUser] = React.useState(null)
+  const [anchorElSupport, setAnchorElSupport] = React.useState(null)
 
   const defaultMode = 'vaporwave' as ThemeMode
   const storedMode = localStorage.getItem(Storage.COLOR_MODE) as ThemeMode | undefined
@@ -83,8 +97,13 @@ const NavView = () => {
   const handleOpenNavMenu = (event: any) => {
     setAnchorElNav(event.currentTarget)
   }
+
   const handleOpenUserMenu = (event: any) => {
     setAnchorElUser(event.currentTarget)
+  }
+
+  const handleOpenSupportMenu = (event: any) => {
+    setAnchorElSupport(event.currentTarget)
   }
 
   const handleCloseNavMenu = () => {
@@ -93,6 +112,10 @@ const NavView = () => {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null)
+  }
+
+  const handleCloseSupportMenu = () => {
+    setAnchorElSupport(null)
   }
 
   return (
@@ -190,6 +213,37 @@ const NavView = () => {
                 <ColorLensIcon fontSize="small" />
               )}
             </IconButton>
+
+            <Tooltip title="Support">
+              <IconButton onClick={handleOpenSupportMenu} sx={{ mr: 2 }}>
+                <SupportAgentIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: '45px' }}
+              id="menu-support"
+              anchorEl={anchorElSupport}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'right'
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right'
+              }}
+              open={Boolean(anchorElSupport)}
+              onClose={handleCloseSupportMenu}
+            >
+              {support.map((setting) => (
+                <MenuItem key={setting.name} onClick={handleCloseSupportMenu}>
+                  <a style={{ color: 'var(--textColor)', textDecoration: 'none' }} target="_blank" href={setting.url}>
+                    {setting.name}
+                  </a>
+                </MenuItem>
+              ))}
+            </Menu>
+
             <Tooltip title="Profile">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircleOutlined fontSize="large" />
@@ -197,7 +251,7 @@ const NavView = () => {
             </Tooltip>
             <Menu
               sx={{ mt: '45px' }}
-              id="menu-appbar"
+              id="menu-user"
               anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: 'top',
