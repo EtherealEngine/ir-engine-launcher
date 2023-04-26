@@ -4,7 +4,7 @@ import { Fragment, useState } from 'react'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded'
-import { Box, CircularProgress, FormControlLabel, Grid, Switch, Typography } from '@mui/material'
+import { Box, CircularProgress, FormControlLabel, Grid, Switch, SxProps, Theme, Typography } from '@mui/material'
 import { Variant } from '@mui/material/styles/createTypography'
 
 import InfoTooltip from '../common/InfoTooltip'
@@ -85,29 +85,36 @@ const StatusView = ({ statuses, title }: Props) => {
 interface StatusViewItemProps {
   status: AppModel
   titleVariant?: Variant
+  verticalAlignTop?: boolean
+  titleSx?: SxProps<Theme>
 }
 
-export const StatusViewItem = ({ status, titleVariant }: StatusViewItemProps) => {
+export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx }: StatusViewItemProps) => {
   return (
     <Grid
       item
       key={status.id}
       xs={12}
       md={3}
-      sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginBottom: 2 }}
+      sx={{
+        display: 'flex',
+        alignItems: verticalAlignTop ? undefined : 'center',
+        flexDirection: 'row',
+        marginBottom: 2
+      }}
     >
       {status.status === AppStatus.Checking && <CircularProgress size={20} />}
       {status.status === AppStatus.Configured && <CheckCircleOutlineIcon sx={{ fill: 'limegreen' }} />}
       {status.status === AppStatus.NotConfigured && <CancelOutlinedIcon sx={{ fill: 'red' }} />}
       {status.status === AppStatus.Pending && <RemoveCircleOutlineRoundedIcon />}
 
-      <Box marginLeft={1}>
+      <Box marginLeft={1} sx={titleSx}>
         <Typography variant={titleVariant}>{status.name}</Typography>
 
         {status.description && <Typography variant="body2">{status.description}</Typography>}
       </Box>
 
-      {status.detail && <InfoTooltip message={status.detail} />}
+      {status.detail && <InfoTooltip sx={titleSx} message={status.detail} />}
     </Grid>
   )
 }

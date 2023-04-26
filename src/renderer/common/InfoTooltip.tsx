@@ -1,12 +1,13 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
-import { Tooltip, Typography } from '@mui/material'
+import { SxProps, Theme, Tooltip, Typography } from '@mui/material'
 
 interface Props {
   message: React.ReactNode
   ml?: number | string
+  sx?: SxProps<Theme>
 }
 
-const InfoTooltip = ({ message, ml }: Props) => {
+const InfoTooltip = ({ message, ml, sx }: Props) => {
   if (!ml) {
     ml = 2
   }
@@ -24,7 +25,7 @@ const InfoTooltip = ({ message, ml }: Props) => {
       }
       arrow
     >
-      <InfoOutlinedIcon color="primary" sx={{ ml, fontSize: '18px' }} />
+      <InfoOutlinedIcon color="primary" sx={{ ...sx, ml, fontSize: '18px' }} />
     </Tooltip>
   )
 }

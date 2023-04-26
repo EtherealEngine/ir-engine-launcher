@@ -69,6 +69,25 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
             Install WSL
           </a>
           .
+          {status.id === 'wslUbuntu' && (
+            <>
+              <br />
+              <br />
+              <span style={{ fontSize: 14, opacity: 0.6 }}>
+                To ensure 'Ubuntu' is set as default WSL distribution. You can check your default distribution by
+                running following command in Powershell/CMD:
+              </span>
+              <br />
+              <code>wsl -l</code>
+              <br />
+              <br />
+              <span style={{ fontSize: 14, opacity: 0.6 }}>
+                Afterwards, if Ubuntu is not selected as default, then you can do so by running following command:
+              </span>
+              <br />
+              <code>wsl -s Ubuntu</code>
+            </>
+          )}
         </Typography>
       )
     } else if (status.id === 'dockerDesktop' || status.id === 'dockerDesktopUbuntu') {
@@ -97,7 +116,7 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
       </Typography>
 
       {statuses.map((status) => (
-        <StatusViewItem key={status.id} titleVariant="body2" status={status} />
+        <StatusViewItem key={status.id} titleVariant="body2" titleSx={{ mt: 0.5 }} verticalAlignTop status={status} />
       ))}
     </Box>
   )
