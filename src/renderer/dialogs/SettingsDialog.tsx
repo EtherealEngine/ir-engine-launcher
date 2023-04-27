@@ -1,7 +1,7 @@
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import ConfigMicroK8sView from 'renderer/components/ConfigMicroK8sView'
+import MicroK8sView from 'renderer/components/Setting/MicroK8sView'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
 import { useSettingsState } from 'renderer/services/SettingsService'
@@ -136,7 +136,7 @@ const SettingsDialog = ({ onClose }: Props) => {
               )}
               {selectedCluster.type === ClusterType.MicroK8s && (
                 <TabPanel value="microK8s">
-                  <ConfigMicroK8sView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
+                  <MicroK8sView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
                 </TabPanel>
               )}
               <TabPanel value="backup">
