@@ -32,7 +32,7 @@ import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
 import AuthView from '../components/Config/AuthView'
-import ClusterDetailsView from '../components/Config/ClusterDetailsView'
+import ClusterView from '../components/Config/ClusterView'
 import ConfigConfigsView from '../components/ConfigConfigsView'
 import ConfigFlagsView from '../components/ConfigFlagsView'
 import ConfigPrereqsView from '../components/ConfigPrereqsView'
@@ -211,7 +211,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       title: 'Provide cluster information',
       content: (
         <Box sx={{ marginLeft: 2, marginRight: 2 }}>
-          <ClusterDetailsView
+          <ClusterView
             name={name}
             type={type}
             onNameChange={(name) => {

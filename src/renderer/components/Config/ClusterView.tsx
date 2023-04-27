@@ -10,7 +10,7 @@ interface Props {
   onTypeChange: (type: ClusterType) => void
 }
 
-const ClusterDetailsView = ({ name, type, sx, onNameChange, onTypeChange }: Props) => {
+const ClusterView = ({ name, type, sx, onNameChange, onTypeChange }: Props) => {
   return (
     <Box sx={sx}>
       <TextField
@@ -47,4 +47,4 @@ const ClusterDetailsView = ({ name, type, sx, onNameChange, onTypeChange }: Prop
   )
 }
 
-export default ClusterDetailsView
+export default ClusterView
