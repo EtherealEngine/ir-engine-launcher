@@ -24,7 +24,7 @@ import {
 import logo from '../../../assets/icon.svg'
 import BackupView from '../components/Setting/BackupView'
 import ConfigConfigsView from '../components/ConfigConfigsView'
-import ConfigMinikubeView from '../components/ConfigMinikubeView'
+import MinikubeView from '../components/Setting/MinikubeView'
 import ConfigVarsView from '../components/ConfigVarsView'
 
 interface Props {
@@ -131,7 +131,7 @@ const SettingsDialog = ({ onClose }: Props) => {
               </TabPanel>
               {selectedCluster.type === ClusterType.Minikube && (
                 <TabPanel value="minikube">
-                  <ConfigMinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
+                  <MinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
                 </TabPanel>
               )}
               {selectedCluster.type === ClusterType.MicroK8s && (
