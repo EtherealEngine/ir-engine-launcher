@@ -35,7 +35,7 @@ import AuthView from '../components/Config/AuthView'
 import ConfigsView from '../components/Config/ConfigsView'
 import FlagsView from '../components/Config/FlagsView'
 import SummaryView from '../components/Config/SummaryView'
-import ConfigVarsView from '../components/ConfigVarsView'
+import VarsView from '../components/Config/VarsView'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
@@ -200,7 +200,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
           </span>
         </>
       ),
-      content: <ConfigVarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
+      content: <VarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
       label: 'Summary',

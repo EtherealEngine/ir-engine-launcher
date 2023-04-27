@@ -25,7 +25,7 @@ import logo from '../../../assets/icon.svg'
 import BackupView from '../components/Setting/BackupView'
 import ConfigsView from '../components/Config/ConfigsView'
 import MinikubeView from '../components/Setting/MinikubeView'
-import ConfigVarsView from '../components/ConfigVarsView'
+import VarsView from '../components/Config/VarsView'
 
 interface Props {
   onClose: () => void
@@ -123,7 +123,7 @@ const SettingsDialog = ({ onClose }: Props) => {
                 />
               </TabPanel>
               <TabPanel value="variables">
-                <ConfigVarsView
+                <VarsView
                   localVars={localVars}
                   onChange={changeVar}
                   sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}

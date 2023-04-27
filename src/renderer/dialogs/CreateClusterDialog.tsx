@@ -37,7 +37,7 @@ import ConfigsView from '../components/Config/ConfigsView'
 import FlagsView from '../components/Config/FlagsView'
 import PrereqsView from '../components/Config/PrereqsView'
 import SummaryView from '../components/Config/SummaryView'
-import ConfigVarsView from '../components/ConfigVarsView'
+import VarsView from '../components/Config/VarsView'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
@@ -252,7 +252,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     {
       label: 'Variables',
       title: 'Provide configuration variables (Optional)',
-      content: <ConfigVarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
+      content: <VarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
       label: 'Summary',
