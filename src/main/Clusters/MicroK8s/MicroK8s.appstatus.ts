@@ -6,7 +6,18 @@ const type = os.type()
 
 const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
   // Escape special characters.
-  if (type === 'Windows_NT') {
+  if (type === 'Darwin') {
+    // https://stackoverflow.com/a/44758924/2077741
+    script = `
+    if  microk8s status | grep 'microk8s is not running'; then
+        echo 'MicroK8s not configured';
+        exit 1;
+      else
+        ${script}
+        exit 0; 
+    fi
+  `
+  } else if (type === 'Windows_NT') {
     script = `
       if ${microk8sPrefix}microk8s status | grep -q 'microk8s is not running'; then
         echo 'MicroK8s not configured' >&2;
@@ -41,7 +52,11 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
   }
 
   if (sudoPassword) {
-    microk8sPrefix = `echo '${sudoPassword}' | sudo -S ${microk8sPrefix}`
+    if (type === 'Darwin') {
+      microk8sPrefix = `echo '${sudoPassword}'`
+    } else {
+      microk8sPrefix = `echo '${sudoPassword}' | sudo -S ${microk8sPrefix}`
+    }
   }
 
   return [
@@ -61,7 +76,12 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
       microk8sDependantScript(
         type === 'Windows_NT'
           ? `${microk8sPrefix}microk8s version;${microk8sPrefix}microk8s status;`
-          : `
+          : (type === 'Darwin') ? `
+      version=$(microk8s version);
+      echo "$version";
+      status=$(microk8s status);
+      echo "$status";
+      ` : `
       version=$(${microk8sPrefix}microk8s version 2>/dev/null);
       echo "$version";
       status=$(${microk8sPrefix}microk8s status 2>/dev/null);
@@ -129,7 +149,22 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
         }
         `
         : microk8sDependantScript(
+          type === 'Darwin' ?
+              `
+              if grep 'local.etherealengine.org' /etc/hosts; then
+                  if grep '127.0.0.1 local.etherealengine.org' /etc/hosts; then
+                      echo '*.etherealengine.org entries exists'
+                      exit 0;
+                  else
+                    echo '*.etherealengine.org entries outdated';
+                    exit 1;
+                  fi
+              else
+                echo '*.etherealengine.org entries does not exist';
+                exit 1;
+              fi
             `
+            : `
         if grep -q 'local.etherealengine.org' /etc/hosts; then
             if grep -q '127.0.0.1 local.etherealengine.org' /etc/hosts; then
                 echo '*.etherealengine.org entries exists'
