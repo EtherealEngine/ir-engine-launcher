@@ -31,11 +31,11 @@ import {
 import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
-import ConfigAuthView from '../components/ConfigAuthView'
-import ConfigConfigsView from '../components/ConfigConfigsView'
-import ConfigFlagsView from '../components/ConfigFlagsView'
-import ConfigSummaryView from '../components/ConfigSummaryView'
-import ConfigVarsView from '../components/ConfigVarsView'
+import AuthView from '../components/Config/AuthView'
+import ConfigsView from '../components/Config/ConfigsView'
+import FlagsView from '../components/Config/FlagsView'
+import SummaryView from '../components/Config/SummaryView'
+import VarsView from '../components/Config/VarsView'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
@@ -171,7 +171,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       label: 'Authenticate',
       title: 'Provide sudo admin password to authenticate',
       content: (
-        <ConfigAuthView
+        <AuthView
           password={password}
           sx={{ marginLeft: 2, marginRight: 2 }}
           onChange={onChangePassword}
@@ -184,8 +184,8 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       title: 'Provide configuration details',
       content: (
         <Box sx={{ marginLeft: 2, marginRight: 2 }}>
-          <ConfigConfigsView localConfigs={localConfigs} onChange={onChangeConfig} />
-          <ConfigFlagsView localFlags={localFlags} onChange={onChangeFlag} />
+          <ConfigsView localConfigs={localConfigs} onChange={onChangeConfig} />
+          <FlagsView localFlags={localFlags} onChange={onChangeFlag} />
         </Box>
       )
     },
@@ -200,13 +200,13 @@ const ConfigurationDialog = ({ onClose }: Props) => {
           </span>
         </>
       ),
-      content: <ConfigVarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
+      content: <VarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
       label: 'Summary',
       title: 'Review configurations before finalizing',
       content: (
-        <ConfigSummaryView
+        <SummaryView
           localConfigs={localConfigs}
           localVars={localVars}
           localFlags={localFlags}

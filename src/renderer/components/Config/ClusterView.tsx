@@ -10,7 +10,7 @@ interface Props {
   onTypeChange: (type: ClusterType) => void
 }
 
-const ConfigClusterView = ({ name, type, sx, onNameChange, onTypeChange }: Props) => {
+const ClusterView = ({ name, type, sx, onNameChange, onTypeChange }: Props) => {
   return (
     <Box sx={sx}>
       <TextField
@@ -47,4 +47,4 @@ const ConfigClusterView = ({ name, type, sx, onNameChange, onTypeChange }: Props
   )
 }
 
-export default ConfigClusterView
+export default ClusterView

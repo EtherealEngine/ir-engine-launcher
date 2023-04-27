@@ -11,7 +11,7 @@ interface Props {
   onEnter: () => void
 }
 
-const ConfigAuthView = ({ password, sx, onChange, onEnter }: Props) => {
+const AuthView = ({ password, sx, onChange, onEnter }: Props) => {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
@@ -44,4 +44,4 @@ const ConfigAuthView = ({ password, sx, onChange, onEnter }: Props) => {
   )
 }
 
-export default ConfigAuthView
+export default AuthView

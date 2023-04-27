@@ -31,13 +31,13 @@ import {
 import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
-import ConfigAuthView from '../components/ConfigAuthView'
-import ConfigClusterView from '../components/ConfigClusterView'
-import ConfigConfigsView from '../components/ConfigConfigsView'
-import ConfigFlagsView from '../components/ConfigFlagsView'
-import ConfigPrereqsView from '../components/ConfigPrereqsView'
-import ConfigSummaryView from '../components/ConfigSummaryView'
-import ConfigVarsView from '../components/ConfigVarsView'
+import AuthView from '../components/Config/AuthView'
+import ClusterView from '../components/Config/ClusterView'
+import ConfigsView from '../components/Config/ConfigsView'
+import FlagsView from '../components/Config/FlagsView'
+import PrereqsView from '../components/Config/PrereqsView'
+import SummaryView from '../components/Config/SummaryView'
+import VarsView from '../components/Config/VarsView'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
@@ -211,7 +211,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       title: 'Provide cluster information',
       content: (
         <Box sx={{ marginLeft: 2, marginRight: 2 }}>
-          <ConfigClusterView
+          <ClusterView
             name={name}
             type={type}
             onNameChange={(name) => {
@@ -223,7 +223,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
               setError('')
             }}
           />
-          <ConfigPrereqsView onChange={(value) => setPrereqsPassed(value)} />
+          <PrereqsView onChange={(value) => setPrereqsPassed(value)} />
         </Box>
       )
     },
@@ -231,7 +231,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       label: 'Authenticate',
       title: 'Provide sudo admin password to authenticate',
       content: (
-        <ConfigAuthView
+        <AuthView
           password={password}
           sx={{ marginLeft: 2, marginRight: 2 }}
           onChange={onChangePassword}
@@ -244,21 +244,21 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       title: 'Provide configuration details',
       content: (
         <Box sx={{ marginLeft: 2, marginRight: 2 }}>
-          <ConfigConfigsView localConfigs={localConfigs} onChange={onChangeConfig} />
-          <ConfigFlagsView localFlags={localFlags} onChange={onChangeFlag} />
+          <ConfigsView localConfigs={localConfigs} onChange={onChangeConfig} />
+          <FlagsView localFlags={localFlags} onChange={onChangeFlag} />
         </Box>
       )
     },
     {
       label: 'Variables',
       title: 'Provide configuration variables (Optional)',
-      content: <ConfigVarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
+      content: <VarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
       label: 'Summary',
       title: 'Review configurations before finalizing',
       content: (
-        <ConfigSummaryView
+        <SummaryView
           name={name}
           type={type}
           localConfigs={localConfigs}

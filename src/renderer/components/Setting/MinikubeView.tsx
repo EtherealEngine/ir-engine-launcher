@@ -25,8 +25,8 @@ import {
   Typography
 } from '@mui/material'
 
-import InfoTooltip from '../common/InfoTooltip'
-import AlertDialog from '../dialogs/AlertDialog'
+import InfoTooltip from '../../common/InfoTooltip'
+import AlertDialog from '../../dialogs/AlertDialog'
 
 interface Props {
   sx?: SxProps<Theme>
@@ -40,7 +40,7 @@ type StatInfo = {
   Type: string
 }
 
-const ConfigMinikubeView = ({ sx }: Props) => {
+const MinikubeView = ({ sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const [showAlert, setAlert] = useState(false)
   const [processingDiskPrune, setProcessingDiskPrune] = useState(false)
@@ -217,4 +217,4 @@ const ConfigMinikubeView = ({ sx }: Props) => {
   )
 }
 
-export default ConfigMinikubeView
+export default MinikubeView

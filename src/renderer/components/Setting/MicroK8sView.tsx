@@ -12,14 +12,14 @@ import { accessSettingsState, SettingsService } from 'renderer/services/Settings
 import { LoadingButton } from '@mui/lab'
 import { Box, CircularProgress, FormControlLabel, SxProps, Theme, Typography } from '@mui/material'
 
-import InfoTooltip from '../common/InfoTooltip'
-import AlertDialog from '../dialogs/AlertDialog'
+import InfoTooltip from '../../common/InfoTooltip'
+import AlertDialog from '../../dialogs/AlertDialog'
 
 interface Props {
   sx?: SxProps<Theme>
 }
 
-const ConfigMicroK8sView = ({ sx }: Props) => {
+const MicroK8sView = ({ sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const [showAlert, setAlert] = useState(false)
   const [processingMicroK8sPrune, setProcessingMicroK8sPrune] = useState(false)
@@ -163,4 +163,4 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
   )
 }
 
-export default ConfigMicroK8sView
+export default MicroK8sView
