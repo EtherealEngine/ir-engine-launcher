@@ -26,30 +26,6 @@ else
     echo "$PASSWORD" | sudo -S usermod -a -G microk8s $USER
     echo "$PASSWORD" | sudo -S chown -R $USER ~/.kube
 
-    # Remove previous context from config
-    if kubectl config view -o jsonpath='{.contexts}' | grep -q 'microk8s'; then
-        kubectl config delete-context microk8s
-    fi
-
-    # Remove previous cluster from config
-    if kubectl config view -o jsonpath='{.clusters}' | grep -q 'microk8s-cluster'; then
-        kubectl config delete-cluster microk8s-cluster
-    fi
-
-    # Remove previous user from config
-    if kubectl config view -o jsonpath='{.users}' | grep -q 'microk8s-admin'; then
-        kubectl config delete-user microk8s-admin
-    fi
-
-    # Ensure the certificate is accessible. Ref: https://askubuntu.com/a/720000/1558816
-    echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/certs/
-    echo "$PASSWORD" | sudo -S chmod a+rwx /var/snap/microk8s/current/certs/ca.crt
-
-    # Ref: https://discuss.kubernetes.io/t/use-kubectl-with-microk8s/5313/6
-    kubectl config set-cluster microk8s --server=https://127.0.0.1:16443/ --certificate-authority=/var/snap/microk8s/current/certs/ca.crt
-    kubectl config set-credentials microk8s-admin --token="$(echo "$PASSWORD" | sudo -S microk8s kubectl config view --raw -o 'jsonpath={.users[0].user.token}')"
-    kubectl config set-context microk8s --cluster=microk8s --namespace=default --user=microk8s-admin
-
     # Update kubelet & known_tokens if hostname is not supported.
     HOSTNAME=$(hostname)
     echo "Hostname is: $HOSTNAME"
@@ -98,13 +74,56 @@ else
     fi
 fi
 
-kubectl config use-context microk8s
+#==============================
+# Ensure kubeconfig of microk8s
+#==============================
+
+# Check if .kube directory exists
+if [[ ! -d ~/.kube ]]; then
+    mkdir ~/.kube
+fi
+
+microk8sConfig=~/.kube/config-microk8s
+eval microk8sConfig=$microk8sConfig
+
+microk8s config >$microk8sConfig
+
+echo "Exported microk8s kubeconfig to: $microk8sConfig"
+
+kubectl config rename-context microk8s etherealengine-microk8s --kubeconfig="$microk8sConfig"
+
+# Check if .bashrc file exists
+if [[ ! -f ~/.bashrc ]]; then
+    touch ~/.bashrc
+fi
+
+# Append config-microk8s in $KUBECONFIG paths of .bashrc
+if grep -q "config-microk8s" ~/.bashrc; then
+    echo "config-microk8s exists in KUBECONFIG of ~/.bashrc"
+else
+    echo "config-microk8s does not exist in KUBECONFIG of ~/.bashrc"
+    if [[ -z $KUBECONFIG ]]; then
+        KUBECONFIG=$HOME/.kube/config
+    fi
+
+    echo "export KUBECONFIG=$KUBECONFIG:$microk8sConfig" >> ~/.bashrc 
+    export KUBECONFIG=$KUBECONFIG:$microk8sConfig
+    source ~/.bashrc
+
+    echo "config-microk8s entry added in KUBECONFIG of ~/.bashrc"
+fi
+
+kubectl config use-context etherealengine-microk8s
 
 MICROK8S_VERSION=$(echo "$PASSWORD" | sudo -S microk8s version)
 echo "microk8s version is $MICROK8S_VERSION"
 
 MICROK8S_STATUS=$(echo "$PASSWORD" | sudo -S microk8s status)
 echo "microk8s status is $MICROK8S_STATUS"
+
+#=======================================================
+# Ensure microk8s is running with correct configurations
+#=======================================================
 
 if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running'; then
     CONFIGURE_MICROK8S=true
