@@ -32,7 +32,7 @@ import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
 import AuthView from '../components/Config/AuthView'
-import ConfigConfigsView from '../components/ConfigConfigsView'
+import ConfigsView from '../components/Config/ConfigsView'
 import ConfigFlagsView from '../components/ConfigFlagsView'
 import ConfigSummaryView from '../components/ConfigSummaryView'
 import ConfigVarsView from '../components/ConfigVarsView'
@@ -184,7 +184,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       title: 'Provide configuration details',
       content: (
         <Box sx={{ marginLeft: 2, marginRight: 2 }}>
-          <ConfigConfigsView localConfigs={localConfigs} onChange={onChangeConfig} />
+          <ConfigsView localConfigs={localConfigs} onChange={onChangeConfig} />
           <ConfigFlagsView localFlags={localFlags} onChange={onChangeFlag} />
         </Box>
       )

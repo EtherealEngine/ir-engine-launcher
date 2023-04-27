@@ -23,7 +23,7 @@ import {
 
 import logo from '../../../assets/icon.svg'
 import BackupView from '../components/Setting/BackupView'
-import ConfigConfigsView from '../components/ConfigConfigsView'
+import ConfigsView from '../components/Config/ConfigsView'
 import MinikubeView from '../components/Setting/MinikubeView'
 import ConfigVarsView from '../components/ConfigVarsView'
 
@@ -116,7 +116,7 @@ const SettingsDialog = ({ onClose }: Props) => {
             </Tabs>
             <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
               <TabPanel value="configs">
-                <ConfigConfigsView
+                <ConfigsView
                   localConfigs={localConfigs}
                   onChange={changeConfig}
                   sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
