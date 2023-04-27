@@ -22,7 +22,7 @@ import {
 } from '@mui/material'
 
 import logo from '../../../assets/icon.svg'
-import ConfigBackupView from '../components/ConfigBackupView'
+import BackupView from '../components/Setting/BackupView'
 import ConfigConfigsView from '../components/ConfigConfigsView'
 import ConfigMinikubeView from '../components/ConfigMinikubeView'
 import ConfigVarsView from '../components/ConfigVarsView'
@@ -140,7 +140,7 @@ const SettingsDialog = ({ onClose }: Props) => {
                 </TabPanel>
               )}
               <TabPanel value="backup">
-                <ConfigBackupView
+                <BackupView
                   hasPendingChanges={Object.keys(tempConfigs).length !== 0 || Object.keys(tempVars).length !== 0}
                   sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
                 />

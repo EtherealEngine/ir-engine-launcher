@@ -5,15 +5,15 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import FileUploadIcon from '@mui/icons-material/FileUpload'
 import { Box, Button, FormControlLabel, SxProps, Theme, Typography } from '@mui/material'
 
-import InfoTooltip from '../common/InfoTooltip'
-import AlertDialog from '../dialogs/AlertDialog'
+import InfoTooltip from '../../common/InfoTooltip'
+import AlertDialog from '../../dialogs/AlertDialog'
 
 interface Props {
   hasPendingChanges: boolean
   sx?: SxProps<Theme>
 }
 
-const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
+const BackupView = ({ hasPendingChanges, sx }: Props) => {
   const [showImportAlert, setImportAlert] = useState(false)
   const [showExportAlert, setExportAlert] = useState(false)
   const configFileState = useConfigFileState()
@@ -121,4 +121,4 @@ const ConfigBackupView = ({ hasPendingChanges, sx }: Props) => {
   )
 }
 
-export default ConfigBackupView
+export default BackupView
