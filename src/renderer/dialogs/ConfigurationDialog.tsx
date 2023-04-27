@@ -34,7 +34,7 @@ import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
 import AuthView from '../components/Config/AuthView'
 import ConfigsView from '../components/Config/ConfigsView'
 import FlagsView from '../components/Config/FlagsView'
-import ConfigSummaryView from '../components/ConfigSummaryView'
+import SummaryView from '../components/Config/SummaryView'
 import ConfigVarsView from '../components/ConfigVarsView'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
@@ -206,7 +206,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       label: 'Summary',
       title: 'Review configurations before finalizing',
       content: (
-        <ConfigSummaryView
+        <SummaryView
           localConfigs={localConfigs}
           localVars={localVars}
           localFlags={localFlags}

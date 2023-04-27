@@ -12,7 +12,7 @@ interface Props {
   sx?: SxProps<Theme>
 }
 
-const ConfigSummaryView = ({ name, type, localConfigs, localVars, localFlags, sx }: Props) => {
+const SummaryView = ({ name, type, localConfigs, localVars, localFlags, sx }: Props) => {
   return (
     <Box sx={sx}>
       <Typography sx={{ display: 'flex', fontWeight: 'bold' }}>
@@ -58,4 +58,4 @@ const ConfigSummaryView = ({ name, type, localConfigs, localVars, localFlags, sx
   )
 }
 
-export default ConfigSummaryView
+export default SummaryView

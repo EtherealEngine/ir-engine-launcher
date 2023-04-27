@@ -36,7 +36,7 @@ import ClusterView from '../components/Config/ClusterView'
 import ConfigsView from '../components/Config/ConfigsView'
 import FlagsView from '../components/Config/FlagsView'
 import PrereqsView from '../components/Config/PrereqsView'
-import ConfigSummaryView from '../components/ConfigSummaryView'
+import SummaryView from '../components/Config/SummaryView'
 import ConfigVarsView from '../components/ConfigVarsView'
 
 const ColorlibStepIcon = (props: StepIconProps) => {
@@ -258,7 +258,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       label: 'Summary',
       title: 'Review configurations before finalizing',
       content: (
-        <ConfigSummaryView
+        <SummaryView
           name={name}
           type={type}
           localConfigs={localConfigs}
