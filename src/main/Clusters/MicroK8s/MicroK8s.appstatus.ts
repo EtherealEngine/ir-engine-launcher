@@ -5,22 +5,10 @@ import { AppModel, getAppModel } from '../../../models/AppStatus'
 const type = os.type()
 
 const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
-  // Escape special characters.
-  if (type === 'Windows_NT') {
-    script = `
-      if ${microk8sPrefix}microk8s status | grep -q 'microk8s is not running'; then
-        echo 'MicroK8s not configured' >&2;
-        exit 1;
-      else
-        ${script}
-        exit 0;
-      fi
-    `
-  } else {
-    // https://stackoverflow.com/a/44758924/2077741
-    script = `
+  // https://stackoverflow.com/a/44758924/2077741
+  script = `
       mk8sStatus=$(${microk8sPrefix}microk8s status 2>/dev/null)
-      if grep -q 'microk8s is running' <<< "$mk8sStatus"; then
+      if echo $mk8sStatus | grep -q 'microk8s is running'; then
         ${script}
         exit 0;
       else
@@ -28,17 +16,12 @@ const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
         exit 1;
       fi
   `
-  }
 
   return script
 }
 
 export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
   let microk8sPrefix = ''
-
-  if (type === 'Windows_NT') {
-    microk8sPrefix = '/snap/bin/'
-  }
 
   if (sudoPassword) {
     microk8sPrefix = `echo '${sudoPassword}' | sudo -S ${microk8sPrefix}`
@@ -59,13 +42,11 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
       'microk8s',
       'MicroK8s',
       microk8sDependantScript(
-        type === 'Windows_NT'
-          ? `${microk8sPrefix}microk8s version;${microk8sPrefix}microk8s status;`
-          : `
+        `
       version=$(${microk8sPrefix}microk8s version 2>/dev/null);
-      echo "$version";
+      echo $version;
       status=$(${microk8sPrefix}microk8s status 2>/dev/null);
-      echo "$status";
+      echo $status;
       `,
         microk8sPrefix
       )
@@ -153,10 +134,6 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
 
 export const MicroK8sRippleAppsStatus = (sudoPassword?: string): AppModel[] => {
   let microk8sPrefix = ''
-
-  if (type === 'Windows_NT') {
-    microk8sPrefix = '/snap/bin/'
-  }
 
   if (sudoPassword) {
     microk8sPrefix = `echo '${sudoPassword}' | sudo -S ${microk8sPrefix}`

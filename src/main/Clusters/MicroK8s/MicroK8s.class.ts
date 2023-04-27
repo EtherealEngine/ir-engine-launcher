@@ -97,7 +97,8 @@ class MicroK8s {
       // Start dashboard port-forward
       let command = Commands.DASHBOARD
       if (type === 'Windows_NT') {
-        command = `wsl /snap/bin/${command}`
+        command = command.replaceAll('$', '`$')
+        command = `wsl bash -ic ${command}`
       }
       await execStream(command, onStdout, onStderr)
     } catch (err) {

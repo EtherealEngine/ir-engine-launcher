@@ -32,11 +32,6 @@ export const exec = (command: string, isLinuxCommand: boolean = true): Promise<S
     shell = 'powershell.exe'
 
     if (isLinuxCommand) {
-      // Ref: https://gist.github.com/jamesmcintyre/fe9a74a603d36ffd534a1c69171994d9#file-nodecheck-sh-L13
-      if (command.includes('npm ') || command.includes('node ')) {
-        command = `source ~/.nvm/nvm.sh [ -x '$(command -v nvm)' ] && ${command}`
-      }
-
       command = command.replaceAll('$', '`$')
 
       command = `wsl bash -ic "${command}"`

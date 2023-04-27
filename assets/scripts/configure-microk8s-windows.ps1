@@ -115,7 +115,7 @@ else {
 # WSL Login
 #==========
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-login.sh" "$PASSWORD"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-login.sh`" `"$PASSWORD`"";
 
 checkExitCode;
 
@@ -123,7 +123,7 @@ checkExitCode;
 # Enable systemd in WSL
 #======================
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-wsl-systemd.sh" "$PASSWORD"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-wsl-systemd.sh`" `"$PASSWORD`"";
 
 if ($LastExitCode -eq 1) {
     $wslRestart = $true;
@@ -225,7 +225,7 @@ if ($LastExitCode -eq 1) {
 # Verify Node
 #============
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-node.sh" "$PASSWORD"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-node.sh`" `"$PASSWORD`"";
 
 checkExitCode;
 
@@ -233,7 +233,7 @@ checkExitCode;
 # Verify Npm
 #=============
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-npm.sh"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-npm.sh`"";
 
 checkExitCode;
 
@@ -241,7 +241,7 @@ checkExitCode;
 # Verify Python 3
 #================
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-python.sh" "$PASSWORD"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-python.sh`" `"$PASSWORD`"";
 
 checkExitCode;
 
@@ -249,7 +249,7 @@ checkExitCode;
 # Verify Make
 #=============
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-make.sh" "$PASSWORD"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-make.sh`" `"$PASSWORD`"";
 
 checkExitCode;
 
@@ -289,7 +289,7 @@ Write-Host "docker-compose version is $dockerComposeVersion";
 # Verify Kubectl
 #===============
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-kubectl.sh" "$PASSWORD"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-kubectl.sh`" `"$PASSWORD`"";
 
 checkExitCode;
 
@@ -297,7 +297,7 @@ checkExitCode;
 # Verify Helm
 #============
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-helm.sh" "$PASSWORD"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-helm.sh`" `"$PASSWORD`"";
 
 checkExitCode;
 
@@ -305,7 +305,7 @@ checkExitCode;
 # Verify MicroK8s
 #================
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-microk8s.sh" "$PASSWORD" "$ASSETS_FOLDER"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-microk8s.sh`" `"$PASSWORD`" `"$ASSETS_FOLDER`"";
 
 checkExitCode;
 
@@ -313,7 +313,7 @@ checkExitCode;
 # Get Engine
 #=============
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER" "$OPS_FOLDER"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-engine-repo.sh`" `"$ENGINE_FOLDER`" `"$OPS_FOLDER`"";
 
 checkExitCode;
 
@@ -321,7 +321,7 @@ checkExitCode;
 # Ensure DB and Redis Running
 #============================
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-mysql.sh`" `"$PASSWORD`" `"$ENGINE_FOLDER`"";
 
 checkExitCode;
 
@@ -329,7 +329,7 @@ checkExitCode;
 # Verify Helm Repos
 #==================
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-helm-repos.sh"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-helm-repos.sh`"";
 
 checkExitCode;
 
@@ -337,7 +337,7 @@ checkExitCode;
 # Verify agones & redis
 #======================
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-agones-redis.sh" "$OPS_FOLDER"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-agones-redis.sh`" `"$OPS_FOLDER`"";
 
 checkExitCode;
 
@@ -345,7 +345,7 @@ checkExitCode;
 # Verify ripple stack
 #====================
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$OPS_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-ripple.sh`" `"$ENABLE_RIPPLE_STACK`" `"$OPS_FOLDER`" `"$CONFIGS_FOLDER`" `"$CLUSTER_ID`"";
 
 checkExitCode;
 
@@ -363,7 +363,7 @@ Write-Host "Tag is $TAG";
 # Verify Ethereal Engine
 #=======================
 
-wsl bash -ic '"$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows" "$OPS_FOLDER" "$TAG"';
+wsl bash -ic "`"$SCRIPTS_FOLDER/check-engine-deployment.sh`" `"$ENGINE_FOLDER`" `"$FORCE_DB_REFRESH`" `"$CONFIGS_FOLDER`" `"$CLUSTER_ID`" `"microk8sWindows`" `"$OPS_FOLDER`" `"$TAG`"";
 
 checkExitCode;
 
