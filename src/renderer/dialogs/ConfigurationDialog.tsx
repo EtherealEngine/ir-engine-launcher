@@ -31,7 +31,7 @@ import {
 import { StepIconProps } from '@mui/material/StepIcon'
 
 import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
-import ConfigAuthView from '../components/ConfigAuthView'
+import AuthView from '../components/Config/AuthView'
 import ConfigConfigsView from '../components/ConfigConfigsView'
 import ConfigFlagsView from '../components/ConfigFlagsView'
 import ConfigSummaryView from '../components/ConfigSummaryView'
@@ -171,7 +171,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       label: 'Authenticate',
       title: 'Provide sudo admin password to authenticate',
       content: (
-        <ConfigAuthView
+        <AuthView
           password={password}
           sx={{ marginLeft: 2, marginRight: 2 }}
           onChange={onChangePassword}

@@ -14,7 +14,7 @@ import {
   LinearProgress
 } from '@mui/material'
 
-import ConfigAuthView from '../components/ConfigAuthView'
+import AuthView from '../components/Config/AuthView'
 
 interface Props {
   onClose: () => void
@@ -70,7 +70,7 @@ const AuthenticationDialog = ({ onClose }: Props) => {
       )}
 
       <DialogContent sx={{ marginBottom: 3 }}>
-        <ConfigAuthView
+        <AuthView
           password={password}
           sx={{ marginLeft: 2, marginRight: 2 }}
           onChange={onChangePassword}
