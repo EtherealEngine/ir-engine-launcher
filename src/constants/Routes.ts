@@ -1,7 +1,7 @@
 const Routes = {
   ROOT: '/',
   CONFIG: '/config',
-  WORKLOAD: '/workload',
+  WORKLOADS: '/workloads',
   ADMIN: '/admin',
   K8DASHBOARD: '/k8dashboard',
   IPFS: '/ipfs',

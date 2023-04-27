@@ -96,7 +96,7 @@ const App = () => {
                 <RouterRoutes>
                   <Route path={Routes.ROOT} element={<WelcomePage />} />
                   <Route path={Routes.CONFIG} element={<ConfigPage />} />
-                  <Route path={Routes.WORKLOAD} element={<ConfigPage />} />
+                  <Route path={Routes.WORKLOADS} element={<ConfigPage />} />
                   <Route path={Routes.ADMIN} element={<AdminPage />} />
                   <Route path={Routes.K8DASHBOARD} element={<K8DashboardPage />} />
                   {enableRippleStack && <Route path={Routes.IPFS} element={<IPFSPage />} />}

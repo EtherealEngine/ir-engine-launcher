@@ -168,7 +168,7 @@ const ConfigPage = () => {
               </>
             )}
 
-            {location.pathname === Routes.WORKLOAD && <h1>Workload</h1>}
+            {location.pathname === Routes.WORKLOADS && <h1>Workloads</h1>}
           </ReflexElement>
 
           <ReflexSplitter />
