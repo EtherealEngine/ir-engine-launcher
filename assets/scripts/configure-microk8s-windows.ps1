@@ -115,7 +115,7 @@ else {
 # WSL Login
 #==========
 
-wsl bash "$SCRIPTS_FOLDER/check-login.sh" "$PASSWORD";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-login.sh" "$PASSWORD"';
 
 checkExitCode;
 
@@ -123,7 +123,7 @@ checkExitCode;
 # Enable systemd in WSL
 #======================
 
-wsl bash "$SCRIPTS_FOLDER/check-wsl-systemd.sh" "$PASSWORD";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-wsl-systemd.sh" "$PASSWORD"';
 
 if ($LastExitCode -eq 1) {
     $wslRestart = $true;
@@ -225,7 +225,7 @@ if ($LastExitCode -eq 1) {
 # Verify Node
 #============
 
-wsl bash "$SCRIPTS_FOLDER/check-node.sh" "$PASSWORD";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-node.sh" "$PASSWORD"';
 
 checkExitCode;
 
@@ -233,7 +233,7 @@ checkExitCode;
 # Verify Npm
 #=============
 
-wsl bash "$SCRIPTS_FOLDER/check-npm.sh";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-npm.sh"';
 
 checkExitCode;
 
@@ -241,7 +241,7 @@ checkExitCode;
 # Verify Python 3
 #================
 
-wsl bash "$SCRIPTS_FOLDER/check-python.sh" "$PASSWORD";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-python.sh" "$PASSWORD"';
 
 checkExitCode;
 
@@ -249,7 +249,7 @@ checkExitCode;
 # Verify Make
 #=============
 
-wsl bash "$SCRIPTS_FOLDER/check-make.sh" "$PASSWORD";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-make.sh" "$PASSWORD"';
 
 checkExitCode;
 
@@ -257,7 +257,7 @@ checkExitCode;
 # Verify Docker
 #==============
 
-$dockerVersion = wsl bash -c "docker --version";
+$dockerVersion = wsl bash -ic "docker --version";
 
 if ($dockerVersion) {    
     Write-Host "docker is installed";
@@ -273,7 +273,7 @@ Write-Host "docker version is $dockerVersion";
 # Verify Docker Compose
 #======================
 
-$dockerComposeVersion = wsl bash -c "docker-compose --version";
+$dockerComposeVersion = wsl bash -ic "docker-compose --version";
 
 if ($dockerComposeVersion) {    
     Write-Host "docker-compose is installed";
@@ -289,7 +289,7 @@ Write-Host "docker-compose version is $dockerComposeVersion";
 # Verify Kubectl
 #===============
 
-wsl bash "$SCRIPTS_FOLDER/check-kubectl.sh" "$PASSWORD";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-kubectl.sh" "$PASSWORD"';
 
 checkExitCode;
 
@@ -297,7 +297,7 @@ checkExitCode;
 # Verify Helm
 #============
 
-wsl bash "$SCRIPTS_FOLDER/check-helm.sh" "$PASSWORD";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-helm.sh" "$PASSWORD"';
 
 checkExitCode;
 
@@ -305,7 +305,7 @@ checkExitCode;
 # Verify MicroK8s
 #================
 
-wsl bash "$SCRIPTS_FOLDER/check-microk8s.sh" "$PASSWORD" "$ASSETS_FOLDER";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-microk8s.sh" "$PASSWORD" "$ASSETS_FOLDER"';
 
 checkExitCode;
 
@@ -313,7 +313,7 @@ checkExitCode;
 # Get Engine
 #=============
 
-wsl bash "$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER" "$OPS_FOLDER";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-engine-repo.sh" "$ENGINE_FOLDER" "$OPS_FOLDER"';
 
 checkExitCode;
 
@@ -321,7 +321,7 @@ checkExitCode;
 # Ensure DB and Redis Running
 #============================
 
-wsl bash "$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER"';
 
 checkExitCode;
 
@@ -329,7 +329,7 @@ checkExitCode;
 # Verify Helm Repos
 #==================
 
-wsl bash "$SCRIPTS_FOLDER/check-helm-repos.sh";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-helm-repos.sh"';
 
 checkExitCode;
 
@@ -337,7 +337,7 @@ checkExitCode;
 # Verify agones & redis
 #======================
 
-wsl bash "$SCRIPTS_FOLDER/check-agones-redis.sh" "$OPS_FOLDER";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-agones-redis.sh" "$OPS_FOLDER"';
 
 checkExitCode;
 
@@ -345,7 +345,7 @@ checkExitCode;
 # Verify ripple stack
 #====================
 
-wsl bash "$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$OPS_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-ripple.sh" "$ENABLE_RIPPLE_STACK" "$OPS_FOLDER" "$CONFIGS_FOLDER" "$CLUSTER_ID"';
 
 checkExitCode;
 
@@ -353,9 +353,9 @@ checkExitCode;
 # Get Docker Image Tag
 #=====================
 
-wsl bash -c "echo '$PASSWORD' | sudo -S apt install jq -y";
+wsl bash -ic "echo '$PASSWORD' | sudo -S apt install jq -y";
 
-$TAG = wsl bash -c "echo `$(jq -r .version `"$ENGINE_FOLDER/packages/server-core/package.json`")_`$(cd `"$ENGINE_FOLDER`" && git rev-parse HEAD)__`$(date +`"%d-%m-%yT%H-%M-%S`")";
+$TAG = wsl bash -ic "echo `$(jq -r .version `"$ENGINE_FOLDER/packages/server-core/package.json`")_`$(cd `"$ENGINE_FOLDER`" && git rev-parse HEAD)__`$(date +`"%d-%m-%yT%H-%M-%S`")";
 
 Write-Host "Tag is $TAG";
 
@@ -363,7 +363,7 @@ Write-Host "Tag is $TAG";
 # Verify Ethereal Engine
 #=======================
 
-wsl bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows" "$OPS_FOLDER" "$TAG";
+wsl bash -ic '"$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_REFRESH" "$CONFIGS_FOLDER" "$CLUSTER_ID" "microk8sWindows" "$OPS_FOLDER" "$TAG"';
 
 checkExitCode;
 

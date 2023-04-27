@@ -55,7 +55,7 @@ const MicroK8sView = ({ sx }: Props) => {
 
       let command = `echo '${password}' | sudo -S ${Commands.MICROK8S_REMOVE}`
       if (appSysInfo.osType === OSType.Windows) {
-        command = `wsl bash -c "${command}"`
+        command = `wsl bash -ic "${command}"`
       }
       await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, command)
     } catch (err) {

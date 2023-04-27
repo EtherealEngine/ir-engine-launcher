@@ -39,7 +39,7 @@ export const exec = (command: string, isLinuxCommand: boolean = true): Promise<S
 
       command = command.replaceAll('$', '`$')
 
-      command = `wsl bash -c "${command}"`
+      command = `wsl bash -ic "${command}"`
     }
   }
 
@@ -59,7 +59,7 @@ export const execStreamScriptFile = async (
     command = `. "${scriptFile}" ${args.join(' ')}`
   } else if (type === 'Windows_NT') {
     scriptFile = await ensureWindowsToWSLPath(scriptFile)
-    command = `wsl bash "${scriptFile}" ${args.join(' ')}`
+    command = `wsl bash -ic '"${scriptFile}" ${args.join(' ')}'`
   } else {
     command = `bash "${scriptFile}" ${args.join(' ')}`
   }

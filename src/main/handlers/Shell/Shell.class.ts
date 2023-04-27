@@ -143,7 +143,7 @@ class Shell {
 
       if (type === 'Windows_NT') {
         command = command.replaceAll('$', '`$')
-        command = `wsl bash -c "${command}"`
+        command = `wsl bash -ic "${command}"`
       }
 
       await execStream(command, onStdout, onStderr)
