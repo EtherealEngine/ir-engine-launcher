@@ -6,14 +6,14 @@ import { SettingsService, useSettingsState } from 'renderer/services/SettingsSer
 
 import { Box, SxProps, Theme, Typography } from '@mui/material'
 
-import { StatusViewItem } from './StatusView'
+import { StatusViewItem } from '../StatusView'
 
 interface Props {
   onChange: (value: boolean) => void
   sx?: SxProps<Theme>
 }
 
-const ConfigPrereqsView = ({ onChange, sx }: Props) => {
+const PrereqsView = ({ onChange, sx }: Props) => {
   const [statuses, setStatuses] = useState<AppModel[]>([])
   const settingsState = useSettingsState()
   const { appSysInfo } = settingsState.value
@@ -122,4 +122,4 @@ const ConfigPrereqsView = ({ onChange, sx }: Props) => {
   )
 }
 
-export default ConfigPrereqsView
+export default PrereqsView

@@ -34,8 +34,8 @@ import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
 import AuthView from '../components/Config/AuthView'
 import ClusterView from '../components/Config/ClusterView'
 import ConfigsView from '../components/Config/ConfigsView'
-import ConfigFlagsView from '../components/ConfigFlagsView'
-import ConfigPrereqsView from '../components/ConfigPrereqsView'
+import FlagsView from '../components/Config/FlagsView'
+import PrereqsView from '../components/Config/PrereqsView'
 import ConfigSummaryView from '../components/ConfigSummaryView'
 import ConfigVarsView from '../components/ConfigVarsView'
 
@@ -223,7 +223,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
               setError('')
             }}
           />
-          <ConfigPrereqsView onChange={(value) => setPrereqsPassed(value)} />
+          <PrereqsView onChange={(value) => setPrereqsPassed(value)} />
         </Box>
       )
     },
@@ -245,7 +245,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       content: (
         <Box sx={{ marginLeft: 2, marginRight: 2 }}>
           <ConfigsView localConfigs={localConfigs} onChange={onChangeConfig} />
-          <ConfigFlagsView localFlags={localFlags} onChange={onChangeFlag} />
+          <FlagsView localFlags={localFlags} onChange={onChangeFlag} />
         </Box>
       )
     },
