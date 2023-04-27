@@ -68,7 +68,7 @@ else
 
         #Restart microk8s
         echo "Restarting microk8s to reflect hostname config changes"
-        echo "$PASSWORD" | sudo snap restart microk8s
+        echo "$PASSWORD" | sudo -S snap restart microk8s
     else
         echo "Hostname is valid"
     fi
@@ -86,7 +86,7 @@ fi
 microk8sConfig=~/.kube/config-microk8s
 eval microk8sConfig=$microk8sConfig
 
-microk8s config >$microk8sConfig
+echo "$PASSWORD" | sudo -S microk8s config > $microk8sConfig
 
 echo "Exported microk8s kubeconfig to: $microk8sConfig"
 
@@ -97,19 +97,22 @@ if [[ ! -f ~/.bashrc ]]; then
     touch ~/.bashrc
 fi
 
+
+if [[ -z $KUBECONFIG ]]; then
+    KUBECONFIG=$HOME/.kube/config
+fi
+
+export KUBECONFIG=$KUBECONFIG:$microk8sConfig
+
 # Append config-microk8s in $KUBECONFIG paths of .bashrc
 if grep -q "config-microk8s" ~/.bashrc; then
     echo "config-microk8s exists in KUBECONFIG of ~/.bashrc"
 else
     echo "config-microk8s does not exist in KUBECONFIG of ~/.bashrc"
-    if [[ -z $KUBECONFIG ]]; then
-        KUBECONFIG=$HOME/.kube/config
-    fi
 
-    echo "export KUBECONFIG=$KUBECONFIG:$microk8sConfig" >> ~/.bashrc 
-    export KUBECONFIG=$KUBECONFIG:$microk8sConfig
+    echo "export KUBECONFIG=$KUBECONFIG" >> ~/.bashrc
     source ~/.bashrc
-
+    
     echo "config-microk8s entry added in KUBECONFIG of ~/.bashrc"
 fi
 
