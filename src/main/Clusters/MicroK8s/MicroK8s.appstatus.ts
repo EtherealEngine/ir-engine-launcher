@@ -86,10 +86,10 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     if lsof -Pi :8642 -sTCP:LISTEN -t >/dev/null ; then
       echo 'File server configured:';
       lsof -Pi :8642 -sTCP:LISTEN;
-      exit 0;
+      ${type !== 'Windows_NT' ? 'exit 0;' : ''}
     else
       echo 'File server not configured' >&2;
-      exit 1;
+      ${type !== 'Windows_NT' ? 'exit 1;' : ''}
     fi
     `
     ),
