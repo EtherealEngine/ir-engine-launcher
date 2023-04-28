@@ -7,7 +7,9 @@ const type = os.type()
 const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
   if (type === 'Windows_NT') {
     script = `
-      if ${microk8sPrefix}microk8s status | grep -q 'microk8s is not running'; then
+      if [[ ! -f '/snap/bin/microk8s' ]]; then
+        echo 'MicroK8s is not installed' >&2;
+      elif ${microk8sPrefix}microk8s status | grep -q 'microk8s is not running'; then
         echo 'MicroK8s not configured' >&2;
       else
         ${script}
