@@ -102,6 +102,18 @@ const PrereqsView = ({ onChange, sx }: Props) => {
           .
         </Typography>
       )
+    } else if (status.id === 'ps1ExecutionPolicy') {
+      status.description = (
+        <Typography fontSize={14}>
+          <span style={{ fontSize: 14, opacity: 0.6 }}>
+            Check whether the execution policy is set to allow unsigned PowerShell scripts.{' '}
+          </span>
+          <a style={{ color: 'white' }} target="_blank" href={"#"}>
+            Learn more
+          </a>
+          .
+        </Typography>
+      )
     }
   }
 
