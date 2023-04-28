@@ -13,10 +13,6 @@ OPS_FOLDER=$2
 # Get Engine
 #=============
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
 if [[ -d $OPS_FOLDER ]]; then
     echo "ethereal engine ops repo exists at $OPS_FOLDER"
 else
