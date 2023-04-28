@@ -5,10 +5,19 @@ import { AppModel, getAppModel } from '../../../models/AppStatus'
 const type = os.type()
 
 const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
-  // https://stackoverflow.com/a/44758924/2077741
-  script = `
+  if (type === 'Windows_NT') {
+    script = `
+      if ${microk8sPrefix}microk8s status | grep -q 'microk8s is not running'; then
+        echo 'MicroK8s not configured' >&2;
+      else
+        ${script}
+      fi
+    `
+  } else {
+    // https://stackoverflow.com/a/44758924/2077741
+    script = `
       mk8sStatus=$(${microk8sPrefix}microk8s status 2>/dev/null)
-      if echo $mk8sStatus | grep -q 'microk8s is running'; then
+      if grep -q 'microk8s is running' <<< "$mk8sStatus"; then
         ${script}
         exit 0;
       else
@@ -16,12 +25,17 @@ const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
         exit 1;
       fi
   `
+  }
 
   return script
 }
 
 export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
   let microk8sPrefix = ''
+
+  if (type === 'Windows_NT') {
+    microk8sPrefix = '/snap/bin/'
+  }
 
   if (sudoPassword) {
     microk8sPrefix = `echo '${sudoPassword}' | sudo -S ${microk8sPrefix}`
@@ -42,12 +56,14 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
       'microk8s',
       'MicroK8s',
       microk8sDependantScript(
-        `
-      version=$(${microk8sPrefix}microk8s version 2>/dev/null);
-      echo $version;
-      status=$(${microk8sPrefix}microk8s status 2>/dev/null);
-      echo $status;
-      `,
+        type === 'Windows_NT'
+          ? `${microk8sPrefix}microk8s version;${microk8sPrefix}microk8s status;`
+          : `
+    version=$(${microk8sPrefix}microk8s version 2>/dev/null);
+    echo "$version";
+    status=$(${microk8sPrefix}microk8s status 2>/dev/null);
+    echo "$status";
+    `,
         microk8sPrefix
       )
     ),
@@ -55,7 +71,9 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
       'ingress',
       'Ingress',
       microk8sDependantScript(
-        "kubectl exec -i -n ingress $(kubectl get pods -n ingress -l name=nginx-ingress-microk8s --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}') -- /nginx-ingress-controller --version;",
+        `kubectl exec -i -n ingress ${
+          type === 'Windows_NT' ? '\\' : ''
+        }$(kubectl get pods -n ingress -l name=nginx-ingress-microk8s --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}') -- /nginx-ingress-controller --version;`,
         microk8sPrefix
       )
     ),
@@ -134,6 +152,10 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
 
 export const MicroK8sRippleAppsStatus = (sudoPassword?: string): AppModel[] => {
   let microk8sPrefix = ''
+
+  if (type === 'Windows_NT') {
+    microk8sPrefix = '/snap/bin/'
+  }
 
   if (sudoPassword) {
     microk8sPrefix = `echo '${sudoPassword}' | sudo -S ${microk8sPrefix}`

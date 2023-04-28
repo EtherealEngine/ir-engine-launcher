@@ -98,7 +98,7 @@ class MicroK8s {
       let command = Commands.DASHBOARD
       if (type === 'Windows_NT') {
         command = command.replaceAll('$', '`$')
-        command = `wsl bash -ic ${command}`
+        command = `wsl bash -ic "/snap/bin/${command}"`
       }
       await execStream(command, onStdout, onStderr)
     } catch (err) {

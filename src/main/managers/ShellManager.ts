@@ -33,6 +33,7 @@ export const exec = (command: string, isLinuxCommand: boolean = true): Promise<S
 
     if (isLinuxCommand) {
       command = command.replaceAll('$', '`$')
+      command = command.replaceAll('"', '`"')
 
       command = `wsl bash -ic "${command}"`
     }
