@@ -97,7 +97,7 @@ class BaseCluster {
 
       if (app.checkCommand) {
         const response = await exec(app.checkCommand, app.isLinuxCommand)
-        const { stdout, stderr } = response
+        const { stdout, stderr, error } = response
 
         if (stdout) {
           const message = typeof stdout === 'string' ? stdout.trim() : stdout.toString()
@@ -123,7 +123,7 @@ class BaseCluster {
         status = {
           ...app,
           detail: stderr ? stderr : stdout,
-          status: stderr ? AppStatus.NotConfigured : AppStatus.Configured
+          status: stderr || error ? AppStatus.NotConfigured : AppStatus.Configured
         }
       }
 

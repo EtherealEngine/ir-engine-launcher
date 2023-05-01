@@ -25,10 +25,6 @@ fi
 # Verify Local File Server
 #=========================
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
 if lsof -Pi :8642 -sTCP:LISTEN -t >/dev/null; then
     echo "file server is configured"
     lsof -Pi :8642 -sTCP:LISTEN
