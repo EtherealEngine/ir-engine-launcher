@@ -55,6 +55,10 @@ const Channels = {
     RemoveFiles: 'RemoveFiles',
     GetDefaultConfigs: 'GetDefaultConfigs',
     GetDefaultVariables: 'GetDefaultVariables'
+  },
+  Workloads: {
+    FetchWorkloads: 'FetchWorkloads',
+    RemovePod: 'RemovePod'
   }
 }
 

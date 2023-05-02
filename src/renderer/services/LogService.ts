@@ -67,7 +67,7 @@ export const useLogState = () => useHookstate(state) as any as typeof state
 
 //Service
 export const LogService = {
-  setLogs: (clusterId: string) => {
+  initLogs: (clusterId: string) => {
     const dispatch = useDispatch()
     dispatch(LogAction.setLogs(clusterId))
   },

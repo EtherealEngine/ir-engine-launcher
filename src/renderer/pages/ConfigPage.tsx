@@ -12,6 +12,7 @@ import PageRoot from 'renderer/common/PageRoot'
 import GitView from 'renderer/components/GitView'
 import LogsView from 'renderer/components/LogsView'
 import StatusView from 'renderer/components/StatusView'
+import WorkloadsView from 'renderer/components/Workloads/WorkloadsView'
 import AlertDialog from 'renderer/dialogs/AlertDialog'
 import ConfigurationDialog from 'renderer/dialogs/ConfigurationDialog'
 import SettingsDialog from 'renderer/dialogs/SettingsDialog'
@@ -168,7 +169,7 @@ const ConfigPage = () => {
               </>
             )}
 
-            {location.pathname === Routes.WORKLOADS && <h1>Workloads</h1>}
+            {location.pathname === Routes.WORKLOADS && <WorkloadsView />}
           </ReflexElement>
 
           <ReflexSplitter />
