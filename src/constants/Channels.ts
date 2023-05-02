@@ -58,7 +58,8 @@ const Channels = {
   },
   Workloads: {
     FetchWorkloads: 'FetchWorkloads',
-    RemovePod: 'RemovePod'
+    RemovePod: 'RemovePod',
+    GetPodLogs: 'GetPodLogs'
   }
 }
 

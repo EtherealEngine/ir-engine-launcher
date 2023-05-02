@@ -88,7 +88,41 @@ export const removePod = async (
   return undefined
 }
 
-export const getPodsData = async (
+export const getPodLogs = async (
+  k8DefaultClient: k8s.CoreV1Api,
+  podName: string,
+  containerName: string
+): Promise<string> => {
+  let serverLogs = ''
+
+  try {
+    log.info('Attempting to check k8s pod logs')
+
+    const podLogs = await k8DefaultClient.readNamespacedPodLog(
+      podName,
+      'default',
+      containerName,
+      undefined,
+      false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined
+    )
+
+    serverLogs = podLogs.body
+  } catch (e) {
+    log.error(e)
+    throw e
+  }
+
+  return serverLogs
+}
+
+const getPodsData = async (
   k8DefaultClient: k8s.CoreV1Api,
   labelSelector: string,
   id: string,

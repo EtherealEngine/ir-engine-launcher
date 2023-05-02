@@ -108,6 +108,20 @@ export const WorkloadsService = {
         variant: 'error'
       })
     }
+  },
+  getPodLogs: async (cluster: ClusterModel, podName: string) => {
+    // Here we are cloning cluster object so that when selected Cluster is changed,
+    // The context cluster does not change.
+    const clonedCluster = cloneCluster(cluster)
+
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    try {
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to get workload pod logs ${podName}. ${error}`, {
+        variant: 'error'
+      })
+    }
   }
 }
 
