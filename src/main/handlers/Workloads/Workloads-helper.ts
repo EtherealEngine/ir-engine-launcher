@@ -67,23 +67,26 @@ export const getWorkloads = async (k8DefaultClient: k8s.CoreV1Api, releaseName: 
   return workloads
 }
 
-// export const removePod = async (k8DefaultClient: k8s.CoreV1Api, podName: string): Promise<Workloads | undefined> => {
-//   try {
-//     log.info(`Attempting to remove k8s pod ${podName}`)
+export const removePod = async (
+  k8DefaultClient: k8s.CoreV1Api,
+  podName: string
+): Promise<WorkloadsPodInfo | undefined> => {
+  try {
+    log.info(`Attempting to remove k8s pod ${podName}`)
 
-//     if (k8DefaultClient) {
-//       const podsResponse = await k8DefaultClient.deleteNamespacedPod(podName, 'default')
-//       const pod = getServerPodInfo(podsResponse.body)
+    if (k8DefaultClient) {
+      const podsResponse = await k8DefaultClient.deleteNamespacedPod(podName, 'default')
+      const pod = getWorkloadsPodInfo(podsResponse.body)
 
-//       return pod
-//     }
-//   } catch (e) {
-//     log.error(e)
-//     throw e
-//   }
+      return pod
+    }
+  } catch (e) {
+    log.error(e)
+    throw e
+  }
 
-//   return undefined
-// }
+  return undefined
+}
 
 export const getPodsData = async (
   k8DefaultClient: k8s.CoreV1Api,

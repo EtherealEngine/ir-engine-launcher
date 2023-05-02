@@ -9,7 +9,7 @@ import Endpoints from '../../../constants/Endpoints'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { getHomePath } from '../../managers/PathManager'
-import { getWorkloads } from './Workloads-helper'
+import { getWorkloads, removePod } from './Workloads-helper'
 
 const type = os.type()
 
@@ -19,6 +19,21 @@ class Workloads {
       const k8DefaultClient = await Workloads._getK8DefaultClient(cluster)
 
       return await getWorkloads(k8DefaultClient, 'local')
+    } catch (err) {
+      log.error(JSON.stringify(err))
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category: 'K8s workloads',
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
+    }
+  }
+
+  static removePod = async (window: BrowserWindow, cluster: ClusterModel, podName: string) => {
+    try {
+      const k8DefaultClient = await Workloads._getK8DefaultClient(cluster)
+
+      return await removePod(k8DefaultClient, podName)
     } catch (err) {
       log.error(JSON.stringify(err))
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

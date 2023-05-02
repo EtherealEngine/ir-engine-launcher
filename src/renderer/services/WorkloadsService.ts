@@ -97,17 +97,17 @@ export const WorkloadsService = {
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
 
-    // const { enqueueSnackbar } = accessSettingsState().value.notistack
-    // try {
-    //   await API.instance.client.service('server-info').remove(podName)
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    try {
+      await window.electronAPI.invoke(Channels.Workloads.RemovePod, clonedCluster, podName)
 
-    //   await WorkloadsService.fetchWorkloads(clusterId)
-    // } catch (error) {
-    //   console.error(error)
-    //   enqueueSnackbar(`Failed to remove workload pod ${podName}. ${error}`, {
-    //     variant: 'error'
-    //   })
-    // }
+      await WorkloadsService.fetchWorkloads(clonedCluster)
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to remove workload pod ${podName}. ${error}`, {
+        variant: 'error'
+      })
+    }
   }
 }
 

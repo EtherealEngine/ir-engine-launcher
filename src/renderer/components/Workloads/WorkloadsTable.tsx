@@ -2,11 +2,13 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en'
 import { WorkloadsPodInfo } from 'models/Workloads'
 import { useEffect, useState } from 'react'
+import AlertDialog from 'renderer/dialogs/AlertDialog'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { useWorkloadsState, WorkloadsService } from 'renderer/services/WorkloadsService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
 import CircularProgress from '@mui/material/CircularProgress'
 import FormControl from '@mui/material/FormControl'
 import IconButton from '@mui/material/IconButton'
@@ -103,15 +105,16 @@ const WorkloadsTable = ({ selectedCard }: Props) => {
           >
             <span>Logs</span>
           </a> */}
-          <a
-            href="#"
+          <Button
+            variant="text"
+            sx={{ textTransform: 'none' }}
             onClick={() => {
               setSelectedPod(el)
               setOpenConfirm(true)
             }}
           >
-            <span>Delete</span>
-          </a>
+            Delete
+          </Button>
         </div>
       )
     }
@@ -232,23 +235,16 @@ const WorkloadsTable = ({ selectedCard }: Props) => {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* <TableComponent
-        allowSort={false}
-        rows={rows}
-        column={serverInfoDataColumns}
-        page={0}
-        count={rows.length}
-        rowsPerPage={rows.length}
-        handlePageChange={() => {}}
-        handleRowsPerPageChange={() => {}}
-      />
 
-      <ConfirmDialog
-        open={openConfirm}
-        description={`${t('admin:components.server.confirmPodDelete')} '${selectedPod?.value?.name}'?`}
-        onClose={() => setOpenConfirm(false)}
-        onSubmit={handleRemovePod}
-      /> */}
+      {openConfirm && (
+        <AlertDialog
+          title="Confirmation"
+          message={`Do you want to delete pod '${selectedPod?.name}'?`}
+          okButtonText="Delete"
+          onClose={() => setOpenConfirm(false)}
+          onOk={handleRemovePod}
+        />
+      )}
     </>
   )
 }

@@ -10,9 +10,12 @@ class WorkloadsHandler implements IBaseHandler {
     ipcMain.handle(Channels.Workloads.FetchWorkloads, async (_event: IpcMainInvokeEvent, cluster: ClusterModel) => {
       return await Workloads.fetchWorkloads(window, cluster)
     }),
-      ipcMain.handle(Channels.Workloads.RemovePod, async (_event: IpcMainInvokeEvent) => {
-        // await Workloads.removePod(window)
-      })
+      ipcMain.handle(
+        Channels.Workloads.RemovePod,
+        async (_event: IpcMainInvokeEvent, cluster: ClusterModel, podName: string) => {
+          await Workloads.removePod(window, cluster, podName)
+        }
+      )
   }
 }
 
