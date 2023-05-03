@@ -1,9 +1,11 @@
 import { hookstate, useHookstate } from '@hookstate/core'
 import Channels from 'constants/Channels'
 import { cloneCluster, ClusterModel } from 'models/Cluster'
+import { AdditionalLogType } from 'models/Log'
 import { Workloads, WorkloadsPodInfo } from 'models/Workloads'
 
 import { store, useDispatch } from '../store'
+import { LogService } from './LogService'
 import { accessSettingsState } from './SettingsService'
 
 type WorkloadsState = {
@@ -109,13 +111,27 @@ export const WorkloadsService = {
       })
     }
   },
-  getPodLogs: async (cluster: ClusterModel, podName: string) => {
+  getPodLogs: async (cluster: ClusterModel, podName: string, containerName: string) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
 
     const { enqueueSnackbar } = accessSettingsState().value.notistack
     try {
+      const logs = await window.electronAPI.invoke(Channels.Workloads.GetPodLogs, clonedCluster, podName, containerName)
+      LogService.setAdditionalLogs(cluster.id, {
+        id: podName,
+        label: podName,
+        isLoading: false,
+        type: AdditionalLogType.Workload,
+        logs: [
+          {
+            date: new Date().toString(),
+            category: `${podName} Logs`,
+            message: logs
+          }
+        ]
+      })
     } catch (error) {
       console.error(error)
       enqueueSnackbar(`Failed to get workload pod logs ${podName}. ${error}`, {

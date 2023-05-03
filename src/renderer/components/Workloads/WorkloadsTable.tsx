@@ -4,6 +4,7 @@ import { WorkloadsPodInfo } from 'models/Workloads'
 import { useEffect, useState } from 'react'
 import AlertDialog from 'renderer/dialogs/AlertDialog'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
+import { LogService } from 'renderer/services/LogService'
 import { useWorkloadsState, WorkloadsService } from 'renderer/services/WorkloadsService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
@@ -99,15 +100,19 @@ const WorkloadsTable = ({ selectedCard }: Props) => {
       age: timeAgo.format(new Date(el.age)),
       action: (
         <div style={{ float: 'right' }}>
-          {/* <a
-            href="#"
-            onClick={() => WorkloadsService.fetchLogs(el.name, el.containers[el.containers.length - 1].name)}
-          >
-            <span>Logs</span>
-          </a> */}
           <Button
             variant="text"
             sx={{ textTransform: 'none' }}
+            onClick={async () => {
+              await WorkloadsService.getPodLogs(selectedCluster, el.name, el.containers[el.containers.length - 1].name)
+              LogService.setSelectedAdditionalLogs(selectedClusterId, el.name)
+            }}
+          >
+            Logs
+          </Button>
+          <Button
+            variant="text"
+            sx={{ textTransform: 'none', color: '#ff8c00' }}
             onClick={() => {
               setSelectedPod(el)
               setOpenConfirm(true)

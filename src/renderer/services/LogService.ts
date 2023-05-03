@@ -43,7 +43,9 @@ store.receptors.push((action: LogActionType): void => {
     case 'SET_ADDITIONAL_LOGS': {
       const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
       if (index !== -1) {
-        const additionalLogsIndex = state.findIndex((item) => item.clusterId.value === action.additionalLogs.id)
+        const additionalLogsIndex = state[index].additionalLogs.findIndex(
+          (item) => item.id.value === action.additionalLogs.id
+        )
         if (additionalLogsIndex === -1) {
           state[index].additionalLogs.merge([action.additionalLogs])
         } else {
@@ -115,6 +117,14 @@ export const LogService = {
   initLogs: (clusterId: string) => {
     const dispatch = useDispatch()
     dispatch(LogAction.setLogs(clusterId))
+  },
+  setAdditionalLogs: (clusterId: string, additionalLogs: AdditionalLogModel) => {
+    const dispatch = useDispatch()
+    dispatch(LogAction.setAdditionalLogs(clusterId, additionalLogs))
+  },
+  setSelectedAdditionalLogs: (clusterId: string, selectedAdditionalLogs: string | undefined) => {
+    const dispatch = useDispatch()
+    dispatch(LogAction.setSelectedAdditionalLogs(clusterId, selectedAdditionalLogs))
   },
   removeLogs: (clusterId: string) => {
     const dispatch = useDispatch()
@@ -216,7 +226,7 @@ export const LogAction = {
       additionalLogs
     }
   },
-  setSelectedAdditionalLogs: (clusterId: string, selectedAdditionalLogs: string) => {
+  setSelectedAdditionalLogs: (clusterId: string, selectedAdditionalLogs: string | undefined) => {
     return {
       type: 'SET_SELECTED_ADDITIONAL_LOGS' as const,
       clusterId,

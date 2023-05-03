@@ -174,7 +174,7 @@ const ConfigPage = () => {
 
           <ReflexSplitter />
 
-          <ReflexElement minSize={200} flex={0.3} style={{ overflow: 'hidden' }}>
+          <ReflexElement minSize={50} flex={0.3} style={{ overflow: 'hidden' }}>
             <LogsView />
           </ReflexElement>
         </ReflexContainer>
