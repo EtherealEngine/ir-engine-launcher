@@ -1,5 +1,6 @@
 import { Workloads } from 'models/Workloads'
 import { useEffect, useState } from 'react'
+import ErrorPage from 'renderer/pages/ErrorPage'
 import LoadingPage from 'renderer/pages/LoadingPage'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { useWorkloadsState, WorkloadsService } from 'renderer/services/WorkloadsService'
@@ -28,6 +29,17 @@ const WorkloadsView = () => {
 
   if (!currentWorkloads?.isFetched) {
     return <LoadingPage title="Loading" variant="body2" isInPage />
+  }
+
+  if (currentWorkloads?.error) {
+    return (
+      <ErrorPage
+        error={'Failed to fetch Workloads'}
+        detail={currentWorkloads?.error}
+        onRetry={() => WorkloadsService.fetchWorkloads(selectedCluster)}
+        isInPage
+      />
+    )
   }
 
   return (

@@ -12,6 +12,7 @@ type WorkloadsState = {
   clusterId: string
   isFetched: boolean
   isLoading: boolean
+  error: string
   workloads: Workloads[]
 }
 
@@ -35,6 +36,7 @@ store.receptors.push((action: WorkloadsActionType): void => {
             clusterId: action.clusterId,
             isFetched: false,
             isLoading: false,
+            error: action.error,
             workloads: action.workloads
           } as WorkloadsState
         ])
@@ -43,6 +45,7 @@ store.receptors.push((action: WorkloadsActionType): void => {
           clusterId: action.clusterId,
           isFetched: true,
           isLoading: false,
+          error: action.error,
           workloads: action.workloads
         } as WorkloadsState)
       }
@@ -59,7 +62,7 @@ export const useWorkloadsState = () => useHookstate(state) as any as typeof stat
 export const WorkloadsService = {
   initWorkloads: (clusterId: string) => {
     const dispatch = useDispatch()
-    dispatch(WorkloadsAction.setWorkloads(clusterId, []))
+    dispatch(WorkloadsAction.setWorkloads(clusterId, [], ''))
   },
   fetchWorkloads: async (cluster: ClusterModel) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
@@ -86,12 +89,13 @@ export const WorkloadsService = {
         ...workloads
       ]
 
-      dispatch(WorkloadsAction.setWorkloads(cluster.id, workloads))
+      dispatch(WorkloadsAction.setWorkloads(cluster.id, workloads, ''))
     } catch (error) {
       console.error(error)
       enqueueSnackbar(`Failed to fetch Workloads. ${error}`, {
         variant: 'error'
       })
+      dispatch(WorkloadsAction.setWorkloads(cluster.id, [], error.message))
     }
   },
   removePod: async (cluster: ClusterModel, podName: string) => {
@@ -148,11 +152,12 @@ export const WorkloadsAction = {
       clusterId
     }
   },
-  setWorkloads: (clusterId: string, workloads: Workloads[]) => {
+  setWorkloads: (clusterId: string, workloads: Workloads[], error: string) => {
     return {
       type: 'SET_WORKLOADS' as const,
       clusterId,
-      workloads
+      workloads,
+      error
     }
   }
 }
