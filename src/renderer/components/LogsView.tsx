@@ -199,7 +199,7 @@ const LogsView = () => {
         </Box>
 
         {containersMenu.length > 0 && (
-          <FormControl margin="dense" size="small">
+          <FormControl margin="dense" size="small" sx={{ width: '200px' }}>
             <InputLabel id="container">Container</InputLabel>
             <Select
               labelId="container"
@@ -244,13 +244,9 @@ const LogsView = () => {
 
         {currentAdditionalLogs?.type === AdditionalLogType.Workload && (
           <>
-            {currentAdditionalLogs?.isLoading === false && (
-              <IconButton title="Refresh Logs" sx={{ marginRight: 1.5 }} onClick={handleRefreshWorkloadLogs}>
-                <CachedOutlinedIcon />
-              </IconButton>
-            )}
-
-            {currentAdditionalLogs?.isLoading && <CircularProgress size={24} sx={{ marginRight: 1.5 }} />}
+            <IconButton title="Refresh Logs" sx={{ marginRight: 1.5 }} onClick={handleRefreshWorkloadLogs}>
+              <CachedOutlinedIcon />
+            </IconButton>
 
             <FormControl margin="dense" size="small">
               <InputLabel id="logs-refresh">Auto Refresh</InputLabel>

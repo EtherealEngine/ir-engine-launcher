@@ -122,7 +122,6 @@ export const WorkloadsService = {
       LogService.setAdditionalLogs(cluster.id, {
         id: `${podName}/${containerName}`,
         label: podName,
-        isLoading: false,
         type: AdditionalLogType.Workload,
         logs: [
           {

@@ -11,7 +11,6 @@ export enum AdditionalLogType {
 export type AdditionalLogModel = {
   id: string
   label: string
-  isLoading: boolean
   type: AdditionalLogType
   logs: LogModel[]
 }
