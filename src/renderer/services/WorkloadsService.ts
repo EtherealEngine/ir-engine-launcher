@@ -120,7 +120,7 @@ export const WorkloadsService = {
     try {
       const logs = await window.electronAPI.invoke(Channels.Workloads.GetPodLogs, clonedCluster, podName, containerName)
       LogService.setAdditionalLogs(cluster.id, {
-        id: podName,
+        id: `${podName}/${containerName}`,
         label: podName,
         isLoading: false,
         type: AdditionalLogType.Workload,

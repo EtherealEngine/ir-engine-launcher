@@ -53,6 +53,7 @@ const WorkloadsTable = ({ selectedCard }: Props) => {
   const workloads = useWorkloadsState()
   const currentWorkloads = workloads.value.find((item) => item.clusterId === selectedClusterId)
 
+  //@ts-ignore
   useEffect(() => {
     if (autoRefresh !== '0') {
       const interval = setInterval(() => {
@@ -104,8 +105,9 @@ const WorkloadsTable = ({ selectedCard }: Props) => {
             variant="text"
             sx={{ textTransform: 'none' }}
             onClick={async () => {
-              await WorkloadsService.getPodLogs(selectedCluster, el.name, el.containers[el.containers.length - 1].name)
-              LogService.setSelectedAdditionalLogs(selectedClusterId, el.name)
+              const containerName = el.containers[el.containers.length - 1].name
+              await WorkloadsService.getPodLogs(selectedCluster, el.name, containerName)
+              LogService.setSelectedAdditionalLogs(selectedClusterId, `${el.name}/${containerName}`)
             }}
           >
             Logs

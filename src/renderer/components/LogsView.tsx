@@ -2,6 +2,7 @@ import { AdditionalLogType } from 'models/Log'
 import { useEffect, useRef, useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { LogService, useLogState } from 'renderer/services/LogService'
+import { useWorkloadsState, WorkloadsService } from 'renderer/services/WorkloadsService'
 
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import CloseIcon from '@mui/icons-material/Close'
@@ -22,9 +23,13 @@ import {
 
 const LogsView = () => {
   const [autoRefresh, setAutoRefresh] = useState('60')
+
   const [intervalTimer, setIntervalTimer] = useState<NodeJS.Timer | undefined>(undefined)
   const configFileState = useConfigFileState()
   const { selectedCluster, selectedClusterId } = configFileState.value
+
+  const workloads = useWorkloadsState()
+  const currentWorkloads = workloads.value.find((item) => item.clusterId === selectedClusterId)
 
   const logState = useLogState()
   const currentLogs = logState.value.find((item) => item.clusterId === selectedClusterId)
@@ -44,6 +49,7 @@ const LogsView = () => {
     scrollLogsToBottom()
   }, [logState])
 
+  //@ts-ignore
   useEffect(() => {
     if (autoRefresh !== '0') {
       const interval = setInterval(() => {
@@ -61,6 +67,17 @@ const LogsView = () => {
 
   if (!selectedCluster) {
     return <></>
+  }
+
+  let containersMenu: string[] = []
+  if (currentLogs?.selectedAdditionalLogs) {
+    const containers = currentWorkloads?.workloads
+      .find((item) => item.id === 'all')
+      ?.pods.find((item) => item.name === currentLogs?.selectedAdditionalLogs?.split('/')[0])?.containers
+    containersMenu =
+      containers?.map((item) => {
+        return item.name
+      }) || []
   }
 
   const autoRefreshMenu: { value: string; label: string }[] = [
@@ -101,7 +118,27 @@ const LogsView = () => {
 
   const handleRefreshWorkloadLogs = () => {
     console.info('Refreshing workload logs.')
-    // WorkloadsService.getPodLogs(selectedCluster)
+
+    const split = currentLogs?.selectedAdditionalLogs?.split('/')
+    if (split) {
+      WorkloadsService.getPodLogs(selectedCluster, split[0], split[1])
+    }
+  }
+
+  const handleContainerChange = async (e) => {
+    try {
+      const { value } = e.target
+
+      const split = currentLogs?.selectedAdditionalLogs?.split('/')
+      if (currentLogs?.selectedAdditionalLogs && split) {
+        await WorkloadsService.getPodLogs(selectedCluster, split[0], value)
+
+        LogService.removeAdditionalLogs(selectedClusterId, currentLogs?.selectedAdditionalLogs)
+        LogService.setSelectedAdditionalLogs(selectedClusterId, `${split[0]}/${value}`)
+      }
+    } catch {
+      LogService.setSelectedAdditionalLogs(selectedClusterId, undefined)
+    }
   }
 
   const handleAutoRefreshWorkloadLogsChange = (e) => {
@@ -114,6 +151,7 @@ const LogsView = () => {
     <Box sx={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexDirection: 'row', marginTop: 1, marginBottom: 1 }}>
         <Typography variant="h5">Logs</Typography>
+
         <Box sx={{ flexGrow: 1, display: 'flex', ml: 4, mr: 4 }}>
           {currentLogs?.additionalLogs?.length !== undefined && currentLogs?.additionalLogs?.length > 0 && (
             <Tabs
@@ -159,6 +197,24 @@ const LogsView = () => {
             </Tabs>
           )}
         </Box>
+
+        {containersMenu.length > 0 && (
+          <FormControl margin="dense" size="small">
+            <InputLabel id="container">Container</InputLabel>
+            <Select
+              labelId="container"
+              label="Container"
+              value={currentLogs?.selectedAdditionalLogs?.split('/')[1]}
+              onChange={handleContainerChange}
+            >
+              {containersMenu.map((item) => (
+                <MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
         <Box sx={{ position: 'relative' }}>
           <IconButton
