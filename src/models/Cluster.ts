@@ -8,7 +8,8 @@ export type ClusterModel = {
 
 export enum ClusterType {
   MicroK8s = 'MicroK8s',
-  Minikube = 'Minikube'
+  Minikube = 'Minikube',
+  Custom = 'Custom Kubernetes'
 }
 
 export const cloneCluster = (cluster: ClusterModel) => {

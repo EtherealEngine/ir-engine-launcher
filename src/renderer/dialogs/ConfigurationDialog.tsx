@@ -277,9 +277,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       )}
 
       {error && (
-        <DialogContentText color={'red'} sx={{ marginLeft: 5, marginRight: 5 }}>
-          Error: {error}
-        </DialogContentText>
+        <DialogContentText sx={{ marginLeft: 5, marginRight: 5, color: 'red' }}>Error: {error}</DialogContentText>
       )}
 
       <DialogContent ref={contentStartRef} sx={{ height: '27vh', marginBottom: 3 }}>
@@ -291,7 +289,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
           <Box sx={{ flex: '1 1 auto' }} />
 
-          <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+          <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
           <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Configure' : 'Next'}</Button>

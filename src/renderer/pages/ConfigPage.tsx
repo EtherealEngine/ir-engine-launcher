@@ -130,7 +130,7 @@ const ConfigPage = () => {
             loading={currentDeployment?.isConfiguring}
             loadingIndicator={
               <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-                <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+                <CircularProgress size={24} sx={{ marginRight: 1 }} />
                 Configuring
               </Box>
             }
@@ -147,7 +147,7 @@ const ConfigPage = () => {
             loading={isLaunching}
             loadingIndicator={
               <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-                <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+                <CircularProgress size={24} sx={{ marginRight: 1 }} />
                 Launching
               </Box>
             }

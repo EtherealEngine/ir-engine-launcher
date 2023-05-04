@@ -132,13 +132,7 @@ const NavView = () => {
           </Box>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
+            <IconButton size="large" aria-controls="menu-appbar" aria-haspopup="true" onClick={handleOpenNavMenu}>
               <MenuIcon />
             </IconButton>
 
@@ -179,7 +173,7 @@ const NavView = () => {
             <Typography variant="h6">Control Center</Typography>
           </Box>
 
-          <IconButton sx={{ mr: 2 }} color="inherit" onClick={() => ConfigFileService.setSelectedClusterId('')}>
+          <IconButton sx={{ mr: 2 }} onClick={() => ConfigFileService.setSelectedClusterId('')}>
             <HomeIcon />
           </IconButton>
 
@@ -207,7 +201,6 @@ const NavView = () => {
                 setMode(newMode)
                 colorMode.toggleColorMode()
               }}
-              color="inherit"
             >
               {mode === 'vaporwave' ? (
                 <Brightness7Icon fontSize="small" />

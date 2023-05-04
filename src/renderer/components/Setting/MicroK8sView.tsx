@@ -99,7 +99,7 @@ const MicroK8sView = ({ sx }: Props) => {
           loading={processingMicroK8sPrune}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
               Pruning
             </Box>
           }
@@ -140,7 +140,7 @@ const MicroK8sView = ({ sx }: Props) => {
           loading={isOpeningRegistry}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
               Opening
             </Box>
           }

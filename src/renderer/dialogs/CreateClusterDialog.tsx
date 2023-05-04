@@ -78,7 +78,6 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   })
   const [name, setName] = useState('')
   const [type, setType] = useState<ClusterType>(ClusterType.MicroK8s)
-  const [prereqsPassed, setPrereqsPassed] = useState(false)
   const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
   const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
@@ -110,8 +109,8 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   }
 
   const handleNext = async (isConfigure: boolean) => {
-    if (appSysInfo.osType === OSType.Windows && type !== ClusterType.MicroK8s) {
-      setError('On Windows, only MicroK8s is currently supported')
+    if (appSysInfo.osType === OSType.Windows && type === ClusterType.Minikube) {
+      setError('On Windows, Minikube is not supported')
       return
     }
 
@@ -223,7 +222,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
               setError('')
             }}
           />
-          <PrereqsView onChange={(value) => setPrereqsPassed(value)} />
+          <PrereqsView />
         </Box>
       )
     },
@@ -333,9 +332,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       )}
 
       {error && (
-        <DialogContentText color={'red'} sx={{ marginLeft: 5, marginRight: 5 }}>
-          Error: {error}
-        </DialogContentText>
+        <DialogContentText sx={{ marginLeft: 5, marginRight: 5, color: 'red' }}>Error: {error}</DialogContentText>
       )}
 
       <DialogContent ref={contentStartRef} sx={{ height: '27vh', marginBottom: 3 }}>
@@ -347,13 +344,11 @@ const CreateClusterDialog = ({ onClose }: Props) => {
 
           <Box sx={{ flex: '1 1 auto' }} />
 
-          <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+          <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
           {activeStep === steps.length - 1 && <Button onClick={() => handleNext(true)}>Create & Configure</Button>}
-          <Button disabled={appSysInfo.osType === OSType.Windows && !prereqsPassed} onClick={() => handleNext(false)}>
-            {activeStep === steps.length - 1 ? 'Create' : 'Next'}
-          </Button>
+          <Button onClick={() => handleNext(false)}>{activeStep === steps.length - 1 ? 'Create' : 'Next'}</Button>
         </Box>
       </DialogActions>
     </Dialog>
