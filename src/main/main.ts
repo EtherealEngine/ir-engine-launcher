@@ -120,16 +120,18 @@ const createWindow = async () => {
     }
   })
 
-  // We want the user to proactively download the install
-  autoUpdater.autoDownload = false
-  autoUpdater.setFeedURL({
-    provider: 'github',
-    owner: 'etherealengine',
-    repo: 'etherealengine-control-center'
-  })
-
   log.transports.file.level = 'info'
-  autoUpdater.logger = log
+
+  // We want the user to proactively download the install
+  if (process.env.NODE_ENV !== 'development') {
+    autoUpdater.autoDownload = false
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'etherealengine',
+      repo: 'etherealengine-control-center'
+    })
+    autoUpdater.logger = log
+  }
 
   const ipcHandlers: IBaseHandler[] = [new UpdatesHandler()]
 
