@@ -23,6 +23,7 @@ import { IBaseHandler } from './handlers/IBaseHandler'
 import ShellHandler from './handlers/Shell/Shell.handler'
 import UpdatesHandler from './handlers/Updates/Updates.handler'
 import UtilitiesHandler from './handlers/Utilities/Utilities.handler'
+import WorkloadsHandler from './handlers/Workloads/Workloads.handler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 
@@ -200,6 +201,7 @@ export const createMainWindow = async () => {
     new ShellHandler(),
     new EngineHandler(),
     new ClusterHandler(),
+    new WorkloadsHandler(),
     new GitHandler()
   ]
 

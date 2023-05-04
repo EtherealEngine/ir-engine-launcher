@@ -74,6 +74,10 @@ const NavView = () => {
       path: Routes.CONFIG
     })
     pages.push({
+      title: 'Workloads',
+      path: Routes.WORKLOADS
+    })
+    pages.push({
       title: 'Admin',
       path: Routes.ADMIN
     })

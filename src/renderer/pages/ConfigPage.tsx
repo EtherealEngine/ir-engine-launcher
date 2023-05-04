@@ -1,15 +1,18 @@
 import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
+import Routes from 'constants/Routes'
 import Storage from 'constants/Storage'
 import { AppStatus } from 'models/AppStatus'
 import { ClusterType } from 'models/Cluster'
 import { useState } from 'react'
 import { ReflexContainer, ReflexElement, ReflexSplitter } from 'react-reflex'
 import 'react-reflex/styles.css'
+import { useLocation } from 'react-router-dom'
 import PageRoot from 'renderer/common/PageRoot'
 import GitView from 'renderer/components/GitView'
 import LogsView from 'renderer/components/LogsView'
 import StatusView from 'renderer/components/StatusView'
+import WorkloadsView from 'renderer/components/Workloads/WorkloadsView'
 import AlertDialog from 'renderer/dialogs/AlertDialog'
 import ConfigurationDialog from 'renderer/dialogs/ConfigurationDialog'
 import SettingsDialog from 'renderer/dialogs/SettingsDialog'
@@ -33,6 +36,8 @@ const ConfigPage = () => {
   const [showSettingsDialog, setSettingsDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [isLaunching, setLaunching] = useState(false)
+
+  const location = useLocation()
 
   const configFileState = useConfigFileState()
   const { selectedCluster, selectedClusterId } = configFileState.value
@@ -154,16 +159,22 @@ const ConfigPage = () => {
 
         <ReflexContainer orientation="horizontal">
           <ReflexElement minSize={200} flex={0.7} style={{ overflowX: 'hidden' }}>
-            <StatusView title="System" statuses={currentDeployment?.systemStatus!} />
+            {location.pathname === Routes.CONFIG && (
+              <>
+                <StatusView title="System" statuses={currentDeployment?.systemStatus!} />
 
-            <StatusView title="Apps" statuses={currentDeployment?.appStatus!} />
+                <StatusView title="Apps" statuses={currentDeployment?.appStatus!} />
 
-            <StatusView title="Engine" statuses={currentDeployment?.engineStatus!} />
+                <StatusView title="Engine" statuses={currentDeployment?.engineStatus!} />
+              </>
+            )}
+
+            {location.pathname === Routes.WORKLOADS && <WorkloadsView />}
           </ReflexElement>
 
           <ReflexSplitter />
 
-          <ReflexElement minSize={200} flex={0.3} style={{ overflow: 'hidden' }}>
+          <ReflexElement minSize={50} flex={0.3} style={{ overflow: 'hidden' }}>
             <LogsView />
           </ReflexElement>
         </ReflexContainer>
