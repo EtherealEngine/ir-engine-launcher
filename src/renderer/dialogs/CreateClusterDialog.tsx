@@ -13,6 +13,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import AppsIcon from '@mui/icons-material/Apps'
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
+import TuneIcon from '@mui/icons-material/Tune'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import {
   Box,
@@ -35,6 +36,7 @@ import AuthView from '../components/Config/AuthView'
 import ClusterView from '../components/Config/ClusterView'
 import ConfigsView from '../components/Config/ConfigsView'
 import FlagsView from '../components/Config/FlagsView'
+import KubeconfigView from '../components/Config/KubeconfigView'
 import PrereqsView from '../components/Config/PrereqsView'
 import SummaryView from '../components/Config/SummaryView'
 import VarsView from '../components/Config/VarsView'
@@ -43,16 +45,17 @@ const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
 
   const icons: { [index: string]: React.ReactElement } = {
-    1: <AdminPanelSettingsIcon />,
-    2: <ViewListIcon />,
-    3: <DisplaySettingsIcon />,
-    4: <AppsIcon />,
-    5: <PlaylistAddCheckIcon />
+    cluster: <ViewListIcon />,
+    kubeconfig: <TuneIcon />,
+    authenticate: <AdminPanelSettingsIcon />,
+    configs: <DisplaySettingsIcon />,
+    summary: <AppsIcon />,
+    variables: <PlaylistAddCheckIcon />
   }
 
   return (
     <ColorlibStepIconRoot ownerState={{ completed, active }} className={className}>
-      {icons[String(props.icon)]}
+      {icons[String(props.id)]}
     </ColorlibStepIconRoot>
   )
 }
@@ -69,7 +72,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   const configFileState = useConfigFileState()
   const { clusters, loading } = configFileState.value
 
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStepId, setActiveStepId] = useState('cluster')
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [password, setPassword] = useState(() => {
@@ -119,13 +122,13 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       return
     }
 
-    if (activeStep === 0) {
+    if (activeStepId === 'cluster') {
       const clusterCount = clusters.filter((item) => item.type === type)
       if (clusterCount.length > 0) {
         setError(`You already have a cluster of ${type}.`)
         return
       }
-    } else if (activeStep === 1) {
+    } else if (activeStepId === 'authenticate') {
       setLoading(true)
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
       setLoading(false)
@@ -138,9 +141,9 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       }
 
       await loadDefaultConfigs()
-    } else if (activeStep === 2) {
+    } else if (activeStepId === 'configs') {
       loadDefaultVariables(type)
-    } else if (activeStep === 4) {
+    } else if (activeStepId === 'summary') {
       const createCluster: ClusterModel = {
         id: generateUUID(),
         name,
@@ -169,12 +172,12 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       return
     }
 
-    setActiveStep((prevActiveStep) => prevActiveStep + 1)
+    setActiveStepId(steps[activeStep + 1].id)
     setError('')
   }
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1)
+    setActiveStepId(steps[activeStep - 1].id)
     setError('')
   }
 
@@ -206,6 +209,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
 
   const steps = [
     {
+      id: 'cluster',
       label: 'Cluster',
       title: 'Provide cluster information',
       content: (
@@ -222,11 +226,12 @@ const CreateClusterDialog = ({ onClose }: Props) => {
               setError('')
             }}
           />
-          <PrereqsView />
+          {type === ClusterType.MicroK8s && appSysInfo.osType === OSType.Windows && <PrereqsView />}
         </Box>
       )
     },
     {
+      id: 'authenticate',
       label: 'Authenticate',
       title: 'Provide sudo admin password to authenticate',
       content: (
@@ -239,6 +244,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       )
     },
     {
+      id: 'configs',
       label: 'Configs',
       title: 'Provide configuration details',
       content: (
@@ -249,11 +255,13 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       )
     },
     {
+      id: 'variables',
       label: 'Variables',
       title: 'Provide configuration variables (Optional)',
       content: <VarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
+      id: 'summary',
       label: 'Summary',
       title: 'Review configurations before finalizing',
       content: (
@@ -269,6 +277,19 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     }
   ]
 
+  if (type === ClusterType.Custom) {
+    steps.splice(1, 0, {
+      id: 'kubeconfig',
+      label: 'Kubeconfig',
+      title: 'Provide kubeconfig information',
+      content: (
+        <KubeconfigView localConfigs={localConfigs} onChange={onChangeConfig} sx={{ marginLeft: 2, marginRight: 2 }} />
+      )
+    })
+  }
+
+  const activeStep = steps.findIndex((item) => item.id === activeStepId)
+
   useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
 
   return (
@@ -278,7 +299,9 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
           {steps.map((step) => (
             <Step key={step.label}>
-              <StepLabel StepIconComponent={ColorlibStepIcon}>{step.label}</StepLabel>
+              <StepLabel StepIconComponent={(prop) => <ColorlibStepIcon id={step.id} {...prop} />}>
+                {step.label}
+              </StepLabel>
             </Step>
           ))}
         </Stepper>
@@ -286,7 +309,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
 
       <DialogContentText sx={{ margin: 3, marginBottom: 0 }}>{steps[activeStep].title}</DialogContentText>
 
-      {steps[activeStep].label === 'Authenticate' && appSysInfo.osType === OSType.Windows && (
+      {activeStepId === 'authenticate' && appSysInfo.osType === OSType.Windows && (
         <Box ml={3} mr={3} mt={1}>
           <Typography fontSize={14}>
             Note:{' '}
@@ -297,7 +320,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         </Box>
       )}
 
-      {steps[activeStep].label === 'Summary' && (
+      {activeStepId === 'summary' && (
         <Box ml={3} mr={3} mt={1}>
           <Typography fontSize={14}>
             Note:{' '}

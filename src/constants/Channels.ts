@@ -13,6 +13,7 @@ const Channels = {
     OpenExternal: 'OpenExternal',
     OpenPath: 'OpenPath',
     SelectFolder: 'SelectFolder',
+    SelectFile: 'SelectFile',
     Log: 'Log',
     SaveLog: 'SaveLog',
     GetPrerequisites: 'GetPrerequisites',

@@ -22,6 +22,9 @@ class UtilitiesHandler implements IBaseHandler {
       ipcMain.handle(Channels.Utilities.SelectFolder, async (_event: IpcMainInvokeEvent) => {
         return await Utilities.selectFolder()
       }),
+      ipcMain.handle(Channels.Utilities.SelectFile, async (_event: IpcMainInvokeEvent) => {
+        return await Utilities.selectFile()
+      }),
       ipcMain.handle(
         Channels.Utilities.SaveLog,
         async (_event: IpcMainInvokeEvent, clusterId: string, contents: string[], fileName: string) => {

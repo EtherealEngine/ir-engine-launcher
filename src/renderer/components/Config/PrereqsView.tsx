@@ -1,8 +1,7 @@
 import Endpoints from 'constants/Endpoints'
 import { AppModel, AppStatus } from 'models/AppStatus'
-import { OSType } from 'models/AppSysInfo'
 import { useEffect, useState } from 'react'
-import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
+import { SettingsService } from 'renderer/services/SettingsService'
 
 import { Box, SxProps, Theme, Typography } from '@mui/material'
 
@@ -14,8 +13,6 @@ interface Props {
 
 const PrereqsView = ({ sx }: Props) => {
   const [statuses, setStatuses] = useState<AppModel[]>([])
-  const settingsState = useSettingsState()
-  const { appSysInfo } = settingsState.value
 
   useEffect(() => {
     loadPrerequisites()
@@ -93,10 +90,6 @@ const PrereqsView = ({ sx }: Props) => {
         </Typography>
       )
     }
-  }
-
-  if (appSysInfo.osType !== OSType.Windows) {
-    return <></>
   }
 
   return (

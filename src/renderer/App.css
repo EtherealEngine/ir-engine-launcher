@@ -227,3 +227,11 @@ body {
 ::-webkit-scrollbar-corner {
   background-color: var(--scrollbarCorner);
 }
+
+.resizable {
+  resize: both !important;
+}
+
+.font-14 {
+  font-size: 14px !important;
+}
