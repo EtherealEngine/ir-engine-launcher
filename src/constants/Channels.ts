@@ -58,7 +58,8 @@ const Channels = {
     GetDefaultVariables: 'GetDefaultVariables'
   },
   Workloads: {
-    FetchWorkloads: 'FetchWorkloads',
+    GetKubeContexts: 'GetKubeContexts',
+    GetWorkloads: 'GetWorkloads',
     RemovePod: 'RemovePod',
     GetPodLogs: 'GetPodLogs'
   }

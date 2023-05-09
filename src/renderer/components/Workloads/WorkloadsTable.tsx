@@ -129,7 +129,7 @@ const WorkloadsTable = ({ selectedCard }: Props) => {
 
   const handleRefreshWorkloads = () => {
     console.info('Refreshing workloads.')
-    WorkloadsService.fetchWorkloads(selectedCluster)
+    WorkloadsService.getWorkloads(selectedCluster)
   }
 
   const handleAutoRefreshWorkloadsChange = (e) => {

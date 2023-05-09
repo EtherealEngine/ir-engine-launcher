@@ -197,11 +197,14 @@ export const ConfigFileService = {
       })
     }
   },
-  getDefaultConfigs: async () => {
+  getDefaultConfigs: async (clusterType: ClusterType) => {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
 
     try {
-      const configs: Record<string, string> = await window.electronAPI.invoke(Channels.ConfigFile.GetDefaultConfigs)
+      const configs: Record<string, string> = await window.electronAPI.invoke(
+        Channels.ConfigFile.GetDefaultConfigs,
+        clusterType
+      )
       return configs
     } catch (error) {
       console.error(error)

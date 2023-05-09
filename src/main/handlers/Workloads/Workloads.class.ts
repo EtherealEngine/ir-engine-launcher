@@ -7,6 +7,7 @@ import path from 'path'
 import Channels from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
+import { KubeconfigType, KubeContext } from '../../../models/Kubeconfig'
 import { LogModel } from '../../../models/Log'
 import { getHomePath } from '../../managers/PathManager'
 import { getPodLogs, getWorkloads, removePod } from './Workloads-helper'
@@ -14,7 +15,38 @@ import { getPodLogs, getWorkloads, removePod } from './Workloads-helper'
 const type = os.type()
 
 class Workloads {
-  static fetchWorkloads = async (window: BrowserWindow, cluster: ClusterModel) => {
+  static getKubeContexts = async (window: BrowserWindow, type: KubeconfigType, typeValue: string) => {
+    try {
+      const kc = new k8s.KubeConfig()
+
+      if (type === KubeconfigType.File) {
+        kc.loadFromFile(typeValue)
+      } else if (type === KubeconfigType.Text) {
+        kc.loadFromString(typeValue)
+      } else {
+        kc.loadFromDefault()
+      }
+
+      const contexts = kc.getContexts()
+      const currentContext = kc.getCurrentContext()
+
+      const kubeContexts: KubeContext[] = contexts.map((item) => ({
+        ...item,
+        isDefault: item.name === currentContext
+      }))
+
+      return kubeContexts
+    } catch (err) {
+      log.error(JSON.stringify(err))
+      window.webContents.send(Channels.Utilities.Log, type, typeValue, {
+        category: 'kubeconfig',
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
+    }
+  }
+
+  static getWorkloads = async (window: BrowserWindow, cluster: ClusterModel) => {
     try {
       const k8DefaultClient = await Workloads._getK8DefaultClient(cluster)
 

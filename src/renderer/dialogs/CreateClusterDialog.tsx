@@ -99,14 +99,14 @@ const CreateClusterDialog = ({ onClose }: Props) => {
 
   const loadDefaultConfigs = async () => {
     setLoading(true)
-    const configs = await ConfigFileService.getDefaultConfigs()
+    const configs = await ConfigFileService.getDefaultConfigs(type)
     setDefaultConfigs(configs)
     setLoading(false)
   }
 
-  const loadDefaultVariables = async (clusterType: ClusterType) => {
+  const loadDefaultVariables = async () => {
     setLoading(true)
-    const vars = await ConfigFileService.getDefaultVariables(clusterType, localConfigs)
+    const vars = await ConfigFileService.getDefaultVariables(type, localConfigs)
     setDefaultVars(vars)
     setLoading(false)
   }
@@ -128,6 +128,8 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         setError(`You already have a cluster of ${type}.`)
         return
       }
+
+      await loadDefaultConfigs()
     } else if (activeStepId === 'authenticate') {
       setLoading(true)
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
@@ -139,10 +141,8 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         setError('Invalid password')
         return
       }
-
-      await loadDefaultConfigs()
     } else if (activeStepId === 'configs') {
-      loadDefaultVariables(type)
+      await loadDefaultVariables()
     } else if (activeStepId === 'summary') {
       const createCluster: ClusterModel = {
         id: generateUUID(),
@@ -191,6 +191,12 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   const onChangeConfig = async (key: string, value: string) => {
     const newConfigs = { ...tempConfigs }
     newConfigs[key] = value
+    setTempConfigs(newConfigs)
+    setError('')
+  }
+
+  const onChangeConfigs = async (records: Record<string, string>) => {
+    const newConfigs = { ...tempConfigs, ...records }
     setTempConfigs(newConfigs)
     setError('')
   }
@@ -283,7 +289,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       label: 'Kubeconfig',
       title: 'Provide kubeconfig information',
       content: (
-        <KubeconfigView localConfigs={localConfigs} onChange={onChangeConfig} sx={{ marginLeft: 2, marginRight: 2 }} />
+        <KubeconfigView localConfigs={localConfigs} onChange={onChangeConfigs} sx={{ marginLeft: 2, marginRight: 2 }} />
       )
     })
   }
