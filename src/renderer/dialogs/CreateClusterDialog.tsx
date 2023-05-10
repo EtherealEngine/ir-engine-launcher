@@ -2,6 +2,7 @@ import { decryptPassword } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import Storage, { generateUUID } from 'constants/Storage'
+import UIEnabled from 'constants/UIEnabled'
 import { OSType } from 'models/AppSysInfo'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useEffect, useRef, useState } from 'react'
@@ -13,6 +14,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import AppsIcon from '@mui/icons-material/Apps'
 import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings'
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
+import StorageIcon from '@mui/icons-material/Storage'
 import TuneIcon from '@mui/icons-material/Tune'
 import ViewListIcon from '@mui/icons-material/ViewList'
 import {
@@ -35,38 +37,12 @@ import { ColorlibConnector, ColorlibStepIconRoot } from '../components/Colorlib'
 import AuthView from '../components/Config/AuthView'
 import ClusterView from '../components/Config/ClusterView'
 import ConfigsView from '../components/Config/ConfigsView'
+import DeploymentView from '../components/Config/DeploymentView'
 import FlagsView from '../components/Config/FlagsView'
 import KubeconfigView from '../components/Config/KubeconfigView'
 import PrereqsView from '../components/Config/PrereqsView'
 import SummaryView from '../components/Config/SummaryView'
 import VarsView from '../components/Config/VarsView'
-
-type CreateClusterSteps = {
-  authenticate?: boolean
-  configs?: boolean
-  variables?: boolean
-  kubeconfig?: boolean
-  showSummaryNotes?: boolean
-  showConfigButton?: boolean
-}
-
-const uiEnabled = {
-  [ClusterType.MicroK8s]: {
-    authenticate: true,
-    configs: true,
-    variables: true,
-    showSummaryNotes: true,
-    showConfigButton: true
-  },
-  [ClusterType.Minikube]: {
-    authenticate: true,
-    configs: true,
-    variables: true,
-    showSummaryNotes: true,
-    showConfigButton: true
-  },
-  [ClusterType.Custom]: { kubeconfig: true }
-} as Record<ClusterType, CreateClusterSteps>
 
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
@@ -74,6 +50,7 @@ const ColorlibStepIcon = (props: StepIconProps) => {
   const icons: { [index: string]: React.ReactElement } = {
     cluster: <ViewListIcon />,
     kubeconfig: <TuneIcon />,
+    deployment: <StorageIcon />,
     authenticate: <AdminPanelSettingsIcon />,
     configs: <DisplaySettingsIcon />,
     variables: <PlaylistAddCheckIcon />,
@@ -276,7 +253,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     }
   ]
 
-  if (uiEnabled[type].authenticate) {
+  if (UIEnabled[type].createCluster.authenticate) {
     steps.push({
       id: 'authenticate',
       label: 'Authenticate',
@@ -292,7 +269,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     })
   }
 
-  if (uiEnabled[type].configs) {
+  if (UIEnabled[type].createCluster.configs) {
     steps.push({
       id: 'configs',
       label: 'Configs',
@@ -306,7 +283,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     })
   }
 
-  if (uiEnabled[type].variables) {
+  if (UIEnabled[type].createCluster.variables) {
     steps.push({
       id: 'variables',
       label: 'Variables',
@@ -315,13 +292,24 @@ const CreateClusterDialog = ({ onClose }: Props) => {
     })
   }
 
-  if (uiEnabled[type].kubeconfig) {
-    steps.splice(1, 0, {
+  if (UIEnabled[type].createCluster.kubeconfig) {
+    steps.push({
       id: 'kubeconfig',
       label: 'Kubeconfig',
       title: 'Provide kubeconfig information',
       content: (
         <KubeconfigView localConfigs={localConfigs} onChange={onChangeConfigs} sx={{ marginLeft: 2, marginRight: 2 }} />
+      )
+    })
+  }
+
+  if (UIEnabled[type].createCluster.deployment) {
+    steps.push({
+      id: 'deployment',
+      label: 'Deployment',
+      title: 'Provide deployment information',
+      content: (
+        <DeploymentView localConfigs={localConfigs} onChange={onChangeConfig} sx={{ marginLeft: 2, marginRight: 2 }} />
       )
     })
   }
@@ -374,7 +362,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         </Box>
       )}
 
-      {activeStepId === 'summary' && uiEnabled[type].showSummaryNotes && (
+      {activeStepId === 'summary' && UIEnabled[type].createCluster.showSummaryNotes && (
         <Box ml={3} mr={3} mt={1}>
           <Typography fontSize={14}>
             Note:{' '}
@@ -424,7 +412,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
-          {activeStep === steps.length - 1 && uiEnabled[type].showConfigButton && (
+          {activeStep === steps.length - 1 && UIEnabled[type].createCluster.showConfigButton && (
             <Button onClick={() => handleNext(true)}>Create & Configure</Button>
           )}
           <Button
