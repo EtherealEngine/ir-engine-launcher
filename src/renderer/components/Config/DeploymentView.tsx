@@ -30,7 +30,7 @@ const DeploymentView = ({ localConfigs, onChange, sx }: Props) => {
 
   const handleCheckRelease = async () => {
     setStatus((state) => ({ ...state, status: AppStatus.Checking, name: 'Checking release name' }))
-    
+
     //TODO: Add handler to check release name.
   }
 
