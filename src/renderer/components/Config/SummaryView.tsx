@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer'
+import Storage from 'constants/Storage'
 import { ClusterType } from 'models/Cluster'
 
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
@@ -13,11 +15,21 @@ interface Props {
 }
 
 const SummaryView = ({ name, type, localConfigs, localVars, localFlags, sx }: Props) => {
+  const processConfigValue = (key: string, value: string) => {
+    if (key === Storage.KUBECONFIG_TEXT) {
+      value = `\n${Buffer.from(value || '', 'base64').toString()}`
+    }
+
+    return value
+  }
+
   return (
     <Box sx={sx}>
-      <Typography sx={{ display: 'flex', fontWeight: 'bold' }}>
-        Authentication: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
-      </Typography>
+      {type !== ClusterType.Custom && (
+        <Typography sx={{ display: 'flex', fontWeight: 'bold' }}>
+          Authentication: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
+        </Typography>
+      )}
 
       {name && type && (
         <>
@@ -36,8 +48,8 @@ const SummaryView = ({ name, type, localConfigs, localVars, localFlags, sx }: Pr
         Configs: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
       </Typography>
       {Object.keys(localConfigs).map((key) => (
-        <Typography key={key} variant="body2">
-          <span style={{ opacity: 0.5 }}>{key.replaceAll('_', ' ')}:</span> {localConfigs[key]}
+        <Typography key={key} variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+          <span style={{ opacity: 0.5 }}>{key.replaceAll('_', ' ')}:</span> {processConfigValue(key, localConfigs[key])}
         </Typography>
       ))}
       {Object.keys(localFlags).map((key) => (
@@ -46,9 +58,11 @@ const SummaryView = ({ name, type, localConfigs, localVars, localFlags, sx }: Pr
         </Typography>
       ))}
 
-      <Typography sx={{ display: 'flex', fontWeight: 'bold', marginTop: 2, marginBottom: 0.5 }}>
-        Variables: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
-      </Typography>
+      {Object.keys(localVars).length > 0 && (
+        <Typography sx={{ display: 'flex', fontWeight: 'bold', marginTop: 2, marginBottom: 0.5 }}>
+          Variables: <CheckCircleOutlineIcon sx={{ marginLeft: 1, fontSize: 20, fill: 'limegreen' }} />
+        </Typography>
+      )}
       {Object.keys(localVars).map((key) => (
         <Typography key={key} variant="body2">
           <span style={{ opacity: 0.5 }}>{key.replaceAll('_', ' ')}:</span> {localVars[key]}

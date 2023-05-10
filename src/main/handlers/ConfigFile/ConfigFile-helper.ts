@@ -3,7 +3,6 @@ import path from 'path'
 import Endpoints from '../../../constants/Endpoints'
 import Storage from '../../../constants/Storage'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
-import { KubeconfigType } from '../../../models/Kubeconfig'
 import { ensureWSLToWindowsPath, getEngineDefaultPath, getOpsDefaultPath } from '../../managers/PathManager'
 import { getValue } from '../../managers/StoreManager'
 import { findRequiredValues, getYamlDoc } from '../../managers/YamlManager'
@@ -19,30 +18,15 @@ export const getClusters = async () => {
   return clusters
 }
 
-export const processConfigs = async (clusterType: ClusterType, clusterConfigs: Record<string, string> = {}) => {
-  if (clusterType === ClusterType.Custom) {
-    if (!clusterConfigs[Storage.KUBECONFIG_TYPE]) {
-      clusterConfigs[Storage.KUBECONFIG_TYPE] = KubeconfigType.Default.toString()
-    }
-    if (!clusterConfigs[Storage.KUBECONFIG_PATH]) {
-      clusterConfigs[Storage.KUBECONFIG_PATH] = ''
-    }
-    if (!clusterConfigs[Storage.KUBECONFIG_TEXT]) {
-      clusterConfigs[Storage.KUBECONFIG_TEXT] = ''
-    }
-    if (!clusterConfigs[Storage.KUBECONFIG_CONTEXT]) {
-      clusterConfigs[Storage.KUBECONFIG_CONTEXT] = ''
-    }
-  } else {
-    if (!clusterConfigs[Storage.ENGINE_PATH]) {
-      clusterConfigs[Storage.ENGINE_PATH] = await getEngineDefaultPath()
-    }
-    if (!clusterConfigs[Storage.OPS_PATH]) {
-      clusterConfigs[Storage.OPS_PATH] = await getOpsDefaultPath()
-    }
-    if (!clusterConfigs[Storage.ENABLE_RIPPLE_STACK]) {
-      clusterConfigs[Storage.ENABLE_RIPPLE_STACK] = 'false'
-    }
+export const processConfigs = async (_clusterType: ClusterType, clusterConfigs: Record<string, string> = {}) => {
+  if (!clusterConfigs[Storage.ENGINE_PATH]) {
+    clusterConfigs[Storage.ENGINE_PATH] = await getEngineDefaultPath()
+  }
+  if (!clusterConfigs[Storage.OPS_PATH]) {
+    clusterConfigs[Storage.OPS_PATH] = await getOpsDefaultPath()
+  }
+  if (!clusterConfigs[Storage.ENABLE_RIPPLE_STACK]) {
+    clusterConfigs[Storage.ENABLE_RIPPLE_STACK] = 'false'
   }
 
   return clusterConfigs

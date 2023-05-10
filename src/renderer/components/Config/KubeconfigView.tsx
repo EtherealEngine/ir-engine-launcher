@@ -47,15 +47,7 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
     : KubeconfigType.Default
 
   useEffect(() => {
-    let typeValue: string | undefined = undefined
-
-    if (kubeConfigType === KubeconfigType.File) {
-      typeValue = localConfigs[Storage.KUBECONFIG_PATH]
-    } else if (kubeConfigType === KubeconfigType.Text) {
-      typeValue = Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT], 'base64').toString()
-    }
-
-    loadKubeContexts(kubeConfigType, typeValue)
+    handleChangeConfigType(kubeConfigType)
   }, [])
 
   const loadKubeContexts = async (type: KubeconfigType, typeValue?: string) => {
@@ -70,6 +62,7 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
         })
         return
       }
+
       if (type === KubeconfigType.Text && !typeValue) {
         setKubeContext({
           data: [],
@@ -80,6 +73,11 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
       }
 
       const contexts = await WorkloadsService.getKubeContexts(type, typeValue)
+
+      const currentContext = contexts.find((item) => item.isDefault)?.name
+      if (currentContext) {
+        onChange({ [Storage.KUBECONFIG_CONTEXT]: currentContext })
+      }
 
       setKubeContext({
         data: contexts,
@@ -103,7 +101,7 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
       [Storage.KUBECONFIG_TYPE]: value
     })
 
-    loadKubeContexts(value as KubeconfigType)
+    await loadKubeContexts(value as KubeconfigType)
   }
 
   const handleChangeFilePath = async (key: string) => {
@@ -146,7 +144,7 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
             margin="dense"
             size="small"
             label={toTitleCase(Storage.KUBECONFIG_PATH.replaceAll('_', ' '))}
-            value={localConfigs[Storage.KUBECONFIG_PATH]}
+            value={localConfigs[Storage.KUBECONFIG_PATH] || ''}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -176,14 +174,14 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
           fullWidth
           inputProps={{ className: 'resizable font-14' }}
           disabled={loading}
-          value={Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT], 'base64').toString()}
+          value={Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT] || '', 'base64').toString()}
           onChange={(event) =>
             onChange({ [Storage.KUBECONFIG_TEXT]: Buffer.from(event.target.value).toString('base64') })
           }
           onBlur={() =>
             loadKubeContexts(
               KubeconfigType.Text,
-              Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT], 'base64').toString()
+              Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT] || '', 'base64').toString()
             )
           }
         />
@@ -197,7 +195,7 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
           <Select
             labelId="kubecontext-label"
             label="Context"
-            value={localConfigs[Storage.KUBECONFIG_CONTEXT] || kubeContext.data.find((item) => item.isDefault)?.name}
+            value={localConfigs[Storage.KUBECONFIG_CONTEXT]}
             onChange={(event) => {
               const value = event.target.value.toString()
               onChange({ [Storage.KUBECONFIG_CONTEXT]: value })

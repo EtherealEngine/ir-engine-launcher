@@ -41,6 +41,33 @@ import PrereqsView from '../components/Config/PrereqsView'
 import SummaryView from '../components/Config/SummaryView'
 import VarsView from '../components/Config/VarsView'
 
+type CreateClusterSteps = {
+  authenticate?: boolean
+  configs?: boolean
+  variables?: boolean
+  kubeconfig?: boolean
+  showSummaryNotes?: boolean
+  showConfigButton?: boolean
+}
+
+const uiEnabled = {
+  [ClusterType.MicroK8s]: {
+    authenticate: true,
+    configs: true,
+    variables: true,
+    showSummaryNotes: true,
+    showConfigButton: true
+  },
+  [ClusterType.Minikube]: {
+    authenticate: true,
+    configs: true,
+    variables: true,
+    showSummaryNotes: true,
+    showConfigButton: true
+  },
+  [ClusterType.Custom]: { kubeconfig: true }
+} as Record<ClusterType, CreateClusterSteps>
+
 const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
 
@@ -49,8 +76,8 @@ const ColorlibStepIcon = (props: StepIconProps) => {
     kubeconfig: <TuneIcon />,
     authenticate: <AdminPanelSettingsIcon />,
     configs: <DisplaySettingsIcon />,
-    summary: <AppsIcon />,
-    variables: <PlaylistAddCheckIcon />
+    variables: <PlaylistAddCheckIcon />,
+    summary: <AppsIcon />
   }
 
   return (
@@ -64,6 +91,19 @@ interface Props {
   onClose: () => void
 }
 
+const defaultState = {
+  activeStepId: 'cluster',
+  name: '',
+  type: ClusterType.MicroK8s,
+  defaultConfigs: {} as Record<string, string>,
+  defaultVars: {} as Record<string, string>,
+  tempConfigs: {} as Record<string, string>,
+  tempVars: {} as Record<string, string>,
+  localFlags: {} as Record<string, string>,
+  isLoading: false,
+  error: ''
+}
+
 const CreateClusterDialog = ({ onClose }: Props) => {
   const contentStartRef = useRef(null)
   const settingsState = useSettingsState()
@@ -72,23 +112,18 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   const configFileState = useConfigFileState()
   const { clusters, loading } = configFileState.value
 
-  const [activeStepId, setActiveStepId] = useState('cluster')
-  const [isLoading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [password, setPassword] = useState(() => {
     const decrypted = decryptPassword(sudoPassword)
     return decrypted
   })
-  const [name, setName] = useState('')
-  const [type, setType] = useState<ClusterType>(ClusterType.MicroK8s)
-  const [defaultConfigs, setDefaultConfigs] = useState<Record<string, string>>({})
-  const [defaultVars, setDefaultVars] = useState<Record<string, string>>({})
-  const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
-  const [tempVars, setTempVars] = useState({} as Record<string, string>)
-  const [localFlags, setLocalFlags] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
+
+  const [
+    { activeStepId, name, type, defaultConfigs, defaultVars, tempConfigs, tempVars, localFlags, isLoading, error },
+    setState
+  ] = useState(defaultState)
 
   const localConfigs = {} as Record<string, string>
-  for (const key in defaultConfigs) {
+  for (const key in { ...defaultConfigs, ...tempConfigs }) {
     localConfigs[key] = key in tempConfigs ? tempConfigs[key] : defaultConfigs[key]
   }
 
@@ -98,49 +133,52 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   }
 
   const loadDefaultConfigs = async () => {
-    setLoading(true)
+    setState((state) => ({ ...state, isLoading: true }))
     const configs = await ConfigFileService.getDefaultConfigs(type)
-    setDefaultConfigs(configs)
-    setLoading(false)
+    setState((state) => ({
+      ...state,
+      defaultConfigs: configs,
+      localFlags: { [Storage.FORCE_DB_REFRESH]: 'false' },
+      isLoading: false
+    }))
   }
 
   const loadDefaultVariables = async () => {
-    setLoading(true)
+    setState((state) => ({ ...state, isLoading: true }))
     const vars = await ConfigFileService.getDefaultVariables(type, localConfigs)
-    setDefaultVars(vars)
-    setLoading(false)
+    setState((state) => ({ ...state, defaultVars: vars, isLoading: false }))
   }
 
   const handleNext = async (isConfigure: boolean) => {
     if (appSysInfo.osType === OSType.Windows && type === ClusterType.Minikube) {
-      setError('On Windows, Minikube is not supported')
+      setState((state) => ({ ...state, error: 'On Windows, Minikube is not supported' }))
       return
     }
 
     if (!name || name.length < 3) {
-      setError('Please select a cluster name of minimum 3 words')
+      setState((state) => ({ ...state, error: 'Please select a cluster name of minimum 3 words' }))
       return
     }
 
     if (activeStepId === 'cluster') {
       const clusterCount = clusters.filter((item) => item.type === type)
       if (clusterCount.length > 0) {
-        setError(`You already have a cluster of ${type}.`)
+        setState((state) => ({ ...state, error: `You already have a cluster of ${type}.` }))
         return
       }
-
-      await loadDefaultConfigs()
     } else if (activeStepId === 'authenticate') {
-      setLoading(true)
+      setState((state) => ({ ...state, isLoading: true }))
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
-      setLoading(false)
+      setState((state) => ({ ...state, isLoading: false }))
 
       if (sudoLoggedIn) {
         SettingsService.setSudoPassword(password)
       } else {
-        setError('Invalid password')
+        setState((state) => ({ ...state, error: 'Invalid password' }))
         return
       }
+
+      await loadDefaultConfigs()
     } else if (activeStepId === 'configs') {
       await loadDefaultVariables()
     } else if (activeStepId === 'summary') {
@@ -172,45 +210,51 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       return
     }
 
-    setActiveStepId(steps[activeStep + 1].id)
-    setError('')
+    setState((state) => ({ ...state, activeStepId: steps[activeStep + 1].id, error: '' }))
   }
 
   const handleBack = () => {
-    setActiveStepId(steps[activeStep - 1].id)
-    setError('')
+    setState((state) => ({ ...state, activeStepId: steps[activeStep - 1].id, error: '' }))
+  }
+
+  const onTypeChange = (type: ClusterType) => {
+    setState({ ...defaultState, name, type })
   }
 
   const onChangeFlag = async (key: string, value: string) => {
     const newFlags = { ...localFlags }
     newFlags[key] = value
-    setLocalFlags(newFlags)
-    setError('')
+    setState((state) => ({ ...state, localFlags: newFlags, error: '' }))
   }
 
   const onChangeConfig = async (key: string, value: string) => {
     const newConfigs = { ...tempConfigs }
     newConfigs[key] = value
-    setTempConfigs(newConfigs)
-    setError('')
+    setState((state) => ({ ...state, tempConfigs: newConfigs, error: '' }))
   }
 
   const onChangeConfigs = async (records: Record<string, string>) => {
-    const newConfigs = { ...tempConfigs, ...records }
-    setTempConfigs(newConfigs)
-    setError('')
+    setState((state) => {
+      const newConfigs = { ...state.tempConfigs, ...records }
+
+      for (const key in records) {
+        if (records[key] === '') {
+          delete newConfigs[key]
+        }
+      }
+      return { ...state, tempConfigs: newConfigs, error: '' }
+    })
   }
 
   const onChangeVar = async (key: string, value: string) => {
     const newVars = { ...tempVars }
     newVars[key] = value
-    setTempVars(newVars)
-    setError('')
+    setState((state) => ({ ...state, tempVars: newVars, error: '' }))
   }
 
   const onChangePassword = (password: string) => {
     setPassword(password)
-    setError('')
+    setState((state) => ({ ...state, error: '' }))
   }
 
   const steps = [
@@ -223,20 +267,17 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           <ClusterView
             name={name}
             type={type}
-            onNameChange={(name) => {
-              setName(name)
-              setError('')
-            }}
-            onTypeChange={(type) => {
-              setType(type)
-              setError('')
-            }}
+            onNameChange={(name) => setState((state) => ({ ...state, name, error: '' }))}
+            onTypeChange={onTypeChange}
           />
           {type === ClusterType.MicroK8s && appSysInfo.osType === OSType.Windows && <PrereqsView />}
         </Box>
       )
-    },
-    {
+    }
+  ]
+
+  if (uiEnabled[type].authenticate) {
+    steps.push({
       id: 'authenticate',
       label: 'Authenticate',
       title: 'Provide sudo admin password to authenticate',
@@ -248,8 +289,11 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           onEnter={() => handleNext(false)}
         />
       )
-    },
-    {
+    })
+  }
+
+  if (uiEnabled[type].configs) {
+    steps.push({
       id: 'configs',
       label: 'Configs',
       title: 'Provide configuration details',
@@ -259,31 +303,19 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           <FlagsView localFlags={localFlags} onChange={onChangeFlag} />
         </Box>
       )
-    },
-    {
+    })
+  }
+
+  if (uiEnabled[type].variables) {
+    steps.push({
       id: 'variables',
       label: 'Variables',
       title: 'Provide configuration variables (Optional)',
       content: <VarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
-    },
-    {
-      id: 'summary',
-      label: 'Summary',
-      title: 'Review configurations before finalizing',
-      content: (
-        <SummaryView
-          name={name}
-          type={type}
-          localConfigs={localConfigs}
-          localVars={localVars}
-          localFlags={localFlags}
-          sx={{ marginLeft: 2, marginRight: 2 }}
-        />
-      )
-    }
-  ]
+    })
+  }
 
-  if (type === ClusterType.Custom) {
+  if (uiEnabled[type].kubeconfig) {
     steps.splice(1, 0, {
       id: 'kubeconfig',
       label: 'Kubeconfig',
@@ -293,6 +325,22 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       )
     })
   }
+
+  steps.push({
+    id: 'summary',
+    label: 'Summary',
+    title: 'Review configurations before finalizing',
+    content: (
+      <SummaryView
+        name={name}
+        type={type}
+        localConfigs={localConfigs}
+        localVars={localVars}
+        localFlags={localFlags}
+        sx={{ marginLeft: 2, marginRight: 2 }}
+      />
+    )
+  })
 
   const activeStep = steps.findIndex((item) => item.id === activeStepId)
 
@@ -326,7 +374,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
         </Box>
       )}
 
-      {activeStepId === 'summary' && (
+      {activeStepId === 'summary' && uiEnabled[type].showSummaryNotes && (
         <Box ml={3} mr={3} mt={1}>
           <Typography fontSize={14}>
             Note:{' '}
@@ -376,8 +424,15 @@ const CreateClusterDialog = ({ onClose }: Props) => {
           <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
-          {activeStep === steps.length - 1 && <Button onClick={() => handleNext(true)}>Create & Configure</Button>}
-          <Button onClick={() => handleNext(false)}>{activeStep === steps.length - 1 ? 'Create' : 'Next'}</Button>
+          {activeStep === steps.length - 1 && uiEnabled[type].showConfigButton && (
+            <Button onClick={() => handleNext(true)}>Create & Configure</Button>
+          )}
+          <Button
+            disabled={activeStepId === 'kubeconfig' && !localConfigs[Storage.KUBECONFIG_CONTEXT]}
+            onClick={() => handleNext(false)}
+          >
+            {activeStep === steps.length - 1 ? 'Create' : 'Next'}
+          </Button>
         </Box>
       </DialogActions>
     </Dialog>
