@@ -122,7 +122,7 @@ export const getPodLogs = async (
   return serverLogs
 }
 
-const getPodsData = async (
+export const getPodsData = async (
   k8DefaultClient: k8s.CoreV1Api,
   labelSelector: string,
   id: string,

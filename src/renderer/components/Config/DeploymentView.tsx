@@ -1,7 +1,10 @@
+import { Buffer } from 'buffer'
 import Storage from 'constants/Storage'
 import { AppModel, AppStatus } from 'models/AppStatus'
+import { KubeconfigType } from 'models/Kubeconfig'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
+import { WorkloadsService } from 'renderer/services/WorkloadsService'
 
 import PowerIcon from '@mui/icons-material/Power'
 import { Box, IconButton, InputAdornment, SxProps, TextField, Theme, Typography } from '@mui/material'
@@ -21,7 +24,11 @@ const DeploymentView = ({ localConfigs, onChange, sx }: Props) => {
 
   const [status, setStatus] = useState<AppModel>({
     id: 'release',
-    name: "Use 'Check Release' button to verify release",
+    name: (
+      <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
+        Use '<PowerIcon />' (Check Release) button to verify release
+      </Typography>
+    ),
     checkCommand: '',
     detail: '',
     isLinuxCommand: false,
@@ -29,9 +36,45 @@ const DeploymentView = ({ localConfigs, onChange, sx }: Props) => {
   })
 
   const handleCheckRelease = async () => {
-    setStatus((state) => ({ ...state, status: AppStatus.Checking, name: 'Checking release name' }))
+    try {
+      setStatus((state) => ({ ...state, status: AppStatus.Checking, name: 'Checking release name' }))
 
-    //TODO: Add handler to check release name.
+      let typeValue: string | undefined = undefined
+
+      if (localConfigs[Storage.KUBECONFIG_PATH]) {
+        typeValue = localConfigs[Storage.KUBECONFIG_PATH]
+      } else if (localConfigs[Storage.KUBECONFIG_TEXT]) {
+        typeValue = Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT], 'base64').toString()
+      }
+
+      const releaseExists = await WorkloadsService.checkReleaseName(
+        localConfigs[Storage.RELEASE_NAME],
+        localConfigs[Storage.KUBECONFIG_CONTEXT],
+        localConfigs[Storage.KUBECONFIG_TYPE] as KubeconfigType,
+        typeValue
+      )
+
+      if (releaseExists) {
+        setStatus((state) => ({
+          ...state,
+          status: AppStatus.Configured,
+          name: `'${localConfigs[Storage.RELEASE_NAME]}' release exists`
+        }))
+      } else {
+        setStatus((state) => ({
+          ...state,
+          status: AppStatus.NotConfigured,
+          name: `'${localConfigs[Storage.RELEASE_NAME]}' release does not exists`
+        }))
+      }
+    } catch (err) {
+      setStatus((state) => ({
+        ...state,
+        status: AppStatus.NotConfigured,
+        name: `Failed to check release '${localConfigs[Storage.RELEASE_NAME]}'`,
+        detail: err?.message ? err.message : err
+      }))
+    }
   }
 
   return (
@@ -44,7 +87,11 @@ const DeploymentView = ({ localConfigs, onChange, sx }: Props) => {
           label="Release Name"
           value={localConfigs[Storage.RELEASE_NAME]}
           onChange={(event) => onChange(Storage.RELEASE_NAME, event.target.value)}
-          onBlur={handleCheckRelease}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              handleCheckRelease()
+            }
+          }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -69,7 +116,7 @@ const DeploymentView = ({ localConfigs, onChange, sx }: Props) => {
         />
       </Box>
 
-      <StatusViewItem titleVariant="body2" titleSx={{ mt: 0.5 }} sx={{ mt: 2 }} verticalAlignTop status={status} />
+      <StatusViewItem titleVariant="body2" titleSx={{ mt: 0.5 }} sx={{ mt: 2 }} status={status} />
     </Box>
   )
 }

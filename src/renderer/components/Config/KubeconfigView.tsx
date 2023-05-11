@@ -47,7 +47,16 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
     : KubeconfigType.Default
 
   useEffect(() => {
-    handleChangeConfigType(kubeConfigType)
+    let typeValue: string | undefined = undefined
+
+    if (localConfigs[Storage.KUBECONFIG_PATH]) {
+      typeValue = localConfigs[Storage.KUBECONFIG_PATH]
+    } else if (localConfigs[Storage.KUBECONFIG_TEXT]) {
+      typeValue = Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT], 'base64').toString()
+    }
+
+    onChange({ [Storage.KUBECONFIG_TYPE]: kubeConfigType })
+    loadKubeContexts(kubeConfigType, typeValue)
   }, [])
 
   const loadKubeContexts = async (type: KubeconfigType, typeValue?: string) => {

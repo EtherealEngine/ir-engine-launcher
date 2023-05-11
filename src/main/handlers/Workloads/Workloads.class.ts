@@ -10,22 +10,14 @@ import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import { KubeconfigType, KubeContext } from '../../../models/Kubeconfig'
 import { LogModel } from '../../../models/Log'
 import { getHomePath } from '../../managers/PathManager'
-import { getPodLogs, getWorkloads, removePod } from './Workloads-helper'
+import { getPodLogs, getPodsData, getWorkloads, removePod } from './Workloads-helper'
 
 const type = os.type()
 
 class Workloads {
   static getKubeContexts = async (window: BrowserWindow, type: KubeconfigType, typeValue: string) => {
     try {
-      const kc = new k8s.KubeConfig()
-
-      if (type === KubeconfigType.File) {
-        kc.loadFromFile(typeValue)
-      } else if (type === KubeconfigType.Text) {
-        kc.loadFromString(typeValue)
-      } else {
-        kc.loadFromDefault()
-      }
+      const kc = await Workloads._loadK8CustomConfig(type, typeValue)
 
       const contexts = kc.getContexts()
       const currentContext = kc.getCurrentContext()
@@ -40,6 +32,41 @@ class Workloads {
       log.error(JSON.stringify(err))
       window.webContents.send(Channels.Utilities.Log, type, typeValue, {
         category: 'kubeconfig',
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
+    }
+  }
+
+  static checkReleaseName = async (
+    window: BrowserWindow,
+    releaseName: string,
+    currentContext: string,
+    type: KubeconfigType,
+    typeValue: string
+  ) => {
+    try {
+      const kc = await Workloads._loadK8CustomConfig(type, typeValue)
+      kc.setCurrentContext(currentContext)
+
+      const k8DefaultClient = kc.makeApiClient(k8s.CoreV1Api)
+
+      const apiPods = await getPodsData(
+        k8DefaultClient,
+        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=api,app.kubernetes.io/name=etherealengine`,
+        'api',
+        'Api'
+      )
+
+      if (apiPods.pods.length > 0) {
+        return true
+      }
+
+      return false
+    } catch (err) {
+      log.error(JSON.stringify(err))
+      window.webContents.send(Channels.Utilities.Log, type, typeValue, {
+        category: 'release name',
         message: JSON.stringify(err)
       } as LogModel)
       throw err
@@ -89,6 +116,20 @@ class Workloads {
       } as LogModel)
       throw err
     }
+  }
+
+  private static _loadK8CustomConfig = async (type: KubeconfigType, typeValue: string) => {
+    const kc = new k8s.KubeConfig()
+
+    if (type === KubeconfigType.File) {
+      kc.loadFromFile(typeValue)
+    } else if (type === KubeconfigType.Text) {
+      kc.loadFromString(typeValue)
+    } else {
+      kc.loadFromDefault()
+    }
+
+    return kc
   }
 
   private static _getK8DefaultClient = async (cluster: ClusterModel) => {

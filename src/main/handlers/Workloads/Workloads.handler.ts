@@ -18,6 +18,18 @@ class WorkloadsHandler implements IBaseHandler {
         }
       ),
       ipcMain.handle(
+        Channels.Workloads.CheckReleaseName,
+        async (
+          _event: IpcMainInvokeEvent,
+          releaseName: string,
+          currentContext: string,
+          type: KubeconfigType,
+          typeValue: string
+        ) => {
+          return await Workloads.checkReleaseName(window, releaseName, currentContext, type, typeValue)
+        }
+      ),
+      ipcMain.handle(
         Channels.Workloads.RemovePod,
         async (_event: IpcMainInvokeEvent, cluster: ClusterModel, podName: string) => {
           await Workloads.removePod(window, cluster, podName)

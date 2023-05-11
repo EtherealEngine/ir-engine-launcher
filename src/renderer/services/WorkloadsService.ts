@@ -116,6 +116,25 @@ export const WorkloadsService = {
       dispatch(WorkloadsAction.setWorkloads(cluster.id, [], error.message))
     }
   },
+  checkReleaseName: async (releaseName: string, currentContext: string, type: KubeconfigType, typeValue?: string) => {
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    try {
+      const contexts: KubeContext[] = await window.electronAPI.invoke(
+        Channels.Workloads.CheckReleaseName,
+        releaseName,
+        currentContext,
+        type,
+        typeValue
+      )
+      return contexts
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to check release name. ${error}`, {
+        variant: 'error'
+      })
+      throw error
+    }
+  },
   removePod: async (cluster: ClusterModel, podName: string) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.

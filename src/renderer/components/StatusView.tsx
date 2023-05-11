@@ -111,7 +111,8 @@ export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx
       {status.status === AppStatus.Pending && <RemoveCircleOutlineRoundedIcon />}
 
       <Box marginLeft={1} sx={titleSx}>
-        <Typography variant={titleVariant}>{status.name}</Typography>
+        {typeof status.name === 'string' && <Typography variant={titleVariant}>{status.name}</Typography>}
+        {typeof status.name !== 'string' && status.name}
 
         {status.description && <Typography variant="body2">{status.description}</Typography>}
       </Box>
