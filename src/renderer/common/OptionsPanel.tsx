@@ -1,6 +1,7 @@
 import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
+import UIEnabled from 'constants/UIEnabled'
 import { AppStatus } from 'models/AppStatus'
 import { ClusterType } from 'models/Cluster'
 import { useState } from 'react'
@@ -85,19 +86,25 @@ const OptionsPanel = () => {
           {selectedCluster.name}
         </Typography>
 
-        <GitView name="Engine" repoType={Storage.ENGINE_PATH} />
+        {UIEnabled[selectedCluster.type].optionsPanel.gitStatus && (
+          <GitView name="Engine" repoType={Storage.ENGINE_PATH} />
+        )}
 
-        <GitView sx={{ ml: 5 }} name="Ops" repoType={Storage.OPS_PATH} />
+        {UIEnabled[selectedCluster.type].optionsPanel.gitStatus && (
+          <GitView sx={{ ml: 5 }} name="Ops" repoType={Storage.OPS_PATH} />
+        )}
       </Box>
 
-      <IconButton
-        title="Refresh"
-        color="primary"
-        disabled={currentDeployment?.isFetchingStatuses}
-        onClick={() => DeploymentService.fetchDeploymentStatus(selectedCluster)}
-      >
-        <CachedOutlinedIcon />
-      </IconButton>
+      {UIEnabled[selectedCluster.type].optionsPanel.refreshButton && (
+        <IconButton
+          title="Refresh"
+          color="primary"
+          disabled={currentDeployment?.isFetchingStatuses}
+          onClick={() => DeploymentService.fetchDeploymentStatus(selectedCluster)}
+        >
+          <CachedOutlinedIcon />
+        </IconButton>
+      )}
 
       <IconButton title="Delete Cluster" color="primary" onClick={() => setShowDeleteDialog(true)}>
         <DeleteIcon />
@@ -107,25 +114,27 @@ const OptionsPanel = () => {
         <SettingsIcon />
       </IconButton>
 
-      <LoadingButton
-        variant="contained"
-        sx={{
-          background: 'linear-gradient(90deg, var(--buttonGradientStart), var(--buttonGradientEnd))',
-          ':hover': { opacity: 0.8 },
-          width: 150
-        }}
-        startIcon={currentDeployment?.isConfiguring ? undefined : <PowerSettingsNewOutlinedIcon />}
-        loading={currentDeployment?.isConfiguring}
-        loadingIndicator={
-          <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-            <CircularProgress size={24} sx={{ marginRight: 1 }} />
-            Configuring
-          </Box>
-        }
-        onClick={onConfigureClicked}
-      >
-        Configure
-      </LoadingButton>
+      {UIEnabled[selectedCluster.type].optionsPanel.configureButton && (
+        <LoadingButton
+          variant="contained"
+          sx={{
+            background: 'linear-gradient(90deg, var(--buttonGradientStart), var(--buttonGradientEnd))',
+            ':hover': { opacity: 0.8 },
+            width: 150
+          }}
+          startIcon={currentDeployment?.isConfiguring ? undefined : <PowerSettingsNewOutlinedIcon />}
+          loading={currentDeployment?.isConfiguring}
+          loadingIndicator={
+            <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
+              Configuring
+            </Box>
+          }
+          onClick={onConfigureClicked}
+        >
+          Configure
+        </LoadingButton>
+      )}
 
       <LoadingButton
         variant="outlined"
