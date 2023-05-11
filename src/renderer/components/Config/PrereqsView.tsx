@@ -108,7 +108,7 @@ const PrereqsView = ({ onChange, sx }: Props) => {
           <span style={{ fontSize: 14, opacity: 0.6 }}>
             Check whether the execution policy is set to allow unsigned PowerShell scripts.{' '}
           </span>
-          <a style={{ color: 'white' }} target="_blank" href={"#"}>
+          <a style={{ color: 'white' }} target="_blank" href={"https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.1"}>
             Learn more
           </a>
           .
