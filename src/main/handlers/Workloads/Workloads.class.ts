@@ -6,6 +6,7 @@ import path from 'path'
 
 import Channels from '../../../constants/Channels'
 import Endpoints from '../../../constants/Endpoints'
+import Storage from '../../../constants/Storage'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import { KubeconfigType, KubeContext } from '../../../models/Kubeconfig'
 import { LogModel } from '../../../models/Log'
@@ -77,7 +78,13 @@ class Workloads {
     try {
       const k8DefaultClient = await Workloads._getK8DefaultClient(cluster)
 
-      return await getWorkloads(k8DefaultClient, 'local')
+      let releaseName = 'local'
+
+      if (cluster.type === ClusterType.Custom) {
+        releaseName = cluster.configs[Storage.RELEASE_NAME]
+      }
+
+      return await getWorkloads(k8DefaultClient, releaseName)
     } catch (err) {
       log.error(JSON.stringify(err))
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
@@ -133,7 +140,7 @@ class Workloads {
   }
 
   private static _getK8DefaultClient = async (cluster: ClusterModel) => {
-    const kc = new k8s.KubeConfig()
+    let kc = new k8s.KubeConfig()
     kc.loadFromDefault()
 
     if (cluster.type === ClusterType.Minikube) {
@@ -156,6 +163,23 @@ class Workloads {
       }
 
       kc.setCurrentContext('etherealengine-microk8s')
+    } else if (cluster.type === ClusterType.Custom) {
+      let typeValue = ''
+
+      if (cluster.configs[Storage.KUBECONFIG_PATH]) {
+        typeValue = cluster.configs[Storage.KUBECONFIG_PATH]
+      } else if (cluster.configs[Storage.KUBECONFIG_TEXT]) {
+        typeValue = Buffer.from(cluster.configs[Storage.KUBECONFIG_TEXT], 'base64').toString()
+      }
+
+      kc = await Workloads._loadK8CustomConfig(cluster.configs[Storage.KUBECONFIG_TYPE] as KubeconfigType, typeValue)
+
+      const contextExists = kc.getContextObject(cluster.configs[Storage.KUBECONFIG_CONTEXT])
+      if (!contextExists) {
+        throw `Unable to find ${cluster.configs[Storage.KUBECONFIG_CONTEXT]} context`
+      }
+
+      kc.setCurrentContext(cluster.configs[Storage.KUBECONFIG_CONTEXT])
     }
 
     const k8DefaultClient = kc.makeApiClient(k8s.CoreV1Api)
