@@ -1,6 +1,7 @@
 import Endpoints from 'constants/Endpoints'
 import Routes from 'constants/Routes'
 import Storage from 'constants/Storage'
+import UIEnabled from 'constants/UIEnabled'
 import { ThemeMode } from 'models/ThemeMode'
 import * as React from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -69,22 +70,33 @@ const NavView = () => {
   let pages: MenuModel[] = []
 
   if (selectedCluster) {
-    pages.push({
-      title: 'Config',
-      path: Routes.CONFIG
-    })
-    pages.push({
-      title: 'Workloads',
-      path: Routes.WORKLOADS
-    })
-    pages.push({
-      title: 'Admin',
-      path: Routes.ADMIN
-    })
-    pages.push({
-      title: 'K8 Dashboard',
-      path: Routes.K8DASHBOARD
-    })
+    if (UIEnabled[selectedCluster.type].navViewRoutes.find((item) => item === Routes.CONFIG)) {
+      pages.push({
+        title: 'Config',
+        path: Routes.CONFIG
+      })
+    }
+
+    if (UIEnabled[selectedCluster.type].navViewRoutes.find((item) => item === Routes.WORKLOADS)) {
+      pages.push({
+        title: 'Workloads',
+        path: Routes.WORKLOADS
+      })
+    }
+
+    if (UIEnabled[selectedCluster.type].navViewRoutes.find((item) => item === Routes.ADMIN)) {
+      pages.push({
+        title: 'Admin',
+        path: Routes.ADMIN
+      })
+    }
+
+    if (UIEnabled[selectedCluster.type].navViewRoutes.find((item) => item === Routes.K8DASHBOARD)) {
+      pages.push({
+        title: 'K8 Dashboard',
+        path: Routes.K8DASHBOARD
+      })
+    }
   }
 
   if (enableRippleStack) {

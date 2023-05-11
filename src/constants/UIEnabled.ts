@@ -1,7 +1,10 @@
 import { ClusterType } from 'models/Cluster'
 
+import Routes from './Routes'
+
 type UI = {
   createCluster: CreateClusterUI
+  navViewRoutes: string[]
 }
 
 type CreateClusterUI = {
@@ -22,7 +25,8 @@ const UIEnabled = {
       variables: true,
       showSummaryNotes: true,
       showConfigButton: true
-    }
+    },
+    navViewRoutes: [Routes.CONFIG, Routes.WORKLOADS, Routes.ADMIN, Routes.K8DASHBOARD]
   },
   [ClusterType.Minikube]: {
     createCluster: {
@@ -31,9 +35,10 @@ const UIEnabled = {
       variables: true,
       showSummaryNotes: true,
       showConfigButton: true
-    }
+    },
+    navViewRoutes: [Routes.CONFIG, Routes.WORKLOADS, Routes.ADMIN, Routes.K8DASHBOARD]
   },
-  [ClusterType.Custom]: { createCluster: { kubeconfig: true, deployment: true } }
+  [ClusterType.Custom]: { createCluster: { kubeconfig: true, deployment: true }, navViewRoutes: [Routes.WORKLOADS] }
 } as Record<ClusterType, UI>
 
 export default UIEnabled
