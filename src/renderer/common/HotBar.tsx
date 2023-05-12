@@ -62,7 +62,7 @@ const HotBar = () => {
                   ? 'Minikube'
                   : cluster.type === ClusterType.MicroK8s
                   ? 'MicroK8s'
-                  : 'Undefined'
+                  : 'Custom'
               })`}
               label={
                 <Box
