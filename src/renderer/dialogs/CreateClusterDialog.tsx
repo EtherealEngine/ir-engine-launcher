@@ -87,7 +87,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
   const { appSysInfo, sudoPassword } = settingsState.value
 
   const configFileState = useConfigFileState()
-  const { clusters, loading } = configFileState.value
+  const { loading } = configFileState.value
 
   const [password, setPassword] = useState(() => {
     const decrypted = decryptPassword(sudoPassword)
@@ -137,13 +137,7 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       return
     }
 
-    if (activeStepId === 'cluster') {
-      const clusterCount = clusters.filter((item) => item.type === type)
-      if (clusterCount.length > 0) {
-        setState((state) => ({ ...state, error: `You already have a cluster of ${type}.` }))
-        return
-      }
-    } else if (activeStepId === 'authenticate') {
+    if (activeStepId === 'authenticate') {
       setState((state) => ({ ...state, isLoading: true }))
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
       setState((state) => ({ ...state, isLoading: false }))
@@ -177,6 +171,10 @@ const CreateClusterDialog = ({ onClose }: Props) => {
       }
 
       ConfigFileService.setSelectedClusterId(createCluster.id)
+
+      if (createCluster.type === ClusterType.Custom) {
+        return
+      }
 
       await DeploymentService.fetchDeploymentStatus(createCluster)
 
