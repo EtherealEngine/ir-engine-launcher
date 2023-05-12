@@ -187,3 +187,27 @@ const getWorkloadsContainerInfo = (items: k8s.V1ContainerStatus[]) => {
     } as WorkloadsContainerInfo
   })
 }
+
+export const getConfigMap = async (k8DefaultClient: k8s.CoreV1Api, labelSelector: string, nameFilter?: string) => {
+  try {
+    const configMapsResponse = await k8DefaultClient.listNamespacedConfigMap(
+      'default',
+      undefined,
+      false,
+      undefined,
+      undefined,
+      labelSelector
+    )
+
+    let items = configMapsResponse.body.items
+    if (nameFilter) {
+      items = items.filter((item) => item.metadata?.name?.startsWith(nameFilter))
+    }
+
+    return items
+  } catch (err) {
+    log.error('Failed to get config maps.', err)
+  }
+
+  return []
+}

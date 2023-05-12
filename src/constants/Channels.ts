@@ -58,6 +58,7 @@ const Channels = {
     GetDefaultVariables: 'GetDefaultVariables'
   },
   Workloads: {
+    LaunchClient: 'LaunchClient',
     CheckReleaseName: 'CheckReleaseName',
     GetKubeContexts: 'GetKubeContexts',
     GetWorkloads: 'GetWorkloads',

@@ -13,7 +13,7 @@ const Endpoints = {
     HOST: 'https://etherealengine.org',
     ADMIN_PORTAL: 'https://local.etherealengine.org/admin',
     LOGIN_PAGE: 'https://local.etherealengine.org/',
-    LAUNCH_PAGE: 'https://local.etherealengine.org/location/apartment',
+    LAUNCH_PAGE: (host: string) => `${host.startsWith('https') ? '' : 'https://'}${host}/location/apartment`,
     ENGINE_ENV_DEFAULT: 'https://raw.githubusercontent.com/etherealengine/etherealengine/dev/.env.local.default',
     MINIKUBE_LINUX_SCRIPT:
       'https://raw.githubusercontent.com/etherealengine/etherealengine-control-center/master/assets/scripts/configure-minikube-linux.sh',

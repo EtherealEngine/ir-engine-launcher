@@ -11,7 +11,8 @@ import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import { KubeconfigType, KubeContext } from '../../../models/Kubeconfig'
 import { LogModel } from '../../../models/Log'
 import { getHomePath } from '../../managers/PathManager'
-import { getPodLogs, getPodsData, getWorkloads, removePod } from './Workloads-helper'
+import Utilities from '../Utilities/Utilities.class'
+import { getConfigMap, getPodLogs, getPodsData, getWorkloads, removePod } from './Workloads-helper'
 
 const type = os.type()
 
@@ -33,6 +34,42 @@ class Workloads {
       log.error(JSON.stringify(err))
       window.webContents.send(Channels.Utilities.Log, type, typeValue, {
         category: 'kubeconfig',
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
+    }
+  }
+
+  static launchClient = async (window: BrowserWindow, cluster: ClusterModel) => {
+    try {
+      const k8DefaultClient = await Workloads._getK8DefaultClient(cluster)
+
+      let releaseName = 'local'
+      if (cluster.type === ClusterType.Custom) {
+        releaseName = cluster.configs[Storage.RELEASE_NAME]
+      }
+
+      const configMap = await getConfigMap(
+        k8DefaultClient,
+        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=client,app.kubernetes.io/name=etherealengine`
+      )
+
+      let appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['VITE_APP_HOST']
+      if (!appHost) {
+        appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['CLIENT_ADDRESS']
+      }
+
+      if (!appHost) {
+        throw 'Unable to find app host'
+      }
+
+      const locationUrl = Endpoints.Urls.LAUNCH_PAGE(appHost)
+
+      await Utilities.openExternal(locationUrl)
+    } catch (err) {
+      log.error(JSON.stringify(err))
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category: 'launch client',
         message: JSON.stringify(err)
       } as LogModel)
       throw err

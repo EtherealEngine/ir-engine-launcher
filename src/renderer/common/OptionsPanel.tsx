@@ -1,9 +1,9 @@
 import Channels from 'constants/Channels'
-import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
 import UIEnabled from 'constants/UIEnabled'
 import { AppStatus } from 'models/AppStatus'
-import { ClusterType } from 'models/Cluster'
+import { cloneCluster, ClusterType } from 'models/Cluster'
+import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import GitView from 'renderer/components/GitView'
 import AlertDialog from 'renderer/dialogs/AlertDialog'
@@ -25,6 +25,7 @@ import logoMicrok8s from '../../../assets/icons/microk8s.png'
 import logoMinikube from '../../../assets/icons/minikube.png'
 
 const OptionsPanel = () => {
+  const { enqueueSnackbar } = useSnackbar()
   const [showConfigDialog, setConfigDialog] = useState(false)
   const [showSettingsDialog, setSettingsDialog] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -40,14 +41,25 @@ const OptionsPanel = () => {
   const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
   const allConfigured = allAppsConfigured && allEngineConfigured
 
+  if (!selectedCluster) {
+    return <></>
+  }
+
   const onConfigureClicked = () => {
     setConfigDialog(true)
   }
 
   const onLaunch = async () => {
-    setLaunching(true)
+    try {
+      setLaunching(true)
 
-    await window.electronAPI.invoke(Channels.Utilities.OpenExternal, Endpoints.Urls.LAUNCH_PAGE)
+      const clonedCluster = cloneCluster(selectedCluster)
+      await window.electronAPI.invoke(Channels.Workloads.LaunchClient, clonedCluster)
+    } catch (err) {
+      enqueueSnackbar(err?.message ? err.message : err, {
+        variant: 'error'
+      })
+    }
 
     setLaunching(false)
   }
@@ -55,10 +67,6 @@ const OptionsPanel = () => {
   const handleDelete = async () => {
     ConfigFileService.setSelectedClusterId('')
     await ConfigFileService.deleteConfig(selectedClusterId)
-  }
-
-  if (!selectedCluster) {
-    return <></>
   }
 
   return (
@@ -122,8 +130,8 @@ const OptionsPanel = () => {
             ':hover': { opacity: 0.8 },
             width: 150
           }}
-          startIcon={currentDeployment?.isConfiguring ? undefined : <PowerSettingsNewOutlinedIcon />}
           loading={currentDeployment?.isConfiguring}
+          startIcon={currentDeployment?.isConfiguring ? undefined : <PowerSettingsNewOutlinedIcon />}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
               <CircularProgress size={24} sx={{ marginRight: 1 }} />
@@ -139,9 +147,9 @@ const OptionsPanel = () => {
       <LoadingButton
         variant="outlined"
         disabled={!allConfigured}
-        startIcon={<RocketLaunchOutlinedIcon />}
         sx={{ width: isLaunching ? 140 : 'auto' }}
         loading={isLaunching}
+        startIcon={isLaunching ? undefined : <RocketLaunchOutlinedIcon />}
         loadingIndicator={
           <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
             <CircularProgress size={24} sx={{ marginRight: 1 }} />
