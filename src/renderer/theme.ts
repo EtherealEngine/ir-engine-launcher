@@ -234,6 +234,8 @@ const theme = createTheme({
     MuiMenuItem: {
       styleOverrides: {
         root: {
+          color: 'var(--textColor)',
+
           '&:hover': {
             backgroundColor: 'var(--dropdownMenuHoverBackground)'
           },
@@ -362,6 +364,27 @@ const theme = createTheme({
               backgroundColor: 'var(--dropdownMenuSelectedBackground)'
             }
           }
+        }
+      }
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'var(--panelBackground)'
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          background: 'var(--tableHeaderBackground)',
+          color: 'var(--textColor)',
+          borderBottom: '2px solid var(--mainBackground)'
+        },
+        body: {
+          background: 'var(--tableCellBackground)',
+          borderBottom: '1px solid var(--mainBackground)',
+          color: 'var(--textColor)'
         }
       }
     },

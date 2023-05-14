@@ -23,6 +23,7 @@ import { IBaseHandler } from './handlers/IBaseHandler'
 import ShellHandler from './handlers/Shell/Shell.handler'
 import UpdatesHandler from './handlers/Updates/Updates.handler'
 import UtilitiesHandler from './handlers/Utilities/Utilities.handler'
+import WorkloadsHandler from './handlers/Workloads/Workloads.handler'
 import MenuBuilder from './menu'
 import { resolveHtmlPath } from './util'
 
@@ -120,16 +121,18 @@ const createWindow = async () => {
     }
   })
 
-  // We want the user to proactively download the install
-  autoUpdater.autoDownload = false
-  autoUpdater.setFeedURL({
-    provider: 'github',
-    owner: 'etherealengine',
-    repo: 'etherealengine-control-center'
-  })
-
   log.transports.file.level = 'info'
-  autoUpdater.logger = log
+
+  // We want the user to proactively download the install
+  if (process.env.NODE_ENV !== 'development') {
+    autoUpdater.autoDownload = false
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'etherealengine',
+      repo: 'etherealengine-control-center'
+    })
+    autoUpdater.logger = log
+  }
 
   const ipcHandlers: IBaseHandler[] = [new UpdatesHandler()]
 
@@ -198,6 +201,7 @@ export const createMainWindow = async () => {
     new ShellHandler(),
     new EngineHandler(),
     new ClusterHandler(),
+    new WorkloadsHandler(),
     new GitHandler()
   ]
 
