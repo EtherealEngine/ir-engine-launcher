@@ -188,11 +188,14 @@ class Workloads {
 
       kc.setCurrentContext('minikube')
     } else if (cluster.type === ClusterType.MicroK8s) {
+      const homePath = await getHomePath()
+      let configPath = path.join(homePath, '.kube/config-microk8s')
+
       if (type === 'Windows_NT') {
-        const homePath = await getHomePath()
-        const configPath = path.join(Endpoints.Paths.WSL_PREFIX, homePath.replace('/', '\\'), '.kube\\config-microk8s')
-        kc.loadFromFile(configPath)
+        configPath = path.join(Endpoints.Paths.WSL_PREFIX, configPath.replaceAll('/', '\\'))
       }
+
+      kc.loadFromFile(configPath)
 
       const contextExists = kc.getContextObject('etherealengine-microk8s')
       if (!contextExists) {
