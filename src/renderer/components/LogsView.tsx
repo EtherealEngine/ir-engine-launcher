@@ -174,6 +174,7 @@ const LogsView = () => {
 
               {currentLogs?.additionalLogs?.map((item) => (
                 <Tab
+                  key={item.id}
                   value={item.id}
                   sx={{ padding: 0, margin: '0 5px' }}
                   label={

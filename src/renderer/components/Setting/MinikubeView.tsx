@@ -151,7 +151,7 @@ const MinikubeView = ({ sx }: Props) => {
           loading={processingDiskPrune}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
               Pruning
             </Box>
           }

@@ -13,6 +13,7 @@ const Channels = {
     OpenExternal: 'OpenExternal',
     OpenPath: 'OpenPath',
     SelectFolder: 'SelectFolder',
+    SelectFile: 'SelectFile',
     Log: 'Log',
     SaveLog: 'SaveLog',
     GetPrerequisites: 'GetPrerequisites',
@@ -57,7 +58,10 @@ const Channels = {
     GetDefaultVariables: 'GetDefaultVariables'
   },
   Workloads: {
-    FetchWorkloads: 'FetchWorkloads',
+    LaunchClient: 'LaunchClient',
+    CheckReleaseName: 'CheckReleaseName',
+    GetKubeContexts: 'GetKubeContexts',
+    GetWorkloads: 'GetWorkloads',
     RemovePod: 'RemovePod',
     GetPodLogs: 'GetPodLogs'
   }

@@ -9,56 +9,54 @@ export const getWorkloads = async (k8DefaultClient: k8s.CoreV1Api, releaseName: 
   try {
     log.info('Attempting to check k8s workloads')
 
-    if (k8DefaultClient) {
-      const builderPods = await getPodsData(
-        k8DefaultClient,
-        `app.kubernetes.io/instance=${releaseName}-builder`,
-        'builder',
-        'Builder'
-      )
-      workloads.push(builderPods)
+    const builderPods = await getPodsData(
+      k8DefaultClient,
+      `app.kubernetes.io/instance=${releaseName}-builder`,
+      'builder',
+      'Builder'
+    )
+    workloads.push(builderPods)
 
-      const clientPods = await getPodsData(
-        k8DefaultClient,
-        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=client`,
-        'client',
-        'Client'
-      )
-      workloads.push(clientPods)
+    const clientPods = await getPodsData(
+      k8DefaultClient,
+      `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=client`,
+      'client',
+      'Client'
+    )
+    workloads.push(clientPods)
 
-      const apiPods = await getPodsData(
-        k8DefaultClient,
-        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=api`,
-        'api',
-        'Api'
-      )
-      workloads.push(apiPods)
+    const apiPods = await getPodsData(
+      k8DefaultClient,
+      `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=api`,
+      'api',
+      'Api'
+    )
+    workloads.push(apiPods)
 
-      const instancePods = await getPodsData(
-        k8DefaultClient,
-        'agones.dev/role=gameserver',
-        'instance',
-        'Instance',
-        `${releaseName}-instanceserver-`
-      )
-      workloads.push(instancePods)
+    const instancePods = await getPodsData(
+      k8DefaultClient,
+      'agones.dev/role=gameserver',
+      'instance',
+      'Instance',
+      `${releaseName}-instanceserver-`
+    )
+    workloads.push(instancePods)
 
-      const taskPods = await getPodsData(
-        k8DefaultClient,
-        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=taskserver`,
-        'task',
-        'Task'
-      )
-      workloads.push(taskPods)
+    const taskPods = await getPodsData(
+      k8DefaultClient,
+      `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=taskserver`,
+      'task',
+      'Task'
+    )
+    workloads.push(taskPods)
 
-      const projectUpdatePods = await getPodsData(
-        k8DefaultClient,
-        `etherealengine/release=${releaseName},etherealengine/projectUpdater=true`,
-        'projectUpdate',
-        'Project Updater'
-      )
-      workloads.push(projectUpdatePods)
-    }
+    const projectUpdatePods = await getPodsData(
+      k8DefaultClient,
+      `etherealengine/release=${releaseName},etherealengine/projectUpdater=true`,
+      'projectUpdate',
+      'Project Updater'
+    )
+    workloads.push(projectUpdatePods)
   } catch (e) {
     log.error(e)
     throw e
@@ -74,12 +72,10 @@ export const removePod = async (
   try {
     log.info(`Attempting to remove k8s pod ${podName}`)
 
-    if (k8DefaultClient) {
-      const podsResponse = await k8DefaultClient.deleteNamespacedPod(podName, 'default')
-      const pod = getWorkloadsPodInfo(podsResponse.body)
+    const podsResponse = await k8DefaultClient.deleteNamespacedPod(podName, 'default')
+    const pod = getWorkloadsPodInfo(podsResponse.body)
 
-      return pod
-    }
+    return pod
   } catch (e) {
     log.error(e)
     throw e
@@ -122,7 +118,7 @@ export const getPodLogs = async (
   return serverLogs
 }
 
-const getPodsData = async (
+export const getPodsData = async (
   k8DefaultClient: k8s.CoreV1Api,
   labelSelector: string,
   id: string,
@@ -190,4 +186,28 @@ const getWorkloadsContainerInfo = (items: k8s.V1ContainerStatus[]) => {
       image: item.image
     } as WorkloadsContainerInfo
   })
+}
+
+export const getConfigMap = async (k8DefaultClient: k8s.CoreV1Api, labelSelector: string, nameFilter?: string) => {
+  try {
+    const configMapsResponse = await k8DefaultClient.listNamespacedConfigMap(
+      'default',
+      undefined,
+      false,
+      undefined,
+      undefined,
+      labelSelector
+    )
+
+    let items = configMapsResponse.body.items
+    if (nameFilter) {
+      items = items.filter((item) => item.metadata?.name?.startsWith(nameFilter))
+    }
+
+    return items
+  } catch (err) {
+    log.error('Failed to get config maps.', err)
+  }
+
+  return []
 }

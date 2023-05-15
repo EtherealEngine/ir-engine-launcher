@@ -64,6 +64,18 @@ class Utilities {
     return ''
   }
 
+  static selectFile = async () => {
+    const { filePaths } = await dialog.showOpenDialog({
+      properties: ['openFile']
+    })
+
+    if (filePaths.length > 0) {
+      return filePaths[0]
+    }
+
+    return ''
+  }
+
   static saveLog = async (clusterId: string, contents: string[], fileName: string, window: BrowserWindow) => {
     try {
       const logPath = path.join(app.getPath('downloads'), fileName)

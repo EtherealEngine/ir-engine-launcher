@@ -87,9 +87,10 @@ interface StatusViewItemProps {
   titleVariant?: Variant
   verticalAlignTop?: boolean
   titleSx?: SxProps<Theme>
+  sx?: SxProps<Theme>
 }
 
-export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx }: StatusViewItemProps) => {
+export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx, sx }: StatusViewItemProps) => {
   return (
     <Grid
       item
@@ -100,7 +101,8 @@ export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx
         display: 'flex',
         alignItems: verticalAlignTop ? undefined : 'center',
         flexDirection: 'row',
-        marginBottom: 2
+        marginBottom: 2,
+        ...sx
       }}
     >
       {status.status === AppStatus.Checking && <CircularProgress size={20} />}
@@ -109,7 +111,8 @@ export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx
       {status.status === AppStatus.Pending && <RemoveCircleOutlineRoundedIcon />}
 
       <Box marginLeft={1} sx={titleSx}>
-        <Typography variant={titleVariant}>{status.name}</Typography>
+        {typeof status.name === 'string' && <Typography variant={titleVariant}>{status.name}</Typography>}
+        {typeof status.name !== 'string' && status.name}
 
         {status.description && <Typography variant="body2">{status.description}</Typography>}
       </Box>

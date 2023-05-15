@@ -20,7 +20,7 @@ const WorkloadsView = () => {
 
   useEffect(() => {
     if (selectedCluster && currentWorkloads?.isFetched === false && currentWorkloads?.isLoading === false)
-      WorkloadsService.fetchWorkloads(selectedCluster)
+      WorkloadsService.getWorkloads(selectedCluster)
   }, [currentWorkloads])
 
   if (!selectedCluster) {
@@ -36,7 +36,7 @@ const WorkloadsView = () => {
       <ErrorPage
         error={'Failed to fetch Workloads'}
         detail={currentWorkloads?.error}
-        onRetry={() => WorkloadsService.fetchWorkloads(selectedCluster)}
+        onRetry={() => WorkloadsService.getWorkloads(selectedCluster)}
         isInPage
       />
     )

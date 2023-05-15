@@ -38,7 +38,7 @@ const ClusterView = ({ name, type, sx, onNameChange, onTypeChange }: Props) => {
             .filter((key) => isNaN(Number(key)))
             .map((item) => (
               <MenuItem key={item} value={item}>
-                {item}
+                {ClusterType[item]}
               </MenuItem>
             ))}
         </Select>

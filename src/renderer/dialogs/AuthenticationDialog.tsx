@@ -64,9 +64,7 @@ const AuthenticationDialog = ({ onClose }: Props) => {
       </DialogContentText>
 
       {error && (
-        <DialogContentText color={'red'} sx={{ marginLeft: 5, marginRight: 5 }}>
-          Error: {error}
-        </DialogContentText>
+        <DialogContentText sx={{ marginLeft: 5, marginRight: 5, color: 'red' }}>Error: {error}</DialogContentText>
       )}
 
       <DialogContent sx={{ marginBottom: 3 }}>
