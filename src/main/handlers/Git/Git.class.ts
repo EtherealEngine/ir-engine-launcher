@@ -17,6 +17,10 @@ class Git {
 
   static getCurrentConfigs = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
+      if (!repoPath) {
+        return undefined
+      }
+
       const git = Git._getGit(repoPath)
 
       const isRepo = await git.checkIsRepo(CheckRepoActions.IS_REPO_ROOT)

@@ -17,6 +17,10 @@ interface Props {
 const StatusView = ({ statuses, title }: Props) => {
   const [showStatus, setShowStatus] = useState(true)
 
+  if (!statuses) {
+    statuses = []
+  }
+
   const checking = statuses.find((status) => status.status === AppStatus.Checking)
   const allConfigured = statuses.every((status) => status.status === AppStatus.Configured)
   const allNotConfigured = statuses.every((status) => status.status === AppStatus.NotConfigured)

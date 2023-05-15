@@ -107,13 +107,13 @@ export const WorkloadsService = {
         ...workloads
       ]
 
-      dispatch(WorkloadsAction.setWorkloads(cluster.id, workloads, ''))
+      dispatch(WorkloadsAction.setWorkloads(clonedCluster.id, workloads, ''))
     } catch (error) {
       console.error(error)
       enqueueSnackbar(`Failed to get Workloads. ${error}`, {
         variant: 'error'
       })
-      dispatch(WorkloadsAction.setWorkloads(cluster.id, [], error.message))
+      dispatch(WorkloadsAction.setWorkloads(clonedCluster.id, [], error.message))
     }
   },
   checkReleaseName: async (releaseName: string, currentContext: string, type: KubeconfigType, typeValue?: string) => {
