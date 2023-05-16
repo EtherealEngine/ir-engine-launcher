@@ -25,24 +25,26 @@ const PrereqsView = ({ sx }: Props) => {
 
     const checkedStatuses = [...initialStatuses]
 
-    for (const status of initialStatuses) {
-      // Display prerequisite with checked status
-      const checkedStatus = await SettingsService.checkPrerequisite(status)
+    await Promise.all(
+      initialStatuses.map(async (status) => {
+        // Display prerequisite with checked status
+        const checkedStatus = await SettingsService.checkPrerequisite(status)
 
-      // Add description for corrective actions to be displayed in dialog
-      if (checkedStatus.status !== AppStatus.Configured) {
-        processDescriptions(checkedStatus)
-      }
+        // Add description for corrective actions to be displayed in dialog
+        if (checkedStatus.status !== AppStatus.Configured) {
+          processDescriptions(checkedStatus)
+        }
 
-      const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
-      checkedStatuses[currentIndex] = checkedStatus
+        const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
+        checkedStatuses[currentIndex] = checkedStatus
 
-      setStatuses((prevState) => {
-        const newState = [...prevState]
-        newState[currentIndex] = checkedStatus
-        return newState
+        setStatuses((prevState) => {
+          const newState = [...prevState]
+          newState[currentIndex] = checkedStatus
+          return newState
+        })
       })
-    }
+    )
   }
 
   const processDescriptions = (status: AppModel) => {
