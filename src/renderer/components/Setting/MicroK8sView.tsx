@@ -14,6 +14,7 @@ import { Box, CircularProgress, FormControlLabel, SxProps, Theme, Typography } f
 
 import InfoTooltip from '../../common/InfoTooltip'
 import AlertDialog from '../../dialogs/AlertDialog'
+import DockerView from './DockerView'
 
 interface Props {
   sx?: SxProps<Theme>
@@ -134,6 +135,7 @@ const MicroK8sView = ({ sx }: Props) => {
           control={<></>}
           sx={{ marginTop: 2, marginLeft: 0 }}
         />
+
         <LoadingButton
           variant="outlined"
           sx={{ marginLeft: 4, width: isOpeningRegistry ? 130 : 'auto' }}
@@ -149,6 +151,8 @@ const MicroK8sView = ({ sx }: Props) => {
           Open
         </LoadingButton>
       </Box>
+
+      <DockerView />
 
       {showAlert && (
         <AlertDialog
