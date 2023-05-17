@@ -5,29 +5,18 @@ import { AppModel, getAppModel } from '../../../models/AppStatus'
 const type = os.type()
 
 const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
-  if (type === 'Windows_NT') {
-    script = `
+  script = `
       if [[ ! -f '/snap/bin/microk8s' ]]; then
         echo 'MicroK8s is not installed' >&2;
-      elif ${microk8sPrefix}microk8s status | grep -q 'microk8s is not running'; then
+        ${type !== 'Windows_NT' && 'exit 1;'}
+      elif ${microk8sPrefix}microk8s status 2>/dev/null | grep -q 'microk8s is not running'; then
         echo 'MicroK8s not configured' >&2;
+        ${type !== 'Windows_NT' && 'exit 1;'}
       else
         ${script}
+        ${type !== 'Windows_NT' && 'exit 0;'}
       fi
     `
-  } else {
-    // https://stackoverflow.com/a/44758924/2077741
-    script = `
-      mk8sStatus=$(${microk8sPrefix}microk8s status 2>/dev/null)
-      if grep -q 'microk8s is running' <<< "$mk8sStatus"; then
-        ${script}
-        exit 0;
-      else
-        echo 'MicroK8s not configured' >&2;
-        exit 1;
-      fi
-  `
-  }
 
   return script
 }
@@ -57,17 +46,7 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     getAppModel(
       'microk8s',
       'MicroK8s',
-      microk8sDependantScript(
-        type === 'Windows_NT'
-          ? `${microk8sPrefix}microk8s version;${microk8sPrefix}microk8s status;`
-          : `
-    version=$(${microk8sPrefix}microk8s version 2>/dev/null);
-    echo "$version";
-    status=$(${microk8sPrefix}microk8s status 2>/dev/null);
-    echo "$status";
-    `,
-        microk8sPrefix
-      )
+      microk8sDependantScript(`${microk8sPrefix}microk8s version;${microk8sPrefix}microk8s status;`, microk8sPrefix)
     ),
     getAppModel(
       'ingress',
