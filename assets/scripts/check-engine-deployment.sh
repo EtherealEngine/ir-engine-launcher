@@ -56,7 +56,7 @@ if [[ $CLUSTER_TYPE == 'microk8s' ]]; then
 
     exit_status=$?
     if [ "$exit_status" -ne 0 ]; then
-        echo "If the previous error is 'localhost:32000 connection refused'. Please restart control center app and configure again."
+        echo "If the previous error is 'localhost:32000 connection refused'. Please wait a while for the local registry to start and then configure again."
         exit "$exit_status"
     fi
 
