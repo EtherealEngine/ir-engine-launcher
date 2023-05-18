@@ -31,14 +31,19 @@ class Git {
 
       await git.fetch({ '--prune': null })
 
-      const { all } = await git.branch()
+      const branches = await git.branch()
+      const tags = await git.tags({ '--sort': '-committerdate' })
       const { ahead, behind, current } = await git.status()
+      const currentBranch = await git.raw('symbolic-ref', '-q', '--short', 'HEAD').catch(swallow)
+      const currentTag = await git.raw('describe', '--tags', '--exact-match').catch(swallow)
+      const selected = currentBranch || currentTag || current || ''
 
       return {
-        branches: all,
+        branches: branches.all,
+        tags: tags.all,
         ahead,
         behind,
-        current
+        current: selected.trim()
       } as GitStatus
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
@@ -117,6 +122,10 @@ class Git {
       return false
     }
   }
+}
+
+const swallow = () => {
+  return ''
 }
 
 export default Git
