@@ -50,7 +50,18 @@ export DOCKER_BUILDKIT=0
 export COMPOSE_DOCKER_CLI_BUILD=0
 
 if [[ $CLUSTER_TYPE == 'microk8s' ]]; then
+    set +e
+
     bash ./scripts/build_microk8s.sh "$TAG" true
+
+    exit_status=$?
+    if [ "$exit_status" -ne 0 ]; then
+        echo "If the previous error is 'localhost:32000 connection refused'. Please restart control center app and configure again."
+        exit "$exit_status"
+    fi
+
+    set -e
+
 elif [[ $CLUSTER_TYPE == 'microk8sWindows' ]]; then
     export REGISTRY_HOST=microk8s.registry
     export MYSQL_HOST=kubernetes.docker.internal
