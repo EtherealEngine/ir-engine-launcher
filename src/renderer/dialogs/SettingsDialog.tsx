@@ -1,7 +1,8 @@
+import UIEnabled from 'constants/UIEnabled'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
-import ConfigMicroK8sView from 'renderer/components/ConfigMicroK8sView'
+import MicroK8sView from 'renderer/components/Setting/MicroK8sView'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
 import { useSettingsState } from 'renderer/services/SettingsService'
@@ -22,10 +23,10 @@ import {
 } from '@mui/material'
 
 import logo from '../../../assets/icon.svg'
-import ConfigBackupView from '../components/ConfigBackupView'
-import ConfigConfigsView from '../components/ConfigConfigsView'
-import ConfigMinikubeView from '../components/ConfigMinikubeView'
-import ConfigVarsView from '../components/ConfigVarsView'
+import ConfigsView from '../components/Config/ConfigsView'
+import VarsView from '../components/Config/VarsView'
+import BackupView from '../components/Setting/BackupView'
+import MinikubeView from '../components/Setting/MinikubeView'
 
 interface Props {
   onClose: () => void
@@ -33,10 +34,12 @@ interface Props {
 
 const SettingsDialog = ({ onClose }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
-  const [currentTab, setTab] = useState('configs')
   const configFileState = useConfigFileState()
   const { loading, selectedCluster } = configFileState.value
   const settingsState = useSettingsState()
+  const [currentTab, setTab] = useState(
+    selectedCluster && UIEnabled[selectedCluster.type].settings.configs ? 'configs' : 'backup'
+  )
   const { appVersion } = settingsState.value.appSysInfo
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
@@ -107,40 +110,44 @@ const SettingsDialog = ({ onClose }: Props) => {
               onChange={(_event, newValue) => setTab(newValue)}
               sx={{ borderRight: 1, borderColor: 'divider' }}
             >
-              <Tab label="Configs" value="configs" />
-              <Tab label="Variables" value="variables" />
+              {UIEnabled[selectedCluster.type].settings.configs && <Tab label="Configs" value="configs" />}
+              {UIEnabled[selectedCluster.type].settings.variables && <Tab label="Variables" value="variables" />}
               {selectedCluster.type === ClusterType.Minikube && <Tab label="Minikube" value="minikube" />}
               {selectedCluster.type === ClusterType.MicroK8s && <Tab label="MicroK8s" value="microK8s" />}
               <Tab label="Backup" value="backup" />
               <Tab label="About" value="about" />
             </Tabs>
             <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-              <TabPanel value="configs">
-                <ConfigConfigsView
-                  localConfigs={localConfigs}
-                  onChange={changeConfig}
-                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
-                />
-              </TabPanel>
-              <TabPanel value="variables">
-                <ConfigVarsView
-                  localVars={localVars}
-                  onChange={changeVar}
-                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
-                />
-              </TabPanel>
+              {UIEnabled[selectedCluster.type].settings.configs && (
+                <TabPanel value="configs">
+                  <ConfigsView
+                    localConfigs={localConfigs}
+                    onChange={changeConfig}
+                    sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
+                  />
+                </TabPanel>
+              )}
+              {UIEnabled[selectedCluster.type].settings.variables && (
+                <TabPanel value="variables">
+                  <VarsView
+                    localVars={localVars}
+                    onChange={changeVar}
+                    sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
+                  />
+                </TabPanel>
+              )}
               {selectedCluster.type === ClusterType.Minikube && (
                 <TabPanel value="minikube">
-                  <ConfigMinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
+                  <MinikubeView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
                 </TabPanel>
               )}
               {selectedCluster.type === ClusterType.MicroK8s && (
                 <TabPanel value="microK8s">
-                  <ConfigMicroK8sView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
+                  <MicroK8sView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
                 </TabPanel>
               )}
               <TabPanel value="backup">
-                <ConfigBackupView
+                <BackupView
                   hasPendingChanges={Object.keys(tempConfigs).length !== 0 || Object.keys(tempVars).length !== 0}
                   sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
                 />

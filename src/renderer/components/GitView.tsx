@@ -40,14 +40,14 @@ const GitView = ({ name, repoType, sx }: Props) => {
   }
 
   let branches: string[] = []
-  if (currentDeployment.gitStatus[repoType].data) {
+  const gitData = currentDeployment.gitStatus[repoType].data
+  if (gitData) {
     const allowedBranches = ['dev', '/dev', 'master', '/master']
-    branches =
-      currentDeployment.gitStatus[repoType].data?.branches.filter((item) =>
-        allowedBranches.some((allowed) => item.endsWith(allowed))
-      ) || []
 
-    const current = currentDeployment.gitStatus[repoType].data?.current
+    branches = gitData.branches.filter((item) => allowedBranches.some((allowed) => item.endsWith(allowed)))
+    branches.push(...gitData.tags)
+
+    const current = gitData.current
     if (current && branches.includes(current) === false) {
       branches = [current, ...branches]
     }

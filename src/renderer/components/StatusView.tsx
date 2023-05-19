@@ -4,7 +4,7 @@ import { Fragment, useState } from 'react'
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded'
-import { Box, CircularProgress, FormControlLabel, Grid, Switch, Typography } from '@mui/material'
+import { Box, CircularProgress, FormControlLabel, Grid, Switch, SxProps, Theme, Typography } from '@mui/material'
 import { Variant } from '@mui/material/styles/createTypography'
 
 import InfoTooltip from '../common/InfoTooltip'
@@ -16,6 +16,10 @@ interface Props {
 
 const StatusView = ({ statuses, title }: Props) => {
   const [showStatus, setShowStatus] = useState(true)
+
+  if (!statuses) {
+    statuses = []
+  }
 
   const checking = statuses.find((status) => status.status === AppStatus.Checking)
   const allConfigured = statuses.every((status) => status.status === AppStatus.Configured)
@@ -85,29 +89,39 @@ const StatusView = ({ statuses, title }: Props) => {
 interface StatusViewItemProps {
   status: AppModel
   titleVariant?: Variant
+  verticalAlignTop?: boolean
+  titleSx?: SxProps<Theme>
+  sx?: SxProps<Theme>
 }
 
-export const StatusViewItem = ({ status, titleVariant }: StatusViewItemProps) => {
+export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx, sx }: StatusViewItemProps) => {
   return (
     <Grid
       item
       key={status.id}
       xs={12}
       md={3}
-      sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', marginBottom: 2 }}
+      sx={{
+        display: 'flex',
+        alignItems: verticalAlignTop ? undefined : 'center',
+        flexDirection: 'row',
+        marginBottom: 2,
+        ...sx
+      }}
     >
       {status.status === AppStatus.Checking && <CircularProgress size={20} />}
       {status.status === AppStatus.Configured && <CheckCircleOutlineIcon sx={{ fill: 'limegreen' }} />}
       {status.status === AppStatus.NotConfigured && <CancelOutlinedIcon sx={{ fill: 'red' }} />}
       {status.status === AppStatus.Pending && <RemoveCircleOutlineRoundedIcon />}
 
-      <Box marginLeft={1}>
-        <Typography variant={titleVariant}>{status.name}</Typography>
+      <Box marginLeft={1} sx={titleSx}>
+        {typeof status.name === 'string' && <Typography variant={titleVariant}>{status.name}</Typography>}
+        {typeof status.name !== 'string' && status.name}
 
         {status.description && <Typography variant="body2">{status.description}</Typography>}
       </Box>
 
-      {status.detail && <InfoTooltip message={status.detail} />}
+      {status.detail && <InfoTooltip sx={titleSx} message={status.detail} />}
     </Grid>
   )
 }

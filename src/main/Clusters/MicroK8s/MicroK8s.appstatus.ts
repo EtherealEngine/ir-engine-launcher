@@ -5,41 +5,18 @@ import { AppModel, getAppModel } from '../../../models/AppStatus'
 const type = os.type()
 
 const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
-  // Escape special characters.
-  if (type === 'Darwin') {
-    // https://stackoverflow.com/a/44758924/2077741
-    script = `
-      if microk8s status | grep 'microk8s is running'; then
-        ${script}
-        exit 0;
-      else
-        echo 'MicroK8s not configured';
-        exit 1;
-      fi
-  `
-  } else if (type === 'Windows_NT') {
-    script = `
-      if ${microk8sPrefix}microk8s status | grep -q 'microk8s is not running'; then
+  script = `
+      if [[ ! -f '/snap/bin/microk8s' ]]; then
+        echo 'MicroK8s is not installed' >&2;
+        ${type !== 'Windows_NT' && 'exit 1;'}
+      elif ${microk8sPrefix}microk8s status 2>/dev/null | grep -q 'microk8s is not running'; then
         echo 'MicroK8s not configured' >&2;
-        exit 1;
+        ${type !== 'Windows_NT' && 'exit 1;'}
       else
         ${script}
-        exit 0;
+        ${type !== 'Windows_NT' && 'exit 0;'}
       fi
     `
-  } else {
-    // https://stackoverflow.com/a/44758924/2077741
-    script = `
-      mk8sStatus=$(${microk8sPrefix}microk8s status 2>/dev/null)
-      if grep -q 'microk8s is running' <<< "$mk8sStatus"; then
-        ${script}
-        exit 0;
-      else
-        echo 'MicroK8s not configured' >&2;
-        exit 1;
-      fi
-  `
-  }
 
   return script
 }
@@ -73,28 +50,15 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     getAppModel(
       'microk8s',
       'MicroK8s',
-      microk8sDependantScript(
-        type === 'Windows_NT'
-          ? `${microk8sPrefix}microk8s version;${microk8sPrefix}microk8s status;`
-          : (type === 'Darwin') ? `
-      version=$(microk8s version);
-      echo "$version";
-      status=$(microk8s status);
-      echo "$status";
-      ` : `
-      version=$(${microk8sPrefix}microk8s version 2>/dev/null);
-      echo "$version";
-      status=$(${microk8sPrefix}microk8s status 2>/dev/null);
-      echo "$status";
-      `,
-        microk8sPrefix
-      )
+      microk8sDependantScript(`${microk8sPrefix}microk8s version;${microk8sPrefix}microk8s status;`, microk8sPrefix)
     ),
     getAppModel(
       'ingress',
       'Ingress',
       microk8sDependantScript(
-        "kubectl exec -i -n ingress $(kubectl get pods -n ingress -l name=nginx-ingress-microk8s --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}') -- /nginx-ingress-controller --version;",
+        `kubectl exec -i -n ingress ${
+          type === 'Windows_NT' ? '\\' : ''
+        }$(kubectl get pods -n ingress -l name=nginx-ingress-microk8s --field-selector=status.phase==Running -o jsonpath='{.items[0].metadata.name}') -- /nginx-ingress-controller --version;`,
         microk8sPrefix
       )
     ),
@@ -107,10 +71,10 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     if lsof -Pi :8642 -sTCP:LISTEN -t >/dev/null ; then
       echo 'File server configured:';
       lsof -Pi :8642 -sTCP:LISTEN;
-      exit 0;
+      ${type !== 'Windows_NT' ? 'exit 0;' : ''}
     else
       echo 'File server not configured' >&2;
-      exit 1;
+      ${type !== 'Windows_NT' ? 'exit 1;' : ''}
     fi
     `
     ),

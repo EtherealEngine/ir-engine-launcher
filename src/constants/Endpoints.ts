@@ -13,7 +13,7 @@ const Endpoints = {
     HOST: 'https://etherealengine.org',
     ADMIN_PORTAL: 'https://local.etherealengine.org/admin',
     LOGIN_PAGE: 'https://local.etherealengine.org/',
-    LAUNCH_PAGE: 'https://local.etherealengine.org/location/apartment',
+    LAUNCH_PAGE: (host: string) => `${host.startsWith('https') ? '' : 'https://'}${host}/location/apartment`,
     ENGINE_ENV_DEFAULT: 'https://raw.githubusercontent.com/etherealengine/etherealengine/dev/.env.local.default',
     MINIKUBE_LINUX_SCRIPT:
       'https://raw.githubusercontent.com/etherealengine/etherealengine-control-center/master/assets/scripts/configure-minikube-linux.sh',
@@ -31,7 +31,9 @@ const Endpoints = {
     IPFS_VALUES_TEMPLATE:
       'https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/ipfs/values.yaml',
     MICROK8S_REGISTRY_CATALOG: 'http://localhost:32000/v2/_catalog',
-    MICROK8S_WINDOWS_REGISTRY_CATALOG: 'http://microk8s.registry:32000/v2/_catalog'
+    MICROK8S_WINDOWS_REGISTRY_CATALOG: 'http://microk8s.registry:32000/v2/_catalog',
+    SUPPORT_GITHUB: 'https://github.com/EtherealEngine/etherealengine-control-center/issues',
+    SUPPORT_DISCORD: 'https://discord.gg/xrf'
   },
   Paths: {
     ENGINE_ENV: '.env.local',

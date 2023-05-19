@@ -21,11 +21,11 @@ const HotBar = () => {
   const settingsState = useSettingsState()
   const { showCreateClusterDialog } = settingsState.value
   const configFileState = useConfigFileState()
-  const { clusters, selectedClusterId } = configFileState.value
+  const { clusters, selectedClusterId, selectedCluster } = configFileState.value
 
   useEffect(() => {
     if (selectedClusterId) {
-      navigate(Routes.CONFIG)
+      navigate(selectedCluster && selectedCluster.type === ClusterType.Custom ? Routes.WORKLOADS : Routes.CONFIG)
     } else {
       navigate(Routes.ROOT)
     }
@@ -62,7 +62,7 @@ const HotBar = () => {
                   ? 'Minikube'
                   : cluster.type === ClusterType.MicroK8s
                   ? 'MicroK8s'
-                  : 'Undefined'
+                  : 'Custom'
               })`}
               label={
                 <Box

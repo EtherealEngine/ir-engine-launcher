@@ -2,7 +2,7 @@ import Storage from 'constants/Storage'
 
 import { Box, FormControlLabel, Switch, SxProps, Theme, Typography } from '@mui/material'
 
-import InfoTooltip from '../common/InfoTooltip'
+import InfoTooltip from '../../common/InfoTooltip'
 
 interface Props {
   localFlags: Record<string, string>
@@ -10,7 +10,7 @@ interface Props {
   sx?: SxProps<Theme>
 }
 
-const ConfigFlagsView = ({ localFlags, onChange, sx }: Props) => {
+const FlagsView = ({ localFlags, onChange, sx }: Props) => {
   return (
     <Box sx={sx}>
       <FormControlLabel
@@ -30,4 +30,4 @@ const ConfigFlagsView = ({ localFlags, onChange, sx }: Props) => {
   )
 }
 
-export default ConfigFlagsView
+export default FlagsView

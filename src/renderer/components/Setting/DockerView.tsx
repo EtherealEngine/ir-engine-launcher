@@ -1,7 +1,8 @@
 import Channels from 'constants/Channels'
-import Commands from 'main/Clusters/Minikube/Minikube.commands'
+import Commands from 'main/Clusters/BaseCluster/BaseCluster.commands'
+import MinikubeCommands from 'main/Clusters/Minikube/Minikube.commands'
 import { AppStatus } from 'models/AppStatus'
-import { cloneCluster } from 'models/Cluster'
+import { cloneCluster, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import ErrorPage from 'renderer/pages/ErrorPage'
@@ -25,8 +26,8 @@ import {
   Typography
 } from '@mui/material'
 
-import InfoTooltip from '../common/InfoTooltip'
-import AlertDialog from '../dialogs/AlertDialog'
+import InfoTooltip from '../../common/InfoTooltip'
+import AlertDialog from '../../dialogs/AlertDialog'
 
 interface Props {
   sx?: SxProps<Theme>
@@ -40,7 +41,15 @@ type StatInfo = {
   Type: string
 }
 
-const ConfigMinikubeView = ({ sx }: Props) => {
+let UIElements = {
+  promptText: '',
+  dependantId: 'docker',
+  dependantName: 'Docker',
+  fetchCommand: Commands.DOCKER_STATS,
+  pruneCommand: Commands.DOCKER_PRUNE
+}
+
+const DockerView = ({ sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const [showAlert, setAlert] = useState(false)
   const [processingDiskPrune, setProcessingDiskPrune] = useState(false)
@@ -51,21 +60,25 @@ const ConfigMinikubeView = ({ sx }: Props) => {
   const configFileState = useConfigFileState()
   const { selectedCluster, selectedClusterId } = configFileState.value
 
+  if (selectedCluster?.type === ClusterType.Minikube) {
+    UIElements = {
+      promptText: ' running in Minikube',
+      dependantId: 'minikube',
+      dependantName: 'Minikube',
+      fetchCommand: MinikubeCommands.DOCKER_STATS,
+      pruneCommand: MinikubeCommands.DOCKER_PRUNE
+    }
+  }
+
   const deploymentState = useDeploymentState()
   const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
-  const minikubeStatus = currentDeployment?.appStatus.find((app) => app.id === 'minikube')
+  const dependantStatus = currentDeployment?.appStatus.find((app) => app.id === UIElements.dependantId)
 
   useEffect(() => {
-    if (minikubeStatus?.status === AppStatus.Configured) {
+    if (dependantStatus?.status === AppStatus.Configured) {
       fetchDiskStats()
-    } else if (minikubeStatus?.status === AppStatus.NotConfigured) {
+    } else if (dependantStatus?.status === AppStatus.NotConfigured) {
       clearDiskStats()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (minikubeStatus?.status === AppStatus.Configured) {
-      fetchDiskStats()
     }
   }, [])
 
@@ -85,7 +98,7 @@ const ConfigMinikubeView = ({ sx }: Props) => {
       setProcessingDiskPrune(true)
 
       const clonedCluster = cloneCluster(selectedCluster)
-      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, Commands.DOCKER_PRUNE)
+      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, UIElements.pruneCommand)
       await fetchDiskStats()
     } catch (err) {
       enqueueSnackbar('Failed to clear docker system.', { variant: 'error' })
@@ -104,7 +117,11 @@ const ConfigMinikubeView = ({ sx }: Props) => {
       setErrorDiskStats('')
 
       const clonedCluster = cloneCluster(selectedCluster)
-      let output = await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, Commands.DOCKER_STATS)
+      let output = await window.electronAPI.invoke(
+        Channels.Shell.ExecuteCommand,
+        clonedCluster,
+        UIElements.fetchCommand
+      )
       output = output.split('}').join('},').slice(0, -1)
       output = `[${output}]`
 
@@ -117,13 +134,13 @@ const ConfigMinikubeView = ({ sx }: Props) => {
     setLoadingDiskStats(false)
   }
 
-  if (minikubeStatus?.status === AppStatus.Checking) {
-    return <LoadingPage title="Checking Minikube" variant="body1" isInPage />
-  } else if (minikubeStatus?.status === AppStatus.NotConfigured) {
+  if (dependantStatus?.status === AppStatus.Checking) {
+    return <LoadingPage title={`Checking ${UIElements.dependantName}`} variant="body1" isInPage />
+  } else if (dependantStatus?.status === AppStatus.NotConfigured) {
     return (
       <ErrorPage
-        error="Minikube Not Configured"
-        detail="Please configure minikube before trying again."
+        error={`${UIElements.dependantName} Not Configured`}
+        detail={`Please configure ${UIElements.dependantName} before trying again.`}
         onRetry={() => DeploymentService.fetchDeploymentStatus(selectedCluster)}
         variant="body1"
         isInPage
@@ -139,7 +156,9 @@ const ConfigMinikubeView = ({ sx }: Props) => {
           label={
             <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
               <Typography variant="body2">CLEAR DOCKER SYSTEM</Typography>
-              <InfoTooltip message="This will prune docker system and clean up space being consumed by docker running in minikube." />
+              <InfoTooltip
+                message={`This will prune docker system and clean up space being consumed by docker${UIElements.promptText}.`}
+              />
             </Box>
           }
           control={<></>}
@@ -151,7 +170,7 @@ const ConfigMinikubeView = ({ sx }: Props) => {
           loading={processingDiskPrune}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
               Pruning
             </Box>
           }
@@ -207,7 +226,7 @@ const ConfigMinikubeView = ({ sx }: Props) => {
       {showAlert && (
         <AlertDialog
           title="Confirmation"
-          message="Are you sure you want to proceed? This will clear docker system running in minikube."
+          message={`Are you sure you want to proceed? This will clear docker system${UIElements.promptText}.`}
           okButtonText="Proceed"
           onClose={() => setAlert(false)}
           onOk={pruneDiskStats}
@@ -217,4 +236,4 @@ const ConfigMinikubeView = ({ sx }: Props) => {
   )
 }
 
-export default ConfigMinikubeView
+export default DockerView

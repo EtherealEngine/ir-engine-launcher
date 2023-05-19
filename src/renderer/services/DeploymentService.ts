@@ -315,6 +315,8 @@ export const DeploymentService = {
 
       await window.electronAPI.invoke(Channels.Cluster.ConfigureCluster, clonedCluster, password, flags)
 
+      await delay(2000)
+
       DeploymentService.fetchDeploymentStatus(clonedCluster)
     } catch (error) {
       console.error(error)
@@ -324,6 +326,10 @@ export const DeploymentService = {
       })
     }
     dispatch(DeploymentAction.setConfiguring(clonedCluster.id, false))
+  },
+  setConfiguring: (clusterId: string, isConfiguring: boolean) => {
+    const dispatch = useDispatch()
+    dispatch(DeploymentAction.setConfiguring(clusterId, isConfiguring))
   },
   listen: async () => {
     const dispatch = useDispatch()

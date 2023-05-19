@@ -129,9 +129,9 @@ class ConfigFile {
     }
   }
 
-  static getDefaultConfigs = async (window: BrowserWindow) => {
+  static getDefaultConfigs = async (window: BrowserWindow, clusterType: ClusterType) => {
     try {
-      return await processConfigs()
+      return await processConfigs(clusterType)
     } catch (err) {
       log.error('Failed to get default configs.', err)
       window.webContents.send(Channels.Utilities.Log, undefined, {

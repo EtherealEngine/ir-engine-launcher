@@ -6,7 +6,7 @@ interface Props {
   sx?: SxProps<Theme>
 }
 
-const ConfigVarsView = ({ localVars, onChange, sx }: Props) => {
+const VarsView = ({ localVars, onChange, sx }: Props) => {
   return (
     <Box sx={sx}>
       {Object.keys(localVars).map((key) => (
@@ -24,4 +24,4 @@ const ConfigVarsView = ({ localVars, onChange, sx }: Props) => {
   )
 }
 
-export default ConfigVarsView
+export default VarsView

@@ -12,14 +12,15 @@ import { accessSettingsState, SettingsService } from 'renderer/services/Settings
 import { LoadingButton } from '@mui/lab'
 import { Box, CircularProgress, FormControlLabel, SxProps, Theme, Typography } from '@mui/material'
 
-import InfoTooltip from '../common/InfoTooltip'
-import AlertDialog from '../dialogs/AlertDialog'
+import InfoTooltip from '../../common/InfoTooltip'
+import AlertDialog from '../../dialogs/AlertDialog'
+import DockerView from './DockerView'
 
 interface Props {
   sx?: SxProps<Theme>
 }
 
-const ConfigMicroK8sView = ({ sx }: Props) => {
+const MicroK8sView = ({ sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const [showAlert, setAlert] = useState(false)
   const [processingMicroK8sPrune, setProcessingMicroK8sPrune] = useState(false)
@@ -55,7 +56,7 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
 
       let command = `echo '${password}' | sudo -S ${Commands.MICROK8S_REMOVE}`
       if (appSysInfo.osType === OSType.Windows) {
-        command = `wsl bash -c "${command}"`
+        command = `wsl bash -ic "${command}"`
       }
       await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, command)
     } catch (err) {
@@ -99,7 +100,7 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
           loading={processingMicroK8sPrune}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
               Pruning
             </Box>
           }
@@ -134,13 +135,14 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
           control={<></>}
           sx={{ marginTop: 2, marginLeft: 0 }}
         />
+
         <LoadingButton
           variant="outlined"
           sx={{ marginLeft: 4, width: isOpeningRegistry ? 130 : 'auto' }}
           loading={isOpeningRegistry}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
               Opening
             </Box>
           }
@@ -149,6 +151,8 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
           Open
         </LoadingButton>
       </Box>
+
+      <DockerView />
 
       {showAlert && (
         <AlertDialog
@@ -163,4 +167,4 @@ const ConfigMicroK8sView = ({ sx }: Props) => {
   )
 }
 
-export default ConfigMicroK8sView
+export default MicroK8sView

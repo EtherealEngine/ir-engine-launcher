@@ -155,6 +155,7 @@
     "@mui/lab": "^5.0.0-alpha.77",
     "@mui/material": "^5.5.1",
     "axios": "^0.26.1",
+    "buffer": "^6.0.3",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-store": "^8.1.0",
@@ -162,6 +163,7 @@
     "find-process": "^1.4.7",
     "fix-path": "^4.0.0",
     "history": "^5.2.0",
+    "javascript-time-ago": "^2.5.9",
     "js-yaml": "^4.1.0",
     "notistack": "^3.0.1",
     "ps-node": "^0.1.6",
@@ -175,6 +177,7 @@
   "devDependencies": {
     "@electron/notarize": "^1.2.3",
     "@electron/rebuild": "^3.2.10",
+    "@kubernetes/client-node": "0.18.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@svgr/webpack": "^6.5.1",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",

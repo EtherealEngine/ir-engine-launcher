@@ -19,7 +19,7 @@ import {
   Typography
 } from '@mui/material'
 
-import InfoTooltip from '../common/InfoTooltip'
+import InfoTooltip from '../../common/InfoTooltip'
 
 interface Props {
   localConfigs: Record<string, string>
@@ -27,7 +27,7 @@ interface Props {
   sx?: SxProps<Theme>
 }
 
-const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
+const ConfigsView = ({ localConfigs, onChange, sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
 
   const configFileState = useConfigFileState()
@@ -125,4 +125,4 @@ const ConfigConfigsView = ({ localConfigs, onChange, sx }: Props) => {
   )
 }
 
-export default ConfigConfigsView
+export default ConfigsView
