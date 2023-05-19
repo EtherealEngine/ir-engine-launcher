@@ -1,9 +1,10 @@
-import childProcess, { ExecException } from 'child_process'
+import childProcess from 'child_process'
 import os from 'os'
 import path from 'path'
 import { lookup, Program } from 'ps-node'
 import TableParser from 'table-parser'
 
+import { ShellResponse } from '../../models/ShellResponse'
 import { ensureWindowsToWSLPath, scriptsPath } from './PathManager'
 
 const type = os.type()
@@ -188,10 +189,4 @@ function formatOutput(data: any) {
   })
 
   return formattedData
-}
-
-type ShellResponse = {
-  error: ExecException | Error | null | undefined
-  stdout: string | Buffer | undefined
-  stderr: string | Buffer | undefined
 }

@@ -1,8 +1,9 @@
+import { delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import { AppModel, AppStatus } from 'models/AppStatus'
-import { OSType } from 'models/AppSysInfo'
 import { cloneCluster, ClusterModel } from 'models/Cluster'
+import { ShellResponse } from 'models/ShellResponse'
 import { Fragment, useState } from 'react'
 import { accessConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
@@ -113,6 +114,8 @@ interface StatusViewItemProps {
 }
 
 export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx, sx }: StatusViewItemProps) => {
+  const [isFixing, setFixing] = useState(false)
+
   return (
     <Grid
       item
@@ -142,15 +145,25 @@ export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx
       {status.detail && <InfoTooltip sx={titleSx} message={status.detail} />}
 
       {status.status === AppStatus.NotConfigured && (status.id === 'mysql' || status.id === 'fileserver') && (
-        <IconButton title={`Fix ${status.name}`} color="primary" sx={{ ml: 2 }} onClick={() => onFix(status)}>
-          <ConstructionIcon sx={{ fill: '#ff8c00' }} />
-        </IconButton>
+        <>
+          {isFixing && <CircularProgress size={20} sx={{ ml: 2 }} />}
+          {isFixing === false && (
+            <IconButton
+              title={`Fix ${status.name}`}
+              color="primary"
+              sx={{ ml: 2 }}
+              onClick={() => onFix(status, setFixing)}
+            >
+              <ConstructionIcon sx={{ fill: '#ff8c00' }} />
+            </IconButton>
+          )}
+        </>
       )}
     </Grid>
   )
 }
 
-const onFix = async (appStatus: AppModel) => {
+const onFix = async (appStatus: AppModel, setFixing: React.Dispatch<React.SetStateAction<boolean>>) => {
   // Here we are cloning cluster object so that when selected Cluster is changed,
   // The context cluster does not change.
   const selectedCluster = accessConfigFileState().value.selectedCluster
@@ -158,25 +171,33 @@ const onFix = async (appStatus: AppModel) => {
     return
   }
 
+  setFixing(true)
+
   const clonedCluster = cloneCluster(selectedCluster)
 
   if (appStatus.id === 'mysql') {
     await processOnFix(appStatus, clonedCluster, async () => {
-      const appSysInfo = accessSettingsState().value.appSysInfo
+      const command = `cd '${clonedCluster.configs[Storage.ENGINE_PATH]}' && npm run dev-docker`
 
-      let command = `cd '${clonedCluster.configs[Storage.ENGINE_PATH]}' && npm run dev-docker`
-
-      if (appSysInfo.osType === OSType.Windows) {
-        command = `wsl bash -ic "${command}"`
+      const output: ShellResponse = await window.electronAPI.invoke(
+        Channels.Shell.ExecuteCommand,
+        clonedCluster,
+        command
+      )
+      if (output.error) {
+        throw output.error
       }
-
-      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, command)
     })
   } else if (appStatus.id === 'fileserver') {
     await processOnFix(appStatus, clonedCluster, async () => {
       await window.electronAPI.invoke(Channels.Engine.StartFileServer, clonedCluster)
+
+      // Delay to wait for fileserver to start
+      await delay(4000)
     })
   }
+
+  setFixing(false)
 }
 
 const processOnFix = async (app: AppModel, cluster: ClusterModel, callback: () => Promise<void>) => {
