@@ -1,10 +1,28 @@
+import Channels from 'constants/Channels'
+import Storage from 'constants/Storage'
 import { AppModel, AppStatus } from 'models/AppStatus'
+import { OSType } from 'models/AppSysInfo'
+import { cloneCluster, ClusterModel } from 'models/Cluster'
 import { Fragment, useState } from 'react'
+import { accessConfigFileState } from 'renderer/services/ConfigFileService'
+import { DeploymentService } from 'renderer/services/DeploymentService'
+import { accessSettingsState } from 'renderer/services/SettingsService'
 
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import ConstructionIcon from '@mui/icons-material/Construction'
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded'
-import { Box, CircularProgress, FormControlLabel, Grid, Switch, SxProps, Theme, Typography } from '@mui/material'
+import {
+  Box,
+  CircularProgress,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Switch,
+  SxProps,
+  Theme,
+  Typography
+} from '@mui/material'
 import { Variant } from '@mui/material/styles/createTypography'
 
 import InfoTooltip from '../common/InfoTooltip'
@@ -122,8 +140,55 @@ export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx
       </Box>
 
       {status.detail && <InfoTooltip sx={titleSx} message={status.detail} />}
+
+      {status.status === AppStatus.NotConfigured && (status.id === 'mysql' || status.id === 'fileserver') && (
+        <IconButton title={`Fix ${status.name}`} color="primary" sx={{ ml: 2 }} onClick={() => onFix(status)}>
+          <ConstructionIcon sx={{ fill: '#ff8c00' }} />
+        </IconButton>
+      )}
     </Grid>
   )
+}
+
+const onFix = async (appStatus: AppModel) => {
+  // Here we are cloning cluster object so that when selected Cluster is changed,
+  // The context cluster does not change.
+  const selectedCluster = accessConfigFileState().value.selectedCluster
+  if (!selectedCluster) {
+    return
+  }
+
+  const clonedCluster = cloneCluster(selectedCluster)
+
+  if (appStatus.id === 'mysql') {
+    await processOnFix(appStatus, clonedCluster, async () => {
+      const appSysInfo = accessSettingsState().value.appSysInfo
+
+      let command = `cd '${clonedCluster.configs[Storage.ENGINE_PATH]}' && npm run dev-docker`
+
+      if (appSysInfo.osType === OSType.Windows) {
+        command = `wsl bash -ic "${command}"`
+      }
+
+      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, command)
+    })
+  } else if (appStatus.id === 'fileserver') {
+    await processOnFix(appStatus, clonedCluster, async () => {
+      await window.electronAPI.invoke(Channels.Engine.StartFileServer, clonedCluster)
+    })
+  }
+}
+
+const processOnFix = async (app: AppModel, cluster: ClusterModel, callback: () => Promise<void>) => {
+  try {
+    await callback()
+
+    await DeploymentService.fetchDeploymentStatus(cluster)
+  } catch (err) {
+    console.log(err)
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    enqueueSnackbar(`Failed to fix ${app.name}. Please try running configure wizard.`, { variant: 'error' })
+  }
 }
 
 export default StatusView
