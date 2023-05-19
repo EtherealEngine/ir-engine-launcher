@@ -3,6 +3,7 @@ import Commands from 'main/Clusters/BaseCluster/BaseCluster.commands'
 import MinikubeCommands from 'main/Clusters/Minikube/Minikube.commands'
 import { AppStatus } from 'models/AppStatus'
 import { cloneCluster, ClusterType } from 'models/Cluster'
+import { ShellResponse } from 'models/ShellResponse'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
 import ErrorPage from 'renderer/pages/ErrorPage'
@@ -98,7 +99,7 @@ const DockerView = ({ sx }: Props) => {
       setProcessingDiskPrune(true)
 
       const clonedCluster = cloneCluster(selectedCluster)
-      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, UIElements.pruneCommand)
+      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, UIElements.pruneCommand, false)
       await fetchDiskStats()
     } catch (err) {
       enqueueSnackbar('Failed to clear docker system.', { variant: 'error' })
@@ -117,15 +118,24 @@ const DockerView = ({ sx }: Props) => {
       setErrorDiskStats('')
 
       const clonedCluster = cloneCluster(selectedCluster)
-      let output = await window.electronAPI.invoke(
+
+      const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
-        UIElements.fetchCommand
+        UIElements.fetchCommand,
+        false
       )
-      output = output.split('}').join('},').slice(0, -1)
-      output = `[${output}]`
 
-      const stats = JSON.parse(output)
+      if (output.error || output.stderr) {
+        throw output.error || output.stderr
+      }
+
+      let stringOutput = output.stdout?.toString().trim() || ''
+
+      stringOutput = stringOutput.split('}').join('},').slice(0, -1)
+      stringOutput = `[${stringOutput}]`
+
+      const stats = JSON.parse(stringOutput)
       setDiskStats(stats)
     } catch (err) {
       setErrorDiskStats('Failed to fetch docker stats')

@@ -4,6 +4,7 @@ import Endpoints from 'constants/Endpoints'
 import Commands from 'main/Clusters/MicroK8s/MicroK8s.commands'
 import { OSType } from 'models/AppSysInfo'
 import { cloneCluster } from 'models/Cluster'
+import { ShellResponse } from 'models/ShellResponse'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
@@ -40,7 +41,6 @@ const MicroK8sView = ({ sx }: Props) => {
 
       const clonedCluster = cloneCluster(selectedCluster)
 
-      const appSysInfo = accessSettingsState().value.appSysInfo
       let sudoPassword = accessSettingsState().value.sudoPassword
 
       if (!sudoPassword) {
@@ -54,11 +54,17 @@ const MicroK8sView = ({ sx }: Props) => {
 
       const password = decryptPassword(sudoPassword)
 
-      let command = `echo '${password}' | sudo -S ${Commands.MICROK8S_REMOVE}`
-      if (appSysInfo.osType === OSType.Windows) {
-        command = `wsl bash -ic "${command}"`
+      const command = `echo '${password}' | sudo -S ${Commands.MICROK8S_REMOVE}`
+      const output: ShellResponse = await window.electronAPI.invoke(
+        Channels.Shell.ExecuteCommand,
+        clonedCluster,
+        command
+      )
+
+      const stringError = output.stderr?.toString().trim() || ''
+      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
+        throw stringError
       }
-      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, command)
     } catch (err) {
       enqueueSnackbar('Failed to remove microK8s.', { variant: 'error' })
     }

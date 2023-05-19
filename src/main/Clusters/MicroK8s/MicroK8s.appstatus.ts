@@ -8,13 +8,13 @@ const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
   script = `
       if [[ ! -f '/snap/bin/microk8s' ]]; then
         echo 'MicroK8s is not installed' >&2;
-        ${type !== 'Windows_NT' && 'exit 1;'}
+        ${type !== 'Windows_NT' ? 'exit 1;' : ''}
       elif ${microk8sPrefix}microk8s status 2>/dev/null | grep -q 'microk8s is not running'; then
         echo 'MicroK8s not configured' >&2;
-        ${type !== 'Windows_NT' && 'exit 1;'}
+        ${type !== 'Windows_NT' ? 'exit 1;' : ''}
       else
         ${script}
-        ${type !== 'Windows_NT' && 'exit 0;'}
+        ${type !== 'Windows_NT' ? 'exit 0;' : ''}
       fi
     `
 
