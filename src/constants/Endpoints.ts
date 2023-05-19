@@ -17,7 +17,7 @@ const Endpoints = {
     ENGINE_ENV_DEFAULT: 'https://raw.githubusercontent.com/etherealengine/etherealengine/dev/.env.local.default',
     MINIKUBE_LINUX_SCRIPT:
       'https://raw.githubusercontent.com/etherealengine/etherealengine-control-center/master/assets/scripts/configure-minikube-linux.sh',
-      MICROK8S_LINUX_SCRIPT:
+    MICROK8S_LINUX_SCRIPT:
       'https://raw.githubusercontent.com/etherealengine/etherealengine-control-center/master/assets/scripts/configure-microk8s-linux.sh',
     MICROK8S_MACOS_SCRIPT:
       'https://raw.githubusercontent.com/etherealengine/etherealengine-control-center/master/assets/scripts/configure-microk8s-macos.sh',

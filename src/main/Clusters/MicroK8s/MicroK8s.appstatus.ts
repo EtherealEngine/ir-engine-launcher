@@ -113,8 +113,8 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
         }
         `
         : microk8sDependantScript(
-          type === 'Darwin' ?
-              `
+            type === 'Darwin'
+              ? `
               if grep 'local.etherealengine.org' /etc/hosts; then
                   if grep '127.0.0.1 local.etherealengine.org' /etc/hosts; then
                       echo '*.etherealengine.org entries exists'
@@ -128,7 +128,7 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
                 exit 1;
               fi
             `
-            : `
+              : `
         if grep -q 'local.etherealengine.org' /etc/hosts; then
             if grep -q '127.0.0.1 local.etherealengine.org' /etc/hosts; then
                 echo '*.etherealengine.org entries exists'
