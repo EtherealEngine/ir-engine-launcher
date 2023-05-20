@@ -11,14 +11,14 @@ export const getClusters = async () => {
   const clusters = ((await getValue('clusters')) || []) as ClusterModel[]
 
   for (const cluster of clusters) {
-    cluster.configs = await processConfigs(cluster.configs)
+    cluster.configs = await processConfigs(cluster.type, cluster.configs)
     cluster.variables = await processVariables(cluster.type, cluster.configs, cluster.variables)
   }
 
   return clusters
 }
 
-export const processConfigs = async (clusterConfigs: Record<string, string> = {}) => {
+export const processConfigs = async (_clusterType: ClusterType, clusterConfigs: Record<string, string> = {}) => {
   if (!clusterConfigs[Storage.ENGINE_PATH]) {
     clusterConfigs[Storage.ENGINE_PATH] = await getEngineDefaultPath()
   }
@@ -28,6 +28,7 @@ export const processConfigs = async (clusterConfigs: Record<string, string> = {}
   if (!clusterConfigs[Storage.ENABLE_RIPPLE_STACK]) {
     clusterConfigs[Storage.ENABLE_RIPPLE_STACK] = 'false'
   }
+
   return clusterConfigs
 }
 

@@ -78,33 +78,20 @@ class Shell {
     }
   }
 
-  static executeCommand = async (window: BrowserWindow, cluster: ClusterModel, command: string) => {
+  static executeCommand = async (
+    window: BrowserWindow,
+    cluster: ClusterModel,
+    command: string,
+    isLinuxCommand: boolean = true
+  ) => {
     const category = 'execute command'
     try {
-      const output = await new Promise((resolve, reject) => {
-        execStream(
-          command,
-          (data: any) => {
-            const stringData = typeof data === 'string' ? data.trim() : data
-            window.webContents.send(Channels.Utilities.Log, cluster.id, {
-              category,
-              message: stringData
-            } as LogModel)
+      const output = await exec(command, isLinuxCommand)
 
-            resolve(stringData)
-          },
-          (data: any) => {
-            const stringData = typeof data === 'string' ? data.trim() : data
-            window.webContents.send(Channels.Utilities.Log, cluster.id, {
-              category,
-              message: stringData
-            } as LogModel)
-
-            if (stringData.toLowerCase().includes('error') || stringData.toLowerCase().includes('is not installed'))
-              reject(stringData)
-          }
-        )
-      })
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category,
+        message: JSON.stringify(output)
+      } as LogModel)
 
       return output
     } catch (err) {

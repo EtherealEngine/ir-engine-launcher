@@ -1,6 +1,7 @@
 import { hookstate, useHookstate } from '@hookstate/core'
 import Channels from 'constants/Channels'
 import { cloneCluster, ClusterModel } from 'models/Cluster'
+import { KubeconfigType, KubeContext } from 'models/Kubeconfig'
 import { AdditionalLogType } from 'models/Log'
 import { Workloads, WorkloadsPodInfo } from 'models/Workloads'
 
@@ -21,7 +22,7 @@ const state = hookstate<WorkloadsState[]>([])
 
 store.receptors.push((action: WorkloadsActionType): void => {
   switch (action.type) {
-    case 'FETCH_WORKLOADS': {
+    case 'GET_WORKLOADS': {
       const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
       if (index !== -1) {
         state[index].isLoading.set(true)
@@ -64,7 +65,24 @@ export const WorkloadsService = {
     const dispatch = useDispatch()
     dispatch(WorkloadsAction.setWorkloads(clusterId, [], ''))
   },
-  fetchWorkloads: async (cluster: ClusterModel) => {
+  getKubeContexts: async (type: KubeconfigType, typeValue?: string) => {
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    try {
+      const contexts: KubeContext[] = await window.electronAPI.invoke(
+        Channels.Workloads.GetKubeContexts,
+        type,
+        typeValue
+      )
+      return contexts
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to get kube contexts. ${error}`, {
+        variant: 'error'
+      })
+      return []
+    }
+  },
+  getWorkloads: async (cluster: ClusterModel) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
@@ -72,9 +90,9 @@ export const WorkloadsService = {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
     const dispatch = useDispatch()
     try {
-      dispatch(WorkloadsAction.fetchWorkloads(clonedCluster.id))
+      dispatch(WorkloadsAction.getWorkloads(clonedCluster.id))
 
-      let workloads: Workloads[] = await window.electronAPI.invoke(Channels.Workloads.FetchWorkloads, clonedCluster)
+      let workloads: Workloads[] = await window.electronAPI.invoke(Channels.Workloads.GetWorkloads, clonedCluster)
       const allPods: WorkloadsPodInfo[] = []
       for (const item of workloads) {
         allPods.push(...item.pods)
@@ -89,13 +107,32 @@ export const WorkloadsService = {
         ...workloads
       ]
 
-      dispatch(WorkloadsAction.setWorkloads(cluster.id, workloads, ''))
+      dispatch(WorkloadsAction.setWorkloads(clonedCluster.id, workloads, ''))
     } catch (error) {
       console.error(error)
-      enqueueSnackbar(`Failed to fetch Workloads. ${error}`, {
+      enqueueSnackbar(`Failed to get Workloads. ${error}`, {
         variant: 'error'
       })
-      dispatch(WorkloadsAction.setWorkloads(cluster.id, [], error.message))
+      dispatch(WorkloadsAction.setWorkloads(clonedCluster.id, [], error.message))
+    }
+  },
+  checkReleaseName: async (releaseName: string, currentContext: string, type: KubeconfigType, typeValue?: string) => {
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    try {
+      const contexts: KubeContext[] = await window.electronAPI.invoke(
+        Channels.Workloads.CheckReleaseName,
+        releaseName,
+        currentContext,
+        type,
+        typeValue
+      )
+      return contexts
+    } catch (error) {
+      console.error(error)
+      enqueueSnackbar(`Failed to check release name. ${error}`, {
+        variant: 'error'
+      })
+      throw error
     }
   },
   removePod: async (cluster: ClusterModel, podName: string) => {
@@ -107,7 +144,7 @@ export const WorkloadsService = {
     try {
       await window.electronAPI.invoke(Channels.Workloads.RemovePod, clonedCluster, podName)
 
-      await WorkloadsService.fetchWorkloads(clonedCluster)
+      await WorkloadsService.getWorkloads(clonedCluster)
     } catch (error) {
       console.error(error)
       enqueueSnackbar(`Failed to remove workload pod ${podName}. ${error}`, {
@@ -146,9 +183,9 @@ export const WorkloadsService = {
 
 //Action
 export const WorkloadsAction = {
-  fetchWorkloads: (clusterId: string) => {
+  getWorkloads: (clusterId: string) => {
     return {
-      type: 'FETCH_WORKLOADS' as const,
+      type: 'GET_WORKLOADS' as const,
       clusterId
     }
   },
