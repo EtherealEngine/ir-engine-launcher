@@ -21,3 +21,9 @@ export const decryptPassword = (encryptedPassword: string) => {
 
   return ''
 }
+
+export const toTitleCase = (inputString: string) => {
+  return inputString.replace(/\w\S*/g, (text: string) => {
+    return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase()
+  })
+}

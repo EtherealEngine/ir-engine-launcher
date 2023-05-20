@@ -179,6 +179,20 @@ const theme = createTheme({
     //     // },
     //   }
     // },
+    MuiCircularProgress: {
+      styleOverrides: {
+        root: {
+          color: 'var(--textColor)'
+        }
+      }
+    },
+    MuiLinearProgress: {
+      styleOverrides: {
+        root: {
+          color: 'var(--textColor)'
+        }
+      }
+    },
     MuiIconButton: {
       styleOverrides: {
         root: {
@@ -188,21 +202,21 @@ const theme = createTheme({
           },
           '&.Mui-disabled': {
             color: 'var(--textColor)',
-            opacity: 0.3
+            opacity: 0.5
           }
         },
         colorPrimary: {
           backgroundColor: 'transparent',
           color: 'var(--textColor)',
           '&:hover': {
-            opacity: '0.7'
+            opacity: 0.7
           }
         },
         colorSecondary: {
           backgroundColor: 'transparent',
           color: 'var(--textColor)',
           '&:hover': {
-            opacity: '0.7'
+            opacity: 0.7
           }
         }
       }
@@ -234,6 +248,8 @@ const theme = createTheme({
     MuiMenuItem: {
       styleOverrides: {
         root: {
+          color: 'var(--textColor)',
+
           '&:hover': {
             backgroundColor: 'var(--dropdownMenuHoverBackground)'
           },
@@ -365,6 +381,27 @@ const theme = createTheme({
         }
       }
     },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'var(--panelBackground)'
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        head: {
+          background: 'var(--tableHeaderBackground)',
+          color: 'var(--textColor)',
+          borderBottom: '2px solid var(--mainBackground)'
+        },
+        body: {
+          background: 'var(--tableCellBackground)',
+          borderBottom: '1px solid var(--mainBackground)',
+          color: 'var(--textColor)'
+        }
+      }
+    },
     // MuiListItemText: {
     //   styleOverrides: {
     //     root: {
@@ -465,7 +502,7 @@ const theme = createTheme({
 
           '&.Mui-disabled': {
             color: 'var(--textColor)',
-            opacity: 0.3
+            opacity: 0.5
           }
         },
         //@ts-ignore
@@ -483,7 +520,7 @@ const theme = createTheme({
             backgroundColor: 'transparent',
             borderColor: 'var(--buttonOutlined)',
             color: 'var(--textColor)',
-            opacity: 0.3
+            opacity: 0.5
           }
         },
         contained: {
@@ -495,7 +532,10 @@ const theme = createTheme({
           },
           '&:disabled': {
             backgroundColor: 'var(--buttonFilled)',
-            opacity: 0.3
+            opacity: 0.5
+          },
+          '&:disabled.MuiLoadingButton-root': {
+            opacity: 0.9
           }
         },
         outlinedPrimary: {
@@ -504,7 +544,7 @@ const theme = createTheme({
           },
           '&:disabled': {
             boxShadow: '0 0 10px var(--buttonOutlined)',
-            opacity: 0.3
+            opacity: 0.5
           }
         },
         outlinedSecondary: {
@@ -513,7 +553,7 @@ const theme = createTheme({
           },
           '&:disabled': {
             boxShadow: '0 0 10px var(--buttonOutlined)',
-            opacity: 0.3
+            opacity: 0.5
           }
         }
       }

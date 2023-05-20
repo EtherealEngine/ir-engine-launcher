@@ -2,7 +2,7 @@ import React from 'react'
 
 export type AppModel = {
   id: string
-  name: string
+  name: React.ReactNode
   description?: React.ReactNode
   checkCommand: string
   isLinuxCommand: boolean

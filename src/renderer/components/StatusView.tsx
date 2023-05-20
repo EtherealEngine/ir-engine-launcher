@@ -1,10 +1,29 @@
+import { delay } from 'common/UtilitiesManager'
+import Channels from 'constants/Channels'
+import Storage from 'constants/Storage'
 import { AppModel, AppStatus } from 'models/AppStatus'
+import { cloneCluster, ClusterModel } from 'models/Cluster'
+import { ShellResponse } from 'models/ShellResponse'
 import { Fragment, useState } from 'react'
+import { accessConfigFileState } from 'renderer/services/ConfigFileService'
+import { DeploymentService } from 'renderer/services/DeploymentService'
+import { accessSettingsState } from 'renderer/services/SettingsService'
 
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import ConstructionIcon from '@mui/icons-material/Construction'
 import RemoveCircleOutlineRoundedIcon from '@mui/icons-material/RemoveCircleOutlineRounded'
-import { Box, CircularProgress, FormControlLabel, Grid, Switch, SxProps, Theme, Typography } from '@mui/material'
+import {
+  Box,
+  CircularProgress,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Switch,
+  SxProps,
+  Theme,
+  Typography
+} from '@mui/material'
 import { Variant } from '@mui/material/styles/createTypography'
 
 import InfoTooltip from '../common/InfoTooltip'
@@ -16,6 +35,10 @@ interface Props {
 
 const StatusView = ({ statuses, title }: Props) => {
   const [showStatus, setShowStatus] = useState(true)
+
+  if (!statuses) {
+    statuses = []
+  }
 
   const checking = statuses.find((status) => status.status === AppStatus.Checking)
   const allConfigured = statuses.every((status) => status.status === AppStatus.Configured)
@@ -87,9 +110,12 @@ interface StatusViewItemProps {
   titleVariant?: Variant
   verticalAlignTop?: boolean
   titleSx?: SxProps<Theme>
+  sx?: SxProps<Theme>
 }
 
-export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx }: StatusViewItemProps) => {
+export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx, sx }: StatusViewItemProps) => {
+  const [isFixing, setFixing] = useState(false)
+
   return (
     <Grid
       item
@@ -100,7 +126,8 @@ export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx
         display: 'flex',
         alignItems: verticalAlignTop ? undefined : 'center',
         flexDirection: 'row',
-        marginBottom: 2
+        marginBottom: 2,
+        ...sx
       }}
     >
       {status.status === AppStatus.Checking && <CircularProgress size={20} />}
@@ -109,14 +136,80 @@ export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx
       {status.status === AppStatus.Pending && <RemoveCircleOutlineRoundedIcon />}
 
       <Box marginLeft={1} sx={titleSx}>
-        <Typography variant={titleVariant}>{status.name}</Typography>
+        {typeof status.name === 'string' && <Typography variant={titleVariant}>{status.name}</Typography>}
+        {typeof status.name !== 'string' && status.name}
 
         {status.description && <Typography variant="body2">{status.description}</Typography>}
       </Box>
 
       {status.detail && <InfoTooltip sx={titleSx} message={status.detail} />}
+
+      {status.status === AppStatus.NotConfigured && (status.id === 'mysql' || status.id === 'fileserver') && (
+        <>
+          {isFixing && <CircularProgress size={20} sx={{ ml: 2 }} />}
+          {isFixing === false && (
+            <IconButton
+              title={`Fix ${status.name}`}
+              color="primary"
+              sx={{ ml: 2 }}
+              onClick={() => onFix(status, setFixing)}
+            >
+              <ConstructionIcon sx={{ fill: '#ff8c00' }} />
+            </IconButton>
+          )}
+        </>
+      )}
     </Grid>
   )
+}
+
+const onFix = async (appStatus: AppModel, setFixing: React.Dispatch<React.SetStateAction<boolean>>) => {
+  // Here we are cloning cluster object so that when selected Cluster is changed,
+  // The context cluster does not change.
+  const selectedCluster = accessConfigFileState().value.selectedCluster
+  if (!selectedCluster) {
+    return
+  }
+
+  setFixing(true)
+
+  const clonedCluster = cloneCluster(selectedCluster)
+
+  if (appStatus.id === 'mysql') {
+    await processOnFix(appStatus, clonedCluster, async () => {
+      const command = `cd '${clonedCluster.configs[Storage.ENGINE_PATH]}' && npm run dev-docker`
+
+      const output: ShellResponse = await window.electronAPI.invoke(
+        Channels.Shell.ExecuteCommand,
+        clonedCluster,
+        command
+      )
+      if (output.error) {
+        throw output.error
+      }
+    })
+  } else if (appStatus.id === 'fileserver') {
+    await processOnFix(appStatus, clonedCluster, async () => {
+      await window.electronAPI.invoke(Channels.Engine.StartFileServer, clonedCluster)
+
+      // Delay to wait for fileserver to start
+      await delay(4000)
+    })
+  }
+
+  setFixing(false)
+}
+
+const processOnFix = async (app: AppModel, cluster: ClusterModel, callback: () => Promise<void>) => {
+  try {
+    await callback()
+
+    await DeploymentService.fetchDeploymentStatus(cluster)
+  } catch (err) {
+    console.log(err)
+    const { enqueueSnackbar } = accessSettingsState().value.notistack
+    enqueueSnackbar(`Failed to fix ${app.name}. Please try running configure wizard.`, { variant: 'error' })
+  }
 }
 
 export default StatusView

@@ -15,11 +15,7 @@ const InfoTooltip = ({ message, ml, sx }: Props) => {
   return (
     <Tooltip
       title={
-        <Typography
-          variant="body2"
-          color="inherit"
-          sx={{ overflow: 'auto', maxHeight: '350px', whiteSpace: 'pre-line' }}
-        >
+        <Typography variant="body2" sx={{ overflow: 'auto', maxHeight: '350px', whiteSpace: 'pre-line' }}>
           {message}
         </Typography>
       }

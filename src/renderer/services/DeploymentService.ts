@@ -315,6 +315,8 @@ export const DeploymentService = {
 
       await window.electronAPI.invoke(Channels.Cluster.ConfigureCluster, clonedCluster, password, flags)
 
+      await delay(2000)
+
       DeploymentService.fetchDeploymentStatus(clonedCluster)
     } catch (error) {
       console.error(error)

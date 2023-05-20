@@ -1,61 +1,50 @@
 import Endpoints from 'constants/Endpoints'
 import { AppModel, AppStatus } from 'models/AppStatus'
-import { OSType } from 'models/AppSysInfo'
 import { useEffect, useState } from 'react'
-import { SettingsService, useSettingsState } from 'renderer/services/SettingsService'
+import { SettingsService } from 'renderer/services/SettingsService'
 
 import { Box, SxProps, Theme, Typography } from '@mui/material'
 
 import { StatusViewItem } from '../StatusView'
 
 interface Props {
-  onChange: (value: boolean) => void
   sx?: SxProps<Theme>
 }
 
-const PrereqsView = ({ onChange, sx }: Props) => {
+const PrereqsView = ({ sx }: Props) => {
   const [statuses, setStatuses] = useState<AppModel[]>([])
-  const settingsState = useSettingsState()
-  const { appSysInfo } = settingsState.value
 
   useEffect(() => {
     loadPrerequisites()
   }, [])
 
   const loadPrerequisites = async () => {
-    // Callback to disable next button in dialog
-    onChange(false)
-
     // load and display prerequisites with loading status
     const initialStatuses = await SettingsService.getPrerequisites()
     setStatuses(initialStatuses)
 
     const checkedStatuses = [...initialStatuses]
 
-    for (const status of initialStatuses) {
-      // Display prerequisite with checked status
-      const checkedStatus = await SettingsService.checkPrerequisite(status)
+    await Promise.all(
+      initialStatuses.map(async (status) => {
+        // Display prerequisite with checked status
+        const checkedStatus = await SettingsService.checkPrerequisite(status)
 
-      // Add description for corrective actions to be displayed in dialog
-      if (checkedStatus.status !== AppStatus.Configured) {
-        processDescriptions(checkedStatus)
-      }
+        // Add description for corrective actions to be displayed in dialog
+        if (checkedStatus.status !== AppStatus.Configured) {
+          processDescriptions(checkedStatus)
+        }
 
-      const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
-      checkedStatuses[currentIndex] = checkedStatus
+        const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
+        checkedStatuses[currentIndex] = checkedStatus
 
-      setStatuses((prevState) => {
-        const newState = [...prevState]
-        newState[currentIndex] = checkedStatus
-        return newState
+        setStatuses((prevState) => {
+          const newState = [...prevState]
+          newState[currentIndex] = checkedStatus
+          return newState
+        })
       })
-    }
-
-    const allConfigured =
-      checkedStatuses.length > 0 && checkedStatuses.every((item) => item.status === AppStatus.Configured)
-
-    // Callback to enabled next button in dialog
-    onChange(allConfigured)
+    )
   }
 
   const processDescriptions = (status: AppModel) => {
@@ -103,10 +92,6 @@ const PrereqsView = ({ onChange, sx }: Props) => {
         </Typography>
       )
     }
-  }
-
-  if (appSysInfo.osType !== OSType.Windows) {
-    return <></>
   }
 
   return (

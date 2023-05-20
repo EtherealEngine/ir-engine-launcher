@@ -4,6 +4,7 @@ import Endpoints from 'constants/Endpoints'
 import Commands from 'main/Clusters/MicroK8s/MicroK8s.commands'
 import { OSType } from 'models/AppSysInfo'
 import { cloneCluster } from 'models/Cluster'
+import { ShellResponse } from 'models/ShellResponse'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
@@ -14,6 +15,7 @@ import { Box, CircularProgress, FormControlLabel, SxProps, Theme, Typography } f
 
 import InfoTooltip from '../../common/InfoTooltip'
 import AlertDialog from '../../dialogs/AlertDialog'
+import DockerView from './DockerView'
 
 interface Props {
   sx?: SxProps<Theme>
@@ -39,7 +41,6 @@ const MicroK8sView = ({ sx }: Props) => {
 
       const clonedCluster = cloneCluster(selectedCluster)
 
-      const appSysInfo = accessSettingsState().value.appSysInfo
       let sudoPassword = accessSettingsState().value.sudoPassword
 
       if (!sudoPassword) {
@@ -53,11 +54,17 @@ const MicroK8sView = ({ sx }: Props) => {
 
       const password = decryptPassword(sudoPassword)
 
-      let command = `echo '${password}' | sudo -S ${Commands.MICROK8S_REMOVE}`
-      if (appSysInfo.osType === OSType.Windows) {
-        command = `wsl bash -ic "${command}"`
+      const command = `echo '${password}' | sudo -S ${Commands.MICROK8S_REMOVE}`
+      const output: ShellResponse = await window.electronAPI.invoke(
+        Channels.Shell.ExecuteCommand,
+        clonedCluster,
+        command
+      )
+
+      const stringError = output.stderr?.toString().trim() || ''
+      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
+        throw stringError
       }
-      await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, command)
     } catch (err) {
       enqueueSnackbar('Failed to remove microK8s.', { variant: 'error' })
     }
@@ -99,7 +106,7 @@ const MicroK8sView = ({ sx }: Props) => {
           loading={processingMicroK8sPrune}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
               Pruning
             </Box>
           }
@@ -134,13 +141,14 @@ const MicroK8sView = ({ sx }: Props) => {
           control={<></>}
           sx={{ marginTop: 2, marginLeft: 0 }}
         />
+
         <LoadingButton
           variant="outlined"
           sx={{ marginLeft: 4, width: isOpeningRegistry ? 130 : 'auto' }}
           loading={isOpeningRegistry}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress color="inherit" size={24} sx={{ marginRight: 1 }} />
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
               Opening
             </Box>
           }
@@ -149,6 +157,8 @@ const MicroK8sView = ({ sx }: Props) => {
           Open
         </LoadingButton>
       </Box>
+
+      <DockerView />
 
       {showAlert && (
         <AlertDialog

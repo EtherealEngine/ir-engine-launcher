@@ -13,6 +13,7 @@ const Channels = {
     OpenExternal: 'OpenExternal',
     OpenPath: 'OpenPath',
     SelectFolder: 'SelectFolder',
+    SelectFile: 'SelectFile',
     Log: 'Log',
     SaveLog: 'SaveLog',
     GetPrerequisites: 'GetPrerequisites',
@@ -25,6 +26,7 @@ const Channels = {
     PushBranch: 'PushBranch'
   },
   Engine: {
+    StartFileServer: 'StartFileServer',
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
@@ -55,6 +57,14 @@ const Channels = {
     RemoveFiles: 'RemoveFiles',
     GetDefaultConfigs: 'GetDefaultConfigs',
     GetDefaultVariables: 'GetDefaultVariables'
+  },
+  Workloads: {
+    LaunchClient: 'LaunchClient',
+    CheckReleaseName: 'CheckReleaseName',
+    GetKubeContexts: 'GetKubeContexts',
+    GetWorkloads: 'GetWorkloads',
+    RemovePod: 'RemovePod',
+    GetPodLogs: 'GetPodLogs'
   }
 }
 

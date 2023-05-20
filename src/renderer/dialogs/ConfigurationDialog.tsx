@@ -41,18 +41,19 @@ const ColorlibStepIcon = (props: StepIconProps) => {
   const { active, completed, className } = props
 
   const icons: { [index: string]: React.ReactElement } = {
-    1: <AdminPanelSettingsIcon />,
-    2: <DisplaySettingsIcon />,
-    3: <AppsIcon />,
-    4: <PlaylistAddCheckIcon />
+    authenticate: <AdminPanelSettingsIcon />,
+    configs: <DisplaySettingsIcon />,
+    summary: <AppsIcon />,
+    variables: <PlaylistAddCheckIcon />
   }
 
   return (
     <ColorlibStepIconRoot ownerState={{ completed, active }} className={className}>
-      {icons[String(props.icon)]}
+      {icons[String(props.id)]}
     </ColorlibStepIconRoot>
   )
 }
+
 interface Props {
   onClose: () => void
 }
@@ -66,7 +67,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const configFileState = useConfigFileState()
   const { loading, selectedCluster } = configFileState.value
 
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStepId, setActiveStepId] = useState('authenticate')
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [password, setPassword] = useState(() => {
@@ -76,8 +77,6 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
   const [localFlags, setLocalFlags] = useState({ [Storage.FORCE_DB_REFRESH]: 'false' } as Record<string, string>)
-
-  useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
 
   if (!selectedCluster) {
     enqueueSnackbar('Please select a cluster.', { variant: 'error' })
@@ -96,7 +95,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
   }
 
   const handleNext = async () => {
-    if (activeStep === 0) {
+    if (activeStepId === 'authenticate') {
       setLoading(true)
       const sudoLoggedIn = await window.electronAPI.invoke(Channels.Shell.CheckSudoPassword, password)
       setLoading(false)
@@ -106,7 +105,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         setError('Invalid password')
         return
       }
-    } else if (activeStep === 3) {
+    } else if (activeStepId === 'summary') {
       const updatedCluster: ClusterModel = {
         ...selectedCluster,
         configs: { ...localConfigs },
@@ -131,12 +130,12 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       return
     }
 
-    setActiveStep((prevActiveStep) => prevActiveStep + 1)
+    setActiveStepId(steps[activeStep + 1].id)
     setError('')
   }
 
   const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1)
+    setActiveStepId(steps[activeStep - 1].id)
     setError('')
   }
 
@@ -168,6 +167,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
   const steps = [
     {
+      id: 'authenticate',
       label: 'Authenticate',
       title: 'Provide sudo admin password to authenticate',
       content: (
@@ -180,6 +180,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       )
     },
     {
+      id: 'configs',
       label: 'Configs',
       title: 'Provide configuration details',
       content: (
@@ -190,6 +191,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       )
     },
     {
+      id: 'variables',
       label: 'Variables',
       title: (
         <>
@@ -203,6 +205,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       content: <VarsView localVars={localVars} sx={{ marginLeft: 2, marginRight: 2 }} onChange={onChangeVar} />
     },
     {
+      id: 'summary',
       label: 'Summary',
       title: 'Review configurations before finalizing',
       content: (
@@ -216,6 +219,10 @@ const ConfigurationDialog = ({ onClose }: Props) => {
     }
   ]
 
+  const activeStep = steps.findIndex((item) => item.id === activeStepId)
+
+  useEffect(() => (contentStartRef.current as any)?.scrollTo(0, 0), [activeStep])
+
   return (
     <Dialog open fullWidth maxWidth="sm">
       {(isLoading || loading) && <LinearProgress />}
@@ -223,7 +230,9 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         <Stepper alternativeLabel activeStep={activeStep} connector={<ColorlibConnector />}>
           {steps.map((step) => (
             <Step key={step.label}>
-              <StepLabel StepIconComponent={ColorlibStepIcon}>{step.label}</StepLabel>
+              <StepLabel StepIconComponent={(prop) => <ColorlibStepIcon id={step.id} {...prop} />}>
+                {step.label}
+              </StepLabel>
             </Step>
           ))}
         </Stepper>
@@ -231,7 +240,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
       <DialogContentText sx={{ margin: 3, marginBottom: 0 }}>{steps[activeStep].title}</DialogContentText>
 
-      {steps[activeStep].label === 'Authenticate' && appSysInfo.osType === OSType.Windows && (
+      {activeStepId === 'authenticate' && appSysInfo.osType === OSType.Windows && (
         <Box ml={3} mr={3} mt={1}>
           <Typography fontSize={14}>
             Note:{' '}
@@ -242,7 +251,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
         </Box>
       )}
 
-      {steps[activeStep].label === 'Summary' && (
+      {activeStepId === 'summary' && (
         <Box ml={3} mr={3} mt={1}>
           <Typography fontSize={14}>
             Note:{' '}
@@ -277,9 +286,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
       )}
 
       {error && (
-        <DialogContentText color={'red'} sx={{ marginLeft: 5, marginRight: 5 }}>
-          Error: {error}
-        </DialogContentText>
+        <DialogContentText sx={{ marginLeft: 5, marginRight: 5, color: 'red' }}>Error: {error}</DialogContentText>
       )}
 
       <DialogContent ref={contentStartRef} sx={{ height: '27vh', marginBottom: 3 }}>
@@ -291,7 +298,7 @@ const ConfigurationDialog = ({ onClose }: Props) => {
 
           <Box sx={{ flex: '1 1 auto' }} />
 
-          <Button color="inherit" disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
+          <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mr: 1 }}>
             Back
           </Button>
           <Button onClick={handleNext}>{activeStep === steps.length - 1 ? 'Configure' : 'Next'}</Button>

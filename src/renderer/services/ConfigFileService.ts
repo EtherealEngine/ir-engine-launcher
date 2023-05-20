@@ -8,6 +8,7 @@ import { store, useDispatch } from '../store'
 import { accessDeploymentState, DeploymentService } from './DeploymentService'
 import { LogService } from './LogService'
 import { accessSettingsState } from './SettingsService'
+import { WorkloadsService } from './WorkloadsService'
 
 //State
 const state = hookstate({
@@ -59,7 +60,8 @@ export const ConfigFileService = {
       const config: ConfigFileModel = await window.electronAPI.invoke(Channels.ConfigFile.LoadConfig)
 
       for (const cluster of config.clusters) {
-        LogService.setLogs(cluster.id)
+        LogService.initLogs(cluster.id)
+        WorkloadsService.initWorkloads(cluster.id)
         await DeploymentService.getDeploymentStatus(cluster)
       }
 
@@ -106,7 +108,8 @@ export const ConfigFileService = {
 
       dispatch(ConfigFileAction.setConfig(configFile))
 
-      LogService.setLogs(cluster.id)
+      LogService.initLogs(cluster.id)
+      WorkloadsService.initWorkloads(cluster.id)
       await DeploymentService.getDeploymentStatus(cluster)
 
       return true
@@ -194,11 +197,14 @@ export const ConfigFileService = {
       })
     }
   },
-  getDefaultConfigs: async () => {
+  getDefaultConfigs: async (clusterType: ClusterType) => {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
 
     try {
-      const configs: Record<string, string> = await window.electronAPI.invoke(Channels.ConfigFile.GetDefaultConfigs)
+      const configs: Record<string, string> = await window.electronAPI.invoke(
+        Channels.ConfigFile.GetDefaultConfigs,
+        clusterType
+      )
       return configs
     } catch (error) {
       console.error(error)

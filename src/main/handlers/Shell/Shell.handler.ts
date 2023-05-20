@@ -12,8 +12,8 @@ class ShellHandler implements IBaseHandler {
     }),
       ipcMain.handle(
         Channels.Shell.ExecuteCommand,
-        async (_event: IpcMainInvokeEvent, cluster: ClusterModel, command: string) => {
-          return await Shell.executeCommand(window, cluster, command)
+        async (_event: IpcMainInvokeEvent, cluster: ClusterModel, command: string, isLinuxCommand: boolean = true) => {
+          return await Shell.executeCommand(window, cluster, command, isLinuxCommand)
         }
       ),
       ipcMain.handle(
