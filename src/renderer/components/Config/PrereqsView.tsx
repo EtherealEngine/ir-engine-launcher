@@ -95,12 +95,21 @@ const PrereqsView = ({ sx }: Props) => {
       status.description = (
         <Typography fontSize={14}>
           <span style={{ fontSize: 14, opacity: 0.6 }}>
-            Check whether the execution policy is set to allow unsigned PowerShell scripts.{' '}
+            Check whether the execution policy is set to allow unsigned PowerShell scripts.
           </span>
-          <a style={{ color: 'white' }} target="_blank" href={"https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.1"}>
+          <a style={{ color: 'white' }} target="_blank" href={Endpoints.Urls.SET_EXECUTION_POLICY}>
             Learn more
           </a>
           .
+          <br />
+          <br />
+          <br />
+          <span style={{ fontSize: 14, opacity: 0.6 }}>
+            Afterwards, if The execution policy is not set to allow unsigned PowerShell scripts, then you can do so by
+            running following command:
+          </span>
+          <br />
+          <code>Set-ExecutionPolicy Unrestricted</code>
         </Typography>
       )
     }

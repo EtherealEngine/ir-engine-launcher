@@ -127,7 +127,9 @@ class Utilities {
       }
 
       if (
-        (prerequisite.id === 'wsl' && stdOutput) || (prerequisite.id === 'ps1ExecutionPolicy' && stdOutput.includes('RemoteSigned')) ||
+        (prerequisite.id === 'wsl' && stdOutput) ||
+        (prerequisite.id === 'ps1ExecutionPolicy' &&
+          (stdOutput.includes('RemoteSigned') || stdOutput.includes('Unrestricted'))) ||
         (prerequisite.id === 'wslUbuntu' && stdOutput.includes(': Ubuntu')) ||
         ((prerequisite.id === 'dockerDesktop' || prerequisite.id === 'dockerDesktopUbuntu') &&
           stdOutput.includes('Server: Docker Desktop'))

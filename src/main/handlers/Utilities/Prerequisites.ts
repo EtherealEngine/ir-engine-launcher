@@ -5,5 +5,5 @@ export const WindowsPrerequisites: AppModel[] = [
   getAppModel('wslUbuntu', 'WSL Ubuntu Distribution', 'wsl --status;', false),
   getAppModel('dockerDesktop', 'Docker Desktop', 'docker version;', false),
   getAppModel('dockerDesktopUbuntu', 'Docker Desktop WSL Ubuntu Integration', 'wsl docker version;', false),
-  getAppModel('ps1ExecutionPolicy', 'PowerShell execution policy', 'Get-ExecutionPolicy;', false)
+  getAppModel('ps1ExecutionPolicy', 'PowerShell Execution Policy', 'Get-ExecutionPolicy;', false)
 ]
