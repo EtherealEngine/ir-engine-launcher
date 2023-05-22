@@ -414,7 +414,10 @@ const CreateClusterDialog = ({ onClose }: Props) => {
             <Button onClick={() => handleNext(true)}>Create & Configure</Button>
           )}
           <Button
-            disabled={activeStepId === 'kubeconfig' && !localConfigs[Storage.KUBECONFIG_CONTEXT]}
+            disabled={
+              (activeStepId === 'kubeconfig' && !localConfigs[Storage.KUBECONFIG_CONTEXT]) ||
+              (activeStepId === 'deployment' && !localConfigs[Storage.RELEASE_NAME])
+            }
             onClick={() => handleNext(false)}
           >
             {activeStep === steps.length - 1 ? 'Create' : 'Next'}

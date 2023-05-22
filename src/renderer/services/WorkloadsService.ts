@@ -116,12 +116,11 @@ export const WorkloadsService = {
       dispatch(WorkloadsAction.setWorkloads(clonedCluster.id, [], error.message))
     }
   },
-  checkReleaseName: async (releaseName: string, currentContext: string, type: KubeconfigType, typeValue?: string) => {
+  getReleaseNames: async (currentContext: string, type: KubeconfigType, typeValue?: string) => {
     const { enqueueSnackbar } = accessSettingsState().value.notistack
     try {
-      const contexts: KubeContext[] = await window.electronAPI.invoke(
-        Channels.Workloads.CheckReleaseName,
-        releaseName,
+      const contexts: string[] = await window.electronAPI.invoke(
+        Channels.Workloads.GetReleaseNames,
         currentContext,
         type,
         typeValue
@@ -129,7 +128,7 @@ export const WorkloadsService = {
       return contexts
     } catch (error) {
       console.error(error)
-      enqueueSnackbar(`Failed to check release name. ${error}`, {
+      enqueueSnackbar(`Failed to get release names. ${error}`, {
         variant: 'error'
       })
       throw error

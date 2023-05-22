@@ -1,16 +1,13 @@
-import { Buffer } from 'buffer'
 import Storage from 'constants/Storage'
-import { AppModel, AppStatus } from 'models/AppStatus'
+import { FetchableItem } from 'models/FetchableItem'
 import { KubeconfigType } from 'models/Kubeconfig'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import InfoTooltip from 'renderer/common/InfoTooltip'
+import LoadingPage from 'renderer/pages/LoadingPage'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { WorkloadsService } from 'renderer/services/WorkloadsService'
 
-import PowerIcon from '@mui/icons-material/Power'
-import { Box, IconButton, InputAdornment, SxProps, TextField, Theme, Typography } from '@mui/material'
-
-import InfoTooltip from '../../common/InfoTooltip'
-import { StatusViewItem } from '../StatusView'
+import { Box, FormControl, InputLabel, MenuItem, Select, SxProps, Theme, Typography } from '@mui/material'
 
 interface Props {
   localConfigs: Record<string, string>
@@ -18,105 +15,91 @@ interface Props {
   sx?: SxProps<Theme>
 }
 
+const defaultReleasesState = {
+  data: [],
+  loading: true,
+  error: ''
+}
+
 const DeploymentView = ({ localConfigs, onChange, sx }: Props) => {
+  const [releaseNames, setReleaseNames] = useState<FetchableItem<string[]>>(defaultReleasesState)
   const configFileState = useConfigFileState()
   const { loading } = configFileState.value
 
-  const [status, setStatus] = useState<AppModel>({
-    id: 'release',
-    name: (
-      <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
-        Use '<PowerIcon />' (Check Release) button to verify release
-      </Typography>
-    ),
-    checkCommand: '',
-    detail: '',
-    isLinuxCommand: false,
-    status: AppStatus.Pending
-  })
+  useEffect(() => {
+    let typeValue: string | undefined = undefined
 
-  const handleCheckRelease = async () => {
+    if (localConfigs[Storage.KUBECONFIG_PATH]) {
+      typeValue = localConfigs[Storage.KUBECONFIG_PATH]
+    } else if (localConfigs[Storage.KUBECONFIG_TEXT]) {
+      typeValue = Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT], 'base64').toString()
+    }
+
+    loadReleaseNames(typeValue)
+  }, [])
+
+  const loadReleaseNames = async (typeValue?: string) => {
     try {
-      setStatus((state) => ({ ...state, status: AppStatus.Checking, name: 'Checking release name' }))
+      setReleaseNames(defaultReleasesState)
 
-      let typeValue: string | undefined = undefined
-
-      if (localConfigs[Storage.KUBECONFIG_PATH]) {
-        typeValue = localConfigs[Storage.KUBECONFIG_PATH]
-      } else if (localConfigs[Storage.KUBECONFIG_TEXT]) {
-        typeValue = Buffer.from(localConfigs[Storage.KUBECONFIG_TEXT], 'base64').toString()
-      }
-
-      const releaseExists = await WorkloadsService.checkReleaseName(
-        localConfigs[Storage.RELEASE_NAME],
+      const releases = await WorkloadsService.getReleaseNames(
         localConfigs[Storage.KUBECONFIG_CONTEXT],
         localConfigs[Storage.KUBECONFIG_TYPE] as KubeconfigType,
         typeValue
       )
 
-      if (releaseExists) {
-        setStatus((state) => ({
-          ...state,
-          status: AppStatus.Configured,
-          name: `'${localConfigs[Storage.RELEASE_NAME]}' release exists`
-        }))
-      } else {
-        setStatus((state) => ({
-          ...state,
-          status: AppStatus.NotConfigured,
-          name: `'${localConfigs[Storage.RELEASE_NAME]}' release does not exists`
-        }))
-      }
+      setReleaseNames({
+        data: releases,
+        loading: false,
+        error: ''
+      })
     } catch (err) {
-      setStatus((state) => ({
-        ...state,
-        status: AppStatus.NotConfigured,
-        name: `Failed to check release '${localConfigs[Storage.RELEASE_NAME]}'`,
-        detail: err?.message ? err.message : err
-      }))
+      setReleaseNames({
+        data: [],
+        loading: false,
+        error: err
+      })
     }
   }
 
   return (
     <Box sx={sx}>
-      <Box display="flex" width="100%" alignItems="center">
-        <TextField
-          fullWidth
-          margin="dense"
-          size="small"
-          label="Release Name"
-          value={localConfigs[Storage.RELEASE_NAME]}
-          onChange={(event) => onChange(Storage.RELEASE_NAME, event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              handleCheckRelease()
-            }
-          }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton edge="end" title="Check Release" disabled={loading} onClick={handleCheckRelease}>
-                  <PowerIcon />
-                </IconButton>
-              </InputAdornment>
-            )
-          }}
-        />
-        <InfoTooltip
-          ml={1}
-          message={
-            <Typography variant="body2">
-              This is the name of your release in selected kubernetes deployment. It can be 'dev', 'prod', 'local', etc.
-              <br />
-              <br />
-              Release name is used to prefix the workloads in your cluster like:
-              <br />'{'{RELEASE_NAME}'}-etherealengine-client'. i.e. 'prod-etherealengine-client'
-            </Typography>
-          }
-        />
-      </Box>
+      {releaseNames.loading && <LoadingPage title="Loading release names" variant="body2" isInPage sx={{ mt: 2 }} />}
 
-      <StatusViewItem titleVariant="body2" titleSx={{ mt: 0.5 }} sx={{ mt: 2 }} status={status} />
+      {!releaseNames.loading && (
+        <Box display="flex" width="100%" alignItems="center">
+          <FormControl fullWidth margin="dense" size="small" disabled={loading || releaseNames.data.length === 0}>
+            <InputLabel id="release-names-label">Release Name</InputLabel>
+            <Select
+              labelId="release-names-label"
+              label="Release Name"
+              value={localConfigs[Storage.RELEASE_NAME]}
+              onChange={(event) => {
+                onChange(Storage.RELEASE_NAME, event.target.value)
+              }}
+            >
+              {releaseNames.data.map((item) => (
+                <MenuItem key={item} value={item}>
+                  {item}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <InfoTooltip
+            ml={1}
+            message={
+              <Typography variant="body2">
+                This is the name of your release in selected kubernetes deployment. It can be 'dev', 'prod', 'local',
+                etc.
+                <br />
+                <br />
+                Release name is used to prefix the workloads in your cluster like:
+                <br />'{'{RELEASE_NAME}'}-etherealengine-client'. i.e. 'prod-etherealengine-client'
+              </Typography>
+            }
+          />
+        </Box>
+      )}
     </Box>
   )
 }
