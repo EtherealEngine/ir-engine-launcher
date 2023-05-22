@@ -60,7 +60,7 @@ const Channels = {
   },
   Workloads: {
     LaunchClient: 'LaunchClient',
-    CheckReleaseName: 'CheckReleaseName',
+    GetReleaseNames: 'GetReleaseNames',
     GetKubeContexts: 'GetKubeContexts',
     GetWorkloads: 'GetWorkloads',
     RemovePod: 'RemovePod',

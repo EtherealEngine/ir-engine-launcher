@@ -154,6 +154,24 @@ export const getPodsData = async (
   }
 }
 
+export const getDeployments = async (k8AppsClient: k8s.AppsV1Api, labelSelector: string) => {
+  try {
+    const deploymentsResponse = await k8AppsClient.listNamespacedDeployment(
+      'default',
+      undefined,
+      false,
+      undefined,
+      undefined,
+      labelSelector
+    )
+
+    return deploymentsResponse
+  } catch (err) {
+    log.error('Failed to get deployments info.', err)
+    return undefined
+  }
+}
+
 const getWorkloadsPodsInfo = (items: k8s.V1Pod[]) => {
   return items.map((item) => {
     return getWorkloadsPodInfo(item)
