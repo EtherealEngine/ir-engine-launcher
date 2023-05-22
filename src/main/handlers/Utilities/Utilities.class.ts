@@ -103,7 +103,7 @@ class Utilities {
         return WindowsPrerequisites
       }
     } catch (err) {
-      log.error('Failed to get pre requisites.', err)
+      log.error('Failed to get prerequisites.', err)
     }
 
     return []
@@ -129,12 +129,16 @@ class Utilities {
       if (
         (prerequisite.id === 'wsl' && stdOutput) ||
         (prerequisite.id === 'ps1ExecutionPolicy' &&
-          (stdOutput.includes('RemoteSigned') || stdOutput.includes('Unrestricted'))) ||
+          stdOutput.includes('Unrestricted')) ||
         (prerequisite.id === 'wslUbuntu' && stdOutput.includes(': Ubuntu')) ||
         ((prerequisite.id === 'dockerDesktop' || prerequisite.id === 'dockerDesktopUbuntu') &&
           stdOutput.includes('Server: Docker Desktop'))
       ) {
         status = AppStatus.Configured
+      }
+
+      if (prerequisite.id === 'ps1ExecutionPolicy' && !stdOutput.includes('Unrestricted')) {
+        status = AppStatus.NotConfigured
       }
 
       return {
