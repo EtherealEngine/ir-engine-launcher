@@ -21,15 +21,9 @@ class WorkloadsHandler implements IBaseHandler {
         return await Workloads.launchClient(window, cluster)
       }),
       ipcMain.handle(
-        Channels.Workloads.CheckReleaseName,
-        async (
-          _event: IpcMainInvokeEvent,
-          releaseName: string,
-          currentContext: string,
-          type: KubeconfigType,
-          typeValue: string
-        ) => {
-          return await Workloads.checkReleaseName(window, releaseName, currentContext, type, typeValue)
+        Channels.Workloads.GetReleaseNames,
+        async (_event: IpcMainInvokeEvent, currentContext: string, type: KubeconfigType, typeValue: string) => {
+          return await Workloads.getReleaseNames(window, currentContext, type, typeValue)
         }
       ),
       ipcMain.handle(

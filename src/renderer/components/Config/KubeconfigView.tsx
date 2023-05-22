@@ -107,6 +107,7 @@ const KubeconfigView = ({ localConfigs, onChange, sx }: Props) => {
       [Storage.KUBECONFIG_CONTEXT]: '',
       [Storage.KUBECONFIG_PATH]: '',
       [Storage.KUBECONFIG_TEXT]: '',
+      [Storage.RELEASE_NAME]: '',
       [Storage.KUBECONFIG_TYPE]: value
     })
 

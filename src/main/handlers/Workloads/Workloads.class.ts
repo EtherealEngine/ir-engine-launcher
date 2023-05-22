@@ -12,7 +12,7 @@ import { KubeconfigType, KubeContext } from '../../../models/Kubeconfig'
 import { LogModel } from '../../../models/Log'
 import { getHomePath } from '../../managers/PathManager'
 import Utilities from '../Utilities/Utilities.class'
-import { getConfigMap, getPodLogs, getPodsData, getWorkloads, removePod } from './Workloads-helper'
+import { getConfigMap, getDeployments, getPodLogs, getWorkloads, removePod } from './Workloads-helper'
 
 const type = os.type()
 
@@ -76,31 +76,30 @@ class Workloads {
     }
   }
 
-  static checkReleaseName = async (
+  static getReleaseNames = async (
     window: BrowserWindow,
-    releaseName: string,
     currentContext: string,
     type: KubeconfigType,
     typeValue: string
   ) => {
+    const releaseNames: string[] = []
     try {
       const kc = await Workloads._loadK8CustomConfig(type, typeValue)
       kc.setCurrentContext(currentContext)
 
-      const k8DefaultClient = kc.makeApiClient(k8s.CoreV1Api)
+      const k8AppsClient = kc.makeApiClient(k8s.AppsV1Api)
 
-      const apiPods = await getPodsData(
-        k8DefaultClient,
-        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=api,app.kubernetes.io/name=etherealengine`,
-        'api',
-        'Api'
+      const apiDeploys = await getDeployments(
+        k8AppsClient,
+        `app.kubernetes.io/component=api,app.kubernetes.io/name=etherealengine`
       )
 
-      if (apiPods.pods.length > 0) {
-        return true
+      for (const item of apiDeploys?.body.items || []) {
+        const releaseLabel = item.metadata?.labels ? item.metadata?.labels['app.kubernetes.io/instance'] : undefined
+        if (releaseLabel) {
+          releaseNames.push(releaseLabel)
+        }
       }
-
-      return false
     } catch (err) {
       log.error(JSON.stringify(err))
       window.webContents.send(Channels.Utilities.Log, type, typeValue, {
@@ -109,6 +108,8 @@ class Workloads {
       } as LogModel)
       throw err
     }
+
+    return releaseNames
   }
 
   static getWorkloads = async (window: BrowserWindow, cluster: ClusterModel) => {
