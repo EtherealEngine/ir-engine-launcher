@@ -95,21 +95,38 @@ const PrereqsView = ({ sx }: Props) => {
       status.description = (
         <Typography fontSize={14}>
           <span style={{ fontSize: 14, opacity: 0.6 }}>
+            {
+              // Check if the user agent contains PowerShell version information
+              window.navigator.userAgent.includes('PowerShell')
+                ? `Run the following command in PowerShell ${window.navigator.userAgent}:`
+                : 'Run the following command in PowerShell:'
+            }
+          </span>
+          <br />
+          <br />
+          <span style={{ fontSize: 14, opacity: 0.6 }}>
             Check whether the execution policy is set to allow unsigned PowerShell scripts.
           </span>
-          <a style={{ color: 'white' }} target="_blank" href={Endpoints.Urls.SET_EXECUTION_POLICY}>
-            Learn more
-          </a>
-          .
-          <br />
           <br />
           <br />
           <span style={{ fontSize: 14, opacity: 0.6 }}>
             Afterwards, if the execution policy is not set to allow unsigned PowerShell scripts, you can do so by
-            running the following command:
+            running the following commands:
+            <br />
+            <br />
+            <code>Get-ExecutionPolicy</code> - This command will show you the current execution policy.
+            <br />
+            <br />
+            <code>Set-ExecutionPolicy Unrestricted</code> - Use this command to set the execution policy to allow
+            unsigned PowerShell scripts.
+            <br />
+            <br />
+            Refer to the Microsoft documentation for information on PowerShell execution policies and &nbsp;
           </span>
-          <br />
-          <code>Set-ExecutionPolicy Unrestricted</code>
+          <a style={{ color: 'white' }} target="_blank" href={'#'}>
+            Learn more
+          </a>
+          .
         </Typography>
       )
     }
