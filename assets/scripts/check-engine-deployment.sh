@@ -155,6 +155,8 @@ elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REF
         fi
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
+    
+    sleep 5
 
     helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
