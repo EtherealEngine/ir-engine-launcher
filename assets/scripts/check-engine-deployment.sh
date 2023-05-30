@@ -86,6 +86,7 @@ elif [[ $CLUSTER_TYPE == 'microk8sWindows' ]]; then
         exit "$exit_status"
     fi
 elif [[ $CLUSTER_TYPE == 'minikube' ]]; then
+    export MYSQL_HOST=host.minikube.internal
     bash ./scripts/build_minikube.sh
 fi
 
