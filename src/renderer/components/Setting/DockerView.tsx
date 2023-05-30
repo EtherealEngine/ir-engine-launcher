@@ -145,16 +145,22 @@ const DockerView = ({ sx }: Props) => {
   }
 
   if (dependantStatus?.status === AppStatus.Checking) {
-    return <LoadingPage title={`Checking ${UIElements.dependantName}`} variant="body1" isInPage />
+    return (
+      <Box sx={sx}>
+        <LoadingPage title={`Checking ${UIElements.dependantName}`} variant="body1" isInPage />
+      </Box>
+    )
   } else if (dependantStatus?.status === AppStatus.NotConfigured) {
     return (
-      <ErrorPage
-        error={`${UIElements.dependantName} Not Configured`}
-        detail={`Please configure ${UIElements.dependantName} before trying again.`}
-        onRetry={() => DeploymentService.fetchDeploymentStatus(selectedCluster)}
-        variant="body1"
-        isInPage
-      />
+      <Box sx={sx}>
+        <ErrorPage
+          error={`${UIElements.dependantName} Not Configured`}
+          detail={`Please configure ${UIElements.dependantName} before trying again.`}
+          onRetry={() => DeploymentService.fetchDeploymentStatus(selectedCluster)}
+          variant="body1"
+          isInPage
+        />
+      </Box>
     )
   }
 
