@@ -158,7 +158,7 @@ const MicroK8sView = ({ sx }: Props) => {
         </LoadingButton>
       </Box>
 
-      <DockerView />
+      <DockerView sx={{ width: '100%', mt: 3 }} />
 
       {showAlert && (
         <AlertDialog
