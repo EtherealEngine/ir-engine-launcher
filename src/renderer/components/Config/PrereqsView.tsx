@@ -48,11 +48,11 @@ const PrereqsView = ({ sx }: Props) => {
   }
 
   const processDescriptions = (status: AppModel) => {
-    if (status.id === 'wsl' || status.id === 'wslUbuntu') {
+    if (status.id === 'wsl' || status.id === 'wslUbuntu' || status.id === 'wslUbuntuStore') {
       status.description = (
         <Typography fontSize={14}>
           <span style={{ fontSize: 14, opacity: 0.6 }}>
-            Make sure WSL is installed and Ubuntu is selected as default distribution.{' '}
+            Make sure WSL is installed and Ubuntu is selected as the default distribution.{' '}
           </span>
           <a style={{ color: 'var(--textColor)' }} target="_blank" href={Endpoints.Docs.INSTALL_WSL}>
             Install WSL
@@ -63,18 +63,30 @@ const PrereqsView = ({ sx }: Props) => {
               <br />
               <br />
               <span style={{ fontSize: 14, opacity: 0.6 }}>
-                To ensure 'Ubuntu' is set as default WSL distribution. You can check your default distribution by
-                running following command in Powershell/CMD:
+                To ensure 'Ubuntu' is set as the default WSL distribution, you can check your default distribution by
+                running the following command in PowerShell/CMD:
               </span>
               <br />
-              <code>wsl -l</code>
+              <code>wsl --list --quiet</code>
               <br />
               <br />
               <span style={{ fontSize: 14, opacity: 0.6 }}>
-                Afterwards, if Ubuntu is not selected as default, then you can do so by running following command:
+                Afterwards, if Ubuntu is not selected as the default, you can set it as the default by running the
+                following command:
               </span>
               <br />
-              <code>wsl -s Ubuntu</code>
+              <code>wsl --set-default Ubuntu</code>
+            </>
+          )}
+          {status.id === 'wslUbuntuStore' && (
+            <>
+              <br />
+              <br />
+              <span style={{ fontSize: 14, opacity: 0.6 }}>
+                To install the Ubuntu distribution from the Windows Store, you can run the following command:
+              </span>
+              <br />
+              <code>wsl --install -d Ubuntu-20.04</code>
             </>
           )}
         </Typography>
