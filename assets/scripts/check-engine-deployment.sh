@@ -22,7 +22,7 @@ cd "$ENGINE_FOLDER" || exit
 
 export MYSQL_HOST=localhost
 export MYSQL_PORT=3304
-DB_STATUS=$(npm run check-db-exists-only)
+DB_STATUS=$(npx cross-env ts-node --swc scripts/check-db-exists-only.ts)
 DB_EXISTS=false
 if [[ $DB_STATUS == *"database found"* ]]; then
     DB_EXISTS=true
@@ -42,7 +42,7 @@ else
     export MYSQL_PORT=3306
     npm run dev-docker
     npm run dev-reinit
-    npm run install-projects
+    npx ts-node --swc scripts/install-projects.js
 fi
 
 echo "Ethereal Engine docker images build starting"
