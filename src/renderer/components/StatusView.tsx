@@ -1,4 +1,3 @@
-import { delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import { AppModel, AppStatus } from 'models/AppStatus'
