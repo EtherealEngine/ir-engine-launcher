@@ -14,7 +14,6 @@ import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import Utilities from '../../handlers/Utilities/Utilities.class'
 import { executeWebViewJS } from '../../managers/BrowserManager'
-import { startFileServer } from '../../managers/FileServerManager'
 import { assetsPath, ensureConfigsFolder, ensureWindowsToWSLPath, scriptsPath } from '../../managers/PathManager'
 import { execStream, execStreamScriptFile } from '../../managers/ShellManager'
 import { ensureConfigs } from '../../managers/YamlManager'
@@ -157,8 +156,6 @@ class MicroK8s {
       if (code !== 0) {
         throw `Failed with error code ${code}.`
       }
-
-      await startFileServer(window, cluster)
     } catch (err) {
       log.error('Error in configureCluster MicroK8s.', err)
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

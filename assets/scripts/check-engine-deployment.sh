@@ -22,7 +22,7 @@ cd "$ENGINE_FOLDER" || exit
 
 export MYSQL_HOST=localhost
 export MYSQL_PORT=3304
-DB_STATUS=$(npm run check-db-exists-only)
+DB_STATUS=$(npx cross-env ts-node --swc scripts/check-db-exists-only.ts)
 DB_EXISTS=false
 if [[ $DB_STATUS == *"database found"* ]]; then
     DB_EXISTS=true
@@ -42,7 +42,7 @@ else
     export MYSQL_PORT=3306
     npm run dev-docker
     npm run dev-reinit
-    npm run install-projects
+    npx ts-node --swc scripts/install-projects.js
 fi
 
 echo "Ethereal Engine docker images build starting"
@@ -86,6 +86,7 @@ elif [[ $CLUSTER_TYPE == 'microk8sWindows' ]]; then
         exit "$exit_status"
     fi
 elif [[ $CLUSTER_TYPE == 'minikube' ]]; then
+    export MYSQL_HOST=host.minikube.internal
     bash ./scripts/build_minikube.sh
 fi
 
@@ -155,6 +156,8 @@ elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REF
         fi
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
+    
+    sleep 5
 
     helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == true ]]; then
