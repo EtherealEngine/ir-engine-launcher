@@ -41,6 +41,7 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     getAppModel('docker', 'Docker', 'docker --version;'),
     getAppModel('dockercompose', 'Docker Compose', 'docker-compose --version;'),
     getAppModel('mysql', 'MySql', 'docker top etherealengine_minikube_db;'),
+    getAppModel('minio', 'MinIO', 'docker top etherealengine_minio_s3;'),
     getAppModel('kubectl', 'kubectl', 'kubectl version --client --output=yaml;'),
     getAppModel('helm', 'Helm', 'helm version;'),
     getAppModel(
@@ -60,20 +61,6 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     ),
     getAppModel('redis', 'Redis', microk8sDependantScript(`helm status local-redis;`, microk8sPrefix)),
     getAppModel('agones', 'Agones', microk8sDependantScript(`helm status agones;`, microk8sPrefix)),
-    getAppModel(
-      'fileserver',
-      'Local File Server',
-      `
-    if lsof -Pi :8642 -sTCP:LISTEN -t >/dev/null ; then
-      echo 'File server configured:';
-      lsof -Pi :8642 -sTCP:LISTEN;
-      ${type !== 'Windows_NT' ? 'exit 0;' : ''}
-    else
-      echo 'File server not configured' >&2;
-      ${type !== 'Windows_NT' ? 'exit 1;' : ''}
-    fi
-    `
-    ),
     getAppModel(
       'hostfile',
       'Hostfile',

@@ -8,7 +8,6 @@ import Storage from '../../../constants/Storage'
 import { DeploymentAppModel } from '../../../models/AppStatus'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
-import { startFileServer } from '../../managers/FileServerManager'
 import { assetsPath, ensureConfigsFolder, isValidUrl, scriptsPath } from '../../managers/PathManager'
 import { execStream, execStreamScriptFile } from '../../managers/ShellManager'
 import { ensureConfigs } from '../../managers/YamlManager'
@@ -112,8 +111,6 @@ class Minikube {
       if (code !== 0) {
         throw `Failed with error code ${code}.`
       }
-
-      await startFileServer(window, cluster)
     } catch (err) {
       log.error('Error in configureCluster Minikube.', err)
       window.webContents.send(Channels.Utilities.Log, cluster.id, {
