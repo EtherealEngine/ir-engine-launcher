@@ -8,7 +8,6 @@ import Storage from '../../../constants/Storage'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { executeJS } from '../../managers/BrowserManager'
-import { startFileServer } from '../../managers/FileServerManager'
 import { exec } from '../../managers/ShellManager'
 
 class Engine {
@@ -117,18 +116,6 @@ class Engine {
         cluster.id,
         `Failed to load admin panel. Please check logs.`
       )
-    }
-  }
-
-  static startFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
-    try {
-      await startFileServer(parentWindow, cluster)
-    } catch (err) {
-      parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
-        category: 'file server',
-        message: JSON.stringify(err)
-      } as LogModel)
-      throw err
     }
   }
 }

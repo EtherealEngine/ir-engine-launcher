@@ -21,6 +21,7 @@ export const MinikubeAppsStatus: AppModel[] = [
   getAppModel('docker', 'Docker', 'docker --version;'),
   getAppModel('dockercompose', 'Docker Compose', 'docker-compose --version;'),
   getAppModel('mysql', 'MySql', 'docker top etherealengine_minikube_db;'),
+  getAppModel('minio', 'MinIO', 'docker top etherealengine_minio_s3;'),
   getAppModel('virtualbox', 'VirtualBox', 'vboxmanage --version;'),
   getAppModel('kubectl', 'kubectl', 'kubectl version --client --output=yaml;'),
   getAppModel('helm', 'Helm', 'helm version;'),
@@ -34,20 +35,6 @@ export const MinikubeAppsStatus: AppModel[] = [
   ),
   getAppModel('redis', 'Redis', minikubeDependantScript('helm status local-redis;')),
   getAppModel('agones', 'Agones', minikubeDependantScript('helm status agones;')),
-  getAppModel(
-    'fileserver',
-    'Local File Server',
-    `
-  if lsof -Pi :8642 -sTCP:LISTEN -t >/dev/null ; then
-    echo 'File server configured:'
-    lsof -Pi :8642 -sTCP:LISTEN
-    exit 0;
-  else
-    echo 'File server not configured' >&2;
-    exit 1;
-  fi
-  `
-  ),
   getAppModel(
     'hostfile',
     'Hostfile',
