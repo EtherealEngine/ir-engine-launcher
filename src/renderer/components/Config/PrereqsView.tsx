@@ -114,11 +114,10 @@ const PrereqsView = ({ sx }: Props) => {
             running the following commands:
             <br />
             <br />
-            <code>Get-ExecutionPolicy</code> - This command will show you the current execution policy.
+            <code>Get-ExecutionPolicy</code>
             <br />
             <br />
-            <code>Set-ExecutionPolicy Unrestricted</code> - Use this command to set the execution policy to allow
-            unsigned PowerShell scripts.
+            <code>Set-ExecutionPolicy Unrestricted</code>
             <br />
             <br />
             Refer to the Microsoft documentation for information on PowerShell execution policies and &nbsp;
