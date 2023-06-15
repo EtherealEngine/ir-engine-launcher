@@ -52,7 +52,7 @@ const PrereqsView = ({ sx }: Props) => {
       status.description = (
         <Typography fontSize={14}>
           <span style={{ fontSize: 14, opacity: 0.6 }}>
-            Make sure WSL is installed and Ubuntu is selected as the default distribution.{' '}
+            Make sure WSL is installed and Ubuntu is selected as default distribution.{' '}
           </span>
           <a style={{ color: 'var(--textColor)' }} target="_blank" href={Endpoints.Docs.INSTALL_WSL}>
             Install WSL
@@ -63,30 +63,27 @@ const PrereqsView = ({ sx }: Props) => {
               <br />
               <br />
               <span style={{ fontSize: 14, opacity: 0.6 }}>
-                To ensure 'Ubuntu' is set as the default WSL distribution, you can check your default distribution by
-                running the following command in PowerShell/CMD:
+                To ensure 'Ubuntu' is set as default WSL distribution. You can check your default distribution by
+                running following command in Powershell/CMD:
               </span>
               <br />
-              <code>wsl --list --quiet</code>
+              <code>wsl -l</code>
               <br />
               <br />
               <span style={{ fontSize: 14, opacity: 0.6 }}>
-                Afterwards, if Ubuntu is not selected as the default, you can set it as the default by running the
-                following command:
+                Afterwards, if Ubuntu is not selected as default, then you can do so by running following command:
               </span>
               <br />
-              <code>wsl --set-default Ubuntu</code>
+              <code>wsl -s Ubuntu</code>
             </>
-          )}
+          )}{' '}
           {status.id === 'wslUbuntuStore' && (
             <>
               <br />
               <br />
               <span style={{ fontSize: 14, opacity: 0.6 }}>
-                To install the Ubuntu distribution from the Windows Store, you can run the following command:
+                To install the Ubuntu distribution from the Windows Store, you can refer to docs above
               </span>
-              <br />
-              <code>wsl --install -d Ubuntu-20.04</code>
             </>
           )}
         </Typography>
