@@ -130,7 +130,8 @@ class Utilities {
         (prerequisite.id === 'wsl' && stdOutput) ||
         (prerequisite.id === 'wslUbuntu' && stdOutput.includes(': Ubuntu')) ||
         ((prerequisite.id === 'dockerDesktop' || prerequisite.id === 'dockerDesktopUbuntu') &&
-          stdOutput.includes('Server: Docker Desktop'))
+          stdOutput.includes('Server: Docker Desktop')) ||
+        (prerequisite.id === 'hostname' && !stdOutput.match(/[A-Z_]/))
       ) {
         status = AppStatus.Configured
       }
