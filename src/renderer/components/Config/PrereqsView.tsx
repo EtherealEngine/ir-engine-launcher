@@ -95,7 +95,7 @@ const PrereqsView = ({ sx }: Props) => {
       status.description = (
         <Typography fontSize={14}>
           <span style={{ fontSize: 14, opacity: 0.6 }}>
-            If the hostname contains uppercase letters and an underscore, you should change it to meet the requirements.
+            If the hostname contains uppercase letters and/or underscore, you should change it to meet the requirements.
           </span>
           <br />
           <br />
@@ -108,10 +108,10 @@ const PrereqsView = ({ sx }: Props) => {
           <br />
           <br />
           <span style={{ fontSize: 14, opacity: 0.6 }}>
-            To rename Hostname you can use this command in terminal (With admin rights):
+            To rename Hostname you can use following command in PowerShell (With admin rights):
             <br />
             <br />
-            <code>Rename-Computer -NewName "New_Computer_Name"</code>
+            <code>Rename-Computer -NewName "newname"</code>
           </span>
         </Typography>
       )
