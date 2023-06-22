@@ -41,6 +41,21 @@ export const getHomePath = async () => {
   return homePath
 }
 
+export const getWSLPrefixPath = async () => {
+  let prefixPath = ''
+
+  const wslPrefixPathResponse = await exec(`wsl bash -c 'echo $WSL_DISTRO_NAME'`, false)
+
+  if (wslPrefixPathResponse.error || wslPrefixPathResponse.stderr) {
+    log.error(`Error while executing get wsl prefix path.`, wslPrefixPathResponse.error, wslPrefixPathResponse.stderr)
+    throw 'Unable to get wsl prefix path'
+  }
+
+  prefixPath = wslPrefixPathResponse.stdout!.toString().trim()
+
+  return path.join(Endpoints.Paths.WSL_PREFIX, prefixPath)
+}
+
 export const appConfigsPath = () => {
   return path.join(app.getPath('userData'), 'configs')
 }
@@ -57,9 +72,10 @@ export const filesPath = () => {
   return path.join(assetsPath(), 'files')
 }
 
-export const ensureWSLToWindowsPath = (filePath: string) => {
+export const ensureWSLToWindowsPath = async (filePath: string) => {
   if (type === 'Windows_NT') {
-    return `${Endpoints.Paths.WSL_PREFIX}${filePath.replaceAll('/', '\\')}`
+    const wslPrefixPath = await getWSLPrefixPath()
+    return path.join(wslPrefixPath, filePath.replaceAll('/', '\\'))
   }
 
   return filePath
@@ -83,7 +99,7 @@ export const ensureWindowsToWSLPath = async (filePath: string) => {
 
 export const getEnvFile = async (enginePath: string) => {
   let envContent = ''
-  enginePath = ensureWSLToWindowsPath(enginePath)
+  enginePath = await ensureWSLToWindowsPath(enginePath)
 
   // First look into .env.local
   const envPath = path.join(enginePath, Endpoints.Paths.ENGINE_ENV)

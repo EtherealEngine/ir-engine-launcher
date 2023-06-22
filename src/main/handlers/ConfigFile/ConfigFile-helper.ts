@@ -76,7 +76,7 @@ export const processVariablesFile = async (
 ) => {
   const vars: Record<string, string> = {}
 
-  const opsPath = ensureWSLToWindowsPath(clusterConfigs[Storage.OPS_PATH])
+  const opsPath = await ensureWSLToWindowsPath(clusterConfigs[Storage.OPS_PATH])
   const templateFullPath = path.join(opsPath, templatePath)
   const yamlDoc = await getYamlDoc(templateFullPath, templateUrl)
 
