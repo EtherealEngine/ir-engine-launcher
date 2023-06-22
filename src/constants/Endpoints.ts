@@ -45,7 +45,7 @@ const Endpoints = {
     VALIDATOR_TEMPLATE: 'rippled/config/validators.template.txt',
     RIPPLED_FILE: 'rippled/config/rippled.cfg',
     RIPPLED_TEMPLATE: 'rippled/config/rippled.template.cfg',
-    WSL_PREFIX: '\\\\wsl$\\Ubuntu',
+    WSL_PREFIX: '\\\\wsl$',
     FILE_SERVER: 'packages/server/upload'
   },
   Docs: {
