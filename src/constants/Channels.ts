@@ -27,6 +27,7 @@ const Channels = {
     PushBranch: 'PushBranch'
   },
   Engine: {
+    StartFileServer: 'StartFileServer',
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
