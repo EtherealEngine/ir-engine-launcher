@@ -1,4 +1,5 @@
 import Channels from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
 import { OSType } from 'models/AppSysInfo'
 import { useSnackbar } from 'notistack'
@@ -19,7 +20,6 @@ import {
 } from '@mui/material'
 
 import InfoTooltip from '../../common/InfoTooltip'
-import Endpoints from 'constants/Endpoints'
 
 interface Props {
   localConfigs: Record<string, string>
