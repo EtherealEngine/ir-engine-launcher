@@ -53,7 +53,7 @@ export const getWSLPrefixPath = async () => {
 
   prefixPath = wslPrefixPathResponse.stdout!.toString().trim()
 
-  return path.join(Endpoints.Paths.WSL_PREFIX, prefixPath)
+  return path.join(Endpoints.Paths.WSL_LOCALHOST_PREFIX, prefixPath)
 }
 
 export const appConfigsPath = () => {
