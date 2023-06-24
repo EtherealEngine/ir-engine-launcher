@@ -45,6 +45,10 @@ else
     npx ts-node --swc scripts/install-projects.js
 fi
 
+export MYSQL_HOST=localhost
+export MYSQL_PORT=3304
+npm run prepare-database
+
 echo "Ethereal Engine docker images build starting"
 export DOCKER_BUILDKIT=0
 export COMPOSE_DOCKER_CLI_BUILD=0

@@ -39,7 +39,10 @@ class UtilitiesHandler implements IBaseHandler {
         async (_event: IpcMainInvokeEvent, prerequisite: AppModel) => {
           return await Utilities.checkPrerequisite(prerequisite)
         }
-      )
+      ),
+      ipcMain.handle(Channels.Utilities.GetWSLPrefixPath, async (_event: IpcMainInvokeEvent) => {
+        return await Utilities.getWSLPrefixPath()
+      })
   }
 }
 

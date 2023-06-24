@@ -17,7 +17,8 @@ const Channels = {
     Log: 'Log',
     SaveLog: 'SaveLog',
     GetPrerequisites: 'GetPrerequisites',
-    CheckPrerequisite: 'CheckPrerequisite'
+    CheckPrerequisite: 'CheckPrerequisite',
+    GetWSLPrefixPath: 'GetWSLPrefixPath'
   },
   Git: {
     GetCurrentConfigs: 'GetCurrentConfigs',
@@ -26,6 +27,7 @@ const Channels = {
     PushBranch: 'PushBranch'
   },
   Engine: {
+    StartFileServer: 'StartFileServer',
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'

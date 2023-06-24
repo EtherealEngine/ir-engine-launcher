@@ -8,7 +8,7 @@ import Channels from '../../../constants/Channels'
 import { AppModel, AppStatus } from '../../../models/AppStatus'
 import { AppSysInfo, OSType } from '../../../models/AppSysInfo'
 import { LogModel } from '../../../models/Log'
-import { ensureWSLToWindowsPath, getHomePath } from '../../managers/PathManager'
+import { ensureWSLToWindowsPath, getHomePath, getWSLPrefixPath } from '../../managers/PathManager'
 import { cleanseString, exec } from '../../managers/ShellManager'
 import { WindowsPrerequisites } from './Prerequisites'
 
@@ -49,7 +49,7 @@ class Utilities {
 
     if (os.type() === 'Windows_NT') {
       const homePath = await getHomePath()
-      defaultPath = ensureWSLToWindowsPath(homePath)
+      defaultPath = await ensureWSLToWindowsPath(homePath)
     }
 
     const { filePaths } = await dialog.showOpenDialog({
@@ -149,6 +149,16 @@ class Utilities {
         detail: err,
         status: AppStatus.NotConfigured
       } as AppModel
+    }
+  }
+
+  static getWSLPrefixPath = async () => {
+    try {
+      return await getWSLPrefixPath()
+    } catch (err) {
+      log.error('Failed to get wsl prefix path.', err)
+
+      throw err
     }
   }
 }

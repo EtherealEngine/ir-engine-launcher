@@ -8,8 +8,8 @@ import { LogModel } from '../../../models/Log'
 import { ensureWSLToWindowsPath } from '../../managers/PathManager'
 
 class Git {
-  private static _getGit = (repoPath: string) => {
-    let enginePath = ensureWSLToWindowsPath(repoPath)
+  private static _getGit = async (repoPath: string) => {
+    let enginePath = await ensureWSLToWindowsPath(repoPath)
 
     const git: SimpleGit = simpleGit(enginePath)
     return git
@@ -21,7 +21,7 @@ class Git {
         return undefined
       }
 
-      const git = Git._getGit(repoPath)
+      const git = await Git._getGit(repoPath)
 
       const isRepo = await git.checkIsRepo(CheckRepoActions.IS_REPO_ROOT)
 
@@ -61,7 +61,7 @@ class Git {
     branch: string
   ) => {
     try {
-      const git = Git._getGit(repoPath)
+      const git = await Git._getGit(repoPath)
 
       if (branch.startsWith('remotes/')) {
         let localBranch = branch.split('/').pop()
@@ -93,7 +93,7 @@ class Git {
 
   static pullBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
-      const git = Git._getGit(repoPath)
+      const git = await Git._getGit(repoPath)
 
       await git.pull()
 
@@ -109,7 +109,7 @@ class Git {
 
   static pushBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
-      const git = Git._getGit(repoPath)
+      const git = await Git._getGit(repoPath)
 
       await git.push()
 
