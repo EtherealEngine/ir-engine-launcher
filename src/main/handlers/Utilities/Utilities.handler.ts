@@ -34,6 +34,9 @@ class UtilitiesHandler implements IBaseHandler {
       ipcMain.handle(Channels.Utilities.GetPrerequisites, async (_event: IpcMainInvokeEvent) => {
         return await Utilities.getPrerequisites()
       }),
+      ipcMain.handle(Channels.Utilities.GetPowerShellVersion, (_event: IpcMainInvokeEvent) => {
+        return Utilities.getPowerShellVersion()
+      }),
       ipcMain.handle(
         Channels.Utilities.CheckPrerequisite,
         async (_event: IpcMainInvokeEvent, prerequisite: AppModel) => {

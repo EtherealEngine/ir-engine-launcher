@@ -8,7 +8,7 @@ export const WindowsPrerequisites: AppModel[] = [
   getAppModel(
     'ps1ExecutionPolicy',
     'PowerShell Execution Policy',
-    'Get-ExecutionPolicy; $PSVersionTable.PSVersion',
+    '$env:PSModulePath = "$PSHomeModules"; Get-ExecutionPolicy;',
     false
   )
 ]

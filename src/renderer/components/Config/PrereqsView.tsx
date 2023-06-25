@@ -1,4 +1,7 @@
+import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
+import { ipcRenderer } from 'electron'
+import log from 'electron-log'
 import { AppModel, AppStatus } from 'models/AppStatus'
 import { useEffect, useState } from 'react'
 import { SettingsService } from 'renderer/services/SettingsService'
@@ -47,7 +50,7 @@ const PrereqsView = ({ sx }: Props) => {
     )
   }
 
-  const processDescriptions = (status: AppModel) => {
+  const processDescriptions = async (status: AppModel) => {
     if (status.id === 'wsl' || status.id === 'wslUbuntu') {
       status.description = (
         <Typography fontSize={14}>
@@ -92,42 +95,42 @@ const PrereqsView = ({ sx }: Props) => {
         </Typography>
       )
     } else if (status.id === 'ps1ExecutionPolicy') {
-      status.description = (
-        <Typography fontSize={14}>
-          <span style={{ fontSize: 14, opacity: 0.6 }}>
-            {
-              // Check if the user agent contains PowerShell version information
-              window.navigator.userAgent.includes('PowerShell')
-                ? `Run the following command in PowerShell ${window.navigator.userAgent}:`
-                : 'Run the following command in PowerShell:'
-            }
-          </span>
-          <br />
-          <br />
-          <span style={{ fontSize: 14, opacity: 0.6 }}>
-            Check whether the execution policy is set to allow unsigned PowerShell scripts.
-          </span>
-          <br />
-          <br />
-          <span style={{ fontSize: 14, opacity: 0.6 }}>
-            Afterwards, if the execution policy is not set to allow unsigned PowerShell scripts, you can do so by
-            running the following commands:
+      try {
+        const powerShellVersion = await ipcRenderer.invoke(Channels.Utilities.GetPowerShellVersion)
+        status.description = (
+          <Typography fontSize={14}>
+            <span style={{ fontSize: 14, opacity: 0.6 }}>
+              Use PowerShell {powerShellVersion} for the following instructions.
+            </span>
             <br />
             <br />
-            <code>Get-ExecutionPolicy</code>
+            <span style={{ fontSize: 14, opacity: 0.6 }}>
+              Check whether the execution policy is set to allow unsigned PowerShell scripts.
+            </span>
             <br />
             <br />
-            <code>Set-ExecutionPolicy Unrestricted</code>
-            <br />
-            <br />
-            Refer to the Microsoft documentation for information on PowerShell execution policies and &nbsp;
-          </span>
-          <a style={{ color: 'white' }} target="_blank" href={'#'}>
-            Learn more
-          </a>
-          .
-        </Typography>
-      )
+            <span style={{ fontSize: 14, opacity: 0.6 }}>
+              Afterwards, if the execution policy is not set to allow unsigned PowerShell scripts, you can do so by
+              running the following commands:
+              <br />
+              <br />
+              <code>Get-ExecutionPolicy</code>
+              <br />
+              <br />
+              <code>Set-ExecutionPolicy Unrestricted</code>
+              <br />
+              <br />
+              Refer to the Microsoft documentation for information on PowerShell execution policies and &nbsp;
+            </span>
+            <a style={{ color: 'white' }} target="_blank" href={'#'}>
+              Learn more
+            </a>
+            .
+          </Typography>
+        )
+      } catch (err) {
+        log.error('Failed to retrieve PowerShell version.', err)
+      }
     }
   }
 
