@@ -66,15 +66,15 @@ const PrereqsView = ({ sx }: Props) => {
               <br />
               <br />
               <span style={{ fontSize: 14, opacity: 0.6 }}>
-                To ensure 'Ubuntu' is set as the default WSL distribution, you can check your default distribution by
-                running the following command in PowerShell/CMD:
+                To ensure 'Ubuntu' is set as default WSL distribution. You can check your default distribution by
+                running following command in Powershell/CMD:
               </span>
               <br />
               <code>wsl -l</code>
               <br />
               <br />
               <span style={{ fontSize: 14, opacity: 0.6 }}>
-                Afterwards, if Ubuntu is not selected as the default, you can do so by running the following command:
+                Afterwards, if Ubuntu is not selected as default, then you can do so by running following command:
               </span>
               <br />
               <code>wsl -s Ubuntu</code>

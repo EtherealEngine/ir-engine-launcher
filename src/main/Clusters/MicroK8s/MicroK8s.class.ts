@@ -157,7 +157,7 @@ class MicroK8s {
       if (code !== 0) {
         throw `Failed with error code ${code}.`
       }
-      
+
       await startFileServer(window, cluster)
     } catch (err) {
       log.error('Error in configureCluster MicroK8s.', err)

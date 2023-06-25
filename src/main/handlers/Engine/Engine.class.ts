@@ -119,7 +119,7 @@ class Engine {
       )
     }
   }
-  
+
   static startFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
     try {
       await startFileServer(parentWindow, cluster)
