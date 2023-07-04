@@ -6,6 +6,7 @@ import { ClusterModel } from '../../../models/Cluster'
 import { GitStatus } from '../../../models/GitStatus'
 import { LogModel } from '../../../models/Log'
 import { ensureWSLToWindowsPath } from '../../managers/PathManager'
+import { pull } from './Git-helper'
 
 class Git {
   private static _getGit = async (repoPath: string) => {
@@ -93,9 +94,7 @@ class Git {
 
   static pullBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
-      const git = await Git._getGit(repoPath)
-
-      await git.pull()
+      await pull(repoPath)
 
       return true
     } catch (err) {
