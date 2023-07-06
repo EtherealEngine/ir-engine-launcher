@@ -6,7 +6,7 @@ import { ClusterModel } from '../../../models/Cluster'
 import { GitStatus } from '../../../models/GitStatus'
 import { LogModel } from '../../../models/Log'
 import { ensureWSLToWindowsPath } from '../../managers/PathManager'
-import { pull } from './Git-helper'
+import { checkout, checkoutBranch, pull } from './Git-helper'
 
 class Git {
   private static _getGit = async (repoPath: string) => {
@@ -74,19 +74,19 @@ class Git {
         const localExists = all.includes(localBranch)
 
         if (localExists) {
-          await git.checkout(localBranch)
+          await checkout(repoPath, localBranch)
         } else {
-          await git.checkoutBranch(localBranch, branch)
+          await checkoutBranch(repoPath, localBranch, branch)
         }
       } else {
-        await git.checkout(branch)
+        await checkout(repoPath, branch)
       }
 
       return true
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'git change branch',
-        message: JSON.stringify((err as GitResponseError).message)
+        message: JSON.stringify(err)
       } as LogModel)
       return false
     }
@@ -100,7 +100,7 @@ class Git {
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'git pull branch',
-        message: JSON.stringify((err as GitResponseError).message)
+        message: JSON.stringify(err)
       } as LogModel)
       return false
     }
