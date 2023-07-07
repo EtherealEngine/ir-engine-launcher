@@ -81,18 +81,19 @@ const OptionsPanel = () => {
         <Box
           sx={{ width: 35 }}
           component="img"
-          title={`${selectedCluster.name} (${selectedCluster.type === ClusterType.Minikube
-            ? 'Minikube'
-            : selectedCluster.type === ClusterType.MicroK8s
+          title={`${selectedCluster.name} (${
+            selectedCluster.type === ClusterType.Minikube
+              ? 'Minikube'
+              : selectedCluster.type === ClusterType.MicroK8s
               ? 'MicroK8s'
               : 'Undefined'
-            })`}
+          })`}
           src={
             selectedCluster.type === ClusterType.Minikube
               ? logoMinikube
               : selectedCluster.type === ClusterType.MicroK8s
-                ? logoMicrok8s
-                : logoEngine
+              ? logoMicrok8s
+              : logoEngine
           }
         />
         <Typography variant="h5" sx={{ mr: 5 }}>
