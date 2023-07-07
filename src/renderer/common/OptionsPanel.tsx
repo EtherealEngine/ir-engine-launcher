@@ -1,7 +1,7 @@
 import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import UIEnabled from 'constants/UIEnabled'
-import { AppStatus } from 'models/AppStatus'
+// import { AppStatus } from 'models/AppStatus'
 import { cloneCluster, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -18,7 +18,7 @@ import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOu
 import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined'
 import SettingsIcon from '@mui/icons-material/Settings'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material'
+import { Box, CircularProgress, IconButton, Popover, Stack, Typography } from '@mui/material'
 
 import logoEngine from '../../../assets/icon.svg'
 import logoMicrok8s from '../../../assets/icons/microk8s.png'
@@ -37,9 +37,10 @@ const OptionsPanel = () => {
   const deploymentState = useDeploymentState()
   const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
 
-  const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
-  const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
-  const allConfigured = allAppsConfigured && allEngineConfigured
+  // const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
+  // const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
+  // const allConfigured = allAppsConfigured && allEngineConfigured
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   if (!selectedCluster) {
     return <></>
@@ -62,6 +63,11 @@ const OptionsPanel = () => {
     }
 
     setLaunching(false)
+    handleClose()
+  }
+
+  const handleClose = () => {
+    setAnchorEl(null)
   }
 
   const handleDelete = async () => {
@@ -146,7 +152,7 @@ const OptionsPanel = () => {
 
       <LoadingButton
         variant="outlined"
-        disabled={!allConfigured}
+        // disabled={!allConfigured}
         sx={{ width: isLaunching ? 140 : 'auto' }}
         loading={isLaunching}
         startIcon={isLaunching ? undefined : <RocketLaunchOutlinedIcon />}
@@ -156,10 +162,35 @@ const OptionsPanel = () => {
             Launching
           </Box>
         }
-        onClick={onLaunch}
+        onClick={(event) => setAnchorEl(event.currentTarget)}
       >
         Launch
       </LoadingButton>
+
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center'
+        }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography sx={{ p: 2, color: 'black', backgroundColor: 'white' }}>
+            Please make sure to accept the certificates of the browser.
+          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 2 }}>
+            <LoadingButton variant="contained" color="primary" onClick={onLaunch}>
+              Continue
+            </LoadingButton>
+          </Box>
+        </Box>
+      </Popover>
 
       {showConfigDialog && <ConfigurationDialog onClose={() => setConfigDialog(false)} />}
 
