@@ -1,7 +1,7 @@
 import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import UIEnabled from 'constants/UIEnabled'
-// import { AppStatus } from 'models/AppStatus'
+import { AppStatus } from 'models/AppStatus'
 import { cloneCluster, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
@@ -37,9 +37,9 @@ const OptionsPanel = () => {
   const deploymentState = useDeploymentState()
   const currentDeployment = deploymentState.value.find((item) => item.clusterId === selectedClusterId)
 
-  // const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
-  // const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
-  // const allConfigured = allAppsConfigured && allEngineConfigured
+  const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
+  const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
+  const allConfigured = allAppsConfigured && allEngineConfigured
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   if (!selectedCluster) {
@@ -81,19 +81,18 @@ const OptionsPanel = () => {
         <Box
           sx={{ width: 35 }}
           component="img"
-          title={`${selectedCluster.name} (${
-            selectedCluster.type === ClusterType.Minikube
-              ? 'Minikube'
-              : selectedCluster.type === ClusterType.MicroK8s
+          title={`${selectedCluster.name} (${selectedCluster.type === ClusterType.Minikube
+            ? 'Minikube'
+            : selectedCluster.type === ClusterType.MicroK8s
               ? 'MicroK8s'
               : 'Undefined'
-          })`}
+            })`}
           src={
             selectedCluster.type === ClusterType.Minikube
               ? logoMinikube
               : selectedCluster.type === ClusterType.MicroK8s
-              ? logoMicrok8s
-              : logoEngine
+                ? logoMicrok8s
+                : logoEngine
           }
         />
         <Typography variant="h5" sx={{ mr: 5 }}>
@@ -152,7 +151,7 @@ const OptionsPanel = () => {
 
       <LoadingButton
         variant="outlined"
-        // disabled={!allConfigured}
+        disabled={!allConfigured}
         sx={{ width: isLaunching ? 140 : 'auto' }}
         loading={isLaunching}
         startIcon={isLaunching ? undefined : <RocketLaunchOutlinedIcon />}
