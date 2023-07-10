@@ -53,4 +53,3 @@ export const startFileServer = async (window: BrowserWindow, cluster: ClusterMod
     onFileServerStd
   )
 }
-	
