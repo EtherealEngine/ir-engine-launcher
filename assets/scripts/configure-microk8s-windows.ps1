@@ -5,8 +5,6 @@
 
 $wslRestart = $false;
 $dockerRestart = $false;
-$wslPath = '///wsl$/';
-$wslLocalPath = '///wsl.localhost/';
 
 #==========
 # Functions
@@ -17,6 +15,7 @@ function checkExitCode() {
         exit $LastExitCode;
     }
 }
+
 function cleanseString($inputSt) { 
     $finalString = ''
     $inputString = $inputSt -join "`n" | Out-String
@@ -30,9 +29,12 @@ function cleanseString($inputSt) {
 
     return $finalString
 }
+
 function setSafeDirectory($repoPath) {
+    $wslPath = '///wsl$/';
+    $wslLocalPath = '///wsl.localhost/';
     $distro = cleanseString(wsl bash -c 'echo $WSL_DISTRO_NAME');
-    $distro = $distro.ToString().Replace("`r`n","");
+    $distro = $distro.ToString().Trim();
 
     $localPathCommand = "git config --global --add safe.directory '%(prefix)$wslPath$distro$repoPath'";
     $localhostPathCommand = "git config --global --add safe.directory '%(prefix)$wslLocalPath$distro$repoPath'";
