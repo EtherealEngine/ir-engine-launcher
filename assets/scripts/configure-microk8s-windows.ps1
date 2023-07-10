@@ -15,6 +15,7 @@ function checkExitCode() {
         exit $LastExitCode;
     }
 }
+
 function cleanseString($inputSt) { 
     $finalString = ''
     $inputString = $inputSt -join "`n" | Out-String
@@ -27,6 +28,21 @@ function cleanseString($inputSt) {
     }
 
     return $finalString
+}
+
+function setSafeDirectory($repoPath) {
+    $wslPath = '///wsl$/';
+    $wslLocalPath = '///wsl.localhost/';
+    $distro = cleanseString(wsl bash -c 'echo $WSL_DISTRO_NAME');
+    $distro = $distro.ToString().Trim();
+
+    $localPathCommand = "git config --global --add safe.directory '%(prefix)$wslPath$distro$repoPath'";
+    $localhostPathCommand = "git config --global --add safe.directory '%(prefix)$wslLocalPath$distro$repoPath'";
+
+    Write-Host "Running git command: $localhostPathCommand";
+    Invoke-Expression "& $localhostPathCommand"
+    Write-Host "Running git command: $localPathCommand";
+    Invoke-Expression "& $localPathCommand"
 }
 
 #===========
@@ -316,6 +332,16 @@ checkExitCode;
 wsl bash -ic "`"$SCRIPTS_FOLDER/check-engine-repo.sh`" `"$ENGINE_FOLDER`" `"$OPS_FOLDER`"";
 
 checkExitCode;
+
+#=========================
+# Ensure directory is safe
+#=========================
+
+Write-Host "Marking repositories as safe directories"
+
+setSafeDirectory($ENGINE_FOLDER);
+
+setSafeDirectory($OPS_FOLDER);
 
 #============================
 # Ensure DB and Redis Running
