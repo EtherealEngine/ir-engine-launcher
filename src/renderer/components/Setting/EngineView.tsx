@@ -1,12 +1,9 @@
 import { decryptPassword, delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
-import Commands from 'main/Clusters/Minikube/Minikube.commands'
-import { ensureWSLToWindowsPath, fileExists } from 'main/managers/PathManager'
 import { cloneCluster } from 'models/Cluster'
 import { ShellResponse } from 'models/ShellResponse'
 import { useSnackbar } from 'notistack'
-import path from 'path'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
@@ -17,27 +14,52 @@ import { Box, CircularProgress, FormControlLabel, SxProps, TextField, Theme, Typ
 import Storage from '../../../constants/Storage'
 import InfoTooltip from '../../common/InfoTooltip'
 import AlertDialog from '../../dialogs/AlertDialog'
-import DockerView from './DockerView'
 
 interface Props {
   sx?: SxProps<Theme>
-  onChange: (value: string) => void
 }
 
-const EngineView = ({ sx, onChange }: Props) => {
+const EngineView = ({ sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const [showDeploymentAlert, setDeploymentAlert] = useState(false)
   const [showDatabaseAlert, setDatabaseAlert] = useState(false)
   const [showEnvAlert, setEnvAlert] = useState(false)
+  const [processingMakeAdmin, setProcessingMakeAdmin] = useState(false)
   const [processingDeploymentPrune, setProcessingDeploymentPrune] = useState(false)
   const [processingDatabaseClear, setProcessingDatabaseClear] = useState(false)
   const [processingEnvPrune, setProcessingEnvPrune] = useState(false)
+  const [adminValue, setAdminValue] = useState('')
 
   const configFileState = useConfigFileState()
   const { selectedCluster } = configFileState.value
 
   if (!selectedCluster) {
     return <></>
+  }
+
+  const onMakeAdmin = async () => {
+    try {
+      setProcessingMakeAdmin(true)
+
+      const clonedCluster = cloneCluster(selectedCluster)
+      const enginePath = clonedCluster.configs[Storage.ENGINE_PATH]
+
+      const command = `cd ${enginePath}; npm run make-user-admin -- --id=${adminValue}`
+      const output: ShellResponse = await window.electronAPI.invoke(
+        Channels.Shell.ExecuteCommand,
+        clonedCluster,
+        command
+      )
+
+      const stringError = output.stderr?.toString().trim() || ''
+      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
+        throw stringError
+      }
+    } catch (err) {
+      enqueueSnackbar('Failed to make admin.', { variant: 'error' })
+    }
+
+    setProcessingMakeAdmin(false)
   }
 
   const onPruneDeployment = async () => {
@@ -47,20 +69,7 @@ const EngineView = ({ sx, onChange }: Props) => {
 
       const clonedCluster = cloneCluster(selectedCluster)
 
-      let sudoPassword = accessSettingsState().value.sudoPassword
-
-      if (!sudoPassword) {
-        SettingsService.setAuthenticationDialog(true)
-
-        while (!sudoPassword) {
-          await delay(1000)
-          sudoPassword = accessSettingsState().value.sudoPassword
-        }
-      }
-
-      const password = decryptPassword(sudoPassword)
-
-      const command = `echo '${password}' | sudo -S helm uninstall local`
+      const command = `helm uninstall local`
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
@@ -85,20 +94,7 @@ const EngineView = ({ sx, onChange }: Props) => {
 
       const clonedCluster = cloneCluster(selectedCluster)
 
-      let sudoPassword = accessSettingsState().value.sudoPassword
-
-      if (!sudoPassword) {
-        SettingsService.setAuthenticationDialog(true)
-
-        while (!sudoPassword) {
-          await delay(1000)
-          sudoPassword = accessSettingsState().value.sudoPassword
-        }
-      }
-
-      const password = decryptPassword(sudoPassword)
-
-      const command = `echo '${password}' | sudo -S ${Commands.DATABASE_CLEAR}`
+      const command = `docker container stop etherealengine_minikube_db; docker container rm etherealengine_minikube_db; docker container prune --force; npm run dev-docker`
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
@@ -122,44 +118,38 @@ const EngineView = ({ sx, onChange }: Props) => {
       setProcessingEnvPrune(true)
 
       const clonedCluster = cloneCluster(selectedCluster)
-      const enginePath = await ensureWSLToWindowsPath(clonedCluster.configs[Storage.ENGINE_PATH])
-      let envPath = path.join(enginePath, Endpoints.Paths.ENGINE_ENV)
-      const envFileExists = await fileExists(envPath)
+      const enginePath = clonedCluster.configs[Storage.ENGINE_PATH]
+      const envPath = enginePath + '/' + Endpoints.Paths.ENGINE_ENV
 
-      if (envFileExists) {
-        let sudoPassword = accessSettingsState().value.sudoPassword
+      let sudoPassword = accessSettingsState().value.sudoPassword
 
-        if (!sudoPassword) {
-          SettingsService.setAuthenticationDialog(true)
+      if (!sudoPassword) {
+        SettingsService.setAuthenticationDialog(true)
 
-          while (!sudoPassword) {
-            await delay(1000)
-            sudoPassword = accessSettingsState().value.sudoPassword
-          }
+        while (!sudoPassword) {
+          await delay(1000)
+          sudoPassword = accessSettingsState().value.sudoPassword
         }
+      }
 
-        const password = decryptPassword(sudoPassword)
-        envPath = path.join(clonedCluster.configs[Storage.ENGINE_PATH], Endpoints.Paths.ENGINE_ENV)
+      const password = decryptPassword(sudoPassword)
 
-        const command = `echo '${password}' | sudo -S rm -f ${envPath}`
-        const output: ShellResponse = await window.electronAPI.invoke(
-          Channels.Shell.ExecuteCommand,
-          clonedCluster,
-          command
-        )
+      const command = `echo '${password}' | sudo -S rm -- ${envPath}`
+      const output: ShellResponse = await window.electronAPI.invoke(
+        Channels.Shell.ExecuteCommand,
+        clonedCluster,
+        command
+      )
 
-        const stringError = output.stderr?.toString().trim() || ''
-        if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
-          throw stringError
-        }
-      } else {
-        enqueueSnackbar("Failed to remove .env.local file: File doesn't exist.", { variant: 'error' })
+      const stringError = output.stderr?.toString().trim() || ''
+      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
+        throw stringError
       }
     } catch (err) {
       enqueueSnackbar('Failed to remove .env.local file.', { variant: 'error' })
     }
 
-    setProcessingDatabaseClear(false)
+    setProcessingEnvPrune(false)
   }
 
   return (
@@ -170,9 +160,27 @@ const EngineView = ({ sx, onChange }: Props) => {
           margin="dense"
           size="small"
           label={'FORCE MAKE ADMIN'}
-          value={''}
-          onChange={(event) => onChange(event.target.value)}
+          value={adminValue}
+          onChange={(event) => {
+            setAdminValue(event.target.value)
+          }}
         />
+        <InfoTooltip message="User ID will be added as an admin." />
+        <LoadingButton
+          variant="outlined"
+          sx={{ marginLeft: 4, width: processingMakeAdmin ? 130 : 'auto' }}
+          loading={processingMakeAdmin}
+          disabled={adminValue === ''}
+          loadingIndicator={
+            <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
+              Making
+            </Box>
+          }
+          onClick={() => onMakeAdmin()}
+        >
+          Make
+        </LoadingButton>
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
         <FormControlLabel
@@ -255,8 +263,6 @@ const EngineView = ({ sx, onChange }: Props) => {
           Prune
         </LoadingButton>
       </Box>
-
-      <DockerView sx={{ width: '100%', mt: 3 }} />
 
       {showDeploymentAlert && (
         <AlertDialog
