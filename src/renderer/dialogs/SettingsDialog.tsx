@@ -1,7 +1,9 @@
 import UIEnabled from 'constants/UIEnabled'
+import { exec } from 'main/managers/ShellManager'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
+import EngineView from 'renderer/components/Setting/EngineView'
 import MicroK8sView from 'renderer/components/Setting/MicroK8sView'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
@@ -43,6 +45,7 @@ const SettingsDialog = ({ onClose }: Props) => {
   const { appVersion } = settingsState.value.appSysInfo
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
+  const [tempAdmin, setTempAdmin] = useState('')
 
   if (!selectedCluster) {
     enqueueSnackbar('Please select a cluster.', { variant: 'error' })
@@ -72,6 +75,11 @@ const SettingsDialog = ({ onClose }: Props) => {
     setTempVars(newVars)
   }
 
+  const changeAdmin = async (value: string) => {
+    const newAdmin = value
+    setTempAdmin(newAdmin)
+  }
+
   const saveSettings = async () => {
     const updatedCluster: ClusterModel = {
       ...selectedCluster,
@@ -85,6 +93,16 @@ const SettingsDialog = ({ onClose }: Props) => {
 
     for (const key in tempVars) {
       updatedCluster.variables[key] = tempVars[key]
+    }
+
+    if (tempAdmin !== '') {
+      const command = `npm run make-user-admin -- --id=${tempAdmin}`
+      const response = await exec(command)
+      const { error } = response
+
+      if (error) {
+        throw JSON.stringify(error)
+      }
     }
 
     const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
@@ -146,6 +164,12 @@ const SettingsDialog = ({ onClose }: Props) => {
                   <MicroK8sView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
                 </TabPanel>
               )}
+              <TabPanel value="engine">
+                <EngineView
+                  onChange={changeAdmin}
+                  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
+                />
+              </TabPanel>
               <TabPanel value="backup">
                 <BackupView
                   hasPendingChanges={Object.keys(tempConfigs).length !== 0 || Object.keys(tempVars).length !== 0}
