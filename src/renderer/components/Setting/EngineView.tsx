@@ -44,7 +44,7 @@ const EngineView = ({ sx }: Props) => {
       const clonedCluster = cloneCluster(selectedCluster)
       const enginePath = clonedCluster.configs[Storage.ENGINE_PATH]
 
-      const command = `cd ${enginePath}; npm run make-user-admin -- --id=${adminValue}`
+      const command = `export MYSQL_PORT=${Endpoints.MYSQL_PORT}; cd ${enginePath}; npm run make-user-admin -- --id=${adminValue}`
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
