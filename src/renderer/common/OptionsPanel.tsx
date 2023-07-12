@@ -1,5 +1,5 @@
-import Endpoints from 'constants/Endpoints'
 import Channels from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
 import UIEnabled from 'constants/UIEnabled'
 import { AppStatus } from 'models/AppStatus'
@@ -82,18 +82,19 @@ const OptionsPanel = () => {
         <Box
           sx={{ width: 35 }}
           component="img"
-          title={`${selectedCluster.name} (${selectedCluster.type === ClusterType.Minikube
-            ? 'Minikube'
-            : selectedCluster.type === ClusterType.MicroK8s
+          title={`${selectedCluster.name} (${
+            selectedCluster.type === ClusterType.Minikube
+              ? 'Minikube'
+              : selectedCluster.type === ClusterType.MicroK8s
               ? 'MicroK8s'
               : 'Undefined'
-            })`}
+          })`}
           src={
             selectedCluster.type === ClusterType.Minikube
               ? logoMinikube
               : selectedCluster.type === ClusterType.MicroK8s
-                ? logoMicrok8s
-                : logoEngine
+              ? logoMicrok8s
+              : logoEngine
           }
         />
         <Typography variant="h5" sx={{ mr: 5 }}>
@@ -180,9 +181,14 @@ const OptionsPanel = () => {
           horizontal: 'center'
         }}
       >
-        <Box sx={{
-          display: 'flex', flexDirection: 'column', backgroundColor: 'var(--navbarBackground)', color: 'var(--textColor)'
-        }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            backgroundColor: 'var(--navbarBackground)',
+            color: 'var(--textColor)'
+          }}
+        >
           <Typography sx={{ p: 2 }}>
             Please make sure to accept the certificates of the browser.
             <br />
@@ -192,7 +198,7 @@ const OptionsPanel = () => {
               accept-invalid-certs
             </a>
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 2, }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 2 }}>
             <LoadingButton variant="contained" color="primary" onClick={onLaunch}>
               Continue
             </LoadingButton>
@@ -204,28 +210,26 @@ const OptionsPanel = () => {
 
       {showSettingsDialog && <SettingsDialog onClose={() => setSettingsDialog(false)} />}
 
-      {
-        showDeleteDialog && (
-          <AlertDialog
-            title="Confirmation"
-            message={
-              <>
-                <Typography>
-                  Are you sure you want to delete '{selectedCluster.name}' cluster and all configurations associated with
-                  it?
-                </Typography>
-                <Typography sx={{ mt: 2, fontWeight: 300 }}>
-                  <span style={{ color: 'red' }}>Note: This is an irreversible action.</span>
-                </Typography>
-              </>
-            }
-            okButtonText="Delete"
-            onClose={() => setShowDeleteDialog(false)}
-            onOk={handleDelete}
-          />
-        )
-      }
-    </Stack >
+      {showDeleteDialog && (
+        <AlertDialog
+          title="Confirmation"
+          message={
+            <>
+              <Typography>
+                Are you sure you want to delete '{selectedCluster.name}' cluster and all configurations associated with
+                it?
+              </Typography>
+              <Typography sx={{ mt: 2, fontWeight: 300 }}>
+                <span style={{ color: 'red' }}>Note: This is an irreversible action.</span>
+              </Typography>
+            </>
+          }
+          okButtonText="Delete"
+          onClose={() => setShowDeleteDialog(false)}
+          onOk={handleDelete}
+        />
+      )}
+    </Stack>
   )
 }
 
