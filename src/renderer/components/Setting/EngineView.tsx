@@ -187,8 +187,8 @@ const EngineView = ({ sx }: Props) => {
           labelPlacement="start"
           label={
             <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
-              <Typography variant="body2">REMOVE ETHEREAL ENGINE DEPLOYMENT</Typography>
-              <InfoTooltip message="This will remove current Ethereal Engine deployment from your machine." />
+              <Typography variant="body2">REMOVE ENGINE DEPLOYMENT</Typography>
+              <InfoTooltip message="This will remove current engine deployment from your machine." />
             </Box>
           }
           control={<></>}
