@@ -40,7 +40,7 @@ class Engine {
           let retry = 0
 
           do {
-            await delay(3000)
+            await delay(10000)
 
             const userRole = await executeJS(
               'function getUserRole() { return document.getElementById("user-role").innerHTML } getUserRole()',
