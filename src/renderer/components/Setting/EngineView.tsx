@@ -10,7 +10,16 @@ import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
 
 import { LoadingButton } from '@mui/lab'
-import { Box, CircularProgress, FormControlLabel, SxProps, TextField, Theme, Typography } from '@mui/material'
+import {
+  Box,
+  CircularProgress,
+  FormControlLabel,
+  InputAdornment,
+  SxProps,
+  TextField,
+  Theme,
+  Typography
+} from '@mui/material'
 
 import Storage from '../../../constants/Storage'
 import InfoTooltip from '../../common/InfoTooltip'
@@ -53,7 +62,7 @@ const EngineView = ({ sx }: Props) => {
       )
 
       const stringError = output.stderr?.toString().trim() || ''
-      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
+      if (stringError) {
         throw stringError
       }
     } catch (err) {
@@ -78,7 +87,7 @@ const EngineView = ({ sx }: Props) => {
       )
 
       const stringError = output.stderr?.toString().trim() || ''
-      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
+      if (stringError) {
         throw stringError
       }
     } catch (err) {
@@ -105,7 +114,7 @@ const EngineView = ({ sx }: Props) => {
       )
 
       const stringError = output.stderr?.toString().trim() || ''
-      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
+      if (stringError) {
         throw stringError
       }
     } catch (err) {
@@ -145,7 +154,7 @@ const EngineView = ({ sx }: Props) => {
       )
 
       const stringError = output.stderr?.toString().trim() || ''
-      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
+      if (stringError) {
         throw stringError
       }
     } catch (err) {
@@ -164,26 +173,35 @@ const EngineView = ({ sx }: Props) => {
           size="small"
           label={'FORCE MAKE ADMIN'}
           value={adminValue}
+          sx={{
+            '& .MuiInputBase-root': { paddingRight: 0 }
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <LoadingButton
+                  variant="outlined"
+                  sx={{ marginLeft: 4, width: processingMakeAdmin ? 150 : 'auto', height: 40 }}
+                  loading={processingMakeAdmin}
+                  disabled={adminValue === ''}
+                  loadingIndicator={
+                    <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
+                      <CircularProgress size={24} sx={{ marginRight: 2 }} />
+                      Making
+                    </Box>
+                  }
+                  onClick={() => onMakeAdmin()}
+                >
+                  {processingMakeAdmin ? '' : 'Make'}
+                </LoadingButton>
+              </InputAdornment>
+            )
+          }}
           onChange={(event) => {
             setAdminValue(event.target.value)
           }}
         />
-        <InfoTooltip message="User ID will be added as an admin." />
-        <LoadingButton
-          variant="outlined"
-          sx={{ marginLeft: 4, width: processingMakeAdmin ? 130 : 'auto' }}
-          loading={processingMakeAdmin}
-          disabled={adminValue === ''}
-          loadingIndicator={
-            <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
-              <CircularProgress size={24} sx={{ marginRight: 1 }} />
-              Making
-            </Box>
-          }
-          onClick={() => onMakeAdmin()}
-        >
-          Make
-        </LoadingButton>
+        <InfoTooltip sx={{ cursor: 'pointer' }} message="This will make entered User ID an admin." />
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
         <FormControlLabel
