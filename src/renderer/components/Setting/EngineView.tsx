@@ -14,6 +14,7 @@ import { Box, CircularProgress, FormControlLabel, SxProps, TextField, Theme, Typ
 import Storage from '../../../constants/Storage'
 import InfoTooltip from '../../common/InfoTooltip'
 import AlertDialog from '../../dialogs/AlertDialog'
+import Commands from 'main/Clusters/BaseCluster/BaseCluster.commands'
 
 interface Props {
   sx?: SxProps<Theme>
@@ -69,7 +70,7 @@ const EngineView = ({ sx }: Props) => {
 
       const clonedCluster = cloneCluster(selectedCluster)
 
-      const command = `helm uninstall local`
+      const command = Commands.DEPLOYMENT_PRUNE
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
@@ -94,7 +95,7 @@ const EngineView = ({ sx }: Props) => {
 
       const clonedCluster = cloneCluster(selectedCluster)
 
-      const command = `docker container stop etherealengine_minikube_db; docker container rm etherealengine_minikube_db; docker container prune --force; npm run dev-docker`
+      const command = `docker container stop etherealengine_minikube_db; docker container rm etherealengine_minikube_db; docker container prune --force; cd '${clonedCluster.configs[Storage.ENGINE_PATH]}'; npm run dev-docker`
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
