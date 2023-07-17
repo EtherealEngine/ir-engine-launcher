@@ -28,6 +28,7 @@ const Channels = {
   },
   Engine: {
     StartFileServer: 'StartFileServer',
+    StopFileServer: 'StopFileServer',
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
