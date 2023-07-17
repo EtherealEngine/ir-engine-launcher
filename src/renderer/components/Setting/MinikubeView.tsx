@@ -91,7 +91,7 @@ const MinikubeView = ({ sx }: Props) => {
         </LoadingButton>
       </Box>
 
-      <DockerView sx={{ width: '100%', mt: 3 }} />
+      <DockerView sx={{ width: '100%', mt: 2 }} />
 
       {showAlert && (
         <AlertDialog
