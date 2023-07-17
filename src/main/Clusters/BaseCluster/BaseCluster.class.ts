@@ -18,8 +18,8 @@ import { getEnvFile } from '../../managers/PathManager'
 import { exec } from '../../managers/ShellManager'
 import Commands from './BaseCluster.commands'
 
-const BATCH_LIMIT = 2
 const type = os.type()
+
 class BaseCluster {
   // #region Status Check Methods
 
@@ -42,7 +42,7 @@ class BaseCluster {
     systemApps: AppModel[],
     sysRequirements: SysRequirement[]
   ) => {
-    const batchSize = type === 'Windows_NT' ? BATCH_LIMIT : systemApps.length
+    const batchSize = type === 'Windows_NT' ? Commands.BATCH_LIMIT : systemApps.length
 
     for (let batch = 0; batch < systemApps.length; batch = batch + batchSize) {
       const currentBatch = systemApps.slice(batch, batch + batchSize)
@@ -98,7 +98,7 @@ class BaseCluster {
 
   private static _checkAppStatus = async (window: BrowserWindow, cluster: ClusterModel, apps: AppModel[]) => {
     let mandatoryConfigured = true
-    const batchSize = type === 'Windows_NT' ? BATCH_LIMIT : apps.length
+    const batchSize = type === 'Windows_NT' ? Commands.BATCH_LIMIT : apps.length
 
     for (let batch = 0; batch < apps.length; batch = batch + batchSize) {
       const currentBatch = apps.slice(batch, batch + batchSize)
@@ -154,7 +154,7 @@ class BaseCluster {
     engineApps: AppModel[],
     preRequisitesConfigured: boolean
   ) => {
-    const batchSize = type === 'Windows_NT' ? BATCH_LIMIT : engineApps.length
+    const batchSize = type === 'Windows_NT' ? Commands.BATCH_LIMIT : engineApps.length
 
     for (let batch = 0; batch < engineApps.length; batch = batch + batchSize) {
       const currentBatch = engineApps.slice(batch, batch + batchSize)

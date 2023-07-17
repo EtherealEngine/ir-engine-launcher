@@ -1,4 +1,5 @@
 import Endpoints from 'constants/Endpoints'
+import Commands from 'main/Clusters/BaseCluster/BaseCluster.commands'
 import { AppModel, AppStatus } from 'models/AppStatus'
 import { OSType } from 'models/AppSysInfo'
 import { useEffect, useState } from 'react'
@@ -26,7 +27,7 @@ const PrereqsView = ({ sx }: Props) => {
 
     const checkedStatuses = [...initialStatuses]
     const appSysInfo = accessSettingsState().value.appSysInfo
-    const batchSize = appSysInfo.osType === OSType.Windows ? 2 : initialStatuses.length
+    const batchSize = appSysInfo.osType === OSType.Windows ? Commands.BATCH_LIMIT : initialStatuses.length
 
     for (let batch = 0; batch < initialStatuses.length; batch = batch + batchSize) {
       const currentBatch = initialStatuses.slice(batch, batch + batchSize)
