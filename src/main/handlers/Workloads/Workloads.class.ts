@@ -51,12 +51,13 @@ class Workloads {
 
       const configMap = await getConfigMap(
         k8DefaultClient,
-        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=client,app.kubernetes.io/name=etherealengine`
+        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=api,app.kubernetes.io/name=etherealengine`
       )
 
-      let appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['VITE_APP_HOST']
+      let appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['CLIENT_ADDRESS']
+
       if (!appHost) {
-        appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['CLIENT_ADDRESS']
+        appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['APP_URL']
       }
 
       if (!appHost) {
