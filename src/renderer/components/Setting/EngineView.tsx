@@ -1,4 +1,3 @@
-import { decryptPassword, delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Endpoints from 'constants/Endpoints'
 import Commands from 'main/Clusters/BaseCluster/BaseCluster.commands'
@@ -7,7 +6,8 @@ import { ShellResponse } from 'models/ShellResponse'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
-import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
+import { DeploymentService } from 'renderer/services/DeploymentService'
+import { SettingsService } from 'renderer/services/SettingsService'
 
 import { LoadingButton } from '@mui/lab'
 import {
@@ -33,10 +33,12 @@ const EngineView = ({ sx }: Props) => {
   const { enqueueSnackbar } = useSnackbar()
   const [showDeploymentAlert, setDeploymentAlert] = useState(false)
   const [showDatabaseAlert, setDatabaseAlert] = useState(false)
+  const [showFileServerAlert, setFileServerAlert] = useState(false)
   const [showEnvAlert, setEnvAlert] = useState(false)
   const [processingMakeAdmin, setProcessingMakeAdmin] = useState(false)
   const [processingDeploymentPrune, setProcessingDeploymentPrune] = useState(false)
   const [processingDatabaseClear, setProcessingDatabaseClear] = useState(false)
+  const [processingFileServerStop, setProcessingFileServerStop] = useState(false)
   const [processingEnvPrune, setProcessingEnvPrune] = useState(false)
   const [adminValue, setAdminValue] = useState('')
 
@@ -123,6 +125,28 @@ const EngineView = ({ sx }: Props) => {
     setProcessingDatabaseClear(false)
   }
 
+  const onStopFileServer = async () => {
+    const clonedCluster = cloneCluster(selectedCluster)
+
+    try {
+      setFileServerAlert(false)
+      setProcessingFileServerStop(true)
+
+      const password = await SettingsService.getDecryptedSudoPassword()
+
+      await window.electronAPI.invoke(Channels.Engine.StopFileServer, clonedCluster, password)
+
+      setProcessingFileServerStop(false)
+
+      await DeploymentService.fetchDeploymentStatus(clonedCluster)
+    } catch (err) {
+      enqueueSnackbar(err?.message ? err.message : err, {
+        variant: 'error'
+      })
+      setProcessingFileServerStop(false)
+    }
+  }
+
   const onPruneEnv = async () => {
     try {
       setEnvAlert(false)
@@ -132,18 +156,7 @@ const EngineView = ({ sx }: Props) => {
       const enginePath = clonedCluster.configs[Storage.ENGINE_PATH]
       const envPath = enginePath + '/' + Endpoints.Paths.ENGINE_ENV
 
-      let sudoPassword = accessSettingsState().value.sudoPassword
-
-      if (!sudoPassword) {
-        SettingsService.setAuthenticationDialog(true)
-
-        while (!sudoPassword) {
-          await delay(1000)
-          sudoPassword = accessSettingsState().value.sudoPassword
-        }
-      }
-
-      const password = decryptPassword(sudoPassword)
+      const password = await SettingsService.getDecryptedSudoPassword()
 
       const command = `echo '${password}' | sudo -S rm -- ${envPath}`
       const output: ShellResponse = await window.electronAPI.invoke(
@@ -261,6 +274,33 @@ const EngineView = ({ sx }: Props) => {
           labelPlacement="start"
           label={
             <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
+              <Typography variant="body2">STOP FILE SERVER</Typography>
+              <InfoTooltip message="This will stop the file server associated with your deployment." />
+            </Box>
+          }
+          control={<></>}
+          sx={{ marginTop: 2, marginLeft: 0 }}
+        />
+        <LoadingButton
+          variant="outlined"
+          sx={{ marginLeft: 4, width: processingFileServerStop ? 130 : 'auto' }}
+          loading={processingFileServerStop}
+          loadingIndicator={
+            <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
+              <CircularProgress size={24} sx={{ marginRight: 1 }} />
+              Stopping
+            </Box>
+          }
+          onClick={() => setFileServerAlert(true)}
+        >
+          Stop
+        </LoadingButton>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
+        <FormControlLabel
+          labelPlacement="start"
+          label={
+            <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
               <Typography variant="body2">REMOVE .ENV.LOCAL</Typography>
               <InfoTooltip message="This will remove .env.local file from your Ethereal Engine local repo." />
             </Box>
@@ -300,6 +340,15 @@ const EngineView = ({ sx }: Props) => {
           okButtonText="Proceed"
           onClose={() => setDatabaseAlert(false)}
           onOk={onClearDatabase}
+        />
+      )}
+      {showFileServerAlert && (
+        <AlertDialog
+          title="Confirmation"
+          message="Are you sure you want to proceed? This will stop the file server associated with your deployment."
+          okButtonText="Proceed"
+          onClose={() => setFileServerAlert(false)}
+          onOk={onStopFileServer}
         />
       )}
       {showEnvAlert && (

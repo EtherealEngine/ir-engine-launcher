@@ -1,4 +1,5 @@
 import { hookstate, useHookstate } from '@hookstate/core'
+import { decryptPassword, delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
@@ -64,6 +65,21 @@ export const SettingsService = {
     const dispatch = useDispatch()
     const encryptedPassword = CryptoJS.AES.encrypt(JSON.stringify(password), Storage.PASSWORD_KEY).toString()
     dispatch(SettingsAction.setSudoPassword(encryptedPassword))
+  },
+  getDecryptedSudoPassword: async () => {
+    let sudoPassword = accessSettingsState().value.sudoPassword
+
+    if (!sudoPassword) {
+      SettingsService.setAuthenticationDialog(true)
+
+      while (!sudoPassword) {
+        await delay(1000)
+        sudoPassword = accessSettingsState().value.sudoPassword
+      }
+    }
+
+    const password = decryptPassword(sudoPassword)
+    return password
   },
   setAuthenticationDialog: (isVisible: boolean) => {
     const dispatch = useDispatch()

@@ -1,15 +1,14 @@
 import { app, BrowserWindow } from 'electron'
 import path from 'path'
-import { kill } from 'ps-node'
 
 import Channels from '../../constants/Channels'
 import Storage from '../../constants/Storage'
 import { ClusterModel } from '../../models/Cluster'
 import { LogModel } from '../../models/Log'
 import { scriptsPath } from './PathManager'
-import { execStreamScriptFile, getProcessList } from './ShellManager'
+import { exec, execStreamScriptFile, getProcessList } from './ShellManager'
 
-export const startFileServer = async (window: BrowserWindow, cluster: ClusterModel) => {
+export const startFileServer = async (window: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
   const existingServer = await getProcessList('http-server')
   if (existingServer.length > 0) {
     window.webContents.send(Channels.Utilities.Log, cluster.id, {
@@ -25,9 +24,11 @@ export const startFileServer = async (window: BrowserWindow, cluster: ClusterMod
       e.preventDefault()
 
       const existingServers = await getProcessList('http-server')
-      existingServers.forEach((httpProcess) => {
-        kill(httpProcess.pid)
-      })
+      for (const httpProcess of existingServers) {
+        if (sudoPassword) {
+          await exec(`echo '${sudoPassword}' | sudo -S kill -9 ${httpProcess.pid}`)
+        }
+      }
     } catch {}
 
     app.quit()
@@ -52,4 +53,17 @@ export const startFileServer = async (window: BrowserWindow, cluster: ClusterMod
     onFileServerStd,
     onFileServerStd
   )
+}
+
+export const stopFileServer = async (window: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
+  const existingServers = await getProcessList('http-server')
+  if (existingServers.length > 0) {
+    for (const httpProcess of existingServers) {
+      if (sudoPassword) {
+        await exec(`echo '${sudoPassword}' | sudo -S kill -9 ${httpProcess.pid}`)
+      }
+    }
+  } else {
+    throw 'No file server found.'
+  }
 }

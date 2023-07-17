@@ -6,6 +6,7 @@ import { ShellResponse } from 'models/ShellResponse'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
+import { DeploymentService } from 'renderer/services/DeploymentService'
 import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
 
 import { LoadingButton } from '@mui/lab'
@@ -32,24 +33,13 @@ const MinikubeView = ({ sx }: Props) => {
   }
 
   const onPruneMinikube = async () => {
+    const clonedCluster = cloneCluster(selectedCluster)
+
     try {
       setAlert(false)
       setProcessingMinikubePrune(true)
 
-      const clonedCluster = cloneCluster(selectedCluster)
-
-      let sudoPassword = accessSettingsState().value.sudoPassword
-
-      if (!sudoPassword) {
-        SettingsService.setAuthenticationDialog(true)
-
-        while (!sudoPassword) {
-          await delay(1000)
-          sudoPassword = accessSettingsState().value.sudoPassword
-        }
-      }
-
-      const password = decryptPassword(sudoPassword)
+      const password = await SettingsService.getDecryptedSudoPassword()
 
       const command = `echo '${password}' | sudo -S ${Commands.MINIKUBE_REMOVE}`
       const output: ShellResponse = await window.electronAPI.invoke(
@@ -62,11 +52,14 @@ const MinikubeView = ({ sx }: Props) => {
       if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
         throw stringError
       }
+
+      setProcessingMinikubePrune(false)
+
+      await DeploymentService.fetchDeploymentStatus(clonedCluster)
     } catch (err) {
       enqueueSnackbar('Failed to remove minikube.', { variant: 'error' })
+      setProcessingMinikubePrune(false)
     }
-
-    setProcessingMinikubePrune(false)
   }
 
   return (

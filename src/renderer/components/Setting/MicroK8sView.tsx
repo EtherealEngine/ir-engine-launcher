@@ -8,6 +8,7 @@ import { ShellResponse } from 'models/ShellResponse'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
+import { DeploymentService } from 'renderer/services/DeploymentService'
 import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
 
 import { LoadingButton } from '@mui/lab'
@@ -35,24 +36,13 @@ const MicroK8sView = ({ sx }: Props) => {
   }
 
   const onPruneMicroK8s = async () => {
+    const clonedCluster = cloneCluster(selectedCluster)
+
     try {
       setAlert(false)
       setProcessingMicroK8sPrune(true)
 
-      const clonedCluster = cloneCluster(selectedCluster)
-
-      let sudoPassword = accessSettingsState().value.sudoPassword
-
-      if (!sudoPassword) {
-        SettingsService.setAuthenticationDialog(true)
-
-        while (!sudoPassword) {
-          await delay(1000)
-          sudoPassword = accessSettingsState().value.sudoPassword
-        }
-      }
-
-      const password = decryptPassword(sudoPassword)
+      const password = await SettingsService.getDecryptedSudoPassword()
 
       const command = `echo '${password}' | sudo -S ${Commands.MICROK8S_REMOVE}`
       const output: ShellResponse = await window.electronAPI.invoke(
@@ -65,11 +55,14 @@ const MicroK8sView = ({ sx }: Props) => {
       if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('is not installed')) {
         throw stringError
       }
+
+      setProcessingMicroK8sPrune(false)
+
+      await DeploymentService.fetchDeploymentStatus(clonedCluster)
     } catch (err) {
       enqueueSnackbar('Failed to remove microK8s.', { variant: 'error' })
+      setProcessingMicroK8sPrune(false)
     }
-
-    setProcessingMicroK8sPrune(false)
   }
 
   const onOpenMicroK8sRegistry = async () => {
@@ -158,7 +151,7 @@ const MicroK8sView = ({ sx }: Props) => {
         </LoadingButton>
       </Box>
 
-      <DockerView sx={{ width: '100%', mt: 3 }} />
+      <DockerView sx={{ width: '100%', mt: 2 }} />
 
       {showAlert && (
         <AlertDialog

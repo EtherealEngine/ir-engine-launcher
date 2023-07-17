@@ -8,7 +8,7 @@ import Storage from '../../../constants/Storage'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { executeJS } from '../../managers/BrowserManager'
-import { startFileServer } from '../../managers/FileServerManager'
+import { startFileServer, stopFileServer } from '../../managers/FileServerManager'
 import { exec } from '../../managers/ShellManager'
 
 class Engine {
@@ -120,12 +120,24 @@ class Engine {
     }
   }
 
-  static startFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel) => {
+  static startFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
     try {
-      await startFileServer(parentWindow, cluster)
+      await startFileServer(parentWindow, cluster, sudoPassword)
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'file server',
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
+    }
+  }
+
+  static stopFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
+    try {
+      await stopFileServer(parentWindow, cluster, sudoPassword)
+    } catch (err) {
+      parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category: 'stop file server',
         message: JSON.stringify(err)
       } as LogModel)
       throw err

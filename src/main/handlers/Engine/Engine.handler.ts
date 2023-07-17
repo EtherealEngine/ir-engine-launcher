@@ -11,9 +11,18 @@ class EngineHandler implements IBaseHandler {
     ipcMain.handle(Channels.Engine.EnsureAdminAccess, async (_event: IpcMainInvokeEvent, cluster: ClusterModel) => {
       await Engine.ensureAdminAccess(window, cluster)
     }),
-      ipcMain.handle(Channels.Engine.StartFileServer, async (_event: IpcMainInvokeEvent, cluster: ClusterModel) => {
-        await Engine.startFileServer(window, cluster)
-      })
+      ipcMain.handle(
+        Channels.Engine.StartFileServer,
+        async (_event: IpcMainInvokeEvent, cluster: ClusterModel, sudoPassword?: string) => {
+          await Engine.startFileServer(window, cluster, sudoPassword)
+        }
+      ),
+      ipcMain.handle(
+        Channels.Engine.StopFileServer,
+        async (_event: IpcMainInvokeEvent, cluster: ClusterModel, sudoPassword?: string) => {
+          await Engine.stopFileServer(window, cluster, sudoPassword)
+        }
+      )
   }
 }
 

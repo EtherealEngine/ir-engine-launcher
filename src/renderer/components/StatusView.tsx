@@ -7,7 +7,7 @@ import { ShellResponse } from 'models/ShellResponse'
 import { Fragment, useState } from 'react'
 import { accessConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
-import { accessSettingsState } from 'renderer/services/SettingsService'
+import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
 
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
@@ -190,7 +190,8 @@ const onFix = async (appStatus: AppModel, setFixing: React.Dispatch<React.SetSta
     })
   } else if (appStatus.id === 'fileserver') {
     await processOnFix(appStatus, clonedCluster, async () => {
-      await window.electronAPI.invoke(Channels.Engine.StartFileServer, clonedCluster)
+      const password = await SettingsService.getDecryptedSudoPassword()
+      await window.electronAPI.invoke(Channels.Engine.StartFileServer, clonedCluster, password)
 
       // Delay to wait for fileserver to start
       await delay(4000)
