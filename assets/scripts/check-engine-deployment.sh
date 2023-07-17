@@ -140,11 +140,11 @@ if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRES
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
 
-    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == true ]]; then
     echo "Updating Ethereal Engine deployment without populating database"
 
-    helm upgrade --reuse-values --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Installing Ethereal Engine deployment with populating database"
 
