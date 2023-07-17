@@ -42,7 +42,7 @@ class BaseCluster {
     limit: number
   ) => {
     for (let batch = 0; batch < systemApps.length; batch = batch + limit) {
-      const currentBatch = systemApps.slice(batch, batch + limit);
+      const currentBatch = systemApps.slice(batch, batch + limit)
       await Promise.all(
         currentBatch.map(async (app) => {
           let status: AppModel = {
@@ -94,11 +94,16 @@ class BaseCluster {
     }
   }
 
-  private static _checkAppStatus = async (window: BrowserWindow, cluster: ClusterModel, apps: AppModel[], limit: number) => {
+  private static _checkAppStatus = async (
+    window: BrowserWindow,
+    cluster: ClusterModel,
+    apps: AppModel[],
+    limit: number
+  ) => {
     let mandatoryConfigured = true
 
     for (let batch = 0; batch < apps.length; batch = batch + limit) {
-      const currentBatch = apps.slice(batch, batch + limit);
+      const currentBatch = apps.slice(batch, batch + limit)
       await Promise.all(
         currentBatch.map(async (app) => {
           let status: AppModel = {
@@ -153,7 +158,7 @@ class BaseCluster {
     limit: number
   ) => {
     for (let batch = 0; batch < engineApps.length; batch = batch + limit) {
-      const currentBatch = engineApps.slice(batch, batch + limit);
+      const currentBatch = engineApps.slice(batch, batch + limit)
       await Promise.all(
         currentBatch.map(async (engineItem) => {
           let status: AppModel = {
