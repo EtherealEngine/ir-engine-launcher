@@ -115,7 +115,9 @@ const SettingsDialog = ({ onClose }: Props) => {
               {UIEnabled[selectedCluster.type].settings.variables && <Tab label="Variables" value="variables" />}
               {selectedCluster.type === ClusterType.Minikube && <Tab label="Minikube" value="minikube" />}
               {selectedCluster.type === ClusterType.MicroK8s && <Tab label="MicroK8s" value="microK8s" />}
-              <Tab label="Engine" value="engine" />
+              {(selectedCluster.type === ClusterType.MicroK8s || selectedCluster.type === ClusterType.Minikube) && (
+                <Tab label="Engine" value="engine" />
+              )}
               <Tab label="Backup" value="backup" />
               <Tab label="About" value="about" />
             </Tabs>

@@ -103,10 +103,9 @@ const EngineView = ({ sx }: Props) => {
       setProcessingDatabaseClear(true)
 
       const clonedCluster = cloneCluster(selectedCluster)
+      const enginePath = clonedCluster.configs[Storage.ENGINE_PATH]
 
-      const command = `docker container stop etherealengine_minikube_db; docker container rm etherealengine_minikube_db; docker container prune --force; cd '${
-        clonedCluster.configs[Storage.ENGINE_PATH]
-      }'; npm run dev-docker`
+      const command = `docker container stop etherealengine_minikube_db; docker container rm etherealengine_minikube_db; docker container prune --force; cd '${enginePath}'; npm run dev-docker`
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
@@ -201,7 +200,7 @@ const EngineView = ({ sx }: Props) => {
             setAdminValue(event.target.value)
           }}
         />
-        <InfoTooltip sx={{ cursor: 'pointer' }} message="This will make entered User ID an admin." />
+        <InfoTooltip sx={{ cursor: 'pointer' }} message="This will make the entered User ID an admin." />
       </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'baseline' }}>
         <FormControlLabel
@@ -209,7 +208,7 @@ const EngineView = ({ sx }: Props) => {
           label={
             <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
               <Typography variant="body2">REMOVE ENGINE DEPLOYMENT</Typography>
-              <InfoTooltip message="This will remove current engine deployment from your machine." />
+              <InfoTooltip message="This will remove engine deployment from your current cluster." />
             </Box>
           }
           control={<></>}
@@ -236,7 +235,7 @@ const EngineView = ({ sx }: Props) => {
           label={
             <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
               <Typography variant="body2">CLEAR DATABASE</Typography>
-              <InfoTooltip message="This will clear the database." />
+              <InfoTooltip message="This will clear the database associated with your deployment." />
             </Box>
           }
           control={<></>}
@@ -262,8 +261,8 @@ const EngineView = ({ sx }: Props) => {
           labelPlacement="start"
           label={
             <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
-              <Typography variant="body2">REMOVE ENV.LOCAL FILE</Typography>
-              <InfoTooltip message="This will remove env.local file from this machine." />
+              <Typography variant="body2">REMOVE .ENV.LOCAL</Typography>
+              <InfoTooltip message="This will remove .env.local file from your Ethereal Engine local repo." />
             </Box>
           }
           control={<></>}
@@ -288,7 +287,7 @@ const EngineView = ({ sx }: Props) => {
       {showDeploymentAlert && (
         <AlertDialog
           title="Confirmation"
-          message="Are you sure you want to proceed? This will remove the current Ethereal Engine deployment from your machine."
+          message="Are you sure you want to proceed? This will remove the Ethereal Engine deployment from your current cluster."
           okButtonText="Proceed"
           onClose={() => setDeploymentAlert(false)}
           onOk={onPruneDeployment}
@@ -297,7 +296,7 @@ const EngineView = ({ sx }: Props) => {
       {showDatabaseAlert && (
         <AlertDialog
           title="Confirmation"
-          message="Are you sure you want to proceed? This will clear the database."
+          message="Are you sure you want to proceed? This will clear the database associated with your deployment."
           okButtonText="Proceed"
           onClose={() => setDatabaseAlert(false)}
           onOk={onClearDatabase}
@@ -306,7 +305,7 @@ const EngineView = ({ sx }: Props) => {
       {showEnvAlert && (
         <AlertDialog
           title="Confirmation"
-          message="Are you sure you want to proceed? This will remove .env.local file from this machine."
+          message="Are you sure you want to proceed? This will remove .env.local file from your Ethereal Engine local repo."
           okButtonText="Proceed"
           onClose={() => setEnvAlert(false)}
           onOk={onPruneEnv}
