@@ -33,7 +33,7 @@ function cleanseString($inputSt) {
 function setSafeDirectory($repoPath) {
     $wslPath = '///wsl$/';
     $wslLocalPath = '///wsl.localhost/';
-    $distro = cleanseString(wsl bash -c 'echo $WSL_DISTRO_NAME');
+    $distro = cleanseString(wsl bash -ic 'echo $WSL_DISTRO_NAME');
     $distro = $distro.ToString().Trim();
 
     $localPathCommand = "git config --global --add safe.directory '%(prefix)$wslPath$distro$repoPath'";

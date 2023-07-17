@@ -1,7 +1,8 @@
 import Endpoints from 'constants/Endpoints'
 import { AppModel, AppStatus } from 'models/AppStatus'
+import { OSType } from 'models/AppSysInfo'
 import { useEffect, useState } from 'react'
-import { SettingsService } from 'renderer/services/SettingsService'
+import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
 
 import { Box, SxProps, Theme, Typography } from '@mui/material'
 
@@ -24,27 +25,32 @@ const PrereqsView = ({ sx }: Props) => {
     setStatuses(initialStatuses)
 
     const checkedStatuses = [...initialStatuses]
+    const appSysInfo = accessSettingsState().value.appSysInfo
+    const batchSize = appSysInfo.osType === OSType.Windows ? 2 : initialStatuses.length
 
-    await Promise.all(
-      initialStatuses.map(async (status) => {
-        // Display prerequisite with checked status
-        const checkedStatus = await SettingsService.checkPrerequisite(status)
+    for (let batch = 0; batch < initialStatuses.length; batch = batch + batchSize) {
+      const currentBatch = initialStatuses.slice(batch, batch + batchSize)
+      await Promise.all(
+        currentBatch.map(async (status) => {
+          // Display prerequisite with checked status
+          const checkedStatus = await SettingsService.checkPrerequisite(status)
 
-        // Add description for corrective actions to be displayed in dialog
-        if (checkedStatus.status !== AppStatus.Configured) {
-          processDescriptions(checkedStatus)
-        }
+          // Add description for corrective actions to be displayed in dialog
+          if (checkedStatus.status !== AppStatus.Configured) {
+            processDescriptions(checkedStatus)
+          }
 
-        const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
-        checkedStatuses[currentIndex] = checkedStatus
+          const currentIndex = initialStatuses.findIndex((item) => item.id === status.id)
+          checkedStatuses[currentIndex] = checkedStatus
 
-        setStatuses((prevState) => {
-          const newState = [...prevState]
-          newState[currentIndex] = checkedStatus
-          return newState
+          setStatuses((prevState) => {
+            const newState = [...prevState]
+            newState[currentIndex] = checkedStatus
+            return newState
+          })
         })
-      })
-    )
+      )
+    }
   }
 
   const processDescriptions = (status: AppModel) => {

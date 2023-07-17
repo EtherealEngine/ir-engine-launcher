@@ -18,6 +18,8 @@ import { getEnvFile } from '../../managers/PathManager'
 import { exec } from '../../managers/ShellManager'
 import Commands from './BaseCluster.commands'
 
+const BATCH_LIMIT = 2
+const type = os.type()
 class BaseCluster {
   // #region Status Check Methods
 
@@ -27,29 +29,29 @@ class BaseCluster {
     deploymentApps: DeploymentAppModel,
     sysRequirements: SysRequirement[]
   ) => {
-    await BaseCluster._checkSystemStatus(window, cluster, deploymentApps.systemStatus, sysRequirements, 2)
+    await BaseCluster._checkSystemStatus(window, cluster, deploymentApps.systemStatus, sysRequirements)
 
-    const preRequisitesConfigured = await BaseCluster._checkAppStatus(window, cluster, deploymentApps.appStatus, 2)
+    const preRequisitesConfigured = await BaseCluster._checkAppStatus(window, cluster, deploymentApps.appStatus)
 
-    await BaseCluster._checkEngineStatus(window, cluster, deploymentApps.engineStatus, preRequisitesConfigured, 2)
+    await BaseCluster._checkEngineStatus(window, cluster, deploymentApps.engineStatus, preRequisitesConfigured)
   }
 
   private static _checkSystemStatus = async (
     window: BrowserWindow,
     cluster: ClusterModel,
     systemApps: AppModel[],
-    sysRequirements: SysRequirement[],
-    limit: number
+    sysRequirements: SysRequirement[]
   ) => {
-    for (let batch = 0; batch < systemApps.length; batch = batch + limit) {
-      const currentBatch = systemApps.slice(batch, batch + limit)
+    const batchSize = type === 'Windows_NT' ? BATCH_LIMIT : systemApps.length
+
+    for (let batch = 0; batch < systemApps.length; batch = batch + batchSize) {
+      const currentBatch = systemApps.slice(batch, batch + batchSize)
       await Promise.all(
         currentBatch.map(async (app) => {
           let status: AppModel = {
             ...app
           }
 
-          const type = os.type()
           const currentOSReqs = sysRequirements.find((item) => item.os === type)
 
           if (status.id === 'os') {
@@ -94,16 +96,12 @@ class BaseCluster {
     }
   }
 
-  private static _checkAppStatus = async (
-    window: BrowserWindow,
-    cluster: ClusterModel,
-    apps: AppModel[],
-    limit: number
-  ) => {
+  private static _checkAppStatus = async (window: BrowserWindow, cluster: ClusterModel, apps: AppModel[]) => {
     let mandatoryConfigured = true
+    const batchSize = type === 'Windows_NT' ? BATCH_LIMIT : apps.length
 
-    for (let batch = 0; batch < apps.length; batch = batch + limit) {
-      const currentBatch = apps.slice(batch, batch + limit)
+    for (let batch = 0; batch < apps.length; batch = batch + batchSize) {
+      const currentBatch = apps.slice(batch, batch + batchSize)
       await Promise.all(
         currentBatch.map(async (app) => {
           let status: AppModel = {
@@ -154,11 +152,12 @@ class BaseCluster {
     window: BrowserWindow,
     cluster: ClusterModel,
     engineApps: AppModel[],
-    preRequisitesConfigured: boolean,
-    limit: number
+    preRequisitesConfigured: boolean
   ) => {
-    for (let batch = 0; batch < engineApps.length; batch = batch + limit) {
-      const currentBatch = engineApps.slice(batch, batch + limit)
+    const batchSize = type === 'Windows_NT' ? BATCH_LIMIT : engineApps.length
+
+    for (let batch = 0; batch < engineApps.length; batch = batch + batchSize) {
+      const currentBatch = engineApps.slice(batch, batch + batchSize)
       await Promise.all(
         currentBatch.map(async (engineItem) => {
           let status: AppModel = {
