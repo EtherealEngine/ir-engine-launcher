@@ -11,6 +11,10 @@ const Endpoints = {
   DEFAULT_OPS_FOLDER: 'etherealengine-ops',
   Urls: {
     HOST: 'https://etherealengine.org',
+    CLIENT_HOST: 'https://local.etherealengine.org',
+    API_HOST: 'https://api-local.etherealengine.org',
+    INSTANCE_HOST: 'https://instanceserver-local.etherealengine.org',
+    FILE_HOST: 'https://localhost:8642',
     ADMIN_PORTAL: 'https://local.etherealengine.org/admin',
     LOGIN_PAGE: 'https://local.etherealengine.org/',
     LAUNCH_PAGE: (host: string) => `${host.startsWith('https') ? '' : 'https://'}${host}/location/apartment`,
