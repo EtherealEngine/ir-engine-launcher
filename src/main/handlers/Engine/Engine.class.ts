@@ -120,7 +120,7 @@ class Engine {
     }
   }
 
-  static startFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
+  static startFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel, sudoPassword: string) => {
     try {
       await startFileServer(parentWindow, cluster, sudoPassword)
     } catch (err) {
@@ -132,9 +132,9 @@ class Engine {
     }
   }
 
-  static stopFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
+  static stopFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel, sudoPassword: string) => {
     try {
-      await stopFileServer(parentWindow, cluster, sudoPassword)
+      await stopFileServer(sudoPassword)
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'stop file server',

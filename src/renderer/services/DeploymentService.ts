@@ -1,5 +1,5 @@
 import { hookstate, none, useHookstate } from '@hookstate/core'
-import { decryptPassword, delay } from 'common/UtilitiesManager'
+import { delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'

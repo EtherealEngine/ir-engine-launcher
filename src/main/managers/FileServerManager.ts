@@ -8,7 +8,7 @@ import { LogModel } from '../../models/Log'
 import { scriptsPath } from './PathManager'
 import { exec, execStreamScriptFile, getProcessList } from './ShellManager'
 
-export const startFileServer = async (window: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
+export const startFileServer = async (window: BrowserWindow, cluster: ClusterModel, sudoPassword: string) => {
   const existingServer = await getProcessList('http-server')
   if (existingServer.length > 0) {
     window.webContents.send(Channels.Utilities.Log, cluster.id, {
@@ -25,9 +25,7 @@ export const startFileServer = async (window: BrowserWindow, cluster: ClusterMod
 
       const existingServers = await getProcessList('http-server')
       for (const httpProcess of existingServers) {
-        if (sudoPassword) {
-          await exec(`echo '${sudoPassword}' | sudo -S kill -9 ${httpProcess.pid}`)
-        }
+        await exec(`echo '${sudoPassword}' | sudo -S kill -9 ${httpProcess.pid}`)
       }
     } catch {}
 
@@ -55,13 +53,11 @@ export const startFileServer = async (window: BrowserWindow, cluster: ClusterMod
   )
 }
 
-export const stopFileServer = async (window: BrowserWindow, cluster: ClusterModel, sudoPassword?: string) => {
+export const stopFileServer = async (sudoPassword: string) => {
   const existingServers = await getProcessList('http-server')
   if (existingServers.length > 0) {
     for (const httpProcess of existingServers) {
-      if (sudoPassword) {
-        await exec(`echo '${sudoPassword}' | sudo -S kill -9 ${httpProcess.pid}`)
-      }
+      await exec(`echo '${sudoPassword}' | sudo -S kill -9 ${httpProcess.pid}`)
     }
   } else {
     throw 'No file server found.'

@@ -1,4 +1,3 @@
-import { decryptPassword, delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Commands from 'main/Clusters/Minikube/Minikube.commands'
 import { cloneCluster } from 'models/Cluster'
@@ -7,7 +6,7 @@ import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
-import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
+import { SettingsService } from 'renderer/services/SettingsService'
 
 import { LoadingButton } from '@mui/lab'
 import { Box, CircularProgress, FormControlLabel, SxProps, Theme, Typography } from '@mui/material'
