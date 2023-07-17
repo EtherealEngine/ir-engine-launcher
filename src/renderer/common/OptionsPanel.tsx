@@ -165,7 +165,11 @@ const OptionsPanel = () => {
             Launching
           </Box>
         }
-        onClick={(event) => setAnchorEl(event.currentTarget)}
+        onClick={(event) =>
+          selectedCluster.type === ClusterType.MicroK8s || selectedCluster.type === ClusterType.Minikube
+            ? setAnchorEl(event.currentTarget)
+            : onLaunch()
+        }
       >
         Launch
       </LoadingButton>
