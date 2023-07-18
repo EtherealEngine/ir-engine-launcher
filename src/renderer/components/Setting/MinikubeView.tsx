@@ -72,14 +72,18 @@ const MinikubeView = ({ sx }: Props) => {
 
       const password = await SettingsService.getDecryptedSudoPassword()
 
-      const command = `echo '${password}' | sudo -S ${Commands.VIRTUALBOX_REMOVE}`
-      const output: ShellResponse = await window.electronAPI.invoke(
-        Channels.Shell.ExecuteCommand,
-        clonedCluster,
-        command
-      )
+      let command = `echo '${password}' | sudo -S ${Commands.VIRTUALBOX_REMOVE}`
+      let output: ShellResponse = await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, command)
 
-      const stringError = output.stderr?.toString().trim() || ''
+      let stringError = output.stderr?.toString().trim() || ''
+      if (stringError.toLowerCase().includes('error')) {
+        throw stringError
+      }
+
+      command = `echo '${password}' | sudo -S ${Commands.VIRTUALBOX_DKMS_REMOVE}`
+      output = await window.electronAPI.invoke(Channels.Shell.ExecuteCommand, clonedCluster, command)
+
+      stringError = output.stderr?.toString().trim() || ''
       if (stringError.toLowerCase().includes('error')) {
         throw stringError
       }
