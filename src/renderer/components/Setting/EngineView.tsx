@@ -64,7 +64,7 @@ const EngineView = ({ sx }: Props) => {
       )
 
       const stringError = output.stderr?.toString().trim() || ''
-      if (stringError) {
+      if (stringError.toLowerCase().includes('error') || stringError.toLowerCase().includes('does not exist')) {
         throw stringError
       }
     } catch (err) {
@@ -89,7 +89,7 @@ const EngineView = ({ sx }: Props) => {
       )
 
       const stringError = output.stderr?.toString().trim() || ''
-      if (stringError) {
+      if (stringError.toLowerCase().includes('error')) {
         throw stringError
       }
     } catch (err) {
@@ -115,7 +115,7 @@ const EngineView = ({ sx }: Props) => {
       )
 
       const stringError = output.stderr?.toString().trim() || ''
-      if (stringError) {
+      if (stringError.toLowerCase().includes('error')) {
         throw stringError
       }
     } catch (err) {
@@ -147,7 +147,7 @@ const EngineView = ({ sx }: Props) => {
     }
   }
 
-  const onPruneEnv = async () => {
+  const onResetEnv = async () => {
     try {
       setEnvAlert(false)
       setProcessingEnvPrune(true)
@@ -158,7 +158,7 @@ const EngineView = ({ sx }: Props) => {
 
       const password = await SettingsService.getDecryptedSudoPassword()
 
-      const command = `echo '${password}' | sudo -S rm -- ${envPath}`
+      const command = `echo '${password}' | sudo -S rm -- ${envPath}; cd ${enginePath}; cp .env.local.default .env.local`
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
@@ -166,11 +166,11 @@ const EngineView = ({ sx }: Props) => {
       )
 
       const stringError = output.stderr?.toString().trim() || ''
-      if (stringError) {
+      if (stringError.toLowerCase().includes('error')) {
         throw stringError
       }
     } catch (err) {
-      enqueueSnackbar('Failed to remove .env.local file.', { variant: 'error' })
+      enqueueSnackbar('Failed to reset .env.local file.', { variant: 'error' })
     }
 
     setProcessingEnvPrune(false)
@@ -301,8 +301,8 @@ const EngineView = ({ sx }: Props) => {
           labelPlacement="start"
           label={
             <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
-              <Typography variant="body2">REMOVE .ENV.LOCAL</Typography>
-              <InfoTooltip message="This will remove .env.local file from your Ethereal Engine local repo." />
+              <Typography variant="body2">RESET .ENV.LOCAL</Typography>
+              <InfoTooltip message="This will reset .env.local file in your Ethereal Engine local repo." />
             </Box>
           }
           control={<></>}
@@ -315,12 +315,12 @@ const EngineView = ({ sx }: Props) => {
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
               <CircularProgress size={24} sx={{ marginRight: 1 }} />
-              Pruning
+              Resetting
             </Box>
           }
           onClick={() => setEnvAlert(true)}
         >
-          Prune
+          Reset
         </LoadingButton>
       </Box>
 
@@ -354,10 +354,10 @@ const EngineView = ({ sx }: Props) => {
       {showEnvAlert && (
         <AlertDialog
           title="Confirmation"
-          message="Are you sure you want to proceed? This will remove .env.local file from your Ethereal Engine local repo."
+          message="Are you sure you want to proceed? This will reset .env.local file in your Ethereal Engine local repo."
           okButtonText="Proceed"
           onClose={() => setEnvAlert(false)}
-          onOk={onPruneEnv}
+          onOk={onResetEnv}
         />
       )}
     </Box>
