@@ -39,7 +39,7 @@ const EngineView = ({ sx }: Props) => {
   const [processingDeploymentPrune, setProcessingDeploymentPrune] = useState(false)
   const [processingDatabaseClear, setProcessingDatabaseClear] = useState(false)
   const [processingFileServerStop, setProcessingFileServerStop] = useState(false)
-  const [processingEnvPrune, setProcessingEnvPrune] = useState(false)
+  const [processingEnvReset, setProcessingEnvReset] = useState(false)
   const [adminValue, setAdminValue] = useState('')
 
   const configFileState = useConfigFileState()
@@ -150,7 +150,7 @@ const EngineView = ({ sx }: Props) => {
   const onResetEnv = async () => {
     try {
       setEnvAlert(false)
-      setProcessingEnvPrune(true)
+      setProcessingEnvReset(true)
 
       const clonedCluster = cloneCluster(selectedCluster)
       const enginePath = clonedCluster.configs[Storage.ENGINE_PATH]
@@ -173,7 +173,7 @@ const EngineView = ({ sx }: Props) => {
       enqueueSnackbar('Failed to reset .env.local file.', { variant: 'error' })
     }
 
-    setProcessingEnvPrune(false)
+    setProcessingEnvReset(false)
   }
 
   return (
@@ -310,8 +310,8 @@ const EngineView = ({ sx }: Props) => {
         />
         <LoadingButton
           variant="outlined"
-          sx={{ marginLeft: 4, width: processingEnvPrune ? 130 : 'auto' }}
-          loading={processingEnvPrune}
+          sx={{ marginLeft: 4, width: processingEnvReset ? 130 : 'auto' }}
+          loading={processingEnvReset}
           loadingIndicator={
             <Box sx={{ display: 'flex', color: 'var(--textColor)' }}>
               <CircularProgress size={24} sx={{ marginRight: 1 }} />
