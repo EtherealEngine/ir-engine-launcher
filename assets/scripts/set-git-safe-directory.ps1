@@ -28,6 +28,8 @@ for ( $i = 0; $i -lt $args.count; $i += 2 ) {
     }
 }
 
+Write-Host "Marking repositories as safe directories"
+
 $localEnginePathCommand = "git config --global --add safe.directory '%(prefix)$wslPath$DISTRO$ENGINE_FOLDER'";
 $localhostEnginePathCommand = "git config --global --add safe.directory '%(prefix)$wslLocalPath$DISTRO$ENGINE_FOLDER'";
 
