@@ -30,21 +30,6 @@ function cleanseString($inputSt) {
     return $finalString
 }
 
-function setSafeDirectory($repoPath) {
-    $wslPath = '///wsl$/';
-    $wslLocalPath = '///wsl.localhost/';
-    $distro = cleanseString(wsl bash -ic 'echo $WSL_DISTRO_NAME');
-    $distro = $distro.ToString().Trim();
-
-    $localPathCommand = "git config --global --add safe.directory '%(prefix)$wslPath$distro$repoPath'";
-    $localhostPathCommand = "git config --global --add safe.directory '%(prefix)$wslLocalPath$distro$repoPath'";
-
-    Write-Host "Running git command: $localhostPathCommand";
-    Invoke-Expression "& $localhostPathCommand"
-    Write-Host "Running git command: $localPathCommand";
-    Invoke-Expression "& $localPathCommand"
-}
-
 #===========
 # Parameters
 #===========
@@ -337,11 +322,33 @@ checkExitCode;
 # Ensure directory is safe
 #=========================
 
-Write-Host "Marking repositories as safe directories"
+Write-Host "Checking if repositories are marked as safe directories"
 
-setSafeDirectory($ENGINE_FOLDER);
+$distro = cleanseString(wsl bash -ic 'echo $WSL_DISTRO_NAME');
+$distro = $distro.ToString().Trim();
+$isEngineSafe = $true
+$isOpsSafe = $true
 
-setSafeDirectory($OPS_FOLDER);
+$engineStatusCommand = 'git -C "\\wsl.localhost\$distro$ENGINE_FOLDER" status';
+$opsStatusCommand = 'git -C "\\wsl.localhost\$distro$OPS_FOLDER" status';
+
+$engineOutput = Invoke-Expression "& $engineStatusCommand 2>&1";
+$opsOutput = Invoke-Expression "& $opsStatusCommand 2>&1";
+
+if ([String]$engineOutput -match "dubious ownership") {
+    $isEngineSafe = $false
+}
+
+if ([String]$opsOutput -match "dubious ownership") {
+    $isOpsSafe = $false
+}
+
+if (($isEngineSafe -eq $false) -or ($isOpsSafe -eq $false)) {
+    Write-Host "Marking repositories as safe directories"
+    Start-Process powershell -PassThru -Wait -verb runas -ArgumentList "-file $PSScriptRoot\set-git-safe-directory.ps1 -e '$ENGINE_FOLDER' -o '$OPS_FOLDER' -d '$distro' -es $isEngineSafe -os $isOpsSafe"
+}
+
+Write-Host "Repositories are marked as safe directories"
 
 #============================
 # Ensure DB and Redis Running
