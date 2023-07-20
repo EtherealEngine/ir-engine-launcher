@@ -329,8 +329,8 @@ $distro = $distro.ToString().Trim();
 $isEngineSafe = $true
 $isOpsSafe = $true
 
-$engineStatusCommand = "git -C \\wsl.localhost\$distro$ENGINE_FOLDER status";
-$opsStatusCommand = "git -C \\wsl.localhost\$distro$OPS_FOLDER status";
+$engineStatusCommand = 'git -C "\\wsl.localhost\$distro$ENGINE_FOLDER" status';
+$opsStatusCommand = 'git -C "\\wsl.localhost\$distro$OPS_FOLDER" status';
 
 $engineOutput = Invoke-Expression "& $engineStatusCommand 2>&1";
 $opsOutput = Invoke-Expression "& $opsStatusCommand 2>&1";
