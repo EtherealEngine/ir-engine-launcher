@@ -345,7 +345,7 @@ if ([String]$opsOutput -match "dubious ownership") {
 
 if (($isEngineSafe -eq $false) -or ($isOpsSafe -eq $false)) {
     Write-Host "Marking repositories as safe directories"
-    Start-Process powershell -PassThru -Wait -verb runas -ArgumentList "-file $PSScriptRoot\set-git-safe-directory.ps1 -e '$ENGINE_FOLDER' -o '$OPS_FOLDER' -d '$distro' -es '$isEngineSafe' -os '$isOpsSafe'"
+    Start-Process powershell -PassThru -Wait -verb runas -ArgumentList "-file $PSScriptRoot\set-git-safe-directory.ps1 -e '$ENGINE_FOLDER' -o '$OPS_FOLDER' -d '$distro' -es $isEngineSafe -os $isOpsSafe"
 }
 
 Write-Host "Repositories are marked as safe directories"
