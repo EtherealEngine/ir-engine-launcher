@@ -206,7 +206,7 @@ if ($wslRestart -or $dockerRestart) {
 & "$PSScriptRoot\check-hostfile.ps1" "readonly"
 
 if ($LastExitCode -eq 1) {
-    $hostfileProcess = Start-Process powershell -PassThru -Wait -verb runas -ArgumentList "-file $PSScriptRoot\check-hostfile.ps1" 
+    $hostfileProcess = Start-Process powershell -PassThru -Wait -verb runas -ArgumentList "-file $PSScriptRoot\check-hostfile.ps1"
 
     if ($hostfileProcess.ExitCode -eq 0) {
         Write-Host "Hostfile already up to date";
