@@ -17,7 +17,7 @@ https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-
 
 ## Getting Started
 
-You can find complete getting started guide [here](https://etherealengine.github.io/etherealengine-docs/docs/tutorials/ethereal_control_center/getting_started).
+You can find complete getting started guide [here](https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/tutorials/ethereal_control_center/getting_started/).
 
 Additionally, there are Control Center video tutorials which you can find [here](./TUTORIALS.md). Although some of them might be outdated.
 

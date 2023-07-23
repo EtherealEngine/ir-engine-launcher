@@ -55,11 +55,11 @@ const Endpoints = {
   },
   Docs: {
     INSTALL_WSL:
-      'https://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl',
+      'https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl',
     INSTALL_DOCKER:
-      'https://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-docker-desktop',
+      'https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/microk8s_windows/#install-docker-desktop',
     ACCEPT_INVALID_CERTS:
-      'https://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_linux/#accept-invalid-certs'
+      'https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/microk8s_linux#accept-invalid-certs'
   }
 }
 
