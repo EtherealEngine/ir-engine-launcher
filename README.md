@@ -94,7 +94,16 @@ cd "C:\Users\%USERNAME%\Downloads"
 "Docker Desktop Installer.exe" install --accept-license --installation-dir=C:\Docker
 ```
 
-### 4. Reporting an Issue
+### 4. Git status unavailable on Windows
+
+On Windows, if you are unable to see Git status after cluster configuration and getting following error in logs:
+
+```bash
+git configs - "fatal: detected dubious ownership in repository at <path to engine directory>\nTo add an exception for this directory, call:\n\n\tgit config --global --add safe.directory <path to engine directory>\n"
+```
+Run Ethereal Engine Control Center as administrator.
+
+### 5. Reporting an Issue
 
 If you face an issue please report it to [Issues](https://github.com/canonical/microk8s/issues) or reach out to us on [Discord](https://discord.gg/xrf). Also please share following log files:
 
