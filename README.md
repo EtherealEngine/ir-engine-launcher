@@ -101,7 +101,7 @@ On Windows, if you are unable to see Git status after cluster configuration and 
 ```bash
 git configs - "fatal: detected dubious ownership in repository at <path to engine directory>\nTo add an exception for this directory, call:\n\n\tgit config --global --add safe.directory <path to engine directory>\n"
 ```
-Run Ethereal Engine Control Center as administrator.
+This is due to the app not having permissions to read the Git config file. To fix this, run Ethereal Engine Control Center as administrator.
 
 ### 5. Reporting an Issue
 
