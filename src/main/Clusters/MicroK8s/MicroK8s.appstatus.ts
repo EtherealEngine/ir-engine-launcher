@@ -21,6 +21,17 @@ const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
   return script
 }
 
+const getGitAppModels = (): AppModel[] => {
+  if (type === 'Windows_NT') {
+    return [
+      getAppModel('gitWindows', 'Git for Windows', 'git --version;', false),
+      getAppModel('gitWsl', 'Git for WSL', 'git --version;')
+    ]
+  }
+
+  return [getAppModel('git', 'Git', 'git --version;')]
+}
+
 export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
   let microk8sPrefix = ''
 
@@ -37,7 +48,7 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     getAppModel('npm', 'npm', 'npm --version;'),
     getAppModel('python', 'Python', 'pip3 --version; python3 --version;'),
     getAppModel('make', 'Make', 'make --version;'),
-    getAppModel('git', 'Git', 'git --version;'),
+    ...getGitAppModels(),
     getAppModel('docker', 'Docker', 'docker --version;'),
     getAppModel('dockercompose', 'Docker Compose', 'docker-compose --version;'),
     getAppModel('mysql', 'MySql', 'docker top etherealengine_minikube_db;'),
