@@ -3,14 +3,13 @@
 # Ref: https://stackoverflow.com/a/73285729
 #==========
 
-
 #========================
 # Verify Git installation
 #========================
 
 $IS_GIT_INSTALLED = $false;
 
-$gitVersion = & "git --version"
+$gitVersion = Invoke-Expression "& git --version"
 
 if ($gitVersion) {
     Write-Host "git for windows is installed";
@@ -22,7 +21,7 @@ else {
 }
 
 #=======================
-# Installing Git
+# Install Git
 #=======================
 
 if ($IS_GIT_INSTALLED -eq $false) {
@@ -38,26 +37,13 @@ if ($IS_GIT_INSTALLED -eq $false) {
 
     # Download git installer
     Write-Host "downloading git for windows using url: $downloadUrl"
-    Invoke-WebRequest -Uri $downloadUrl -UseBasicParsing -OutFile $exePath
+    Invoke-WebRequest -Uri $downloadUrl -UseBasicParsing -OutFile $exePath 
 
-    # Execute git installer
-    Start-Process $exePath -verb runas -ArgumentList '/VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"' -Wait
+    Start-Process powershell -PassThru -WindowStyle hidden -Wait -verb runas -ArgumentList " -file $PSScriptRoot\setup-git-windows.ps1 '$exePath'"
 
-    # Optional: For bash.exe, add '$env:PROGRAMFILES\Git\bin' to PATH
-    [Environment]::SetEnvironmentVariable('Path', "$([Environment]::GetEnvironmentVariable('Path', 'Machine'));$env:PROGRAMFILES\Git\bin", 'Machine')
+    Write-Host "git for windows successfully installed";
 
-    # Make new environment variables available in the current PowerShell session:
-    foreach ($level in "Machine", "User") {
-        [Environment]::GetEnvironmentVariables($level).GetEnumerator() | ForEach-Object {
-            # For Path variables, append the new values, if they're not already in there
-            if ($_.Name -match 'Path$') { 
-                $_.Value = ($((Get-Content "Env:$($_.Name)") + ";$($_.Value)") -split ';' | Select-Object -unique) -join ';'
-            }
-            $_
-        } | Set-Content -Path { "Env:$($_.Name)" }
-    }
-
-    $gitVersion = & "git --version"
+    $gitVersion = Invoke-Expression "& git --version"
 }
 
 Write-Host "git for windows version is $gitVersion";
