@@ -112,6 +112,12 @@ else {
     exit 1;
 }
 
+#=======================
+# Verify Git for Windows
+#=======================
+
+& "$PSScriptRoot\check-git-windows.ps1";
+
 #==========
 # WSL Login
 #==========
