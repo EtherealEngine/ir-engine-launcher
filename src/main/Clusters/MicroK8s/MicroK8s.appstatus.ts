@@ -20,18 +20,6 @@ const microk8sDependantScript = (script: string, microk8sPrefix: string) => {
 
   return script
 }
-
-const getGitAppModels = (): AppModel[] => {
-  if (type === 'Windows_NT') {
-    return [
-      getAppModel('gitWindows', 'Git for Windows', 'git --version;', false),
-      getAppModel('gitWsl', 'Git for WSL', 'git --version;')
-    ]
-  }
-
-  return [getAppModel('git', 'Git', 'git --version;')]
-}
-
 export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
   let microk8sPrefix = ''
 
@@ -43,12 +31,11 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     microk8sPrefix = `echo '${sudoPassword}' | sudo -S ${microk8sPrefix}`
   }
 
-  return [
+  const appStatus = [
     getAppModel('node', 'Node', 'node --version;'),
     getAppModel('npm', 'npm', 'npm --version;'),
     getAppModel('python', 'Python', 'pip3 --version; python3 --version;'),
     getAppModel('make', 'Make', 'make --version;'),
-    ...getGitAppModels(),
     getAppModel('docker', 'Docker', 'docker --version;'),
     getAppModel('dockercompose', 'Docker Compose', 'docker-compose --version;'),
     getAppModel('mysql', 'MySql', 'docker top etherealengine_minikube_db;'),
@@ -140,6 +127,19 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
     ),
     getAppModel('engine', 'Ethereal Engine', microk8sDependantScript(`helm status local;`, microk8sPrefix))
   ]
+
+  if (type === 'Windows_NT') {
+    appStatus.splice(
+      4,
+      0,
+      getAppModel('gitWindows', 'Git for Windows', 'git --version;', false),
+      getAppModel('gitWsl', 'Git for WSL', 'git --version;')
+    )
+  } else {
+    appStatus.splice(4, 0, getAppModel('git', 'Git', 'git --version;'))
+  }
+
+  return appStatus
 }
 
 export const MicroK8sRippleAppsStatus = (sudoPassword?: string): AppModel[] => {
