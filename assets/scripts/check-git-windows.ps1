@@ -20,9 +20,9 @@ else {
     $IS_GIT_INSTALLED = $false;
 }
 
-#=======================
+#============
 # Install Git
-#=======================
+#============
 
 if ($IS_GIT_INSTALLED -eq $false) {
     $exePath = "$env:TEMP\git.exe"
