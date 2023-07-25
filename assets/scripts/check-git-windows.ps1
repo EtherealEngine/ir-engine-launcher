@@ -39,9 +39,7 @@ if ($IS_GIT_INSTALLED -eq $false) {
     Write-Host "downloading git for windows using url: $downloadUrl"
     Invoke-WebRequest -Uri $downloadUrl -UseBasicParsing -OutFile $exePath 
 
-    Start-Process powershell -PassThru -WindowStyle hidden -Wait -verb runas -ArgumentList " -file $PSScriptRoot\setup-git-windows.ps1 '$exePath'"
-
-    Write-Host "git for windows successfully installed";
+    Start-Process powershell -PassThru -WindowStyle hidden -Wait -verb runas -ArgumentList " -file $PSScriptRoot\setup-git-windows.ps1 $exePath"
 
     $gitVersion = Invoke-Expression "& git --version"
 }

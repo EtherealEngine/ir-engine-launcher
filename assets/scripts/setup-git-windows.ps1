@@ -3,10 +3,7 @@
 # Setup Git
 #=======================
 
-Write-Host "args:: $args"
-$exePath = $args[0].Trim("'")
-
-Write-Host "exepath: $exePath"
+$exePath = $args[0]
 
 Write-Host "installing git for windows";
 # Execute git installer
