@@ -54,6 +54,14 @@ checkExitCode
 
 set -e
 
+#===========
+# Verify MOK
+#===========
+
+bash "$SCRIPTS_FOLDER/check-mok.sh" "$PASSWORD" "$SCRIPTS_FOLDER"
+
+checkExitCode
+
 #=============
 # Verify Node
 #=============
