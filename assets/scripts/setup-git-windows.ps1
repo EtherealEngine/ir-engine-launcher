@@ -3,9 +3,10 @@
 # Setup Git
 #==========
 
-$exePath = $args[0]
+$exePath = $args[0].Trim("'")
 
 Write-Host "installing git for windows";
+
 # Execute git installer
 Start-Process $exePath -ArgumentList '/VERYSILENT /NORESTART /NOCANCEL /SP- /CLOSEAPPLICATIONS /RESTARTAPPLICATIONS /COMPONENTS="icons,ext\reg\shellhere,assoc,assoc_sh"' -Wait
 
