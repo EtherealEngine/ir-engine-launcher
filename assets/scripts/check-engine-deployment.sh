@@ -53,8 +53,6 @@ if [[ $RE_INIT == true || $FORCE_DB_REFRESH == 'true' ]]; then
     docker container prune --force
     npm run dev-docker
     npm run dev-reinit
-
-    npx ts-node --swc scripts/install-projects.js
 fi
 
 export MYSQL_HOST=localhost
