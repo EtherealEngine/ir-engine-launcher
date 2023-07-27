@@ -41,14 +41,14 @@ export -f enrollMok
 # Verify MOK
 #===========
 
-if mokutil --version >/dev/null; then
-    echo "mokutil is installed"
-else
+if mokutil --version 2>/dev/null | grep -q 'command not found'; then
     echo "mokutil is not installed"
     echo $(mokutil --version)
 
     echo "$PASSWORD" | sudo -S apt-get update -y
     echo "$PASSWORD" | sudo -S apt-get install -y mokutil
+else
+    echo "mokutil is installed"
 fi
 
 if echo "$PASSWORD" | sudo -S mokutil --sb-state | grep -q 'SecureBoot enabled'; then
@@ -58,4 +58,4 @@ if echo "$PASSWORD" | sudo -S mokutil --sb-state | grep -q 'SecureBoot enabled';
         gnome-terminal --wait -- bash -c "enrollMok $PASSWORD;exec bash"
 
     fi
-fi        
+fi
