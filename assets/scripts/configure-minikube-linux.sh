@@ -58,7 +58,7 @@ set -e
 # Verify MOK
 #===========
 
-bash "$SCRIPTS_FOLDER/check-mok.sh" "$PASSWORD" "$SCRIPTS_FOLDER"
+bash "$SCRIPTS_FOLDER/check-mok.sh" "$PASSWORD"
 
 checkExitCode
 
@@ -174,6 +174,19 @@ bash "$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER"
 
 checkExitCode
 
+#=======================
+# Verify VirtualBox dkms
+#=======================
+
+if virtualbox-dkms --version >/dev/null; then
+    echo "virtualbox-dkms is installed"
+else
+    echo "virtualbox-dkms is not installed"
+
+    echo "$PASSWORD" | sudo -S apt update -y
+    echo "$PASSWORD" | sudo -S sudo apt-get install virtualbox-dkms
+fi
+
 #==================
 # Verify VirtualBox
 #==================
@@ -209,12 +222,10 @@ checkExitCode
 #================
 # Verify Minikube
 #================
-
 if minikube version >/dev/null; then
     echo "minikube is installed"
 else
     echo "minikube is not installed"
-
     curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
     echo "$PASSWORD" | sudo -S install minikube-linux-amd64 /usr/local/bin/minikube
 fi
@@ -234,7 +245,6 @@ fi
 
 MINIKUBE_STATUS=$(minikube status)
 echo "minikube status is $MINIKUBE_STATUS"
-
 kubectl config use-context minikube
 
 #================
