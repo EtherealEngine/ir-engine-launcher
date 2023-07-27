@@ -13,9 +13,10 @@ PASSWORD=$1
 #==========
 
 enrollMok() {
-
     password=$1
+
     sudo dpkg --configure -a
+    
     echo -e "\n\n\n"
     echo -e "The system needs to restart. After booting, you will be presented\n with the MOK Manager. In MOK Manager select 'Enroll MOK' and continue.\n
     Enter the password you just entered when asked by the MOK Manager.\n After the process is complete, click 'Reboot'.\n

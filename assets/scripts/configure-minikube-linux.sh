@@ -222,10 +222,12 @@ checkExitCode
 #================
 # Verify Minikube
 #================
+
 if minikube version >/dev/null; then
     echo "minikube is installed"
 else
     echo "minikube is not installed"
+
     curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
     echo "$PASSWORD" | sudo -S install minikube-linux-amd64 /usr/local/bin/minikube
 fi
@@ -245,6 +247,7 @@ fi
 
 MINIKUBE_STATUS=$(minikube status)
 echo "minikube status is $MINIKUBE_STATUS"
+
 kubectl config use-context minikube
 
 #================
