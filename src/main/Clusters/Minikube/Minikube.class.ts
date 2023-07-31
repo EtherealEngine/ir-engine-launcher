@@ -95,7 +95,7 @@ class Minikube {
       const code = await execStreamScriptFile(
         checkMokScript,
         [
-          `-pr "${permission}"`,
+          `-o "${permission}"`,
           `-p "${password}"`
         ],
         onCheckMokStd,
@@ -110,7 +110,7 @@ class Minikube {
       }
 
       return code
-      
+
     } catch (err) {
       log.error('Error in checkMok Minikube.', err)
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

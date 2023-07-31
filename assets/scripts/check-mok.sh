@@ -6,7 +6,21 @@ set -e
 # Parameters
 #===========
 
-PASSWORD=$1
+while getopts o:p: flag; do
+    case "${flag}" in
+    o) PERMISSION=${OPTARG} ;;
+    p) PASSWORD=${OPTARG} ;;
+    *)
+        echo "Invalid argument passed" >&2
+        exit 1
+        ;;
+    esac
+done
+
+if [[  -z $PERMISSION || -z $PASSWORD ]]; then
+    echo "Missing arguments"
+    exit 1
+fi
 
 #==========
 # Functions
@@ -16,20 +30,6 @@ enrollMok() {
     password=$1
 
     sudo dpkg --configure -a
-    
-    echo -e "\n\n\n"
-    echo -e "The system needs to restart. After booting, you will be presented\n with the MOK Manager. In MOK Manager select 'Enroll MOK' and continue.\n
-    Enter the password you just entered when asked by the MOK Manager.\n After the process is complete, click 'Reboot'.\n
-    After booting run Ethereal Engine Control Center."
-    read -p "Do you want to restart the system? (y/n) " yn
-
-    case $yn in 
-        y ) echo Restarting...;;
-        n ) echo Exiting...;
-            exit 1;;
-        * ) echo invalid response;
-            exit 1;;
-    esac
 
     echo "$password" | sudo -S systemctl reboot
     exit 0
@@ -55,7 +55,13 @@ if echo "$PASSWORD" | sudo -S mokutil --sb-state | grep -q 'SecureBoot enabled';
     if echo "$PASSWORD" | sudo -S mokutil --list-enrolled | grep -q 'Secure Boot Module Signature key'; then
         echo "mok is enrolled"
     else
-        gnome-terminal --wait -- bash -c "enrollMok $PASSWORD;exec bash"
-
+        if $PERMISSION -eq 'yes'; then
+            gnome-terminal --wait -- bash -c "enrollMok $PASSWORD;exec bash"
+            exit 0
+        elif $PERMISSION -eq 'none'; then 
+            exit 2
+        else
+            exit 1
+        fi
     fi
 fi
