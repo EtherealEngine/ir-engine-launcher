@@ -82,19 +82,19 @@ const RestartDialog = ({ onClose }: Props) => {
               <Typography variant="body2">Press any key on first screen</Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>1</Avatar>
+              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>2</Avatar>
               <Typography variant="body2">Select 'Enroll MOK' option</Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
-              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>2</Avatar>
+              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>3</Avatar>
               <Typography variant="body2">Select 'Continue' on 'Enroll MOK' screen</Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
-              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>3</Avatar>
+              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>4</Avatar>
               <Typography variant="body2">Select 'Yes' on 'Enroll the key(s)'' screen</Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
-              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>4</Avatar>
+              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>5</Avatar>
               <Typography variant="body2">Select 'Reboot' option in the final screen</Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>

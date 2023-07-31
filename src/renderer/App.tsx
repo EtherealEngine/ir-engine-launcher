@@ -26,7 +26,7 @@ import { useConfigFileState } from './services/ConfigFileService'
 import { SettingsService, useSettingsState } from './services/SettingsService'
 import theme from './theme'
 
-export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
+export const ColorModeContext = React.createContext({ toggleColorMode: () => { } })
 
 const App = () => {
   const notistackRef = React.createRef<SnackbarProvider>()
@@ -36,6 +36,7 @@ const App = () => {
   const settingsState = useSettingsState()
   const { showAuthenticationDialog } = settingsState.value
   const { showRestartDialog } = settingsState.value
+  const { showEnrollMokDialog } = settingsState.value
 
   const defaultMode = 'vaporwave' as ThemeMode
   const storedMode = localStorage.getItem(Storage.COLOR_MODE) as ThemeMode | undefined
@@ -78,7 +79,7 @@ const App = () => {
     const theme = defaultThemeSettings[mode] as any
     if (theme)
       for (const variable of Object.keys(theme)) {
-        ;(document.querySelector(`[data-theme=${mode}]`) as any)?.style.setProperty('--' + variable, theme[variable])
+        ; (document.querySelector(`[data-theme=${mode}]`) as any)?.style.setProperty('--' + variable, theme[variable])
       }
   }
 
@@ -111,12 +112,10 @@ const App = () => {
               {showAuthenticationDialog && (
                 <AuthenticationDialog onClose={() => SettingsService.setAuthenticationDialog(false)} />
               )}
-              {settingsState.value.enrollMokDialog.isVisible && (
+              {showEnrollMokDialog && (
                 <EnrollMokDialog
                   onClose={() =>
-                    SettingsService.setEnrollMokDialog({
-                      isVisible: false
-                    })
+                    SettingsService.setShowEnrollMokDialog(false)
                   }
                 />
               )}

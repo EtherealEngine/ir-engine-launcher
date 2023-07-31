@@ -20,6 +20,7 @@ const state = hookstate({
   sudoPassword: '',
   showAuthenticationDialog: false,
   showCreateClusterDialog: false,
+  showEnrollMokDialog: false,
   enrollMokDialog: {
     isVisible: false,
     cluster: undefined
@@ -50,6 +51,10 @@ store.receptors.push((action: SettingsActionType): void => {
       }
       return state.merge({
         enrollMokDialog: action.payload
+      })
+    case 'SET_SHOW_ENROLL_MOK_DIALOG':
+      return state.merge({
+        showEnrollMokDialog: action.payload
       })
     case 'SET_RESTART_DIALOG':
       return state.merge({
@@ -113,6 +118,10 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setEnrollMokDialog(mokDialogInfo))
   },
+  setShowEnrollMokDialog: (isVisible: boolean) => {
+    const dispatch = useDispatch()
+    dispatch(SettingsAction.setShowEnrollMokDialog(isVisible))
+  },
   setRestartDialog: (isVisible: boolean) => {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setRestartDialog(isVisible))
@@ -129,6 +138,7 @@ export const SettingsService = {
     const dispatch = useDispatch()
     window.electronAPI.on(Channels.Cluster.SetupMok, (cluster: ClusterModel) => {
       dispatch(SettingsAction.setEnrollMokDialog({ isVisible: true, cluster: cluster }))
+      dispatch(SettingsAction.setShowEnrollMokDialog(true))
       return
     })
   }
@@ -163,6 +173,12 @@ export const SettingsAction = {
   setRestartDialog: (payload: boolean) => {
     return {
       type: 'SET_RESTART_DIALOG' as const,
+      payload
+    }
+  },
+  setShowEnrollMokDialog: (payload: boolean) => {
+    return {
+      type: 'SET_SHOW_ENROLL_MOK_DIALOG' as const,
       payload
     }
   },
