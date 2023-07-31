@@ -4,7 +4,7 @@ import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'
 import { OSType } from 'models/AppSysInfo'
-import { cloneCluster, ClusterModel, ClusterType } from 'models/Cluster'
+import { cloneCluster, ClusterModel } from 'models/Cluster'
 import { FetchableItem } from 'models/FetchableItem'
 import { GitStatus } from 'models/GitStatus'
 
@@ -23,8 +23,6 @@ type DeploymentState = {
   systemStatus: AppModel[]
   appStatus: AppModel[]
   engineStatus: AppModel[]
-  showPermissionDialog: boolean
-  showRestartDialog: boolean
 }
 
 //State
@@ -162,20 +160,6 @@ store.receptors.push((action: DeploymentActionType): void => {
       }
       break
     }
-    case 'SET_SHOW_PERMISSION_DIALOG': {
-      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
-      if (index !== -1) {
-        state[index].showPermissionDialog.set(action.showPermissionDialog)
-      }
-      break
-    }
-    case 'SET_SHOW_RESTART_DIALOG': {
-      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
-      if (index !== -1) {
-        state[index].showRestartDialog.set(action.showRestartDialog)
-      }
-      break
-    }
   }
 })
 
@@ -309,7 +293,7 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     dispatch(DeploymentAction.setAdminPanel(clusterId))
   },
-  processConfigurations: async (cluster: ClusterModel, password: string, permission: string = 'none', flags: Record<string, string>) => {
+  processConfigurations: async (cluster: ClusterModel, password: string, flags: Record<string, string>) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
@@ -319,25 +303,11 @@ export const DeploymentService = {
     try {
       dispatch(DeploymentAction.setConfiguring(clonedCluster.id, true))
 
-      let code = 0;
+      await window.electronAPI.invoke(Channels.Cluster.ConfigureCluster, clonedCluster, password, flags)
 
-      if (clonedCluster.type === ClusterType.Minikube) {
-        code = await window.electronAPI.invoke(Channels.Cluster.CheckMok, clonedCluster, password, permission, flags)
-      }
+      await delay(2000)
 
-      if (code === 2) {
-        dispatch(DeploymentAction.setShowPermissionDialog(clonedCluster.id, true))
-      }
-
-      else {
-
-        await window.electronAPI.invoke(Channels.Cluster.ConfigureCluster, clonedCluster, password, flags)
-
-        await delay(2000)
-
-        DeploymentService.fetchDeploymentStatus(clonedCluster)
-      }
-
+      DeploymentService.fetchDeploymentStatus(clonedCluster)
     } catch (error) {
       console.error(error)
 
@@ -465,21 +435,7 @@ export const DeploymentAction = {
       clusterId,
       engineStatus: engineStatus
     }
-  },
-  setShowPermissionDialog: (clusterId: string, showPermissionDialog: boolean) => {
-    return {
-      type: 'SET_SHOW_PERMISSION_DIALOG' as const,
-      clusterId,
-      showPermissionDialog,
-    }
-  },
-  setShowRestartDialog: (clusterId: string, showRestartDialog: boolean) => {
-    return {
-      type: 'SET_SHOW_RESTART_DIALOG' as const,
-      clusterId,
-      showRestartDialog,
-    }
-  },
+  }
 }
 
 export type DeploymentActionType = ReturnType<(typeof DeploymentAction)[keyof typeof DeploymentAction]>
