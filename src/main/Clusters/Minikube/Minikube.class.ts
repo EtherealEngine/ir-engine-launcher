@@ -72,8 +72,7 @@ class Minikube {
     window: BrowserWindow,
     cluster: ClusterModel,
     password: string,
-    flags: Record<string, string>,
-    permission: string = 'none'
+    flags: Record<string, string>
   ) => {
     const category = 'configure minikube'
     try {
@@ -96,12 +95,7 @@ class Minikube {
       const onCheckMokStd = (data: any) => {
         window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: data } as LogModel)
       }
-      const mokCode = await execStreamScriptFile(
-        checkMokScript,
-        [`-o "${permission}"`, `-p "${password}"`],
-        onCheckMokStd,
-        onCheckMokStd
-      )
+      const mokCode = await execStreamScriptFile(checkMokScript, [`-p "${password}"`], onCheckMokStd, onCheckMokStd)
 
       if (mokCode === 1) {
         throw `Failed with error code ${mokCode}.`

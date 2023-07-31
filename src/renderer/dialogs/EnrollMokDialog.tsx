@@ -7,6 +7,8 @@ import { SettingsService, useSettingsState } from 'renderer/services/SettingsSer
 
 import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material'
 
+import logoMinikube from '../../../assets/icons/minikube.png'
+
 interface Props {
   onClose: () => void
 }
@@ -17,7 +19,7 @@ const EnrollMokDialog = ({ onClose }: Props) => {
 
   const onSetupMok = async () => {
     try {
-      const clonedCluster = cloneCluster(selectedCluster)
+      const clonedCluster = cloneCluster(selectedCluster!)
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
@@ -30,6 +32,7 @@ const EnrollMokDialog = ({ onClose }: Props) => {
       }
 
       SettingsService.setRestartDialog(true)
+      onClose()
     } catch (err) {
       enqueueSnackbar('Failed to setup MOK.', { variant: 'error' })
     }
@@ -37,9 +40,7 @@ const EnrollMokDialog = ({ onClose }: Props) => {
 
   return (
     <Dialog open fullWidth maxWidth="sm" scroll="paper">
-      <DialogTitle>
-        {selectedCluster.name}: Do you want to allow this app to enroll Machine Owner Key (MOK)?
-      </DialogTitle>
+      <DialogTitle>Machine Owner Key (MOK) enrollment</DialogTitle>
       <DialogContent dividers sx={{ padding: 0 }}>
         <Box
           sx={{
@@ -48,14 +49,33 @@ const EnrollMokDialog = ({ onClose }: Props) => {
             m: 2
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
-            <Typography variant="body2">
-              UEFI Secure Boot is enabled for this system. You need a Secure Boot Module Signature key enrolled for
-              Minikube configuration to proceed. Once you allow this app to enroll this Machine Owner Key, you will be
-              presented with a terminal.
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row', mt: 1 }}>
+            <Box
+              sx={{
+                width: '50%',
+                height: '100%',
+                flexDirection: 'column',
+                display: 'flex',
+                padding: 1,
+                alignItems: 'center',
+                borderRadius: 1,
+                gap: 1
+              }}
+            >
+              <Box sx={{ width: 45, mt: 0.5 }} component="img" src={logoMinikube} />
+              <Typography variant="body1">{selectedCluster?.name}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
+              <Typography variant="body2">
+                UEFI Secure Boot is enabled for this system. You need a Secure Boot Module Signature key enrolled for
+                Minikube configuration to proceed. Once you allow this app to enroll this Machine Owner Key, you will be
+                presented with a terminal.
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
             <Typography variant="body2" sx={{ marginTop: 2 }}>
-              Please follow these steps in the terminal:
+              Please follow these steps in the terminal to create a Secure Boot Module Signature key for your system:
             </Typography>
           </Box>
           <Box sx={{ ml: 1.5, mt: 2 }}>
@@ -75,16 +95,16 @@ const EnrollMokDialog = ({ onClose }: Props) => {
               <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>4</Avatar>
               <Typography variant="body2">Confirm password for MOK management</Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
-              <Typography variant="body2" sx={{ marginTop: 2 }}>
-                This will create a Secure Boot Module Signature key for your system
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
+              <Typography variant="body2" sx={{ marginTop: 2, fontWeight: 600 }}>
+                Do you want to enroll Machine Owner Key?
               </Typography>
             </Box>
           </Box>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>No</Button>
+        <Button onClick={onClose}>Cancel</Button>
         <Button type="submit" onClick={onSetupMok}>
           Yes
         </Button>

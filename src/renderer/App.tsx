@@ -35,6 +35,7 @@ const App = () => {
 
   const settingsState = useSettingsState()
   const { showAuthenticationDialog } = settingsState.value
+  const { showRestartDialog } = settingsState.value
 
   const defaultMode = 'vaporwave' as ThemeMode
   const storedMode = localStorage.getItem(Storage.COLOR_MODE) as ThemeMode | undefined
@@ -114,15 +115,12 @@ const App = () => {
                 <EnrollMokDialog
                   onClose={() =>
                     SettingsService.setEnrollMokDialog({
-                      isVisible: false,
-                      cluster: settingsState.value.enrollMokDialog.cluster
+                      isVisible: false
                     })
                   }
                 />
               )}
-              {settingsState.showRestartDialog.value && (
-                <RestartDialog onClose={() => SettingsService.setRestartDialog(false)} />
-              )}
+              {showRestartDialog && <RestartDialog onClose={() => SettingsService.setRestartDialog(false)} />}
             </Box>
           </HashRouter>
         </SnackbarProvider>

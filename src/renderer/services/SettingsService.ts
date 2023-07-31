@@ -22,7 +22,7 @@ const state = hookstate({
   showCreateClusterDialog: false,
   enrollMokDialog: {
     isVisible: false,
-    cluster: {} as ClusterModel
+    cluster: undefined
   } as MokDialogInfo,
   showRestartDialog: false,
   notistack: {} as SnackbarProvider
@@ -43,6 +43,11 @@ store.receptors.push((action: SettingsActionType): void => {
         showAuthenticationDialog: action.payload
       })
     case 'SET_ENROLL_MOK_DIALOG':
+      if (!action.payload.cluster) {
+        return state.merge({
+          enrollMokDialog: { isVisible: action.payload.isVisible, cluster: state.enrollMokDialog.cluster.value }
+        })
+      }
       return state.merge({
         enrollMokDialog: action.payload
       })
