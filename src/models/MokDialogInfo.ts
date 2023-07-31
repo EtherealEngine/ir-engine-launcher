@@ -1,6 +1,6 @@
-import { ClusterModel } from "./Cluster"
+import { ClusterModel } from './Cluster'
 
 export type MokDialogInfo = {
-  isVisible: boolean,
+  isVisible: boolean
   cluster: ClusterModel
 }

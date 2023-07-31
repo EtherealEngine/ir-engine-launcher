@@ -98,10 +98,7 @@ class Minikube {
       }
       const mokCode = await execStreamScriptFile(
         checkMokScript,
-        [
-          `-o "${permission}"`,
-          `-p "${password}"`
-        ],
+        [`-o "${permission}"`, `-p "${password}"`],
         onCheckMokStd,
         onCheckMokStd
       )

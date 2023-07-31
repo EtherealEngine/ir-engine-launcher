@@ -5,11 +5,11 @@ import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { AppModel } from 'models/AppStatus'
 import { AppSysInfo, OSType } from 'models/AppSysInfo'
+import { ClusterModel } from 'models/Cluster'
+import { MokDialogInfo } from 'models/MokDialogInfo'
 import { SnackbarProvider } from 'notistack'
 
 import { store, useDispatch } from '../store'
-import { ClusterModel } from 'models/Cluster'
-import { MokDialogInfo } from 'models/MokDialogInfo'
 
 //State
 const state = hookstate({
@@ -22,7 +22,7 @@ const state = hookstate({
   showCreateClusterDialog: false,
   enrollMokDialog: {
     isVisible: false,
-    cluster: {}
+    cluster: {} as ClusterModel
   } as MokDialogInfo,
   showRestartDialog: false,
   notistack: {} as SnackbarProvider
@@ -104,7 +104,7 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setCreateClusterDialog(isVisible))
   },
-  setEnrollMokDialog: (mokDialogInfo) => {
+  setEnrollMokDialog: (mokDialogInfo: MokDialogInfo) => {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setEnrollMokDialog(mokDialogInfo))
   },
@@ -123,7 +123,6 @@ export const SettingsService = {
   listen: async () => {
     const dispatch = useDispatch()
     window.electronAPI.on(Channels.Cluster.SetupMok, (cluster: ClusterModel) => {
-
       dispatch(SettingsAction.setEnrollMokDialog({ isVisible: true, cluster: cluster }))
       return
     })

@@ -14,6 +14,8 @@ import HotBar from './common/HotBar'
 import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import AuthenticationDialog from './dialogs/AuthenticationDialog'
+import EnrollMokDialog from './dialogs/EnrollMokDialog'
+import RestartDialog from './dialogs/RestartDialog'
 import AdminPage from './pages/AdminPage'
 import ConfigPage from './pages/ConfigPage'
 import IPFSPage from './pages/IPFSPage'
@@ -107,6 +109,19 @@ const App = () => {
 
               {showAuthenticationDialog && (
                 <AuthenticationDialog onClose={() => SettingsService.setAuthenticationDialog(false)} />
+              )}
+              {settingsState.value.enrollMokDialog.isVisible && (
+                <EnrollMokDialog
+                  onClose={() =>
+                    SettingsService.setEnrollMokDialog({
+                      isVisible: false,
+                      cluster: settingsState.value.enrollMokDialog.cluster
+                    })
+                  }
+                />
+              )}
+              {settingsState.showRestartDialog.value && (
+                <RestartDialog onClose={() => SettingsService.setRestartDialog(false)} />
               )}
             </Box>
           </HashRouter>

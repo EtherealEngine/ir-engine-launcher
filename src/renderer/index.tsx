@@ -24,6 +24,7 @@ if (isSplash) {
   DeploymentService.listen()
   ConfigFileService.init()
   SettingsService.init()
+  SettingsService.listen()
 
   root.render(<App />)
 }

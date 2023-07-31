@@ -8,7 +8,6 @@ set -e
 
 while getopts o:p: flag; do
     case "${flag}" in
-    o) PERMISSION=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
     *)
         echo "Invalid argument passed" >&2
@@ -17,25 +16,10 @@ while getopts o:p: flag; do
     esac
 done
 
-if [[  -z $PERMISSION || -z $PASSWORD ]]; then
+if [[  -z $PASSWORD ]]; then
     echo "Missing arguments"
     exit 1
 fi
-
-#==========
-# Functions
-#==========
-
-enrollMok() {
-    password=$1
-
-    sudo dpkg --configure -a
-
-    echo "$password" | sudo -S systemctl reboot
-    exit 0
-}
-
-export -f enrollMok
 
 #===========
 # Verify MOK
@@ -54,16 +38,9 @@ fi
 if echo "$PASSWORD" | sudo -S mokutil --sb-state | grep -q 'SecureBoot enabled'; then
     if echo "$PASSWORD" | sudo -S mokutil --list-enrolled | grep -q 'Secure Boot Module Signature key'; then
         echo "mok is enrolled"
+        exit 0
     else
-        if $PERMISSION -eq 'yes'; then
-            gnome-terminal --wait -- bash -c "enrollMok $PASSWORD;exec bash"
-            #Exit code 3 indicates restart is needed
-            exit 3
-        elif $PERMISSION -eq 'none'; then 
-            #Exit code 2 indicates permission is needed 
-            exit 2
-        else
-            exit 1
-        fi
+        #Exit code 2 indicates permission is needed
+        exit 2
     fi
 fi
