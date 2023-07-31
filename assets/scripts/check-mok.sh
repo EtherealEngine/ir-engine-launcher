@@ -59,6 +59,7 @@ if echo "$PASSWORD" | sudo -S mokutil --sb-state | grep -q 'SecureBoot enabled';
             gnome-terminal --wait -- bash -c "enrollMok $PASSWORD;exec bash"
             exit 0
         elif $PERMISSION -eq 'none'; then 
+            #Exit code 2 indicates permission is needed 
             exit 2
         else
             exit 1
