@@ -8,6 +8,8 @@ import { AppSysInfo, OSType } from 'models/AppSysInfo'
 import { SnackbarProvider } from 'notistack'
 
 import { store, useDispatch } from '../store'
+import { ClusterModel } from 'models/Cluster'
+import { MokDialogInfo } from 'models/MokDialogInfo'
 
 //State
 const state = hookstate({
@@ -18,6 +20,11 @@ const state = hookstate({
   sudoPassword: '',
   showAuthenticationDialog: false,
   showCreateClusterDialog: false,
+  enrollMokDialog: {
+    isVisible: false,
+    cluster: {}
+  } as MokDialogInfo,
+  showRestartDialog: false,
   notistack: {} as SnackbarProvider
 })
 
@@ -34,6 +41,14 @@ store.receptors.push((action: SettingsActionType): void => {
     case 'SET_AUTHENTICATION_DIALOG':
       return state.merge({
         showAuthenticationDialog: action.payload
+      })
+    case 'SET_ENROLL_MOK_DIALOG':
+      return state.merge({
+        enrollMokDialog: action.payload
+      })
+    case 'SET_RESTART_DIALOG':
+      return state.merge({
+        showRestartDialog: action.payload
       })
     case 'SET_CREATE_CLUSTER_DIALOG':
       return state.merge({
@@ -89,6 +104,14 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setCreateClusterDialog(isVisible))
   },
+  setEnrollMokDialog: (mokDialogInfo) => {
+    const dispatch = useDispatch()
+    dispatch(SettingsAction.setEnrollMokDialog(mokDialogInfo))
+  },
+  setRestartDialog: (isVisible: boolean) => {
+    const dispatch = useDispatch()
+    dispatch(SettingsAction.setRestartDialog(isVisible))
+  },
   getPrerequisites: async () => {
     const statuses: AppModel[] = await window.electronAPI.invoke(Channels.Utilities.GetPrerequisites)
     return statuses
@@ -96,6 +119,14 @@ export const SettingsService = {
   checkPrerequisite: async (prerequisite: AppModel) => {
     const status: AppModel = await window.electronAPI.invoke(Channels.Utilities.CheckPrerequisite, prerequisite)
     return status
+  },
+  listen: async () => {
+    const dispatch = useDispatch()
+    window.electronAPI.on(Channels.Cluster.SetupMok, (cluster: ClusterModel) => {
+
+      dispatch(SettingsAction.setEnrollMokDialog({ isVisible: true, cluster: cluster }))
+      return
+    })
   }
 }
 
@@ -116,6 +147,18 @@ export const SettingsAction = {
   setAuthenticationDialog: (payload: boolean) => {
     return {
       type: 'SET_AUTHENTICATION_DIALOG' as const,
+      payload
+    }
+  },
+  setEnrollMokDialog: (payload: MokDialogInfo) => {
+    return {
+      type: 'SET_ENROLL_MOK_DIALOG' as const,
+      payload
+    }
+  },
+  setRestartDialog: (payload: boolean) => {
+    return {
+      type: 'SET_RESTART_DIALOG' as const,
       payload
     }
   },
