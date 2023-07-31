@@ -68,6 +68,59 @@ class Minikube {
     }
   }
 
+  static checkMok = async (
+    window: BrowserWindow,
+    cluster: ClusterModel,
+    password: string,
+    permission: string,
+    flags: Record<string, string>
+  ) => {
+    const category = 'check mok'
+    try {
+      await BaseCluster.ensureVariables(
+        cluster,
+        (variables) =>
+          (variables['FILE_SERVER_FOLDER'] = cluster.variables['FILE_SERVER_FOLDER'].replace('home/', 'hosthome/'))
+      )
+
+      await ensureConfigs(cluster, Endpoints.Paths.MINIKUBE_VALUES_TEMPLATE, Endpoints.Urls.MINIKUBE_VALUES_TEMPLATE)
+
+      const scriptsFolder = scriptsPath()
+      const checkMokScript = path.join(scriptsFolder, 'check-mok.sh')
+      log.info(`Executing script ${checkMokScript}`)
+
+      const onCheckMokStd = (data: any) => {
+        window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: data } as LogModel)
+      }
+      const code = await execStreamScriptFile(
+        checkMokScript,
+        [
+          `-pr "${permission}"`,
+          `-p "${password}"`
+        ],
+        onCheckMokStd,
+        onCheckMokStd
+      )
+      if (code === 2) {
+        return code
+      }
+
+      if (code === 1) {
+        throw `Failed with error code ${code}.`
+      }
+
+      return code
+      
+    } catch (err) {
+      log.error('Error in checkMok Minikube.', err)
+      window.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category,
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
+    }
+  }
+
   static configureCluster = async (
     window: BrowserWindow,
     cluster: ClusterModel,

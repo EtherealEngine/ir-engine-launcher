@@ -279,6 +279,9 @@ const OptionsPanel = () => {
           onOk={handleDelete}
         />
       )}
+
+      {currentDeployment?.showPermissionDialog && <div></div>}
+
     </Stack>
   )
 }

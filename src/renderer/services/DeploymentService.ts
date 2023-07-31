@@ -4,7 +4,7 @@ import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'
 import { OSType } from 'models/AppSysInfo'
-import { cloneCluster, ClusterModel } from 'models/Cluster'
+import { cloneCluster, ClusterModel, ClusterType } from 'models/Cluster'
 import { FetchableItem } from 'models/FetchableItem'
 import { GitStatus } from 'models/GitStatus'
 
@@ -23,6 +23,7 @@ type DeploymentState = {
   systemStatus: AppModel[]
   appStatus: AppModel[]
   engineStatus: AppModel[]
+  showPermissionDialog: boolean
 }
 
 //State
@@ -49,6 +50,13 @@ store.receptors.push((action: DeploymentActionType): void => {
         }
       } catch (err) {
         console.log(err)
+      }
+      break
+    }
+    case 'SET_SHOW_PERMISSION_DIALOG': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].showPermissionDialog.set(action.showPermissionDialog)
       }
       break
     }
@@ -293,7 +301,7 @@ export const DeploymentService = {
     const dispatch = useDispatch()
     dispatch(DeploymentAction.setAdminPanel(clusterId))
   },
-  processConfigurations: async (cluster: ClusterModel, password: string, flags: Record<string, string>) => {
+  processConfigurations: async (cluster: ClusterModel, password: string, permission: string = 'none', flags: Record<string, string>) => {
     // Here we are cloning cluster object so that when selected Cluster is changed,
     // The context cluster does not change.
     const clonedCluster = cloneCluster(cluster)
@@ -303,11 +311,25 @@ export const DeploymentService = {
     try {
       dispatch(DeploymentAction.setConfiguring(clonedCluster.id, true))
 
-      await window.electronAPI.invoke(Channels.Cluster.ConfigureCluster, clonedCluster, password, flags)
+      let code = 0;
 
-      await delay(2000)
+      if (clonedCluster.type === ClusterType.Minikube) {
+        code = await window.electronAPI.invoke(Channels.Cluster.CheckMok, clonedCluster, password, permission, flags)
+      }
 
-      DeploymentService.fetchDeploymentStatus(clonedCluster)
+      if (code === 2) {
+        dispatch(DeploymentAction.setShowPermissionDialog(clonedCluster.id, true))
+      }
+
+      else {
+
+        await window.electronAPI.invoke(Channels.Cluster.ConfigureCluster, clonedCluster, password, flags)
+
+        await delay(2000)
+
+        DeploymentService.fetchDeploymentStatus(clonedCluster)
+      }
+
     } catch (error) {
       console.error(error)
 
@@ -371,6 +393,13 @@ export const DeploymentAction = {
       type: 'SET_FETCHING_STATUSES' as const,
       clusterId,
       isFetchingStatuses
+    }
+  },
+  setShowPermissionDialog: (clusterId: string, showPermissionDialog: boolean) => {
+    return {
+      type: 'SET_SHOW_PERMISSION_DIALOG' as const,
+      clusterId,
+      showPermissionDialog,
     }
   },
   removeDeployment: (clusterId: string) => {
