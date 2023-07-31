@@ -107,7 +107,14 @@ const EngineView = ({ sx }: Props) => {
       const clonedCluster = cloneCluster(selectedCluster)
       const enginePath = clonedCluster.configs[Storage.ENGINE_PATH]
 
-      const command = `docker container stop etherealengine_minikube_db; docker container rm etherealengine_minikube_db; docker container prune --force; cd '${enginePath}'; npm run dev-docker`
+      const command = `
+        docker container stop etherealengine_minikube_db;
+        docker container stop etherealengine_test_db;
+        docker container rm etherealengine_minikube_db;
+        docker container rm etherealengine_test_db;
+        docker container prune --force;
+        cd '${enginePath}';
+        npm run dev-docker`
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
