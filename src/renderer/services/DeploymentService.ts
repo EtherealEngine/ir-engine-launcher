@@ -24,6 +24,7 @@ type DeploymentState = {
   appStatus: AppModel[]
   engineStatus: AppModel[]
   showPermissionDialog: boolean
+  showRestartDialog: boolean
 }
 
 //State
@@ -50,13 +51,6 @@ store.receptors.push((action: DeploymentActionType): void => {
         }
       } catch (err) {
         console.log(err)
-      }
-      break
-    }
-    case 'SET_SHOW_PERMISSION_DIALOG': {
-      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
-      if (index !== -1) {
-        state[index].showPermissionDialog.set(action.showPermissionDialog)
       }
       break
     }
@@ -165,6 +159,20 @@ store.receptors.push((action: DeploymentActionType): void => {
       if (index !== -1) {
         const statusIndex = state[index].engineStatus.findIndex((app) => app.id.value === action.engineStatus.id)
         state[index].engineStatus.merge({ [statusIndex]: action.engineStatus })
+      }
+      break
+    }
+    case 'SET_SHOW_PERMISSION_DIALOG': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].showPermissionDialog.set(action.showPermissionDialog)
+      }
+      break
+    }
+    case 'SET_SHOW_RESTART_DIALOG': {
+      const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
+      if (index !== -1) {
+        state[index].showRestartDialog.set(action.showRestartDialog)
       }
       break
     }
@@ -395,13 +403,6 @@ export const DeploymentAction = {
       isFetchingStatuses
     }
   },
-  setShowPermissionDialog: (clusterId: string, showPermissionDialog: boolean) => {
-    return {
-      type: 'SET_SHOW_PERMISSION_DIALOG' as const,
-      clusterId,
-      showPermissionDialog,
-    }
-  },
   removeDeployment: (clusterId: string) => {
     return {
       type: 'REMOVE_DEPLOYMENT' as const,
@@ -464,7 +465,21 @@ export const DeploymentAction = {
       clusterId,
       engineStatus: engineStatus
     }
-  }
+  },
+  setShowPermissionDialog: (clusterId: string, showPermissionDialog: boolean) => {
+    return {
+      type: 'SET_SHOW_PERMISSION_DIALOG' as const,
+      clusterId,
+      showPermissionDialog,
+    }
+  },
+  setShowRestartDialog: (clusterId: string, showRestartDialog: boolean) => {
+    return {
+      type: 'SET_SHOW_RESTART_DIALOG' as const,
+      clusterId,
+      showRestartDialog,
+    }
+  },
 }
 
 export type DeploymentActionType = ReturnType<(typeof DeploymentAction)[keyof typeof DeploymentAction]>
