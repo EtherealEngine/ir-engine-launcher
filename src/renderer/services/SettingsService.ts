@@ -6,7 +6,6 @@ import CryptoJS from 'crypto-js'
 import { AppModel } from 'models/AppStatus'
 import { AppSysInfo, OSType } from 'models/AppSysInfo'
 import { ClusterModel } from 'models/Cluster'
-import { MokDialogInfo } from 'models/MokDialogInfo'
 import { SnackbarProvider } from 'notistack'
 
 import { store, useDispatch } from '../store'
@@ -21,10 +20,7 @@ const state = hookstate({
   showAuthenticationDialog: false,
   showCreateClusterDialog: false,
   showEnrollMokDialog: false,
-  enrollMokDialog: {
-    isVisible: false,
-    cluster: undefined
-  } as MokDialogInfo,
+  mokCluster: {} as ClusterModel,
   showRestartDialog: false,
   notistack: {} as SnackbarProvider
 })
@@ -43,16 +39,11 @@ store.receptors.push((action: SettingsActionType): void => {
       return state.merge({
         showAuthenticationDialog: action.payload
       })
-    case 'SET_ENROLL_MOK_DIALOG':
-      if (!action.payload.cluster) {
-        return state.merge({
-          enrollMokDialog: { isVisible: action.payload.isVisible, cluster: state.enrollMokDialog.cluster.value }
-        })
-      }
+    case 'SET_MOK_CLUSTER':
       return state.merge({
-        enrollMokDialog: action.payload
+        mokCluster: action.payload
       })
-    case 'SET_SHOW_ENROLL_MOK_DIALOG':
+    case 'SET_ENROLL_MOK_DIALOG':
       return state.merge({
         showEnrollMokDialog: action.payload
       })
@@ -114,13 +105,13 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setCreateClusterDialog(isVisible))
   },
-  setEnrollMokDialog: (mokDialogInfo: MokDialogInfo) => {
+  setMokCluster: (cluster: ClusterModel) => {
     const dispatch = useDispatch()
-    dispatch(SettingsAction.setEnrollMokDialog(mokDialogInfo))
+    dispatch(SettingsAction.setMokCluster(cluster))
   },
-  setShowEnrollMokDialog: (isVisible: boolean) => {
+  setEnrollMokDialog: (isVisible: boolean) => {
     const dispatch = useDispatch()
-    dispatch(SettingsAction.setShowEnrollMokDialog(isVisible))
+    dispatch(SettingsAction.setEnrollMokDialog(isVisible))
   },
   setRestartDialog: (isVisible: boolean) => {
     const dispatch = useDispatch()
@@ -137,8 +128,8 @@ export const SettingsService = {
   listen: async () => {
     const dispatch = useDispatch()
     window.electronAPI.on(Channels.Cluster.SetupMok, (cluster: ClusterModel) => {
-      dispatch(SettingsAction.setEnrollMokDialog({ isVisible: true, cluster: cluster }))
-      dispatch(SettingsAction.setShowEnrollMokDialog(true))
+      dispatch(SettingsAction.setMokCluster(cluster))
+      dispatch(SettingsAction.setEnrollMokDialog(true))
       return
     })
   }
@@ -164,9 +155,9 @@ export const SettingsAction = {
       payload
     }
   },
-  setEnrollMokDialog: (payload: MokDialogInfo) => {
+  setMokCluster: (payload: ClusterModel) => {
     return {
-      type: 'SET_ENROLL_MOK_DIALOG' as const,
+      type: 'SET_MOK_CLUSTER' as const,
       payload
     }
   },
@@ -176,9 +167,9 @@ export const SettingsAction = {
       payload
     }
   },
-  setShowEnrollMokDialog: (payload: boolean) => {
+  setEnrollMokDialog: (payload: boolean) => {
     return {
-      type: 'SET_SHOW_ENROLL_MOK_DIALOG' as const,
+      type: 'SET_ENROLL_MOK_DIALOG' as const,
       payload
     }
   },

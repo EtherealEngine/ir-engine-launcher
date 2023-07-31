@@ -14,7 +14,7 @@ interface Props {
 
 const RestartDialog = ({ onClose }: Props) => {
   const settingsState = useSettingsState()
-  const selectedCluster = settingsState.value.enrollMokDialog.cluster
+  const selectedCluster = settingsState.value.mokCluster
 
   const onRestart = async () => {
     try {
@@ -47,7 +47,10 @@ const RestartDialog = ({ onClose }: Props) => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            m: 2
+            mb: 2,
+            ml: 2,
+            mr: 2,
+            mt: 1
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row', mt: 1 }}>
@@ -91,10 +94,14 @@ const RestartDialog = ({ onClose }: Props) => {
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
               <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>4</Avatar>
-              <Typography variant="body2">Select 'Yes' on 'Enroll the key(s)'' screen</Typography>
+              <Typography variant="body2">Select 'Yes' on 'Enroll the key(s)' screen</Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
               <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>5</Avatar>
+              <Typography variant="body2">Enter MOK management password, which you used in the terminal</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
+              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>6</Avatar>
               <Typography variant="body2">Select 'Reboot' option in the final screen</Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
@@ -107,11 +114,11 @@ const RestartDialog = ({ onClose }: Props) => {
                 After rebooting you can run 'Configure' button in Ethereal Engine Control Center again
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
-              <Typography variant="body2" sx={{ marginTop: 2, fontWeight: 600 }}>
-                Do you want to reboot the system?
-              </Typography>
-            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
+            <Typography variant="body2" sx={{ marginTop: 2, fontWeight: 600 }}>
+              Do you want to reboot the system?
+            </Typography>
           </Box>
         </Box>
       </DialogContent>

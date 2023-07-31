@@ -15,7 +15,7 @@ interface Props {
 
 const EnrollMokDialog = ({ onClose }: Props) => {
   const settingsState = useSettingsState()
-  const selectedCluster = settingsState.value.enrollMokDialog.cluster
+  const selectedCluster = settingsState.value.mokCluster
 
   const onSetupMok = async () => {
     try {
@@ -46,7 +46,10 @@ const EnrollMokDialog = ({ onClose }: Props) => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            m: 2
+            mb: 2,
+            ml: 2,
+            mr: 2,
+            mt: 1
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row', mt: 1 }}>
@@ -95,11 +98,11 @@ const EnrollMokDialog = ({ onClose }: Props) => {
               <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>4</Avatar>
               <Typography variant="body2">Confirm password for MOK management</Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
-              <Typography variant="body2" sx={{ marginTop: 2, fontWeight: 600 }}>
-                Do you want to enroll Machine Owner Key?
-              </Typography>
-            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
+            <Typography variant="body2" sx={{ marginTop: 2, fontWeight: 600 }}>
+              Do you want to enroll Machine Owner Key?
+            </Typography>
           </Box>
         </Box>
       </DialogContent>

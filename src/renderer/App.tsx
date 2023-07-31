@@ -26,7 +26,7 @@ import { useConfigFileState } from './services/ConfigFileService'
 import { SettingsService, useSettingsState } from './services/SettingsService'
 import theme from './theme'
 
-export const ColorModeContext = React.createContext({ toggleColorMode: () => { } })
+export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
 const App = () => {
   const notistackRef = React.createRef<SnackbarProvider>()
@@ -79,7 +79,7 @@ const App = () => {
     const theme = defaultThemeSettings[mode] as any
     if (theme)
       for (const variable of Object.keys(theme)) {
-        ; (document.querySelector(`[data-theme=${mode}]`) as any)?.style.setProperty('--' + variable, theme[variable])
+        ;(document.querySelector(`[data-theme=${mode}]`) as any)?.style.setProperty('--' + variable, theme[variable])
       }
   }
 
@@ -112,13 +112,7 @@ const App = () => {
               {showAuthenticationDialog && (
                 <AuthenticationDialog onClose={() => SettingsService.setAuthenticationDialog(false)} />
               )}
-              {showEnrollMokDialog && (
-                <EnrollMokDialog
-                  onClose={() =>
-                    SettingsService.setShowEnrollMokDialog(false)
-                  }
-                />
-              )}
+              {showEnrollMokDialog && <EnrollMokDialog onClose={() => SettingsService.setEnrollMokDialog(false)} />}
               {showRestartDialog && <RestartDialog onClose={() => SettingsService.setRestartDialog(false)} />}
             </Box>
           </HashRouter>
