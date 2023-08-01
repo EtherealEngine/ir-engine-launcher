@@ -15,7 +15,7 @@ import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import AuthenticationDialog from './dialogs/AuthenticationDialog'
 import EnrollMokDialog from './dialogs/EnrollMokDialog'
-import RestartDialog from './dialogs/RestartDialog'
+import MokRestartDialog from './dialogs/MokRestartDialog'
 import AdminPage from './pages/AdminPage'
 import ConfigPage from './pages/ConfigPage'
 import IPFSPage from './pages/IPFSPage'
@@ -35,7 +35,7 @@ const App = () => {
 
   const settingsState = useSettingsState()
   const { showAuthenticationDialog } = settingsState.value
-  const { showRestartDialog } = settingsState.value
+  const { showMokRestartDialog } = settingsState.value
   const { showEnrollMokDialog } = settingsState.value
 
   const defaultMode = 'vaporwave' as ThemeMode
@@ -113,7 +113,7 @@ const App = () => {
                 <AuthenticationDialog onClose={() => SettingsService.setAuthenticationDialog(false)} />
               )}
               {showEnrollMokDialog && <EnrollMokDialog onClose={() => SettingsService.setEnrollMokDialog(false)} />}
-              {showRestartDialog && <RestartDialog onClose={() => SettingsService.setRestartDialog(false)} />}
+              {showMokRestartDialog && <MokRestartDialog onClose={() => SettingsService.setMokRestartDialog(false)} />}
             </Box>
           </HashRouter>
         </SnackbarProvider>

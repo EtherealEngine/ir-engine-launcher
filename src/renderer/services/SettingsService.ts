@@ -21,7 +21,7 @@ const state = hookstate({
   showCreateClusterDialog: false,
   showEnrollMokDialog: false,
   mokCluster: {} as ClusterModel,
-  showRestartDialog: false,
+  showMokRestartDialog: false,
   notistack: {} as SnackbarProvider
 })
 
@@ -47,9 +47,9 @@ store.receptors.push((action: SettingsActionType): void => {
       return state.merge({
         showEnrollMokDialog: action.payload
       })
-    case 'SET_RESTART_DIALOG':
+    case 'SET_MOK_RESTART_DIALOG':
       return state.merge({
-        showRestartDialog: action.payload
+        showMokRestartDialog: action.payload
       })
     case 'SET_CREATE_CLUSTER_DIALOG':
       return state.merge({
@@ -113,9 +113,9 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setEnrollMokDialog(isVisible))
   },
-  setRestartDialog: (isVisible: boolean) => {
+  setMokRestartDialog: (isVisible: boolean) => {
     const dispatch = useDispatch()
-    dispatch(SettingsAction.setRestartDialog(isVisible))
+    dispatch(SettingsAction.setMokRestartDialog(isVisible))
   },
   getPrerequisites: async () => {
     const statuses: AppModel[] = await window.electronAPI.invoke(Channels.Utilities.GetPrerequisites)
@@ -161,9 +161,9 @@ export const SettingsAction = {
       payload
     }
   },
-  setRestartDialog: (payload: boolean) => {
+  setMokRestartDialog: (payload: boolean) => {
     return {
-      type: 'SET_RESTART_DIALOG' as const,
+      type: 'SET_MOK_RESTART_DIALOG' as const,
       payload
     }
   },

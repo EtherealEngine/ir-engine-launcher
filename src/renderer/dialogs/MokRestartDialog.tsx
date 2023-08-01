@@ -12,7 +12,7 @@ interface Props {
   onClose: () => void
 }
 
-const RestartDialog = ({ onClose }: Props) => {
+const MokRestartDialog = ({ onClose }: Props) => {
   const settingsState = useSettingsState()
   const selectedCluster = settingsState.value.mokCluster
 
@@ -132,4 +132,4 @@ const RestartDialog = ({ onClose }: Props) => {
   )
 }
 
-export default RestartDialog
+export default MokRestartDialog

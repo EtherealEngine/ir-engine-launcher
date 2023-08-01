@@ -31,7 +31,7 @@ const EnrollMokDialog = ({ onClose }: Props) => {
         throw stringError
       }
 
-      SettingsService.setRestartDialog(true)
+      SettingsService.setMokRestartDialog(true)
       onClose()
     } catch (err) {
       enqueueSnackbar('Failed to setup MOK.', { variant: 'error' })

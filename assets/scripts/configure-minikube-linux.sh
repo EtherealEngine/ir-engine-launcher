@@ -176,7 +176,7 @@ else
     echo "virtualbox-dkms is not installed"
 
     echo "$PASSWORD" | sudo -S apt update -y
-    echo "$PASSWORD" | sudo -S sudo apt-get install virtualbox-dkms
+    echo "$PASSWORD" | sudo -S sudo apt-get install -y virtualbox-dkms
 fi
 
 #==================
