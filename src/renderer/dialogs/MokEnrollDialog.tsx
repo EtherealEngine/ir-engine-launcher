@@ -53,19 +53,22 @@ const MokEnrollDialog = ({ onClose }: Props) => {
             mt: 2
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'center'}}>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'center' }}>
             <Box
               sx={{
                 height: '100%',
+                maxWidth: 80,
                 flexDirection: 'column',
                 display: 'flex',
                 alignItems: 'center',
-                paddingRight: 3,
+                paddingRight: 2,
                 gap: 1
               }}
             >
-              <Box sx={{ width: 45}} component="img" src={logoMinikube} />
-              <Typography variant="body1">{selectedCluster?.name}</Typography>
+              <Box sx={{ width: 45 }} component="img" src={logoMinikube} />
+              <Typography variant="body1" title={selectedCluster?.name} className="textEllipse">
+                {selectedCluster?.name}
+              </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
               <Typography variant="body2">

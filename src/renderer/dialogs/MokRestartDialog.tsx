@@ -23,7 +23,7 @@ const MokRestartDialog = ({ onClose }: Props) => {
 
       const password = await SettingsService.getDecryptedSudoPassword()
 
-      const command =  Commands.MOK_RESTART.replaceAll('sudo', `echo "${password}" | sudo -S`)
+      const command = Commands.MOK_RESTART.replaceAll('sudo', `echo "${password}" | sudo -S`)
 
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
@@ -58,15 +58,18 @@ const MokRestartDialog = ({ onClose }: Props) => {
             <Box
               sx={{
                 height: '100%',
+                maxWidth: 80,
                 flexDirection: 'column',
                 display: 'flex',
                 alignItems: 'center',
-                paddingRight: 3,
+                paddingRight: 2,
                 gap: 1
               }}
             >
-              <Box sx={{ width: 45}} component="img" src={logoMinikube} />
-              <Typography variant="body1">{selectedCluster?.name}</Typography>
+              <Box sx={{ width: 45 }} component="img" src={logoMinikube} />
+              <Typography variant="body1" title={selectedCluster?.name} className="textEllipse">
+                {selectedCluster?.name}
+              </Typography>
             </Box>
             <Typography variant="body2">
               Secure Boot Module Signature key has been setup, you will need to restart this system to enroll it. After
