@@ -1,4 +1,5 @@
 import Channels from 'constants/Channels'
+import Commands from 'main/Clusters/BaseCluster/BaseCluster.commands'
 import { cloneCluster } from 'models/Cluster'
 import { ShellResponse } from 'models/ShellResponse'
 import { enqueueSnackbar } from 'notistack'
@@ -14,7 +15,7 @@ interface Props {
 
 const MokRestartDialog = ({ onClose }: Props) => {
   const settingsState = useSettingsState()
-  const selectedCluster = settingsState.value.mokCluster
+  const selectedCluster = settingsState.value.mokRestartCluster
 
   const onRestart = async () => {
     try {
@@ -22,7 +23,7 @@ const MokRestartDialog = ({ onClose }: Props) => {
 
       const password = await SettingsService.getDecryptedSudoPassword()
 
-      const command = `echo '${password}' | sudo -S systemctl reboot`
+      const command =  Commands.MOK_RESTART.replaceAll('sudo', `echo "${password}" | sudo -S`)
 
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
@@ -49,24 +50,22 @@ const MokRestartDialog = ({ onClose }: Props) => {
             flexDirection: 'column',
             mb: 2,
             ml: 3,
-            mr: 2,
-            mt: 1
+            mr: 3,
+            mt: 2
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row', mt: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row' }}>
             <Box
               sx={{
-                width: '50%',
                 height: '100%',
                 flexDirection: 'column',
                 display: 'flex',
-                padding: 1,
                 alignItems: 'center',
-                borderRadius: 1,
+                paddingRight: 3,
                 gap: 1
               }}
             >
-              <Box sx={{ width: 45, mt: 0.5 }} component="img" src={logoMinikube} />
+              <Box sx={{ width: 45}} component="img" src={logoMinikube} />
               <Typography variant="body1">{selectedCluster?.name}</Typography>
             </Box>
             <Typography variant="body2">
@@ -76,7 +75,7 @@ const MokRestartDialog = ({ onClose }: Props) => {
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
             <Typography variant="body2" sx={{ marginTop: 2 }}>
-              Please follow these steps in the MOK manager:
+              Please follow these steps in the MOK manager to enroll a Secure Boot Module Signature key for your system:
             </Typography>
           </Box>
           <Box sx={{ ml: 1.5, mt: 2 }}>
@@ -104,11 +103,6 @@ const MokRestartDialog = ({ onClose }: Props) => {
               <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>6</Avatar>
               <Typography variant="body2">Select 'Reboot' option in the final screen</Typography>
             </Box>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
-            <Typography variant="body2" sx={{ marginTop: 2 }}>
-              This will enroll a Secure Boot Module Signature key for your system.
-            </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
             <Typography variant="body2">

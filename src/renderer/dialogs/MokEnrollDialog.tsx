@@ -20,10 +20,11 @@ const MokEnrollDialog = ({ onClose }: Props) => {
   const onSetupMok = async () => {
     try {
       const clonedCluster = cloneCluster(selectedCluster!)
+
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
         clonedCluster,
-        Commands.SETUP_MOK
+        Commands.MOK_SETUP
       )
 
       const stringError = output.stderr?.toString().trim() || ''
@@ -32,7 +33,7 @@ const MokEnrollDialog = ({ onClose }: Props) => {
       }
 
       onClose()
-      SettingsService.setMokRestartCluster(selectedCluster)
+      SettingsService.setMokRestartCluster(clonedCluster)
     } catch (err) {
       enqueueSnackbar('Failed to setup MOK.', { variant: 'error' })
     }
@@ -48,27 +49,25 @@ const MokEnrollDialog = ({ onClose }: Props) => {
             flexDirection: 'column',
             mb: 2,
             ml: 3,
-            mr: 2,
-            mt: 1
+            mr: 3,
+            mt: 2
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row', mt: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'row', justifyContent: 'center'}}>
             <Box
               sx={{
-                width: '50%',
                 height: '100%',
                 flexDirection: 'column',
                 display: 'flex',
-                padding: 1,
                 alignItems: 'center',
-                borderRadius: 1,
+                paddingRight: 3,
                 gap: 1
               }}
             >
-              <Box sx={{ width: 45, mt: 0.5 }} component="img" src={logoMinikube} />
+              <Box sx={{ width: 45}} component="img" src={logoMinikube} />
               <Typography variant="body1">{selectedCluster?.name}</Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
               <Typography variant="body2">
                 UEFI Secure Boot is enabled for this system. You need a Secure Boot Module Signature key enrolled for
                 Minikube configuration to proceed. Once you allow this app to enroll this Machine Owner Key, you will be
