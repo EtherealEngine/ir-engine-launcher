@@ -13,9 +13,9 @@ interface Props {
   onClose: () => void
 }
 
-const EnrollMokDialog = ({ onClose }: Props) => {
+const MokEnrollDialog = ({ onClose }: Props) => {
   const settingsState = useSettingsState()
-  const selectedCluster = settingsState.value.mokCluster
+  const selectedCluster = settingsState.value.mokEnrollCluster
 
   const onSetupMok = async () => {
     try {
@@ -31,8 +31,8 @@ const EnrollMokDialog = ({ onClose }: Props) => {
         throw stringError
       }
 
-      SettingsService.setMokRestartDialog(true)
       onClose()
+      SettingsService.setMokRestartCluster(selectedCluster)
     } catch (err) {
       enqueueSnackbar('Failed to setup MOK.', { variant: 'error' })
     }
@@ -116,4 +116,4 @@ const EnrollMokDialog = ({ onClose }: Props) => {
   )
 }
 
-export default EnrollMokDialog
+export default MokEnrollDialog

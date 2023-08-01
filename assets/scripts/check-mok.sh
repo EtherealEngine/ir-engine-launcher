@@ -36,11 +36,15 @@ else
 fi
 
 if echo "$PASSWORD" | sudo -S mokutil --sb-state | grep -q 'SecureBoot enabled'; then
+    echo "Secureboot is enabled"
     if echo "$PASSWORD" | sudo -S mokutil --list-enrolled | grep -q 'Secure Boot Module Signature key'; then
         echo "mok is enrolled"
         exit 0
     else
+        echo "mok is not enrolled"
         #Exit code 2 indicates permission is needed
         exit 2
     fi
+else
+    echo "SecureBoot is disabled"
 fi

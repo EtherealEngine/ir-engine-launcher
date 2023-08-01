@@ -100,9 +100,8 @@ class Minikube {
       if (mokCode === 1) {
         throw `Failed with error code ${mokCode}.`
       }
-
-      if (mokCode === 2) {
-        window.webContents.send(Channels.Cluster.SetupMok, cluster)
+      else if (mokCode === 2) {
+        window.webContents.send(Channels.Cluster.PromptSetupMok, cluster)
         return
       }
 

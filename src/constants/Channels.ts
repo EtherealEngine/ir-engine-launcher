@@ -43,7 +43,7 @@ const Channels = {
     ConfigureK8DashboardError: 'ConfigureK8DashboardError',
     ConfigureK8DashboardResponse: 'ConfigureK8DashboardResponse',
     ConfigureCluster: 'ConfigureCluster',
-    SetupMok: 'SetupMok'
+    PromptSetupMok: 'PromptSetupMok'
   },
   Updates: {
     CheckUpdate: 'CheckUpdate',

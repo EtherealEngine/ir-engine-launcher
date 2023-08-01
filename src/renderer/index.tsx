@@ -22,9 +22,9 @@ if (isSplash) {
 } else {
   LogService.listen()
   DeploymentService.listen()
+  SettingsService.listen()
   ConfigFileService.init()
   SettingsService.init()
-  SettingsService.listen()
 
   root.render(<App />)
 }

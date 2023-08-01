@@ -14,7 +14,6 @@ import HotBar from './common/HotBar'
 import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import AuthenticationDialog from './dialogs/AuthenticationDialog'
-import EnrollMokDialog from './dialogs/EnrollMokDialog'
 import MokRestartDialog from './dialogs/MokRestartDialog'
 import AdminPage from './pages/AdminPage'
 import ConfigPage from './pages/ConfigPage'
@@ -25,6 +24,7 @@ import WelcomePage from './pages/WelcomePage'
 import { useConfigFileState } from './services/ConfigFileService'
 import { SettingsService, useSettingsState } from './services/SettingsService'
 import theme from './theme'
+import MokEnrollDialog from './dialogs/MokEnrollDialog'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
@@ -35,8 +35,8 @@ const App = () => {
 
   const settingsState = useSettingsState()
   const { showAuthenticationDialog } = settingsState.value
-  const { showMokRestartDialog } = settingsState.value
-  const { showEnrollMokDialog } = settingsState.value
+  const { mokEnrollCluster } = settingsState.value
+  const { mokRestartCluster } = settingsState.value
 
   const defaultMode = 'vaporwave' as ThemeMode
   const storedMode = localStorage.getItem(Storage.COLOR_MODE) as ThemeMode | undefined
@@ -112,8 +112,8 @@ const App = () => {
               {showAuthenticationDialog && (
                 <AuthenticationDialog onClose={() => SettingsService.setAuthenticationDialog(false)} />
               )}
-              {showEnrollMokDialog && <EnrollMokDialog onClose={() => SettingsService.setEnrollMokDialog(false)} />}
-              {showMokRestartDialog && <MokRestartDialog onClose={() => SettingsService.setMokRestartDialog(false)} />}
+              {mokEnrollCluster && <MokEnrollDialog onClose={() => SettingsService.setMokEnrollCluster(undefined)} />}
+              {mokRestartCluster && <MokRestartDialog onClose={() => SettingsService.setMokRestartCluster(undefined)} />}
             </Box>
           </HashRouter>
         </SnackbarProvider>

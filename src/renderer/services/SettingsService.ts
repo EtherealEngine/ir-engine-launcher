@@ -19,9 +19,8 @@ const state = hookstate({
   sudoPassword: '',
   showAuthenticationDialog: false,
   showCreateClusterDialog: false,
-  showEnrollMokDialog: false,
-  mokCluster: {} as ClusterModel,
-  showMokRestartDialog: false,
+  mokEnrollCluster: undefined as ClusterModel | undefined,
+  mokRestartCluster: undefined as ClusterModel | undefined,
   notistack: {} as SnackbarProvider
 })
 
@@ -39,17 +38,13 @@ store.receptors.push((action: SettingsActionType): void => {
       return state.merge({
         showAuthenticationDialog: action.payload
       })
-    case 'SET_MOK_CLUSTER':
+    case 'SET_MOK_ENROLL_CLUSTER':
       return state.merge({
-        mokCluster: action.payload
+        mokEnrollCluster: action.payload
       })
-    case 'SET_ENROLL_MOK_DIALOG':
+    case 'SET_MOK_RESTART_CLUSTER':
       return state.merge({
-        showEnrollMokDialog: action.payload
-      })
-    case 'SET_MOK_RESTART_DIALOG':
-      return state.merge({
-        showMokRestartDialog: action.payload
+        mokRestartCluster: action.payload
       })
     case 'SET_CREATE_CLUSTER_DIALOG':
       return state.merge({
@@ -105,17 +100,13 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setCreateClusterDialog(isVisible))
   },
-  setMokCluster: (cluster: ClusterModel) => {
+  setMokEnrollCluster: (cluster?: ClusterModel) => {
     const dispatch = useDispatch()
-    dispatch(SettingsAction.setMokCluster(cluster))
+    dispatch(SettingsAction.setMokEnrollCluster(cluster!))
   },
-  setEnrollMokDialog: (isVisible: boolean) => {
+  setMokRestartCluster: (cluster?: ClusterModel) => {
     const dispatch = useDispatch()
-    dispatch(SettingsAction.setEnrollMokDialog(isVisible))
-  },
-  setMokRestartDialog: (isVisible: boolean) => {
-    const dispatch = useDispatch()
-    dispatch(SettingsAction.setMokRestartDialog(isVisible))
+    dispatch(SettingsAction.setMokRestartCluster(cluster!))
   },
   getPrerequisites: async () => {
     const statuses: AppModel[] = await window.electronAPI.invoke(Channels.Utilities.GetPrerequisites)
@@ -127,10 +118,8 @@ export const SettingsService = {
   },
   listen: async () => {
     const dispatch = useDispatch()
-    window.electronAPI.on(Channels.Cluster.SetupMok, (cluster: ClusterModel) => {
-      dispatch(SettingsAction.setMokCluster(cluster))
-      dispatch(SettingsAction.setEnrollMokDialog(true))
-      return
+    window.electronAPI.on(Channels.Cluster.PromptSetupMok, (cluster: ClusterModel) => {
+      dispatch(SettingsAction.setMokEnrollCluster(cluster))
     })
   }
 }
@@ -155,21 +144,15 @@ export const SettingsAction = {
       payload
     }
   },
-  setMokCluster: (payload: ClusterModel) => {
+  setMokEnrollCluster: (payload?: ClusterModel) => {
     return {
-      type: 'SET_MOK_CLUSTER' as const,
+      type: 'SET_MOK_ENROLL_CLUSTER' as const,
       payload
     }
   },
-  setMokRestartDialog: (payload: boolean) => {
+  setMokRestartCluster: (payload?: ClusterModel) => {
     return {
-      type: 'SET_MOK_RESTART_DIALOG' as const,
-      payload
-    }
-  },
-  setEnrollMokDialog: (payload: boolean) => {
-    return {
-      type: 'SET_ENROLL_MOK_DIALOG' as const,
+      type: 'SET_MOK_RESTART_CLUSTER' as const,
       payload
     }
   },
