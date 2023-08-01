@@ -235,3 +235,10 @@ body {
 .font-14 {
   font-size: 14px !important;
 }
+
+.textEllipse {
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

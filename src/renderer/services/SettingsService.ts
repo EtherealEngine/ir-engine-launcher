@@ -5,6 +5,7 @@ import Storage from 'constants/Storage'
 import CryptoJS from 'crypto-js'
 import { AppModel } from 'models/AppStatus'
 import { AppSysInfo, OSType } from 'models/AppSysInfo'
+import { ClusterModel } from 'models/Cluster'
 import { SnackbarProvider } from 'notistack'
 
 import { store, useDispatch } from '../store'
@@ -18,6 +19,8 @@ const state = hookstate({
   sudoPassword: '',
   showAuthenticationDialog: false,
   showCreateClusterDialog: false,
+  mokEnrollCluster: undefined as ClusterModel | undefined,
+  mokRestartCluster: undefined as ClusterModel | undefined,
   notistack: {} as SnackbarProvider
 })
 
@@ -34,6 +37,14 @@ store.receptors.push((action: SettingsActionType): void => {
     case 'SET_AUTHENTICATION_DIALOG':
       return state.merge({
         showAuthenticationDialog: action.payload
+      })
+    case 'SET_MOK_ENROLL_CLUSTER':
+      return state.merge({
+        mokEnrollCluster: action.payload
+      })
+    case 'SET_MOK_RESTART_CLUSTER':
+      return state.merge({
+        mokRestartCluster: action.payload
       })
     case 'SET_CREATE_CLUSTER_DIALOG':
       return state.merge({
@@ -89,6 +100,14 @@ export const SettingsService = {
     const dispatch = useDispatch()
     dispatch(SettingsAction.setCreateClusterDialog(isVisible))
   },
+  setMokEnrollCluster: (cluster?: ClusterModel) => {
+    const dispatch = useDispatch()
+    dispatch(SettingsAction.setMokEnrollCluster(cluster!))
+  },
+  setMokRestartCluster: (cluster?: ClusterModel) => {
+    const dispatch = useDispatch()
+    dispatch(SettingsAction.setMokRestartCluster(cluster!))
+  },
   getPrerequisites: async () => {
     const statuses: AppModel[] = await window.electronAPI.invoke(Channels.Utilities.GetPrerequisites)
     return statuses
@@ -96,6 +115,12 @@ export const SettingsService = {
   checkPrerequisite: async (prerequisite: AppModel) => {
     const status: AppModel = await window.electronAPI.invoke(Channels.Utilities.CheckPrerequisite, prerequisite)
     return status
+  },
+  listen: async () => {
+    const dispatch = useDispatch()
+    window.electronAPI.on(Channels.Cluster.PromptSetupMok, (cluster: ClusterModel) => {
+      dispatch(SettingsAction.setMokEnrollCluster(cluster))
+    })
   }
 }
 
@@ -116,6 +141,18 @@ export const SettingsAction = {
   setAuthenticationDialog: (payload: boolean) => {
     return {
       type: 'SET_AUTHENTICATION_DIALOG' as const,
+      payload
+    }
+  },
+  setMokEnrollCluster: (payload?: ClusterModel) => {
+    return {
+      type: 'SET_MOK_ENROLL_CLUSTER' as const,
+      payload
+    }
+  },
+  setMokRestartCluster: (payload?: ClusterModel) => {
+    return {
+      type: 'SET_MOK_RESTART_CLUSTER' as const,
       payload
     }
   },
