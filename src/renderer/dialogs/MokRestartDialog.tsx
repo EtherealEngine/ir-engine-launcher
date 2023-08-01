@@ -23,7 +23,7 @@ const MokRestartDialog = ({ onClose }: Props) => {
 
       const password = await SettingsService.getDecryptedSudoPassword()
 
-      const command =  Commands.MOK_RESTART.replaceAll('sudo', `echo "${password}" | sudo -S`)
+      const command = Commands.MOK_RESTART.replaceAll('sudo', `echo "${password}" | sudo -S`)
 
       const output: ShellResponse = await window.electronAPI.invoke(
         Channels.Shell.ExecuteCommand,
@@ -65,7 +65,7 @@ const MokRestartDialog = ({ onClose }: Props) => {
                 gap: 1
               }}
             >
-              <Box sx={{ width: 45}} component="img" src={logoMinikube} />
+              <Box sx={{ width: 45 }} component="img" src={logoMinikube} />
               <Typography variant="body1">{selectedCluster?.name}</Typography>
             </Box>
             <Typography variant="body2">
