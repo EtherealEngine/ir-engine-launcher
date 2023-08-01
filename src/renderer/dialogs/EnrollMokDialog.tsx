@@ -47,7 +47,7 @@ const EnrollMokDialog = ({ onClose }: Props) => {
             display: 'flex',
             flexDirection: 'column',
             mb: 2,
-            ml: 2,
+            ml: 3,
             mr: 2,
             mt: 1
           }}

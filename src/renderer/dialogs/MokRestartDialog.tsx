@@ -48,7 +48,7 @@ const MokRestartDialog = ({ onClose }: Props) => {
             display: 'flex',
             flexDirection: 'column',
             mb: 2,
-            ml: 2,
+            ml: 3,
             mr: 2,
             mt: 1
           }}
@@ -84,7 +84,7 @@ const MokRestartDialog = ({ onClose }: Props) => {
               <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>1</Avatar>
               <Typography variant="body2">Press any key on first screen</Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
               <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>2</Avatar>
               <Typography variant="body2">Select 'Enroll MOK' option</Typography>
             </Box>
@@ -104,16 +104,16 @@ const MokRestartDialog = ({ onClose }: Props) => {
               <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>6</Avatar>
               <Typography variant="body2">Select 'Reboot' option in the final screen</Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
-              <Typography variant="body2" sx={{ marginTop: 2 }}>
-                This will enroll a Secure Boot Module Signature key for your system.
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
-              <Typography variant="body2">
-                After rebooting you can run 'Configure' button in Ethereal Engine Control Center again
-              </Typography>
-            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
+            <Typography variant="body2" sx={{ marginTop: 2 }}>
+              This will enroll a Secure Boot Module Signature key for your system.
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
+            <Typography variant="body2">
+              After rebooting you can run 'Configure' button in Ethereal Engine Control Center again
+            </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column', mt: 1 }}>
             <Typography variant="body2" sx={{ marginTop: 2, fontWeight: 600 }}>
