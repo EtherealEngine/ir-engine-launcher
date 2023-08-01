@@ -14,6 +14,7 @@ import HotBar from './common/HotBar'
 import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import AuthenticationDialog from './dialogs/AuthenticationDialog'
+import MokEnrollDialog from './dialogs/MokEnrollDialog'
 import MokRestartDialog from './dialogs/MokRestartDialog'
 import AdminPage from './pages/AdminPage'
 import ConfigPage from './pages/ConfigPage'
@@ -24,7 +25,6 @@ import WelcomePage from './pages/WelcomePage'
 import { useConfigFileState } from './services/ConfigFileService'
 import { SettingsService, useSettingsState } from './services/SettingsService'
 import theme from './theme'
-import MokEnrollDialog from './dialogs/MokEnrollDialog'
 
 export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
 
@@ -113,7 +113,9 @@ const App = () => {
                 <AuthenticationDialog onClose={() => SettingsService.setAuthenticationDialog(false)} />
               )}
               {mokEnrollCluster && <MokEnrollDialog onClose={() => SettingsService.setMokEnrollCluster(undefined)} />}
-              {mokRestartCluster && <MokRestartDialog onClose={() => SettingsService.setMokRestartCluster(undefined)} />}
+              {mokRestartCluster && (
+                <MokRestartDialog onClose={() => SettingsService.setMokRestartCluster(undefined)} />
+              )}
             </Box>
           </HashRouter>
         </SnackbarProvider>
