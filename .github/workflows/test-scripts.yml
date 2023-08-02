@@ -30,7 +30,6 @@ jobs:
       - name: Configure MicroK8s Cluster
         if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && steps.changed-files.outputs.scripts_any_modified == 'true' }}
         run: |
-          sudo apt install sed
           mkdir -p /opt
 
           ASSETS_PATH="$GITHUB_WORKSPACE/assets"
