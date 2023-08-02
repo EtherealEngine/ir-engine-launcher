@@ -41,9 +41,9 @@ jobs:
           PASSWORD= # Github actions run in password-less sudo mode.
           ENABLE_RIPPLE_STACK=false
 
-          mkdir -p "$CONFIGS_PATH"
-          curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
-          sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/opt'," "$CONFIGS_PATH/test-engine.values.yaml"
+          sudo mkdir -p "$CONFIGS_PATH"
+          sudo curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
+          sudo sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/opt'," "$CONFIGS_PATH/test-engine.values.yaml"
 
           sudo bash "$ASSETS_PATH/scripts/configure-microk8s-linux.sh" \
           -a "$ASSETS_PATH" \
