@@ -18,7 +18,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
       
-      - name: Get all test, doc and src files that have changed
+      - name: Get all script files that have changed
         id: changed-files
         uses: tj-actions/changed-files@v37
         with:
@@ -30,7 +30,7 @@ jobs:
       - name: Configure MicroK8s Cluster
         if: ${{ (matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest') && steps.changed-files.outputs.scripts_any_modified == 'true' }}
         run: |
-          mkdir -p /opt
+          sudo mkdir -p /opt
 
           ASSETS_PATH="$GITHUB_WORKSPACE/assets"
           CONFIGS_PATH=/opt/configs
