@@ -1,7 +1,9 @@
+import Storage from 'constants/Storage'
 import UIEnabled from 'constants/UIEnabled'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
+import AdditionalConfigsView from 'renderer/components/Setting/AdditionalConfigsView'
 import MicroK8sView from 'renderer/components/Setting/MicroK8sView'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
@@ -45,6 +47,12 @@ const SettingsDialog = ({ onClose }: Props) => {
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
 
+  const showAllBranches = localStorage.getItem(Storage.SHOW_ALL_BRANCHES) as string | undefined
+  const defaultFlags = {
+    [Storage.SHOW_ALL_BRANCHES]: showAllBranches ? showAllBranches : 'false'
+  } as Record<string, string>
+  const [localFlags, setLocalFlags] = useState(defaultFlags)
+
   if (!selectedCluster) {
     enqueueSnackbar('Please select a cluster.', { variant: 'error' })
     onClose()
@@ -59,6 +67,12 @@ const SettingsDialog = ({ onClose }: Props) => {
   const localVars = {} as Record<string, string>
   for (const key in selectedCluster.variables) {
     localVars[key] = key in tempVars ? tempVars[key] : selectedCluster.variables[key]
+  }
+
+  const changeFlag = async (key: string, value: string) => {
+    const newFlags = { ...localFlags }
+    newFlags[key] = value
+    setLocalFlags(newFlags)
   }
 
   const changeConfig = async (key: string, value: string) => {
@@ -87,6 +101,8 @@ const SettingsDialog = ({ onClose }: Props) => {
     for (const key in tempVars) {
       updatedCluster.variables[key] = tempVars[key]
     }
+
+    localStorage.setItem(Storage.SHOW_ALL_BRANCHES, localFlags[Storage.SHOW_ALL_BRANCHES])
 
     const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
     if (saved) {
@@ -129,6 +145,7 @@ const SettingsDialog = ({ onClose }: Props) => {
                     onChange={changeConfig}
                     sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
                   />
+                  <AdditionalConfigsView localFlags={localFlags} onChange={changeFlag} />
                 </TabPanel>
               )}
               {UIEnabled[selectedCluster.type].settings.variables && (
@@ -176,7 +193,12 @@ const SettingsDialog = ({ onClose }: Props) => {
         <Button onClick={onClose}>Cancel</Button>
         <Button
           type="submit"
-          disabled={loading || (Object.keys(tempConfigs).length === 0 && Object.keys(tempVars).length === 0)}
+          disabled={
+            loading ||
+            (Object.keys(tempConfigs).length === 0 &&
+              Object.keys(tempVars).length === 0 &&
+              JSON.stringify(defaultFlags) === JSON.stringify(localFlags))
+          }
           onClick={saveSettings}
         >
           Save
