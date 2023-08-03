@@ -7,17 +7,13 @@ on:
     branches: [master]
 
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
+  test-linux:
+    runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-    
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
-      
+
       - name: Get all script files that have changed
         id: changed-files
         uses: tj-actions/changed-files@v37
@@ -28,7 +24,7 @@ jobs:
               - .github/test-scripts.yml
 
       - name: Configure MicroK8s Cluster
-        if: ${{ (matrix.os == 'ubuntu-latest') && steps.changed-files.outputs.scripts_any_modified == 'true' }}
+        if: ${{ steps.changed-files.outputs.scripts_any_modified == 'true' }}
         run: |
           sudo mkdir -p /opt
 
@@ -43,7 +39,7 @@ jobs:
 
           sudo mkdir -p "$CONFIGS_PATH"
           sudo curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
-          sudo sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/opt'," "$CONFIGS_PATH/test-engine.values.yaml"
+          sudo sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/opt/etherealengine/packages/server/upload'," "$CONFIGS_PATH/test-engine.values.yaml"
 
           sudo bash "$ASSETS_PATH/scripts/configure-microk8s-linux.sh" \
           -a "$ASSETS_PATH" \
@@ -55,3 +51,76 @@ jobs:
           -p "$PASSWORD" \
           -r "$ENABLE_RIPPLE_STACK"
         shell: bash
+
+  test-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Get all script files that have changed
+        id: changed-files
+        uses: tj-actions/changed-files@v37
+        with:
+          files_yaml: |
+            scripts:
+              - assets/scripts/**
+              - .github/test-scripts.yml
+
+      - name: Check for admin privileges
+        shell: powershell
+        run: |
+          if ([Security.Principal.WindowsPrincipal]::GetCurrent().IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+            Write-Host "Runner has admin privileges"
+          } else {
+            Write-Host "Runner doesn't have admin privileges"
+            exit 1
+          }
+
+      - name: Configure MicroK8s Cluster
+        if: ${{ steps.changed-files.outputs.scripts_any_modified == 'true' }}
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path "C:\Program Files\EE" -Verb RunAs;
+
+          $ASSETS_PATH="$env:GITHUB_WORKSPACE\assets";
+          $CONFIGS_PATH="C:\Program Files\EE\config";
+          $FORCE_DB_REFRESH='true';
+          $ENGINE_PATH="C:\Program Files\EE\etherealengine";
+          $CLUSTER_ID='test';
+          $OPS_PATH="C:\Program Files\EE\ethereal-engine-ops";
+          $PASSWORD=''; # Github actions run in password-less sudo mode.
+          $ENABLE_RIPPLE_STACK='false';
+
+          New-Item -ItemType Directory -Force -Path "$CONFIGS_PATH" -Verb RunAs;
+          Invoke-WebRequest -Uri https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml -OutFile "$CONFIGS_PATH\test-engine.values.yaml" -Verb RunAs;
+
+
+          $yamlContent = Get-Content -Path "$CONFIGS_PATH\test-engine.values.yaml" -Raw;
+          $newHostUploadFolder = "C:\Program Files\EE\etherealengine\packages\server\upload";
+
+          # Use Select-String to find and replace the hostUploadFolder value
+          $modifiedYamlContent = $yamlContent -split '\r?\n' | ForEach-Object {
+              if ($_ -match '^\s*hostUploadFolder:\s*(.*)') {
+                  $_ -replace $matches[0], ("hostUploadFolder: '{0}'" -f $newHostUploadFolder)
+              } else {
+                  $_
+              }
+          }
+
+          # Join the modified lines into a single string with line breaks
+          $modifiedYamlContent = $modifiedYamlContent -join "`r`n";
+
+          # Overwrite the YAML file with the modified content
+          $modifiedYamlContent | Set-Content -Path "$CONFIGS_PATH\test-engine.values.yaml";
+
+          & "$ASSETS_PATH/scripts/configure-microk8s-windows.ps1" -Verb RunAs \
+          -a "$ASSETS_PATH" \
+          -c "$CONFIGS_PATH" \
+          -d "$FORCE_DB_REFRESH" \
+          -f "$ENGINE_PATH" \
+          -i "$CLUSTER_ID" \
+          -o "$OPS_PATH" \
+          -p "$PASSWORD" \
+          -r "$ENABLE_RIPPLE_STACK";
