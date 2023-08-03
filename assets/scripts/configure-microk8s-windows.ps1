@@ -73,8 +73,8 @@ if ([string]::IsNullOrEmpty($ASSETS_FOLDER) -or
     [string]::IsNullOrEmpty($ENGINE_FOLDER) -or 
     [string]::IsNullOrEmpty($CLUSTER_ID) -or 
     [string]::IsNullOrEmpty($OPS_FOLDER) -or 
+    [string]::IsNullOrEmpty($PASSWORD) -or 
     [string]::IsNullOrEmpty($ENABLE_RIPPLE_STACK)) {
-    # Allow empty passwords
     throw "Missing arguments"
     exit 1
 }
