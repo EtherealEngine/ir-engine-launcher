@@ -27,17 +27,17 @@ jobs:
         if: ${{ steps.changed-files.outputs.scripts_any_modified == 'true' }}
         run: |
           ASSETS_PATH="$GITHUB_WORKSPACE/assets"
-          CONFIGS_PATH="$GITHUB_WORKSPACE/../opt/config"
+          CONFIGS_PATH="/home/runner/opt/config"
           FORCE_DB_REFRESH=true
-          ENGINE_PATH="$GITHUB_WORKSPACE/../opt/etherealengine"
+          ENGINE_PATH="/home/runner/opt/etherealengine"
           CLUSTER_ID=test
-          OPS_PATH="$GITHUB_WORKSPACE/../opt/ethereal-engine-ops"
+          OPS_PATH="/home/runner/opt/ethereal-engine-ops"
           PASSWORD= # Github actions run in password-less sudo mode.
           ENABLE_RIPPLE_STACK=false
 
           sudo mkdir -p "$CONFIGS_PATH"
           sudo curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
-          sudo sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '$GITHUB_WORKSPACE/../opt/etherealengine/packages/server/upload'," "$CONFIGS_PATH/test-engine.values.yaml"
+          sudo sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/home/runner/opt/etherealengine/packages/server/upload'," "$CONFIGS_PATH/test-engine.values.yaml"
 
           sudo bash "$ASSETS_PATH/scripts/configure-microk8s-linux.sh" \
           -a "$ASSETS_PATH" \
