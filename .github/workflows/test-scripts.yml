@@ -68,16 +68,6 @@ jobs:
               - assets/scripts/**
               - .github/test-scripts.yml
 
-      - name: Check for admin privileges
-        shell: powershell
-        run: |
-          if ([Security.Principal.WindowsPrincipal]::GetCurrent().IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-            Write-Host "Runner has admin privileges"
-          } else {
-            Write-Host "Runner doesn't have admin privileges"
-            exit 1
-          }
-
       - name: Configure MicroK8s Cluster
         if: ${{ steps.changed-files.outputs.scripts_any_modified == 'true' }}
         shell: powershell
