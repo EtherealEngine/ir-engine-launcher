@@ -1,4 +1,4 @@
-name: Test Congure scripts
+name: test-microk8s-ubuntu
 
 on:
   pull_request:
@@ -21,7 +21,7 @@ jobs:
           files_yaml: |
             scripts:
               - assets/scripts/**
-              - .github/test-scripts.yml
+              - .github/test-microk8s-ubuntu.yml
 
       - name: Configure MicroK8s Cluster
         if: ${{ steps.changed-files.outputs.scripts_any_modified == 'true' }}

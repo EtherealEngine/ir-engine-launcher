@@ -1,0 +1,51 @@
+name: test-minikube-ubuntu
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  test-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Get all script files that have changed
+        id: changed-files
+        uses: tj-actions/changed-files@v37
+        with:
+          files_yaml: |
+            scripts:
+              - assets/scripts/**
+              - .github/test-scripts.yml
+
+      - name: Configure MicroK8s Cluster
+        if: ${{ steps.changed-files.outputs.scripts_any_modified == 'true' }}
+        run: |
+          ASSETS_PATH="$GITHUB_WORKSPACE/assets"
+          CONFIGS_PATH="/home/runner/opt/config"
+          FORCE_DB_REFRESH=true
+          ENGINE_PATH="/home/runner/opt/etherealengine"
+          CLUSTER_ID=test
+          OPS_PATH="/home/runner/opt/ethereal-engine-ops"
+          PASSWORD= # Github actions run in password-less sudo mode.
+          ENABLE_RIPPLE_STACK=false
+
+          sudo mkdir -p "$CONFIGS_PATH"
+          sudo curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
+          sudo sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/home/runner/opt/etherealengine/packages/server/upload'," "$CONFIGS_PATH/test-engine.values.yaml"
+
+          sudo bash "$ASSETS_PATH/scripts/configure-minikube-linux.sh" \
+          -a "$ASSETS_PATH" \
+          -c "$CONFIGS_PATH" \
+          -d "$FORCE_DB_REFRESH" \
+          -f "$ENGINE_PATH" \
+          -i "$CLUSTER_ID" \
+          -o "$OPS_PATH" \
+          -p "$PASSWORD" \
+          -r "$ENABLE_RIPPLE_STACK"
+        shell: bash
