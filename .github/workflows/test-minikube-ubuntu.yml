@@ -36,11 +36,11 @@ jobs:
           ENABLE_RIPPLE_STACK=false
           TEST=true
 
-          sudo mkdir -p "$CONFIGS_PATH"
-          sudo curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.minikube.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
-          sudo sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/home/runner/opt/etherealengine/packages/server/upload'," "$CONFIGS_PATH/test-engine.values.yaml"
+          mkdir -p "$CONFIGS_PATH"
+          curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.minikube.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
+          sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/home/runner/opt/etherealengine/packages/server/upload'," "$CONFIGS_PATH/test-engine.values.yaml"
 
-          sudo bash "$ASSETS_PATH/scripts/configure-minikube-linux.sh" \
+          bash "$ASSETS_PATH/scripts/configure-minikube-linux.sh" \
           -a "$ASSETS_PATH" \
           -c "$CONFIGS_PATH" \
           -d "$FORCE_DB_REFRESH" \
