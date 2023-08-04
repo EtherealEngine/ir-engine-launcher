@@ -237,7 +237,6 @@ if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"None
     if [[ "$TEST" == "true" ]]; then
         minikube start --disk-size 9000m --cpus 2 --memory max --addons ingress metrics-server --driver virtualbox
     else
-        echo "$TEST"
         minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress metrics-server --driver virtualbox
     fi
 elif [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then

@@ -48,6 +48,6 @@ jobs:
           -i "$CLUSTER_ID" \
           -o "$OPS_PATH" \
           -p "$PASSWORD" \
-          -r "$ENABLE_RIPPLE_STACK"
+          -r "$ENABLE_RIPPLE_STACK" \
           -t "$TEST"
         shell: bash
