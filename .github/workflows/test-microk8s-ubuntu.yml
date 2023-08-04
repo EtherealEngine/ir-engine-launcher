@@ -21,8 +21,7 @@ jobs:
           files: |
             assets/scripts/**.sh
             .github/test-microk8s-ubuntu.yml
-          files_ignore: |
-            assets/scripts/configure-minikube-linux.sh
+          files_ignore: assets/scripts/configure-minikube-linux.sh
 
       - name: Configure MicroK8s Cluster
         if: ${{ steps.changed-files.outputs.any_modified == 'true' }}

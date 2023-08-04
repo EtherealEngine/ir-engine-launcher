@@ -15,7 +15,7 @@ checkExitCode() {
 # Parameters
 #===========
 
-while getopts a:c:d:f:i:o:p:r: flag; do
+while getopts a:c:d:f:i:o:p:r:t: flag; do
     case "${flag}" in
     a) ASSETS_FOLDER=${OPTARG} ;;
     c) CONFIGS_FOLDER=${OPTARG} ;;
@@ -25,6 +25,7 @@ while getopts a:c:d:f:i:o:p:r: flag; do
     o) OPS_FOLDER=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
     r) ENABLE_RIPPLE_STACK=${OPTARG} ;;
+    t) TEST=${OPTARG} ;;
     *)
         echo "Invalid argument passed" >&2
         exit 1
@@ -233,7 +234,11 @@ set +e
 MINIKUBE_STATUS=$(minikube status --output json)
 set -e
 if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"Nonexistent"* ]]; then
-    minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress metrics-server --driver virtualbox
+    if [[ "$TEST" == "true" ]]; then
+        minikube start --disk-size 9000m --cpus 2 --memory max --addons ingress metrics-server --driver virtualbox
+    else
+        minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress metrics-server --driver virtualbox
+    fi
 elif [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
     minikube start
 fi
