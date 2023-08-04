@@ -18,13 +18,14 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v37
         with:
-          files_yaml: |
-            scripts:
-              - assets/scripts/**
-              - .github/test-scripts.yml
+          files: |
+            assets/scripts/**.sh
+            .github/test-minikube-ubuntu.yml
+          files_ignore: |
+            assets/scripts/configure-microk8s-linux.sh
 
-      - name: Configure MicroK8s Cluster
-        if: ${{ steps.changed-files.outputs.scripts_any_modified == 'true' }}
+      - name: Configure Minikube Cluster
+        if: ${{ steps.changed-files.outputs.any_modified == 'true' }}
         run: |
           ASSETS_PATH="$GITHUB_WORKSPACE/assets"
           CONFIGS_PATH="/home/runner/opt/config"
@@ -36,7 +37,7 @@ jobs:
           ENABLE_RIPPLE_STACK=false
 
           sudo mkdir -p "$CONFIGS_PATH"
-          sudo curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.microk8s.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
+          sudo curl https://raw.githubusercontent.com/EtherealEngine/ethereal-engine-ops/master/configs/local.minikube.template.values.yaml -o "$CONFIGS_PATH/test-engine.values.yaml"
           sudo sed -i "s,^\([[:space:]]*hostUploadFolder:\).*,\1 '/home/runner/opt/etherealengine/packages/server/upload'," "$CONFIGS_PATH/test-engine.values.yaml"
 
           sudo bash "$ASSETS_PATH/scripts/configure-minikube-linux.sh" \

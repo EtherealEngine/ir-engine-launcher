@@ -18,13 +18,14 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v37
         with:
-          files_yaml: |
-            scripts:
-              - assets/scripts/**
-              - .github/test-microk8s-ubuntu.yml
+          files: |
+            assets/scripts/**.sh
+            .github/test-microk8s-ubuntu.yml
+          files_ignore: |
+            assets/scripts/configure-minikube-linux.sh
 
       - name: Configure MicroK8s Cluster
-        if: ${{ steps.changed-files.outputs.scripts_any_modified == 'true' }}
+        if: ${{ steps.changed-files.outputs.any_modified == 'true' }}
         run: |
           ASSETS_PATH="$GITHUB_WORKSPACE/assets"
           CONFIGS_PATH="/home/runner/opt/config"
