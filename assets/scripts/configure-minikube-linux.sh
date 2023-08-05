@@ -15,7 +15,7 @@ checkExitCode() {
 # Parameters
 #===========
 
-while getopts a:c:d:f:i:o:p:r:t: flag; do
+while getopts a:c:d:f:i:o:p:r: flag; do
     case "${flag}" in
     a) ASSETS_FOLDER=${OPTARG} ;;
     c) CONFIGS_FOLDER=${OPTARG} ;;
@@ -25,7 +25,6 @@ while getopts a:c:d:f:i:o:p:r:t: flag; do
     o) OPS_FOLDER=${OPTARG} ;;
     p) PASSWORD=${OPTARG} ;;
     r) ENABLE_RIPPLE_STACK=${OPTARG} ;;
-    t) TEST=${OPTARG} ;;
     *)
         echo "Invalid argument passed" >&2
         exit 1
@@ -33,9 +32,7 @@ while getopts a:c:d:f:i:o:p:r:t: flag; do
     esac
 done
 
-if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENGINE_FOLDER || -z $CLUSTER_ID || -z $OPS_FOLDER || -z $ENABLE_RIPPLE_STACK ]]; then
-    # Allow empty passwords
-    echo "Missing arguments"
+if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENGINE_FOLDER || -z $CLUSTER_ID || -z $OPS_FOLDER || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
     exit 1
 fi
 
@@ -234,11 +231,7 @@ set +e
 MINIKUBE_STATUS=$(minikube status --output json)
 set -e
 if [[ $MINIKUBE_STATUS == *"minikube start"* ]] || [[ $MINIKUBE_STATUS == *"Nonexistent"* ]]; then
-    if [[ "$TEST" == "true" ]]; then
-        minikube start --disk-size 9000m --cpus 2 --memory max --addons ingress metrics-server --driver docker
-    else
-        minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress metrics-server --driver virtualbox
-    fi
+    minikube start --disk-size 30000m --cpus 4 --memory 10124m --addons ingress metrics-server --driver virtualbox
 elif [[ $MINIKUBE_STATUS == *"Stopped"* ]]; then
     minikube start
 fi
