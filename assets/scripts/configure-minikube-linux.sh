@@ -33,6 +33,7 @@ while getopts a:c:d:f:i:o:p:r: flag; do
 done
 
 if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENGINE_FOLDER || -z $CLUSTER_ID || -z $OPS_FOLDER || -z $PASSWORD || -z $ENABLE_RIPPLE_STACK ]]; then
+    echo "Missing arguments"
     exit 1
 fi
 
