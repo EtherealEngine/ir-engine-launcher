@@ -20,8 +20,9 @@ jobs:
         with:
           files: |
             assets/scripts/**.sh
-            .github/test-minikube-ubuntu.yml
+            .github/workflows/test-minikube-ubuntu.yml
           files_ignore: assets/scripts/configure-microk8s-linux.sh
+          since_last_remote_commit: true
 
       - name: Configure Minikube Cluster
         if: ${{ steps.changed-files.outputs.any_modified == 'true' }}
