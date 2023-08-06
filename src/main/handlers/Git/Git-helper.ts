@@ -13,7 +13,7 @@ export const checkout = async (repoPath: string, branch: string) => {
 }
 
 export const checkoutBranch = async (repoPath: string, localBranch: string, branch: string) => {
-  const command = `git -C ${repoPath} checkout ${localBranch} ${branch}`
+  const command = `git -C ${repoPath} checkout -b ${localBranch} ${branch}`
   const { stdout } = await exec(command, true)
   return stdout?.toString()
 }
