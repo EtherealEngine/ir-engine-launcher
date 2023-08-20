@@ -1,3 +1,4 @@
+import { execSync } from 'child_process'
 import { app, BrowserWindow, clipboard, dialog, shell } from 'electron'
 import log from 'electron-log'
 import { promises as fs } from 'fs'
@@ -103,10 +104,20 @@ class Utilities {
         return WindowsPrerequisites
       }
     } catch (err) {
-      log.error('Failed to get pre requisites.', err)
+      log.error('Failed to get prerequisites.', err)
     }
 
     return []
+  }
+
+  static getPowerShellVersion = () => {
+    try {
+      const version = execSync('powershell.exe -Command "$PSVersionTable.PSVersion.Major"').toString().trim()
+      return version
+    } catch (err) {
+      log.error('Failed to get PowerShell version.', err)
+      throw err
+    }
   }
 
   static checkPrerequisite = async (prerequisite: AppModel) => {
@@ -128,6 +139,7 @@ class Utilities {
 
       if (
         (prerequisite.id === 'wsl' && stdOutput) ||
+        (prerequisite.id === 'ps1ExecutionPolicy' && stdOutput.includes('Unrestricted')) ||
         (prerequisite.id === 'wslUbuntu' && stdOutput.includes(': Ubuntu')) ||
         ((prerequisite.id === 'dockerDesktop' || prerequisite.id === 'dockerDesktopUbuntu') &&
           stdOutput.includes('Server: Docker Desktop'))

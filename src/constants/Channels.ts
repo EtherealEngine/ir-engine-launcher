@@ -18,7 +18,8 @@ const Channels = {
     SaveLog: 'SaveLog',
     GetPrerequisites: 'GetPrerequisites',
     CheckPrerequisite: 'CheckPrerequisite',
-    GetWSLPrefixPath: 'GetWSLPrefixPath'
+    GetWSLPrefixPath: 'GetWSLPrefixPath',
+    GetPowerShellVersion: 'GetPowerShellVersion'
   },
   Git: {
     GetCurrentConfigs: 'GetCurrentConfigs',

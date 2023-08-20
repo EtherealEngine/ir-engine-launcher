@@ -35,7 +35,9 @@ const Endpoints = {
     MICROK8S_REGISTRY_CATALOG: 'http://localhost:32000/v2/_catalog',
     MICROK8S_WINDOWS_REGISTRY_CATALOG: 'http://microk8s.registry:32000/v2/_catalog',
     SUPPORT_GITHUB: 'https://github.com/EtherealEngine/etherealengine-control-center/issues',
-    SUPPORT_DISCORD: 'https://discord.gg/xrf'
+    SUPPORT_DISCORD: 'https://discord.gg/xrf',
+    SET_EXECUTION_POLICY:
+      'https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies'
   },
   Paths: {
     ENGINE_ENV: '.env.local',
