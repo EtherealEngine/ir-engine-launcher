@@ -10,7 +10,7 @@ import Storage from '../../../constants/Storage'
 import { ClusterModel, ClusterType } from '../../../models/Cluster'
 import { KubeconfigType, KubeContext } from '../../../models/Kubeconfig'
 import { LogModel } from '../../../models/Log'
-import { getHomePath } from '../../managers/PathManager'
+import { getHomePath, getWSLPrefixPath } from '../../managers/PathManager'
 import Utilities from '../Utilities/Utilities.class'
 import { getConfigMap, getDeployments, getPodLogs, getWorkloads, removePod } from './Workloads-helper'
 
@@ -51,12 +51,13 @@ class Workloads {
 
       const configMap = await getConfigMap(
         k8DefaultClient,
-        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=client,app.kubernetes.io/name=etherealengine`
+        `app.kubernetes.io/instance=${releaseName},app.kubernetes.io/component=api,app.kubernetes.io/name=etherealengine`
       )
 
-      let appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['VITE_APP_HOST']
+      let appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['CLIENT_ADDRESS']
+
       if (!appHost) {
-        appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['CLIENT_ADDRESS']
+        appHost = configMap.length > 0 && configMap[0].data && configMap[0].data['APP_URL']
       }
 
       if (!appHost) {
@@ -193,7 +194,8 @@ class Workloads {
       let configPath = path.join(homePath, '.kube/config-microk8s')
 
       if (type === 'Windows_NT') {
-        configPath = path.join(Endpoints.Paths.WSL_PREFIX, configPath.replaceAll('/', '\\'))
+        const wslPrefixPath = await getWSLPrefixPath()
+        configPath = path.join(wslPrefixPath, configPath.replaceAll('/', '\\'))
       }
 
       kc.loadFromFile(configPath)

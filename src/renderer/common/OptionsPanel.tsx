@@ -1,4 +1,5 @@
 import Channels from 'constants/Channels'
+import Endpoints from 'constants/Endpoints'
 import Storage from 'constants/Storage'
 import UIEnabled from 'constants/UIEnabled'
 import { AppStatus } from 'models/AppStatus'
@@ -12,13 +13,15 @@ import SettingsDialog from 'renderer/dialogs/SettingsDialog'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService, useDeploymentState } from 'renderer/services/DeploymentService'
 
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
 import CachedOutlinedIcon from '@mui/icons-material/CachedOutlined'
 import DeleteIcon from '@mui/icons-material/Delete'
+import LocalPoliceIcon from '@mui/icons-material/LocalPolice'
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
 import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined'
 import SettingsIcon from '@mui/icons-material/Settings'
 import LoadingButton from '@mui/lab/LoadingButton'
-import { Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material'
+import { Avatar, Box, Button, CircularProgress, IconButton, Popover, Stack, Typography } from '@mui/material'
 
 import logoEngine from '../../../assets/icon.svg'
 import logoMicrok8s from '../../../assets/icons/microk8s.png'
@@ -40,6 +43,7 @@ const OptionsPanel = () => {
   const allAppsConfigured = currentDeployment?.appStatus.every((app) => app.status === AppStatus.Configured)
   const allEngineConfigured = currentDeployment?.engineStatus.every((engine) => engine.status === AppStatus.Configured)
   const allConfigured = allAppsConfigured && allEngineConfigured
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   if (!selectedCluster) {
     return <></>
@@ -51,6 +55,8 @@ const OptionsPanel = () => {
 
   const onLaunch = async () => {
     try {
+      handlePopoverClose()
+
       setLaunching(true)
 
       const clonedCluster = cloneCluster(selectedCluster)
@@ -62,6 +68,10 @@ const OptionsPanel = () => {
     }
 
     setLaunching(false)
+  }
+
+  const handlePopoverClose = () => {
+    setAnchorEl(null)
   }
 
   const handleDelete = async () => {
@@ -156,10 +166,95 @@ const OptionsPanel = () => {
             Launching
           </Box>
         }
-        onClick={onLaunch}
+        onClick={(event) =>
+          selectedCluster.type === ClusterType.MicroK8s || selectedCluster.type === ClusterType.Minikube
+            ? setAnchorEl(event.currentTarget)
+            : onLaunch()
+        }
       >
         Launch
       </LoadingButton>
+
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center'
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            m: 2
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <LocalPoliceIcon sx={{ fontSize: 40 }} />
+
+            <Typography sx={{ ml: 1 }}>Please make sure to accept all certificates in the browser.</Typography>
+          </Box>
+
+          <Box sx={{ ml: 1.5, mt: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
+              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>1</Avatar>
+              <Typography variant="body2">
+                Launch{' '}
+                <a style={{ color: 'var(--textColor)' }} href={Endpoints.Urls.CLIENT_HOST} target="_blank">
+                  Engine
+                </a>{' '}
+                in browser & accept certificate.
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', mt: 1 }}>
+              <Avatar sx={{ width: 30, height: 30, fontSize: 16, bgcolor: 'var(--panelBackground)', mr: 1 }}>2</Avatar>
+              <Typography variant="body2">Accept certificates for following as well:</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: 4, flexDirection: 'row', mt: 1 }}>
+              <ArrowForwardIosIcon sx={{ fontSize: 14, mr: 1 }} />
+              <Typography variant="body2">
+                <a style={{ color: 'var(--textColor)' }} href={Endpoints.Urls.API_HOST} target="_blank">
+                  Api Server
+                </a>
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: 4, flexDirection: 'row', mt: 1 }}>
+              <ArrowForwardIosIcon sx={{ fontSize: 14, mr: 1 }} />
+              <Typography variant="body2">
+                <a style={{ color: 'var(--textColor)' }} href={Endpoints.Urls.INSTANCE_HOST} target="_blank">
+                  Instance Server
+                </a>
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', ml: 4, flexDirection: 'row', mt: 1 }}>
+              <ArrowForwardIosIcon sx={{ fontSize: 14, mr: 1 }} />
+              <Typography variant="body2">
+                <a style={{ color: 'var(--textColor)' }} href={Endpoints.Urls.FILE_HOST} target="_blank">
+                  File Server
+                </a>
+              </Typography>
+            </Box>
+            <Typography fontSize={14} sx={{ mt: 3 }}>
+              <span style={{ fontSize: 14, opacity: 0.6 }}>Reference: </span>
+              <a style={{ color: 'var(--textColor)' }} href={Endpoints.Docs.ACCEPT_INVALID_CERTS} target="_blank">
+                accept-invalid-certs
+              </a>
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button variant="contained" color="primary" onClick={onLaunch}>
+              Continue
+            </Button>
+          </Box>
+        </Box>
+      </Popover>
 
       {showConfigDialog && <ConfigurationDialog onClose={() => setConfigDialog(false)} />}
 

@@ -17,7 +17,8 @@ const Channels = {
     Log: 'Log',
     SaveLog: 'SaveLog',
     GetPrerequisites: 'GetPrerequisites',
-    CheckPrerequisite: 'CheckPrerequisite'
+    CheckPrerequisite: 'CheckPrerequisite',
+    GetWSLPrefixPath: 'GetWSLPrefixPath'
   },
   Git: {
     GetCurrentConfigs: 'GetCurrentConfigs',
@@ -26,6 +27,8 @@ const Channels = {
     PushBranch: 'PushBranch'
   },
   Engine: {
+    StartFileServer: 'StartFileServer',
+    StopFileServer: 'StopFileServer',
     EnsureAdminAccess: 'EnsureAdminAccess',
     EnsureAdminAccessError: 'EnsureAdminAccessError',
     EnsureAdminAccessResponse: 'EnsureAdminAccessResponse'
@@ -39,7 +42,8 @@ const Channels = {
     ConfigureK8Dashboard: 'ConfigureK8Dashboard',
     ConfigureK8DashboardError: 'ConfigureK8DashboardError',
     ConfigureK8DashboardResponse: 'ConfigureK8DashboardResponse',
-    ConfigureCluster: 'ConfigureCluster'
+    ConfigureCluster: 'ConfigureCluster',
+    PromptSetupMok: 'PromptSetupMok'
   },
   Updates: {
     CheckUpdate: 'CheckUpdate',

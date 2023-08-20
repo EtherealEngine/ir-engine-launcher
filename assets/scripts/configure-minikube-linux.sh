@@ -166,6 +166,19 @@ bash "$SCRIPTS_FOLDER/check-mysql.sh" "$PASSWORD" "$ENGINE_FOLDER"
 
 checkExitCode
 
+#=======================
+# Verify VirtualBox dkms
+#=======================
+
+if virtualbox-dkms --version >/dev/null; then
+    echo "virtualbox-dkms is installed"
+else
+    echo "virtualbox-dkms is not installed"
+
+    echo "$PASSWORD" | sudo -S apt update -y
+    echo "$PASSWORD" | sudo -S sudo apt-get install -y virtualbox-dkms
+fi
+
 #==================
 # Verify VirtualBox
 #==================

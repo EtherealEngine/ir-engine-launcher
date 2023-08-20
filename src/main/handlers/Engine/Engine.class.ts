@@ -8,6 +8,7 @@ import Storage from '../../../constants/Storage'
 import { ClusterModel } from '../../../models/Cluster'
 import { LogModel } from '../../../models/Log'
 import { executeJS } from '../../managers/BrowserManager'
+import { startFileServer, stopFileServer } from '../../managers/FileServerManager'
 import { exec } from '../../managers/ShellManager'
 
 class Engine {
@@ -39,7 +40,7 @@ class Engine {
           let retry = 0
 
           do {
-            await delay(3000)
+            await delay(10000)
 
             const userRole = await executeJS(
               'function getUserRole() { return document.getElementById("user-role").innerHTML } getUserRole()',
@@ -116,6 +117,30 @@ class Engine {
         cluster.id,
         `Failed to load admin panel. Please check logs.`
       )
+    }
+  }
+
+  static startFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel, sudoPassword: string) => {
+    try {
+      await startFileServer(parentWindow, cluster, sudoPassword)
+    } catch (err) {
+      parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category: 'file server',
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
+    }
+  }
+
+  static stopFileServer = async (parentWindow: BrowserWindow, cluster: ClusterModel, sudoPassword: string) => {
+    try {
+      await stopFileServer(sudoPassword)
+    } catch (err) {
+      parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
+        category: 'stop file server',
+        message: JSON.stringify(err)
+      } as LogModel)
+      throw err
     }
   }
 }

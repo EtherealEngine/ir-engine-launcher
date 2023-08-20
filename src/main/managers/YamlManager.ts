@@ -61,7 +61,7 @@ const _ensureConfigsFile = async (
   templateUrl: string,
   valuesFileName: string
 ) => {
-  const opsPath = ensureWSLToWindowsPath(cluster.configs[Storage.OPS_PATH])
+  const opsPath = await ensureWSLToWindowsPath(cluster.configs[Storage.OPS_PATH])
   const templateFullPath = path.join(opsPath, templatePath)
   const yamlDoc = await getYamlDoc(templateFullPath, templateUrl)
 
@@ -89,7 +89,7 @@ const _ensureRippleConfigs = async (cluster: ClusterModel) => {
 }
 
 const _ensureRippledConfigs = async (cluster: ClusterModel) => {
-  const opsPath = ensureWSLToWindowsPath(cluster.configs[Storage.OPS_PATH])
+  const opsPath = await ensureWSLToWindowsPath(cluster.configs[Storage.OPS_PATH])
   const rippledCfgPath = path.join(opsPath, Endpoints.Paths.RIPPLED_FILE)
   const rippledCfgExists = await fileExists(rippledCfgPath)
   if (rippledCfgExists === false) {

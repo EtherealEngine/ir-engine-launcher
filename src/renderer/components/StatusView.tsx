@@ -1,3 +1,4 @@
+import { delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import { AppModel, AppStatus } from 'models/AppStatus'
@@ -6,7 +7,7 @@ import { ShellResponse } from 'models/ShellResponse'
 import { Fragment, useState } from 'react'
 import { accessConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
-import { accessSettingsState } from 'renderer/services/SettingsService'
+import { accessSettingsState, SettingsService } from 'renderer/services/SettingsService'
 
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
@@ -143,7 +144,7 @@ export const StatusViewItem = ({ status, titleVariant, verticalAlignTop, titleSx
 
       {status.detail && <InfoTooltip sx={titleSx} message={status.detail} />}
 
-      {status.status === AppStatus.NotConfigured && (status.id === 'mysql' || status.id === 'minio') && (
+      {status.status === AppStatus.NotConfigured && (status.id === 'mysql' || status.id === 'fileserver') && (
         <>
           {isFixing && <CircularProgress size={20} sx={{ ml: 2 }} />}
           {isFixing === false && (
@@ -174,7 +175,7 @@ const onFix = async (appStatus: AppModel, setFixing: React.Dispatch<React.SetSta
 
   const clonedCluster = cloneCluster(selectedCluster)
 
-  if (appStatus.id === 'mysql' || appStatus.id === 'minio') {
+  if (appStatus.id === 'mysql') {
     await processOnFix(appStatus, clonedCluster, async () => {
       const command = `cd '${clonedCluster.configs[Storage.ENGINE_PATH]}' && npm run dev-docker`
 
@@ -186,6 +187,14 @@ const onFix = async (appStatus: AppModel, setFixing: React.Dispatch<React.SetSta
       if (output.error) {
         throw output.error
       }
+    })
+  } else if (appStatus.id === 'fileserver') {
+    await processOnFix(appStatus, clonedCluster, async () => {
+      const password = await SettingsService.getDecryptedSudoPassword()
+      await window.electronAPI.invoke(Channels.Engine.StartFileServer, clonedCluster, password)
+
+      // Delay to wait for fileserver to start
+      await delay(4000)
     })
   }
 

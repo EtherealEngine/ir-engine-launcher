@@ -18,6 +18,8 @@ import { getEnvFile } from '../../managers/PathManager'
 import { exec } from '../../managers/ShellManager'
 import Commands from './BaseCluster.commands'
 
+const type = os.type()
+
 class BaseCluster {
   // #region Status Check Methods
 
@@ -40,100 +42,108 @@ class BaseCluster {
     systemApps: AppModel[],
     sysRequirements: SysRequirement[]
   ) => {
-    await Promise.all(
-      systemApps.map(async (app) => {
-        let status: AppModel = {
-          ...app
-        }
+    const batchSize = type === 'Windows_NT' ? Commands.STATUS_CHECK_BATCH_LIMIT : systemApps.length
 
-        const type = os.type()
-        const currentOSReqs = sysRequirements.find((item) => item.os === type)
+    for (let batch = 0; batch < systemApps.length; batch = batch + batchSize) {
+      const currentBatch = systemApps.slice(batch, batch + batchSize)
+      await Promise.all(
+        currentBatch.map(async (app) => {
+          let status: AppModel = {
+            ...app
+          }
 
-        if (status.id === 'os') {
-          status = {
-            ...app,
-            detail: type,
-            status: currentOSReqs ? AppStatus.Configured : AppStatus.NotConfigured
-          }
-        } else if (status.id === 'cpu') {
-          const cpus = os.cpus()
-          status = {
-            ...app,
-            detail: `${cpus.length.toString()} core(s)`,
-            status: currentOSReqs
-              ? cpus.length < currentOSReqs.minCPU
-                ? AppStatus.NotConfigured
-                : AppStatus.Configured
-              : AppStatus.Pending
-          }
-        } else if (status.id === 'memory') {
-          let memory = os.totalmem() / (1024 * 1024)
-          status = {
-            ...app,
-            detail: `${memory.toString()} MB`,
-            status: currentOSReqs
-              ? memory < currentOSReqs.minMemory
-                ? AppStatus.NotConfigured
-                : AppStatus.Configured
-              : AppStatus.Pending
-          }
-        } else {
-          status = await Utilities.checkPrerequisite(app)
-        }
+          const currentOSReqs = sysRequirements.find((item) => item.os === type)
 
-        window.webContents.send(Channels.Utilities.Log, cluster.id, {
-          category: status.name,
-          message: status.detail
-        } as LogModel)
-        window.webContents.send(Channels.Cluster.CheckSystemStatusResult, cluster.id, status)
-      })
-    )
+          if (status.id === 'os') {
+            status = {
+              ...app,
+              detail: type,
+              status: currentOSReqs ? AppStatus.Configured : AppStatus.NotConfigured
+            }
+          } else if (status.id === 'cpu') {
+            const cpus = os.cpus()
+            status = {
+              ...app,
+              detail: `${cpus.length.toString()} core(s)`,
+              status: currentOSReqs
+                ? cpus.length < currentOSReqs.minCPU
+                  ? AppStatus.NotConfigured
+                  : AppStatus.Configured
+                : AppStatus.Pending
+            }
+          } else if (status.id === 'memory') {
+            let memory = os.totalmem() / (1024 * 1024)
+            status = {
+              ...app,
+              detail: `${memory.toString()} MB`,
+              status: currentOSReqs
+                ? memory < currentOSReqs.minMemory
+                  ? AppStatus.NotConfigured
+                  : AppStatus.Configured
+                : AppStatus.Pending
+            }
+          } else {
+            status = await Utilities.checkPrerequisite(app)
+          }
+
+          window.webContents.send(Channels.Utilities.Log, cluster.id, {
+            category: status.name,
+            message: status.detail
+          } as LogModel)
+          window.webContents.send(Channels.Cluster.CheckSystemStatusResult, cluster.id, status)
+        })
+      )
+    }
   }
 
   private static _checkAppStatus = async (window: BrowserWindow, cluster: ClusterModel, apps: AppModel[]) => {
     let mandatoryConfigured = true
+    const batchSize = type === 'Windows_NT' ? Commands.STATUS_CHECK_BATCH_LIMIT : apps.length
 
-    await Promise.all(
-      apps.map(async (app) => {
-        let status: AppModel = {
-          ...app
-        }
-
-        if (app.checkCommand) {
-          const response = await exec(app.checkCommand, app.isLinuxCommand)
-          const { stdout, stderr, error } = response
-
-          if (stdout) {
-            const message = typeof stdout === 'string' ? stdout.trim() : stdout.toString()
-
-            window.webContents.send(Channels.Utilities.Log, cluster.id, {
-              category: status.name,
-              message
-            } as LogModel)
+    for (let batch = 0; batch < apps.length; batch = batch + batchSize) {
+      const currentBatch = apps.slice(batch, batch + batchSize)
+      await Promise.all(
+        currentBatch.map(async (app) => {
+          let status: AppModel = {
+            ...app
           }
-          if (stderr) {
-            const message = typeof stderr === 'string' ? stderr.trim() : stderr.toString()
 
-            window.webContents.send(Channels.Utilities.Log, cluster.id, {
-              category: status.name,
-              message
-            } as LogModel)
+          if (app.checkCommand) {
+            const response = await exec(app.checkCommand, app.isLinuxCommand)
+            const { stdout, stderr, error } = response
 
-            if (!app.isOptional) {
-              mandatoryConfigured = false
+            if (stdout) {
+              const message = typeof stdout === 'string' ? stdout.trim() : stdout.toString()
+
+              window.webContents.send(Channels.Utilities.Log, cluster.id, {
+                category: status.name,
+                message
+              } as LogModel)
+            }
+            if (stderr) {
+              const message = typeof stderr === 'string' ? stderr.trim() : stderr.toString()
+
+              window.webContents.send(Channels.Utilities.Log, cluster.id, {
+                category: status.name,
+                message
+              } as LogModel)
+
+              if (!app.isOptional) {
+                mandatoryConfigured = false
+              }
+            }
+
+            status = {
+              ...app,
+              detail: stderr ? stderr : stdout,
+              status: stderr || error ? AppStatus.NotConfigured : AppStatus.Configured
             }
           }
 
-          status = {
-            ...app,
-            detail: stderr ? stderr : stdout,
-            status: stderr || error ? AppStatus.NotConfigured : AppStatus.Configured
-          }
-        }
-
-        window.webContents.send(Channels.Cluster.CheckAppStatusResult, cluster.id, status)
-      })
-    )
+          window.webContents.send(Channels.Cluster.CheckAppStatusResult, cluster.id, status)
+        })
+      )
+    }
 
     return mandatoryConfigured
   }
@@ -144,55 +154,60 @@ class BaseCluster {
     engineApps: AppModel[],
     preRequisitesConfigured: boolean
   ) => {
-    await Promise.all(
-      engineApps.map(async (engineItem) => {
-        let status: AppModel = {
-          ...engineItem
-        }
+    const batchSize = type === 'Windows_NT' ? Commands.STATUS_CHECK_BATCH_LIMIT : engineApps.length
 
-        if (preRequisitesConfigured == false) {
-          status = {
-            ...engineItem,
-            detail: 'Ethereal Engine required apps not configured',
-            status: AppStatus.NotConfigured
-          }
-        } else if (engineItem.checkCommand) {
-          const response = await exec(engineItem.checkCommand, engineItem.isLinuxCommand)
-          const { stdout, stderr } = response
-
-          if (stdout) {
-            window.webContents.send(Channels.Utilities.Log, cluster.id, {
-              category: engineItem.name,
-              message: typeof stdout === 'string' ? stdout.trim() : stdout
-            } as LogModel)
-          }
-          if (stderr) {
-            window.webContents.send(Channels.Utilities.Log, cluster.id, {
-              category: engineItem.name,
-              message: typeof stderr === 'string' ? stderr.trim() : stderr
-            } as LogModel)
+    for (let batch = 0; batch < engineApps.length; batch = batch + batchSize) {
+      const currentBatch = engineApps.slice(batch, batch + batchSize)
+      await Promise.all(
+        currentBatch.map(async (engineItem) => {
+          let status: AppModel = {
+            ...engineItem
           }
 
-          let detail: string | Buffer = `Ready Instances: ${stdout === '' || stdout === undefined ? 0 : stdout}`
-          let itemStatus = AppStatus.Configured
+          if (preRequisitesConfigured == false) {
+            status = {
+              ...engineItem,
+              detail: 'Ethereal Engine required apps not configured',
+              status: AppStatus.NotConfigured
+            }
+          } else if (engineItem.checkCommand) {
+            const response = await exec(engineItem.checkCommand, engineItem.isLinuxCommand)
+            const { stdout, stderr } = response
 
-          if (stderr) {
-            detail = stderr
-            itemStatus = AppStatus.NotConfigured
-          } else if (!stdout || parseInt(stdout.toString()) < 1) {
-            itemStatus = AppStatus.NotConfigured
+            if (stdout) {
+              window.webContents.send(Channels.Utilities.Log, cluster.id, {
+                category: engineItem.name,
+                message: typeof stdout === 'string' ? stdout.trim() : stdout
+              } as LogModel)
+            }
+            if (stderr) {
+              window.webContents.send(Channels.Utilities.Log, cluster.id, {
+                category: engineItem.name,
+                message: typeof stderr === 'string' ? stderr.trim() : stderr
+              } as LogModel)
+            }
+
+            let detail: string | Buffer = `Ready Instances: ${stdout === '' || stdout === undefined ? 0 : stdout}`
+            let itemStatus = AppStatus.Configured
+
+            if (stderr) {
+              detail = stderr
+              itemStatus = AppStatus.NotConfigured
+            } else if (!stdout || parseInt(stdout.toString()) < 1) {
+              itemStatus = AppStatus.NotConfigured
+            }
+
+            status = {
+              ...engineItem,
+              detail,
+              status: itemStatus
+            }
           }
 
-          status = {
-            ...engineItem,
-            detail,
-            status: itemStatus
-          }
-        }
-
-        window.webContents.send(Channels.Cluster.CheckEngineStatusResult, cluster.id, status)
-      })
-    )
+          window.webContents.send(Channels.Cluster.CheckEngineStatusResult, cluster.id, status)
+        })
+      )
+    }
   }
 
   // #endregion Status Check Methods

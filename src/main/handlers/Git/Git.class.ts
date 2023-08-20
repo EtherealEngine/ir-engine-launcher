@@ -6,10 +6,11 @@ import { ClusterModel } from '../../../models/Cluster'
 import { GitStatus } from '../../../models/GitStatus'
 import { LogModel } from '../../../models/Log'
 import { ensureWSLToWindowsPath } from '../../managers/PathManager'
+import { checkout, checkoutBranch, pull } from './Git-helper'
 
 class Git {
-  private static _getGit = (repoPath: string) => {
-    let enginePath = ensureWSLToWindowsPath(repoPath)
+  private static _getGit = async (repoPath: string) => {
+    let enginePath = await ensureWSLToWindowsPath(repoPath)
 
     const git: SimpleGit = simpleGit(enginePath)
     return git
@@ -21,7 +22,7 @@ class Git {
         return undefined
       }
 
-      const git = Git._getGit(repoPath)
+      const git = await Git._getGit(repoPath)
 
       const isRepo = await git.checkIsRepo(CheckRepoActions.IS_REPO_ROOT)
 
@@ -61,7 +62,7 @@ class Git {
     branch: string
   ) => {
     try {
-      const git = Git._getGit(repoPath)
+      const git = await Git._getGit(repoPath)
 
       if (branch.startsWith('remotes/')) {
         let localBranch = branch.split('/').pop()
@@ -73,19 +74,19 @@ class Git {
         const localExists = all.includes(localBranch)
 
         if (localExists) {
-          await git.checkout(localBranch)
+          await checkout(repoPath, localBranch)
         } else {
-          await git.checkoutBranch(localBranch, branch)
+          await checkoutBranch(repoPath, localBranch, branch)
         }
       } else {
-        await git.checkout(branch)
+        await checkout(repoPath, branch)
       }
 
       return true
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'git change branch',
-        message: JSON.stringify((err as GitResponseError).message)
+        message: JSON.stringify(err)
       } as LogModel)
       return false
     }
@@ -93,15 +94,13 @@ class Git {
 
   static pullBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
-      const git = Git._getGit(repoPath)
-
-      await git.pull()
+      await pull(repoPath)
 
       return true
     } catch (err) {
       parentWindow.webContents.send(Channels.Utilities.Log, cluster.id, {
         category: 'git pull branch',
-        message: JSON.stringify((err as GitResponseError).message)
+        message: JSON.stringify(err)
       } as LogModel)
       return false
     }
@@ -109,7 +108,7 @@ class Git {
 
   static pushBranch = async (parentWindow: BrowserWindow, cluster: ClusterModel, repoPath: string) => {
     try {
-      const git = Git._getGit(repoPath)
+      const git = await Git._getGit(repoPath)
 
       await git.push()
 
