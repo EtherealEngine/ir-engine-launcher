@@ -41,8 +41,19 @@ const ConfigsView = ({ localConfigs, onChange, sx }: Props) => {
     if (path) {
       // On windows we need to make sure its WSL folder.
       if (appSysInfo.osType === OSType.Windows) {
-        if (path.startsWith(Endpoints.Paths.WSL_PREFIX)) {
-          path = path.replace(Endpoints.Paths.WSL_PREFIX, '').replaceAll('\\', '/')
+        let wslPrefixPath: string = await window.electronAPI.invoke(Channels.Utilities.GetWSLPrefixPath)
+        // https://www.designcise.com/web/tutorial/how-to-remove-a-trailing-slash-from-a-string-in-javascript
+        wslPrefixPath = wslPrefixPath.endsWith('\\') ? wslPrefixPath.slice(0, -1) : wslPrefixPath
+
+        const wslDollarPrefixPath = wslPrefixPath.replace(
+          Endpoints.Paths.WSL_LOCALHOST_PREFIX,
+          Endpoints.Paths.WSL_$_PREFIX
+        )
+
+        if (path.startsWith(wslPrefixPath)) {
+          path = path.replace(wslPrefixPath, '').replaceAll('\\', '/')
+        } else if (path.startsWith(wslDollarPrefixPath)) {
+          path = path.replace(wslDollarPrefixPath, '').replaceAll('\\', '/')
         } else {
           enqueueSnackbar('Please select a folder in your WSL Ubuntu distribution.', { variant: 'error' })
           return

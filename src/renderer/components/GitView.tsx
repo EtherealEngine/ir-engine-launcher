@@ -1,4 +1,5 @@
 import Channels from 'constants/Channels'
+import Storage from 'constants/Storage'
 import { cloneCluster } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useConfigFileState } from 'renderer/services/ConfigFileService'
@@ -42,9 +43,17 @@ const GitView = ({ name, repoType, sx }: Props) => {
   let branches: string[] = []
   const gitData = currentDeployment.gitStatus[repoType].data
   if (gitData) {
-    const allowedBranches = ['dev', '/dev', 'master', '/master']
+    const showAllBranches = localStorage.getItem(Storage.SHOW_ALL_BRANCHES) ?? 'false'
 
-    branches = gitData.branches.filter((item) => allowedBranches.some((allowed) => item.endsWith(allowed)))
+    if (showAllBranches === 'true') {
+      branches = gitData.branches.map((item) => item) // Doing map here so that a clone is created rather than referencing original object
+    } else {
+      const allowedBranches = ['dev', '/dev', 'master', '/master']
+      branches = gitData.branches.filter((item) => allowedBranches.some((allowed) => item.endsWith(allowed)))
+    }
+
+    console.log(branches)
+    console.log(gitData.tags)
     branches.push(...gitData.tags)
 
     const current = gitData.current

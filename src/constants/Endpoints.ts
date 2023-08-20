@@ -11,6 +11,10 @@ const Endpoints = {
   DEFAULT_OPS_FOLDER: 'etherealengine-ops',
   Urls: {
     HOST: 'https://etherealengine.org',
+    CLIENT_HOST: 'https://local.etherealengine.org',
+    API_HOST: 'https://api-local.etherealengine.org',
+    INSTANCE_HOST: 'https://instanceserver-local.etherealengine.org',
+    FILE_HOST: 'https://localhost:8642',
     ADMIN_PORTAL: 'https://local.etherealengine.org/admin',
     LOGIN_PAGE: 'https://local.etherealengine.org/',
     LAUNCH_PAGE: (host: string) => `${host.startsWith('https') ? '' : 'https://'}${host}/location/apartment`,
@@ -45,14 +49,17 @@ const Endpoints = {
     VALIDATOR_TEMPLATE: 'rippled/config/validators.template.txt',
     RIPPLED_FILE: 'rippled/config/rippled.cfg',
     RIPPLED_TEMPLATE: 'rippled/config/rippled.template.cfg',
-    WSL_PREFIX: '\\\\wsl$\\Ubuntu',
+    WSL_LOCALHOST_PREFIX: '\\\\wsl.localhost',
+    WSL_$_PREFIX: '\\\\wsl$',
     FILE_SERVER: 'packages/server/upload'
   },
   Docs: {
     INSTALL_WSL:
-      'https://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl',
+      'https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl',
     INSTALL_DOCKER:
-      'https://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-docker-desktop'
+      'https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/microk8s_windows/#install-docker-desktop',
+    ACCEPT_INVALID_CERTS:
+      'https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/microk8s_linux#accept-invalid-certs'
   }
 }
 
