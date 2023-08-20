@@ -117,6 +117,15 @@ const theme = createTheme({
         //     }
       }
     },
+    MuiPopover: {
+      styleOverrides: {
+        paper: {
+          borderRadius: '4px',
+          background: 'var(--popupBackground)',
+          color: 'var(--textColor)'
+        }
+      }
+    },
     MuiDialog: {
       styleOverrides: {
         // paperWidthSm: {

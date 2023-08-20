@@ -14,6 +14,8 @@ import HotBar from './common/HotBar'
 import NavView from './common/NavView'
 import { defaultAction } from './common/NotistackActions'
 import AuthenticationDialog from './dialogs/AuthenticationDialog'
+import MokEnrollDialog from './dialogs/MokEnrollDialog'
+import MokRestartDialog from './dialogs/MokRestartDialog'
 import AdminPage from './pages/AdminPage'
 import ConfigPage from './pages/ConfigPage'
 import IPFSPage from './pages/IPFSPage'
@@ -33,6 +35,8 @@ const App = () => {
 
   const settingsState = useSettingsState()
   const { showAuthenticationDialog } = settingsState.value
+  const { mokEnrollCluster } = settingsState.value
+  const { mokRestartCluster } = settingsState.value
 
   const defaultMode = 'vaporwave' as ThemeMode
   const storedMode = localStorage.getItem(Storage.COLOR_MODE) as ThemeMode | undefined
@@ -107,6 +111,10 @@ const App = () => {
 
               {showAuthenticationDialog && (
                 <AuthenticationDialog onClose={() => SettingsService.setAuthenticationDialog(false)} />
+              )}
+              {mokEnrollCluster && <MokEnrollDialog onClose={() => SettingsService.setMokEnrollCluster(undefined)} />}
+              {mokRestartCluster && (
+                <MokRestartDialog onClose={() => SettingsService.setMokRestartCluster(undefined)} />
               )}
             </Box>
           </HashRouter>

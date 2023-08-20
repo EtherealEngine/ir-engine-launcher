@@ -1,7 +1,9 @@
+import Storage from 'constants/Storage'
 import UIEnabled from 'constants/UIEnabled'
 import { ClusterModel, ClusterType } from 'models/Cluster'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
+import AdditionalConfigsView from 'renderer/components/Setting/AdditionalConfigsView'
 import MicroK8sView from 'renderer/components/Setting/MicroK8sView'
 import { ConfigFileService, useConfigFileState } from 'renderer/services/ConfigFileService'
 import { DeploymentService } from 'renderer/services/DeploymentService'
@@ -26,6 +28,7 @@ import logo from '../../../assets/icon.svg'
 import ConfigsView from '../components/Config/ConfigsView'
 import VarsView from '../components/Config/VarsView'
 import BackupView from '../components/Setting/BackupView'
+import EngineView from '../components/Setting/EngineView'
 import MinikubeView from '../components/Setting/MinikubeView'
 
 interface Props {
@@ -44,6 +47,12 @@ const SettingsDialog = ({ onClose }: Props) => {
   const [tempConfigs, setTempConfigs] = useState({} as Record<string, string>)
   const [tempVars, setTempVars] = useState({} as Record<string, string>)
 
+  const showAllBranches = localStorage.getItem(Storage.SHOW_ALL_BRANCHES) as string | undefined
+  const defaultFlags = {
+    [Storage.SHOW_ALL_BRANCHES]: showAllBranches ? showAllBranches : 'false'
+  } as Record<string, string>
+  const [localFlags, setLocalFlags] = useState(defaultFlags)
+
   if (!selectedCluster) {
     enqueueSnackbar('Please select a cluster.', { variant: 'error' })
     onClose()
@@ -58,6 +67,12 @@ const SettingsDialog = ({ onClose }: Props) => {
   const localVars = {} as Record<string, string>
   for (const key in selectedCluster.variables) {
     localVars[key] = key in tempVars ? tempVars[key] : selectedCluster.variables[key]
+  }
+
+  const changeFlag = async (key: string, value: string) => {
+    const newFlags = { ...localFlags }
+    newFlags[key] = value
+    setLocalFlags(newFlags)
   }
 
   const changeConfig = async (key: string, value: string) => {
@@ -87,6 +102,8 @@ const SettingsDialog = ({ onClose }: Props) => {
       updatedCluster.variables[key] = tempVars[key]
     }
 
+    localStorage.setItem(Storage.SHOW_ALL_BRANCHES, localFlags[Storage.SHOW_ALL_BRANCHES])
+
     const saved = await ConfigFileService.insertOrUpdateConfig(updatedCluster)
     if (saved) {
       onClose()
@@ -114,6 +131,9 @@ const SettingsDialog = ({ onClose }: Props) => {
               {UIEnabled[selectedCluster.type].settings.variables && <Tab label="Variables" value="variables" />}
               {selectedCluster.type === ClusterType.Minikube && <Tab label="Minikube" value="minikube" />}
               {selectedCluster.type === ClusterType.MicroK8s && <Tab label="MicroK8s" value="microK8s" />}
+              {(selectedCluster.type === ClusterType.MicroK8s || selectedCluster.type === ClusterType.Minikube) && (
+                <Tab label="Engine" value="engine" />
+              )}
               <Tab label="Backup" value="backup" />
               <Tab label="About" value="about" />
             </Tabs>
@@ -125,6 +145,7 @@ const SettingsDialog = ({ onClose }: Props) => {
                     onChange={changeConfig}
                     sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
                   />
+                  <AdditionalConfigsView localFlags={localFlags} onChange={changeFlag} />
                 </TabPanel>
               )}
               {UIEnabled[selectedCluster.type].settings.variables && (
@@ -146,6 +167,9 @@ const SettingsDialog = ({ onClose }: Props) => {
                   <MicroK8sView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
                 </TabPanel>
               )}
+              <TabPanel value="engine">
+                <EngineView sx={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }} />
+              </TabPanel>
               <TabPanel value="backup">
                 <BackupView
                   hasPendingChanges={Object.keys(tempConfigs).length !== 0 || Object.keys(tempVars).length !== 0}
@@ -169,7 +193,12 @@ const SettingsDialog = ({ onClose }: Props) => {
         <Button onClick={onClose}>Cancel</Button>
         <Button
           type="submit"
-          disabled={loading || (Object.keys(tempConfigs).length === 0 && Object.keys(tempVars).length === 0)}
+          disabled={
+            loading ||
+            (Object.keys(tempConfigs).length === 0 &&
+              Object.keys(tempVars).length === 0 &&
+              JSON.stringify(defaultFlags) === JSON.stringify(localFlags))
+          }
           onClick={saveSettings}
         >
           Save

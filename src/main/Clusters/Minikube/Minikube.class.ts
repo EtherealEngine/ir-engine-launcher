@@ -88,6 +88,22 @@ class Minikube {
 
       const scriptsFolder = scriptsPath()
       const assetsFolder = assetsPath()
+
+      const checkMokScript = path.join(scriptsFolder, 'check-mok.sh')
+      log.info(`Executing script ${checkMokScript}`)
+
+      const onCheckMokStd = (data: any) => {
+        window.webContents.send(Channels.Utilities.Log, cluster.id, { category, message: data } as LogModel)
+      }
+      const mokCode = await execStreamScriptFile(checkMokScript, [`-p "${password}"`], onCheckMokStd, onCheckMokStd)
+
+      if (mokCode === 1) {
+        throw `Failed with error code ${mokCode}.`
+      } else if (mokCode === 2) {
+        window.webContents.send(Channels.Cluster.PromptSetupMok, cluster)
+        return
+      }
+
       const configureScript = path.join(scriptsFolder, 'configure-minikube-linux.sh')
       log.info(`Executing script ${configureScript}`)
 
@@ -113,7 +129,7 @@ class Minikube {
         throw `Failed with error code ${code}.`
       }
 
-      await startFileServer(window, cluster)
+      await startFileServer(window, cluster, password)
     } catch (err) {
       log.error('Error in configureCluster Minikube.', err)
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

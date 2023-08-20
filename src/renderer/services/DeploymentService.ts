@@ -1,5 +1,5 @@
 import { hookstate, none, useHookstate } from '@hookstate/core'
-import { decryptPassword, delay } from 'common/UtilitiesManager'
+import { delay } from 'common/UtilitiesManager'
 import Channels from 'constants/Channels'
 import Storage from 'constants/Storage'
 import { AppModel, DeploymentAppModel } from 'models/AppStatus'
@@ -195,23 +195,13 @@ export const DeploymentService = {
     const clonedCluster = cloneCluster(cluster)
 
     let appSysInfo = accessSettingsState().value.appSysInfo
-    let sudoPassword = accessSettingsState().value.sudoPassword
     const dispatch = useDispatch()
 
     try {
       let password: undefined | string = undefined
 
       if (appSysInfo.osType !== OSType.Windows) {
-        if (!sudoPassword) {
-          SettingsService.setAuthenticationDialog(true)
-
-          while (!sudoPassword) {
-            await delay(1000)
-            sudoPassword = accessSettingsState().value.sudoPassword
-          }
-        }
-
-        password = decryptPassword(sudoPassword)
+        password = await SettingsService.getDecryptedSudoPassword()
       }
 
       DeploymentService.fetchGitStatuses(clonedCluster)

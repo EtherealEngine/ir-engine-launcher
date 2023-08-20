@@ -17,7 +17,7 @@ https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-
 
 ## Getting Started
 
-You can find complete getting started guide [here](https://etherealengine.github.io/etherealengine-docs/docs/tutorials/ethereal_control_center/getting_started).
+You can find complete getting started guide [here](https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/tutorials/ethereal_control_center/getting_started/).
 
 Additionally, there are Control Center video tutorials which you can find [here](./TUTORIALS.md). Although some of them might be outdated.
 
@@ -94,7 +94,16 @@ cd "C:\Users\%USERNAME%\Downloads"
 "Docker Desktop Installer.exe" install --accept-license --installation-dir=C:\Docker
 ```
 
-### 4. Reporting an Issue
+### 4. Git status unavailable on Windows
+
+On Windows, if you are unable to see Git status after cluster configuration and getting following error in logs:
+
+```bash
+git configs - "fatal: detected dubious ownership in repository at <path to engine directory>\nTo add an exception for this directory, call:\n\n\tgit config --global --add safe.directory <path to engine directory>\n"
+```
+This is due to the app not having permissions to read the Git config file. To fix this, run Ethereal Engine Control Center as administrator.
+
+### 5. Reporting an Issue
 
 If you face an issue please report it to [Issues](https://github.com/canonical/microk8s/issues) or reach out to us on [Discord](https://discord.gg/xrf). Also please share following log files:
 

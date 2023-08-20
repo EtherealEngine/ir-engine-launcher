@@ -20,6 +20,8 @@ TAG=$7
 
 cd "$ENGINE_FOLDER" || exit
 
+RE_INIT=false
+
 export MYSQL_HOST=localhost
 export MYSQL_PORT=3304
 DB_STATUS=$(npx cross-env ts-node --swc scripts/check-db-exists-only.ts)
@@ -38,11 +40,19 @@ if [[ -d $PROJECTS_PATH ]]; then
 else
     echo "ethereal engine projects does not exists at $PROJECTS_PATH"
 
+    RE_INIT=true
+fi
+
+if [[ $RE_INIT == true || $FORCE_DB_REFRESH == 'true' ]]; then
     export MYSQL_HOST=localhost
-    export MYSQL_PORT=3306
+    export MYSQL_PORT=3305
+    
+    # Resetting test db and doing dev reinit to ensure project folders are seeded.
+    docker container stop etherealengine_test_db
+    docker container rm etherealengine_test_db
+    docker container prune --force
     npm run dev-docker
     npm run dev-reinit
-    npx ts-node --swc scripts/install-projects.js
 fi
 
 export MYSQL_HOST=localhost
@@ -134,11 +144,11 @@ if [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRES
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
 
-    helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == true ]] && [[ $DB_EXISTS == true ]]; then
     echo "Updating Ethereal Engine deployment without populating database"
 
-    helm upgrade --reuse-values --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
+    helm upgrade --reuse-values -f "$CONFIGS_FOLDER/$CLUSTER_ID-engine.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine
 elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REFRESH == 'true' ]]; then
     echo "Installing Ethereal Engine deployment with populating database"
 
@@ -160,7 +170,7 @@ elif [[ $ENGINE_INSTALLED == false ]] && [[ $DB_EXISTS == false || $FORCE_DB_REF
         fi
         echo "Waiting for API pod to be ready. API ready count: $apiCount"
     done
-    
+
     sleep 5
 
     helm upgrade --reuse-values -f "$OPS_FOLDER/configs/db-refresh-false.values.yaml" --set taskserver.image.tag="$TAG",api.image.tag="$TAG",instanceserver.image.tag="$TAG",testbot.image.tag="$TAG",client.image.tag="$TAG",testbot.image.tag="$TAG" local etherealengine/etherealengine

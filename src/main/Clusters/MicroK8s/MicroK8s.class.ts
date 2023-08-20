@@ -158,7 +158,7 @@ class MicroK8s {
         throw `Failed with error code ${code}.`
       }
 
-      await startFileServer(window, cluster)
+      await startFileServer(window, cluster, password)
     } catch (err) {
       log.error('Error in configureCluster MicroK8s.', err)
       window.webContents.send(Channels.Utilities.Log, cluster.id, {

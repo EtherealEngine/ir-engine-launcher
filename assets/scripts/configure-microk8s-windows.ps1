@@ -15,6 +15,7 @@ function checkExitCode() {
         exit $LastExitCode;
     }
 }
+
 function cleanseString($inputSt) { 
     $finalString = ''
     $inputString = $inputSt -join "`n" | Out-String
@@ -86,7 +87,7 @@ $wslStatus = cleanseString(wsl --status);
 Write-Host "WSL Status: `n$wslStatus";
 
 if ([string]::IsNullOrEmpty($wslStatus) -or $wslStatus -notlike '*: Ubuntu*') {
-    throw "Make sure WSL is installed and Ubuntu is selected as default distribution.`nhttps://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl";
+    throw "Make sure WSL is installed and Ubuntu is selected as default distribution.`nhttps://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/microk8s_windows/#install-windows-subsystem-for-linux-wsl";
     exit 1;
 }
 
@@ -96,7 +97,7 @@ $wslDockerVersion = cleanseString(wsl docker version);
 Write-Host "WSL Docker version: `n$wslDockerVersion";
 
 if ($dockerVersion -notlike '*Server: Docker Desktop*' -or $wslDockerVersion -notlike '*Server: Docker Desktop*') {
-    throw "Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.`nhttps://etherealengine.github.io/etherealengine-docs/docs/devops_deployment/microk8s_windows/#install-docker-desktop";
+    throw "Make sure Docker Desktop is installed and Ubuntu WSL Integration is enabled.`nhttps://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/microk8s_windows/#install-docker-desktop";
     exit 1;
 }
 
@@ -110,6 +111,12 @@ else {
     throw "You do not have WSL from the Windows Store.";
     exit 1;
 }
+
+#=======================
+# Verify Git for Windows
+#=======================
+
+& "$PSScriptRoot\check-git-windows.ps1";
 
 #==========
 # WSL Login
@@ -316,6 +323,38 @@ checkExitCode;
 wsl bash -ic "`"$SCRIPTS_FOLDER/check-engine-repo.sh`" `"$ENGINE_FOLDER`" `"$OPS_FOLDER`"";
 
 checkExitCode;
+
+#=========================
+# Ensure directory is safe
+#=========================
+
+Write-Host "Checking if repositories are marked as safe directories"
+
+$distro = cleanseString(wsl bash -ic 'echo $WSL_DISTRO_NAME');
+$distro = $distro.ToString().Trim();
+$isEngineSafe = $true
+$isOpsSafe = $true
+
+$engineStatusCommand = 'git -C "\\wsl.localhost\$distro$ENGINE_FOLDER" status';
+$opsStatusCommand = 'git -C "\\wsl.localhost\$distro$OPS_FOLDER" status';
+
+$engineOutput = Invoke-Expression "& $engineStatusCommand 2>&1";
+$opsOutput = Invoke-Expression "& $opsStatusCommand 2>&1";
+
+if ([String]$engineOutput -match "dubious ownership") {
+    $isEngineSafe = $false
+}
+
+if ([String]$opsOutput -match "dubious ownership") {
+    $isOpsSafe = $false
+}
+
+if (($isEngineSafe -eq $false) -or ($isOpsSafe -eq $false)) {
+    Write-Host "Marking repositories as safe directories"
+    Start-Process powershell -PassThru -Wait -verb runas -ArgumentList "-file $PSScriptRoot\set-git-safe-directory.ps1 -e '$ENGINE_FOLDER' -o '$OPS_FOLDER' -d '$distro' -es $isEngineSafe -os $isOpsSafe"
+}
+
+Write-Host "Repositories are marked as safe directories"
 
 #============================
 # Ensure DB and Redis Running
