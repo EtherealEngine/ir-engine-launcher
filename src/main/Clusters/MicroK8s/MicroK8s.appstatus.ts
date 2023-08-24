@@ -120,7 +120,7 @@ export const MicroK8sAppsStatus = (sudoPassword?: string): AppModel[] => {
       4,
       0,
       getAppModel('gitWindows', 'Git for Windows', 'git --version;', false),
-      getAppModel('gitWsl', 'Git for WSL', 'git --version;')
+      getAppModel('gitWsl', 'Git in WSL', 'git --version;')
     )
   } else {
     appStatus.splice(4, 0, getAppModel('git', 'Git', 'git --version;'))
