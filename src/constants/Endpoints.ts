@@ -3,7 +3,7 @@ const Endpoints = {
     'local.etherealengine.org', // Client
     'api-local.etherealengine.org', // API Server
     'instanceserver-local.etherealengine.org', // Instance Server
-    'localhost:8642', // File Server
+    'localhost:9000', // MinIO
     'localhost:10443' // Microk8s Dashboard
   ],
   MYSQL_PORT: 3304,
@@ -14,7 +14,7 @@ const Endpoints = {
     CLIENT_HOST: 'https://local.etherealengine.org',
     API_HOST: 'https://api-local.etherealengine.org',
     INSTANCE_HOST: 'https://instanceserver-local.etherealengine.org',
-    FILE_HOST: 'https://localhost:8642',
+    MINIO_HOST: 'https://localhost:9000',
     ADMIN_PORTAL: 'https://local.etherealengine.org/admin',
     LOGIN_PAGE: 'https://local.etherealengine.org/',
     LAUNCH_PAGE: (host: string) => `${host.startsWith('https') ? '' : 'https://'}${host}/location/apartment`,
