@@ -45,12 +45,16 @@ fi
 
 if [[ $RE_INIT == true || $FORCE_DB_REFRESH == 'true' ]]; then
     export MYSQL_HOST=localhost
-    export MYSQL_PORT=3305
+    export MYSQL_PORT=3304
     
-    # Resetting test db and doing dev reinit to ensure project folders are seeded.
-    docker container stop etherealengine_test_db
-    docker container rm etherealengine_test_db
-    docker container prune --force
+    if [[ $CLUSTER_TYPE == 'minikube' ]]; then
+        export STORAGE_S3_STATIC_RESOURCE_BUCKET=etherealengine-minikube-static-resources
+        export VITE_FILE_SERVER=https://localhost:9000/etherealengine-minikube-static-resources
+    else
+        export STORAGE_S3_STATIC_RESOURCE_BUCKET=etherealengine-microk8s-static-resources
+        export VITE_FILE_SERVER=https://localhost:9000/etherealengine-microk8s-static-resources
+    fi
+
     npm run dev-docker
     npm run dev-reinit
 fi
