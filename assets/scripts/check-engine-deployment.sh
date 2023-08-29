@@ -45,12 +45,8 @@ fi
 
 if [[ $RE_INIT == true || $FORCE_DB_REFRESH == 'true' ]]; then
     export MYSQL_HOST=localhost
-    export MYSQL_PORT=3305
+    export MYSQL_PORT=3304
     
-    # Resetting test db and doing dev reinit to ensure project folders are seeded.
-    docker container stop etherealengine_test_db
-    docker container rm etherealengine_test_db
-    docker container prune --force
     npm run dev-docker
     npm run dev-reinit
 fi
