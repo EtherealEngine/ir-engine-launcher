@@ -17,7 +17,7 @@ if helm status agones >/dev/null; then
 else
     echo "agones is not deployed"
 
-    helm install -f "$OPS_FOLDER/configs/agones-default-values.yaml" agones agones/agones
+    helm install -f "$OPS_FOLDER/configs/agones-default-values.yaml" agones agones/agones --version "1.33.0"
     sleep 20
 fi
 
