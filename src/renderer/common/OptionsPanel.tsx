@@ -235,8 +235,8 @@ const OptionsPanel = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', ml: 4, flexDirection: 'row', mt: 1 }}>
               <ArrowForwardIosIcon sx={{ fontSize: 14, mr: 1 }} />
               <Typography variant="body2">
-                <a style={{ color: 'var(--textColor)' }} href={Endpoints.Urls.FILE_HOST} target="_blank">
-                  File Server
+                <a style={{ color: 'var(--textColor)' }} href={Endpoints.Urls.MINIO_HOST} target="_blank">
+                  MinIO
                 </a>
               </Typography>
             </Box>

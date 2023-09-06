@@ -47,6 +47,14 @@ if [[ $RE_INIT == true || $FORCE_DB_REFRESH == 'true' ]]; then
     export MYSQL_HOST=localhost
     export MYSQL_PORT=3304
     
+    if [[ $CLUSTER_TYPE == 'minikube' ]]; then
+        export STORAGE_S3_STATIC_RESOURCE_BUCKET=etherealengine-minikube-static-resources
+        export VITE_FILE_SERVER=https://localhost:9000/etherealengine-minikube-static-resources
+    else
+        export STORAGE_S3_STATIC_RESOURCE_BUCKET=etherealengine-microk8s-static-resources
+        export VITE_FILE_SERVER=https://localhost:9000/etherealengine-microk8s-static-resources
+    fi
+
     npm run dev-docker
     npm run dev-reinit
 fi
