@@ -49,7 +49,7 @@ if $INSTALL_NODE; then
     NVM_VERSION=$(nvm --version)
     echo "nvm version is $NVM_VERSION"
 
-    nvm install node
+    nvm install --lts
     echo "node is installed"
 fi
 
