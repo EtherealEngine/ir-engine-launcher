@@ -133,27 +133,47 @@ if echo "$PASSWORD" | sudo -S microk8s status | grep -q 'microk8s is not running
 fi
 
 if $CONFIGURE_MICROK8S; then
+    echo "configuring microk8s"
+    
     echo "$PASSWORD" | sudo -S ufw allow in on cni0 && echo "$PASSWORD" | sudo -S ufw allow out on cni0
     echo "$PASSWORD" | sudo -S ufw default allow routed
+    echo "microk8s network routing configured"
 
     # To fix: IPtables FORWARD policy is DROP
     echo "$PASSWORD" | sudo -S iptables -P FORWARD ACCEPT
+    echo "microk8s iptables forwarding configured"
 
     # Start microk8s
     echo "$PASSWORD" | sudo -S microk8s start
+    echo "microk8s started"
 
     # Enable Addons
     echo "$PASSWORD" | sudo -S microk8s enable dashboard
+    echo "microk8s dashboard addon enabled"
+
     echo "$PASSWORD" | sudo -S microk8s enable dns
+    echo "microk8s dns addon enabled"
+
     echo "$PASSWORD" | sudo -S microk8s enable registry
+    echo "microk8s registry addon enabled"
+
     # Since below command can cause terminal to exit.
     set +e
     echo "$PASSWORD" | sudo -S microk8s enable host-access
+    echo "microk8s host-access addon enabled"
     set -e
+
     echo "$PASSWORD" | sudo -S microk8s enable ingress
+    echo "microk8s ingress addon enabled"
+
     echo "$PASSWORD" | sudo -S microk8s enable rbac
+    echo "microk8s rbac addon enabled"
+    
     echo "$PASSWORD" | sudo -S microk8s enable hostpath-storage
+    echo "microk8s hostpath-storage addon enabled"
+    
     echo "$PASSWORD" | sudo -S microk8s enable helm3
+    echo "microk8s helm3 addon enabled"
 
     sleep 30
 
