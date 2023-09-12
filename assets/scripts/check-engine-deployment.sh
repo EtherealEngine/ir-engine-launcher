@@ -33,20 +33,15 @@ elif [[ $DB_STATUS == *"database not found"* ]]; then
     echo "Existing database not populated"
 fi
 
-PROJECTS_PATH="$ENGINE_FOLDER/packages/projects/projects/"
-
-if [[ -d $PROJECTS_PATH ]]; then
-    echo "ethereal engine projects exists at $PROJECTS_PATH"
-else
-    echo "ethereal engine projects does not exists at $PROJECTS_PATH"
-
-    npx ts-node --swc scripts/install-projects.js
-
-    echo "ethereal engine projects installed at $PROJECTS_PATH"
-fi
-
 export MYSQL_HOST=localhost
 export MYSQL_PORT=3304
+
+# Running prepare-database so that database in populated else install-projects will no do its job..
+npm run prepare-database
+
+npx ts-node --swc scripts/install-projects.js
+
+# Running prepare-database again so that if a project has migrations that can be entertained.
 npm run prepare-database
 
 echo "Ethereal Engine docker images build starting"
