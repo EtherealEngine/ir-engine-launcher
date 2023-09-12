@@ -33,15 +33,32 @@ elif [[ $DB_STATUS == *"database not found"* ]]; then
     echo "Existing database not populated"
 fi
 
+PROJECTS_PATH="$ENGINE_FOLDER/packages/projects/projects/"
+
+if [[ -d $PROJECTS_PATH ]]; then
+    echo "ethereal engine projects exists at $PROJECTS_PATH"
+else
+    echo "ethereal engine projects does not exists at $PROJECTS_PATH"
+
+    RE_INIT=true
+fi
+
 export MYSQL_HOST=localhost
 export MYSQL_PORT=3304
 
-# Running prepare-database so that database in populated else install-projects will no do its job..
-npm run prepare-database
+if [[ $RE_INIT == true || $FORCE_DB_REFRESH == 'true' ]]; then
+    if [[ $CLUSTER_TYPE == 'minikube' ]]; then
+        export STORAGE_S3_STATIC_RESOURCE_BUCKET=etherealengine-minikube-static-resources
+        export VITE_FILE_SERVER=https://localhost:9000/etherealengine-minikube-static-resources
+    else
+        export STORAGE_S3_STATIC_RESOURCE_BUCKET=etherealengine-microk8s-static-resources
+        export VITE_FILE_SERVER=https://localhost:9000/etherealengine-microk8s-static-resources
+    fi
 
-npx ts-node --swc scripts/install-projects.js
+    npm run dev-docker
+    npm run dev-reinit
+fi
 
-# Running prepare-database again so that if a project has migrations that can be entertained.
 npm run prepare-database
 
 echo "Ethereal Engine docker images build starting"
