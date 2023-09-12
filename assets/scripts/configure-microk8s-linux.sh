@@ -159,6 +159,23 @@ bash "$SCRIPTS_FOLDER/check-docker-compose.sh" "$PASSWORD"
 
 checkExitCode
 
+#================================
+# Docker MicroK8s Registry access
+#================================
+
+if [[ -f "/etc/docker/daemon.json" ]]; then
+    echo "daemon.json file exists at /etc/docker/daemon.json"
+else
+    if [[ ! -d "/etc/docker" ]]; then
+        echo "$PASSWORD" | sudo -S mkdir "/etc/docker"
+    fi
+
+    echo "$PASSWORD" | sudo -S -- sh -c "echo '{\"insecure-registries\" : [\"localhost:32000\"]}' >>/etc/docker/daemon.json"
+    echo "daemon.json file created at /etc/docker/daemon.json"
+
+    echo "$PASSWORD" | sudo -S systemctl restart docker
+fi
+
 #============================
 # Ensure DB and Redis Running
 #============================
@@ -182,23 +199,6 @@ checkExitCode
 bash "$SCRIPTS_FOLDER/check-helm.sh" "$PASSWORD"
 
 checkExitCode
-
-#================================
-# Docker MicroK8s Registry access
-#================================
-
-if [[ -f "/etc/docker/daemon.json" ]]; then
-    echo "daemon.json file exists at /etc/docker/daemon.json"
-else
-    if [[ ! -d "/etc/docker" ]]; then
-        echo "$PASSWORD" | sudo -S mkdir "/etc/docker"
-    fi
-
-    echo "$PASSWORD" | sudo -S -- sh -c "echo '{\"insecure-registries\" : [\"localhost:32000\"]}' >>/etc/docker/daemon.json"
-    echo "daemon.json file created at /etc/docker/daemon.json"
-
-    echo "$PASSWORD" | sudo -S systemctl restart docker
-fi
 
 #================
 # Verify MicroK8s
