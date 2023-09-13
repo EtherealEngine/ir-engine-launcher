@@ -21,6 +21,7 @@ else
     echo "$PASSWORD" | sudo -S sh get-docker.sh
     rm ./get-docker.sh -f
 
+    # https://github.com/docker/compose/issues/10299#issuecomment-1438247730
     echo "$PASSWORD" | sudo -S usermod -aG docker $USER
 fi
 
