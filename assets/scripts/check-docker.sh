@@ -20,6 +20,8 @@ else
     curl -fsSL https://get.docker.com -o get-docker.sh
     echo "$PASSWORD" | sudo -S sh get-docker.sh
     rm ./get-docker.sh -f
+
+    echo "$PASSWORD" | sudo -S usermod -aG docker $USER
 fi
 
 DOCKER_VERSION=$(docker --version)
