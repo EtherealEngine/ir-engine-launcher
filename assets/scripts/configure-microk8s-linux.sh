@@ -38,6 +38,16 @@ if [[ -z $ASSETS_FOLDER || -z $CONFIGS_FOLDER || -z $FORCE_DB_REFRESH || -z $ENG
     exit 1
 fi
 
+echo "Starting Ethereal Engine configuration for MicroK8s"
+
+echo "Cluster ID: ${CLUSTER_ID}"
+echo "Force DB Refresh: ${FORCE_DB_REFRESH}"
+echo "Enable Ripple Stack: ${ENABLE_RIPPLE_STACK}"
+echo "Engine Folder: ${ENGINE_FOLDER}"
+echo "OPS Folder: ${OPS_FOLDER}"
+echo "Assets Folder: ${ASSETS_FOLDER}"
+echo "Configs Folder: ${CONFIGS_FOLDER}"
+
 #================================
 # Set script directory as current
 # Ref: https://stackoverflow.com/a/64168461/2077741
@@ -289,6 +299,6 @@ bash "$SCRIPTS_FOLDER/check-engine-deployment.sh" "$ENGINE_FOLDER" "$FORCE_DB_RE
 
 checkExitCode
 
-echo "All Done"
+echo "All Configurations Completed"
 
 exit 0

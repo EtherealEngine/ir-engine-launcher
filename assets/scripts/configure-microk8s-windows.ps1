@@ -79,6 +79,16 @@ if ([string]::IsNullOrEmpty($ASSETS_FOLDER) -or
     exit 1
 }
 
+Write-Host "Starting Ethereal Engine configuration for MicroK8s in WSL";
+
+Write-Host "Cluster ID: $CLUSTER_ID";
+Write-Host "Force DB Refresh: $FORCE_DB_REFRESH";
+Write-Host "Enable Ripple Stack: $ENABLE_RIPPLE_STACK";
+Write-Host "Engine Folder: $ENGINE_FOLDER";
+Write-Host "OPS Folder: $OPS_FOLDER";
+Write-Host "Configs Folder: $CONFIGS_FOLDER";
+Write-Host "Assets Folder: $ASSETS_FOLDER";
+
 #==============
 # Prerequisites
 #==============
@@ -406,6 +416,6 @@ wsl bash -ic "`"$SCRIPTS_FOLDER/check-engine-deployment.sh`" `"$ENGINE_FOLDER`" 
 
 checkExitCode;
 
-Write-Host "All Done";
+Write-Host "All Configurations Completed";
 
 exit 0;
