@@ -78,7 +78,7 @@ if ([string]::IsNullOrEmpty($ASSETS_FOLDER) -or
     [string]::IsNullOrEmpty($OPS_FOLDER) -or 
     [string]::IsNullOrEmpty($PASSWORD) -or 
     [string]::IsNullOrEmpty($ENABLE_RIPPLE_STACK) -or
-    [string]::IsNullOrEmpty($RUN_IN_DEVELOPMENT)) -or {
+    [string]::IsNullOrEmpty($RUN_IN_DEVELOPMENT)) {
     throw "Missing arguments"
     exit 1
 }
