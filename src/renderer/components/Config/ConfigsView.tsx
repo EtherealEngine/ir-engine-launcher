@@ -119,7 +119,7 @@ const ConfigsView = ({ localConfigs, onChange, sx }: Props) => {
         />
         <InfoTooltip ml={1} message="Folder of Ethereal Engine OPS source code." />
       </Box>
-      <FormControlLabel
+      {/* <FormControlLabel
         labelPlacement="start"
         label={
           <Box sx={{ display: 'flex', alignItems: 'top', flexDirection: 'row' }}>
@@ -131,7 +131,7 @@ const ConfigsView = ({ localConfigs, onChange, sx }: Props) => {
         control={<Switch checked={localConfigs[Storage.ENABLE_RIPPLE_STACK] === 'true'} sx={{ marginLeft: 4 }} />}
         value={localConfigs[Storage.ENABLE_RIPPLE_STACK] === 'true'}
         onChange={(_event, checked) => onChange(Storage.ENABLE_RIPPLE_STACK, checked ? 'true' : 'false')}
-      />
+      /> */}
     </Box>
   )
 }
