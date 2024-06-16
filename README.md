@@ -1,29 +1,29 @@
-# Ethereal Engine Control Center
+# Infinite Reality Engine Launcher
 
-Want to build the spatial web on your website? Looking for a place to start? Run a web metaverse cluster yourself on your own computer.
+Want to build the spatial web on your website? Looking for a place to start? Run a web metaverse on your own computer.
 
-**The Ethereal Engine Control Center is a self-contained Metaverse world in a box.** 
-Take what you need or launch the full stack.  Ethereal Engine Control Center is a desktop app to manage a metaverse cluster.
+**The Infinite Reality Engine Launcher is a self-contained Metaverse world in a box.** 
+Take what you need or launch the full stack. iR Engine Launcher is a desktop app to manage a metaverse cluster.
 
 We know it's been complicated to build with #EtherealEngine and we've made this tool to give the community easy access to the engine for development and creation. The full Kubernetes cluster can run on Windows and any Debian Linux distro with at least 16 GB of ram.
 
 We would love to see your creations and invite you all to come build with us. We've got a long backlog and need your help to build the Open Metaverse. Come build with us!
 
-### [DOWNLOAD HERE](https://github.com/etherealengine/etherealengine-control-center/releases)
+### [DOWNLOAD HERE](https://github.com/etherealengine/ir-engine-launcher/releases)
 
 https://user-images.githubusercontent.com/10975502/168554732-86a202b6-053c-4588-8153-cd2c9c2771d5.mp4
 
-### [DOWNLOAD HERE](https://github.com/etherealengine/etherealengine-control-center/releases)
+### [DOWNLOAD HERE](https://github.com/etherealengine/ir-engine-launcher/releases)
 
 ## Getting Started
 
 You can find complete getting started guide [here](https://etherealengine.github.io/etherealengine-docs/docs/host/devops_deployment/tutorials/ethereal_control_center/getting_started/).
 
-Additionally, there are Control Center video tutorials which you can find [here](./TUTORIALS.md). Although some of them might be outdated.
+Additionally, there are iR Engine Launcher video tutorials which you can find [here](./TUTORIALS.md). Although some of them might be outdated.
 
 ## Install Released
 
-[Download latest version of Ethereal Engine control center app from here](https://github.com/etherealengine/etherealengine-control-center/releases).
+[Download latest version of the iR Engine Launcher app from here](https://github.com/etherealengine/etherealengine-control-center/releases).
 
 1. (Windows) Directly download the .exe file.
 2. (Linux) For AppImage: Once downloaded, right click and go to **Properties**. In **Permissions** tab check 'Allow executing file as program'.
@@ -101,7 +101,7 @@ On Windows, if you are unable to see Git status after cluster configuration and 
 ```bash
 git configs - "fatal: detected dubious ownership in repository at <path to engine directory>\nTo add an exception for this directory, call:\n\n\tgit config --global --add safe.directory <path to engine directory>\n"
 ```
-This is due to the app not having permissions to read the Git config file. To fix this, run Ethereal Engine Control Center as administrator.
+This is due to the app not having permissions to read the Git config file. To fix this, run the iR Engine Launcher as administrator.
 
 ### 5. Reporting an Issue
 
@@ -120,11 +120,11 @@ If you face an issue please report it to [Issues](https://github.com/canonical/m
 
 Clone this repository:
 ```bash
-git clone https://github.com/etherealengine/etherealengine-control-center.git ethereal-control-center
+git clone https://github.com/etherealengine/ir-engine-launcher.git ir-engine-launcher
 ```
 Go inside the folder:
 ```bash
-cd ethereal-control-center
+cd ir-engine-launcher
 ```
 Install the dependencies:
 ```bash
@@ -156,7 +156,7 @@ We are always hiring talented people who want to be leaders in what is to come. 
 ### [Join our Discord](https://discord.gg/xrf)  [![Discord Chat](https://img.shields.io/discord/692672143053422678.svg)](https://discord.gg/xrf)
 
 **Your own sandbox in the Metaverse. Take what you need, or launch the full stack.
-Ethereal Engine Control Center is a desktop app for managing Ethereal Engine cluster.**
+iR Engine Launcher is a desktop app for managing an iR Engine cluster.**
 
 Electron based Ethereal Engine Server Cluster Creator app
 
