@@ -1,12 +1,18 @@
-import { hookstate, none, useHookstate } from '@hookstate/core'
 import Channels from 'constants/Channels'
 import { AdditionalLogModel, LogModel } from 'models/Log'
 import { openPathAction } from 'renderer/common/NotistackActions'
 
+import {
+  defineState,
+  getMutableState,
+  none,
+  useMutableState
+} from '@etherealengine/hyperflux'
+
 import { store, useDispatch } from '../store'
 import { accessSettingsState } from './SettingsService'
 
-type LogState = {
+type LogStateType = {
   clusterId: string
   isSaving: boolean
   logs: LogModel[]
@@ -15,9 +21,13 @@ type LogState = {
 }
 
 //State
-const state = hookstate<LogState[]>([])
+const LogState = defineState({
+  name: 'ir-launcher.LogState',
+  initial: [] as LogStateType[]
+})
 
 store.receptors.push((action: LogActionType): void => {
+  const state = getMutableState(LogState)
   switch (action.type) {
     case 'SET_IS_SAVING': {
       const index = state.findIndex((item) => item.clusterId.value === action.clusterId)
@@ -35,7 +45,7 @@ store.receptors.push((action: LogActionType): void => {
             isSaving: false,
             logs: [],
             additionalLogs: []
-          } as LogState
+          }
         ])
       }
       break
@@ -108,9 +118,9 @@ store.receptors.push((action: LogActionType): void => {
   }
 })
 
-export const accessLogState = () => state
+export const accessLogState = () => getMutableState(LogState)
 
-export const useLogState = () => useHookstate(state) as any as typeof state
+export const useLogState = () => useMutableState(LogState)
 
 //Service
 export const LogService = {

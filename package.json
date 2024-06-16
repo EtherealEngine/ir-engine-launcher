@@ -151,7 +151,8 @@
   "dependencies": {
     "@emotion/react": "^11.8.2",
     "@emotion/styled": "^11.8.1",
-    "@hookstate/core": "4.0.0-rc21",
+    "@etherealengine/hyperflux": "https://gitpkg.now.sh/etherealengine/etherealengine/packages/hyperflux?7dfaab9ec7789ffe8fc1b0fbe5bad75043e666f",
+    "@hookstate/core": "npm:@speigg/hookstate@4.0.1-fix-111-106.2",
     "@mui/icons-material": "^5.5.1",
     "@mui/lab": "^5.0.0-alpha.77",
     "@mui/material": "^5.5.1",
