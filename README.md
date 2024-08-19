@@ -1,3 +1,7 @@
+# Ethereal Engine is now Infinite Reality Engine and has been moved!
+
+## You can find the project now at https://github.com/ir-engine/ir-engine-launcher
+
 # Infinite Reality Engine Launcher
 
 Want to build the spatial web on your website? Looking for a place to start? Run a web metaverse on your own computer.
